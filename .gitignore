@@ -1,0 +1,7 @@
+node_modules
+*.code-workspace
+dist
+build
+.vscode
+.idea
+.history

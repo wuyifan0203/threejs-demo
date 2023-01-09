@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #head{
+            color: aliceblue;
+            position: absolute;
+            top:30px;
+            padding-left: 20px ;
+        }
+    </style>
+</head>
+<body>
+   <div id="head">
+    material:
+    <select id="material">
+        <option value="basic">MeshBasicMaterial</option>
+        <option value="lambert">MeshLambertMaterial</option>
+        <option value="matcap">MeshMatcapMaterial</option>
+        <option value="phong">MeshPhongMaterial</option>
+        <option value="physical">MeshPhysicalMaterial</option>
+    </select>
+light:
+    <select id="light">
+        <option value="directional">DirectionalLight</option>
+        <option value="point">PointLight</option>
+        <option value="spot">SpotLight</option>
+        <option value="rectArea">RectAreaLight</option>
+    </select>
+   </div>
+
+    <div id="webgl-output"></div>
+    <script src="./index.js" type="module"></script>
+</body>
+</html>

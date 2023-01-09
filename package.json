@@ -1,0 +1,11 @@
+{
+  "name": "yes",
+  "version": "yes",
+  "description": "this is a demo which was written when I learn threejs",
+  "main": "no",
+  "author": "Yifan Wu",
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.148.0"
+  }
+}
