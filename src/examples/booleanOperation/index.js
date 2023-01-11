@@ -11,6 +11,7 @@ import {
     MeshNormalMaterial,
     SphereGeometry,
     BoxGeometry,
+    Matrix4
   } from "../../lib/three/three.module.js";
   import {
     initRenderer,
@@ -22,7 +23,7 @@ import {
   import { OrbitControls } from "../../lib/three/OrbitControls.js";
   import { ViewHelper } from "../../lib/three/viewHelper.js";
   import dat from '../../lib/util/dat.gui.js';
-  import {ThreeBSP} from '../../lib/other/ThreeBSP.js'
+  import {CSG} from '../../lib/other/CSGMesh.js'
 
 
   
@@ -70,9 +71,9 @@ import {
 
     sphere1Mesh.position.set(-6,0,0)
     sphere2Mesh.position.set(4,0,0)
-    scene.add(sphere1Mesh,sphere2Mesh,boxMesh);
+    // scene.add(sphere1Mesh,sphere2Mesh,boxMesh);
 
-    console.log(sphere1.getFace());
+    // console.log(sphere1.getFace());
 
     // 胎死腹中 ThreeBSP 代码太远古了。使用了Geometry， Face3等远古类
     // 试图改写但失败了
@@ -81,6 +82,14 @@ import {
     // const sphere2MeshBSP = new ThreeBSP(sphere2Mesh);
     // const boxMeshBSP = new ThreeBSP(boxMesh);
 
+    const sphere1CSG = CSG.fromMesh(sphere1Mesh);
+    const sphere2CSG = CSG.fromMesh(sphere2Mesh);
+    const boxMeshCSG = CSG.fromMesh(boxMesh);
+
+    const finalCSG = boxMeshCSG.intersect(sphere2CSG);
+    const finalMesh = CSG.toMesh(finalCSG, new Matrix4())
+    finalMesh.material = material
+    scene.add(finalMesh)
 
 
     //// GUI
