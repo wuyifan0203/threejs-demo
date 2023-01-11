@@ -1,15 +1,16 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-10 19:22:58
+ * @LastEditTime: 2023-01-11 15:14:48
  * @FilePath: /threejs-demo/src/examples/use dat.GUI/index.js
  */
 import {
   Vector3,
   Scene,
   Mesh,
-  MeshNormalMaterial,
   MeshBasicMaterial,
+  SphereGeometry,
+  Color
 } from "../../lib/three/three.module.js";
 import {
   initRenderer,
@@ -55,7 +56,13 @@ function init() {
 
 function draw(scene) {
   const material = new MeshBasicMaterial();
-  const mesh = new Mesh();
+  const sphereGeometry = new SphereGeometry(5,32,32)
+  const mesh = new Mesh(sphereGeometry,material);
+
+  const position = sphereGeometry.getAttribute('position')
+  console.log(sphereGeometry.getFace());
+
+  scene.add(mesh)
 
   const controls = {
     test: material.color.getStyle(),
@@ -65,7 +72,15 @@ function draw(scene) {
     update:function (param){
       console.log(param);
     },
-    material
+    material,
+    mesh,
+    redraw(){
+      if(mesh) scene.remove(controls.mesh);
+      const newMesh = new Mesh(sphereGeometry,material);
+      controls.mesh = newMesh;
+      scene.add(newMesh);
+      newMesh.scale.set(controls.scaleX,mesh.scale.y,mesh.scale.z)
+    }
   };
 
   // 创建 gui 对象
@@ -89,7 +104,9 @@ function draw(scene) {
   folder.open();
 
   // 文件夹添加颜色选择控件
-  folder.addColor(controls, "test");
+  folder.addColor(controls, "test").onChange(e=>{
+    material.color.set(new Color(controls.test))
+  });
 
   //  add(控件对象变量名，对象属性名，其它参数),会返回一个controller 对象
   // 不同的参数对应不同的控件
@@ -110,11 +127,7 @@ function draw(scene) {
 
   // 控件添加事件
   slider.onChange(e=>{
-    console.log(e);
+    controls.redraw();
   })
-
-  const materialFolder =  gui.addFolder('Material');
-  materialFolder.add(controls,'material');
-  addMaterialGUI(gui,controls,material)
-
+  addMaterialGUI(gui,controls,material);
 }

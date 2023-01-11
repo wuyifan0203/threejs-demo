@@ -1,48 +1,42 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-11 16:59:50
- * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
+ * @LastEditTime: 2023-01-11 17:02:02
+ * @FilePath: /threejs-demo/src/examples/oldThreejs/index.js
+ * @Text：为了调研布尔运算，研究Geometry而建
  */
 import {
-    Vector3,
     Scene,
     Mesh,
     MeshNormalMaterial,
     SphereGeometry,
     BoxGeometry,
-  } from "../../lib/three/three.module.js";
-  import {
-    initRenderer,
-    initPerspectiveCamera,
-    createAxesHelper,
-    initCustomGrid,
-    resize
-  } from "../../lib/tools/index.js";
+    WebGLRenderer,
+    PerspectiveCamera
+  } from "./three.module.js";
+  import dat from "../../lib/util/dat.gui.js";
   import { OrbitControls } from "../../lib/three/OrbitControls.js";
   import { ViewHelper } from "../../lib/three/viewHelper.js";
-  import dat from '../../lib/util/dat.gui.js';
-  import {ThreeBSP} from '../../lib/other/ThreeBSP.js'
-
-
+  import {
+    resize
+  } from "../../lib/tools/index.js";
   
   window.onload = function () {
     init();
   };
   
   function init() {
-    const renderer = initRenderer();
-    const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
+    const renderer = new WebGLRenderer()
+    const camera = new PerspectiveCamera(75,window.innerHeight/window.innerWidth,0.1,10000)
     const scene = new Scene();
     renderer.setClearColor(0xffffff);
     renderer.autoClear = false;
     camera.up.set(0, 0, 1);
-    resize(renderer,camera)
-    initCustomGrid(scene,100,100);
-    createAxesHelper(scene);
-  
+    resize(renderer,camera);
+
     const controls = new OrbitControls(camera, renderer.domElement);
     const viewHelper = new ViewHelper(camera, renderer.domElement);
+
    
     draw(scene);
   
@@ -72,14 +66,7 @@ import {
     sphere2Mesh.position.set(4,0,0)
     scene.add(sphere1Mesh,sphere2Mesh,boxMesh);
 
-    console.log(sphere1.getFace());
-
-    // 胎死腹中 ThreeBSP 代码太远古了。使用了Geometry， Face3等远古类
-    // 试图改写但失败了
-
-    // const sphere1BSP = new ThreeBSP(sphere1Mesh);
-    // const sphere2MeshBSP = new ThreeBSP(sphere2Mesh);
-    // const boxMeshBSP = new ThreeBSP(boxMesh);
+    console.log(scene);
 
 
 

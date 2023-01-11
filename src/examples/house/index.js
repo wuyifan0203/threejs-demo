@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-01-09 14:37:51
+ * @LastEditors: wuyifan wuyifan@max-optics.com
+ * @LastEditTime: 2023-01-11 17:06:32
+ * @FilePath: /threejs-demo/src/examples/house/index.js
+ */
 import {
     Scene,
     Mesh,
