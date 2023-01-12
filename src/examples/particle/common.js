@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-11 18:32:50
- * @FilePath: /threejs-demo/src/examples/particle/index.js
+ * @LastEditTime: 2023-01-12 17:18:17
+ * @FilePath: /threejs-demo/src/examples/particle/common.js
  */
 import {
   Scene,
@@ -26,19 +26,20 @@ import { OrbitControls } from "../../lib/three/OrbitControls.js";
 import { ViewHelper } from "../../lib/three/viewHelper.js";
 import { initRenderer, resize } from "../../lib/tools/index.js";
 import datGui from "../../lib/util/dat.gui.js";
-(function () {
+
+import {Stats} from '../../lib/util/Stats.js'
+window.onload = () => {
   init();
-})();
+};
 
 function init() {
   const renderer = initRenderer();
+
+  const stats = new Stats();
+  stats.showPanel(0);
+  document.getElementById('webgl-output').append(stats.dom)
   renderer.autoClear = false;
-  const camera = new PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    1000
-  );
+  const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1,10000000);
   camera.position.set(3, 3, 63);
   camera.lookAt(10, 0, 0);
   const scene = new Scene();
@@ -52,11 +53,13 @@ function init() {
 
   render();
   function render() {
+    stats.begin()
     controls.update();
     requestAnimationFrame(render);
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
+    stats.end()
   }
 
   window.camera = camera;
@@ -69,16 +72,15 @@ function draw(scene) {
     row: 30,
     col: 20,
     drawFunc: createParticlesBySprite,
+    color:'#ffffff'
   };
   createParticlesBySprite();
-  gui.add(controls, "row", 1, 100, 1).onChange(e=>{change(scene)});
-  gui.add(controls, "col", 1, 100, 1).onChange(e=>{change(scene)});
+  gui.add(controls, "row", 1, 500, 1).onChange((e) => {change(scene);});
+  gui.add(controls, "col", 1, 500, 1).onChange((e) => {change(scene);});
   gui.add(controls, "drawFunc", {
-    Sprite: createParticlesBySprite,
-    Points: createParticlesByPoints,
-  }).onChange(e=>{
-    change(scene)
-  });
+      Sprite: createParticlesBySprite,
+      Points: createParticlesByPoints,
+  }).onChange((e) => {change(scene);});
 
   function createParticlesBySprite() {
     const hx = controls.row / 2;
@@ -122,21 +124,19 @@ function draw(scene) {
   }
 
   function change(scene) {
-    scene.children.forEach(obj3d=>{
-        scene.remove(obj3d);
-        obj3d.parent = null;
-        if(obj3d.material){
-            obj3d.material.dispose();
-        }
-        if(obj3d.geometry){
-            obj3d.geometry.dispose();
-        }
-        console.log('remove');
-    })
-
-    console.log(scene.children);
+    for (let i = 0; i < scene.children.length; i++) {
+      const obj = scene.children[i];
+      obj.parent = null;
+      if (obj.material) {
+        obj.material.dispose();
+      }
+      if (obj.geometry) {
+        obj.geometry.dispose();
+      }
+    }
+    scene.children.length = 0;
 
     const F = eval("(" + controls.drawFunc + ")");
-    // F(scene);
+    F(scene);
   }
 }

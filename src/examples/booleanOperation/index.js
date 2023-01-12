@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-12 14:27:07
+ * @LastEditTime: 2023-01-12 17:20:33
  * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
  */
 import {
@@ -102,16 +102,9 @@ import {
       },
       // function
       redraw(){
-        if(this.sphere1Mesh) scene.remove(this.sphere1Mesh);
-        if(this.sphere2Mesh) scene.remove(this.sphere2Mesh);
-        if(this.boxMesh) scene.remove(this.boxMesh);
-        this.sphere1Mesh = new Mesh(sphere1,material);
-        this.sphere2Mesh = new Mesh(sphere2,material);
-        this.boxMesh = new Mesh(box,material);
-        scene.add(this.sphere1Mesh,this.boxMesh,this.sphere2Mesh);
-        this.sphere1Mesh.position.set(this.sphere1.positionX,this.sphere1.positionY,this.sphere1.positionZ);
-        this.sphere2Mesh.position.set(this.sphere2.positionX,this.sphere2.positionY,this.sphere2.positionZ);
-        this.boxMesh.position.set(this.box.positionX,this.box.positionY,this.box.positionZ);
+        sphere1Mesh.position.set(this.sphere1.positionX,this.sphere1.positionY,this.sphere1.positionZ);
+        sphere2Mesh.position.set(this.sphere2.positionX,this.sphere2.positionY,this.sphere2.positionZ);
+        boxMesh.position.set(this.box.positionX,this.box.positionY,this.box.positionZ);
         const func1 = this.sphere1.operationWithBox;
         const func2 = this.sphere2.operationWithBox;
         func1 !== 'none' && this[func1]('sphere1');

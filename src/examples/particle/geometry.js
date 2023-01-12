@@ -1,0 +1,155 @@
+/*
+ * @Date: 2023-01-09 14:37:51
+ * @LastEditors: wuyifan wuyifan@max-optics.com
+ * @LastEditTime: 2023-01-12 18:21:23
+ * @FilePath: /threejs-demo/src/examples/particle/geometry.js
+ */
+import {
+    Scene,
+    SphereGeometry,
+    TextureLoader,
+    PerspectiveCamera,
+    BufferGeometry,
+    PointsMaterial,
+    AdditiveBlending,
+    Points,
+    Texture,
+  } from "../../lib/three/three.module.js";
+  import { OrbitControls } from "../../lib/three/OrbitControls.js";
+  import { ViewHelper } from "../../lib/three/viewHelper.js";
+  import { initRenderer, resize,angle2Radians } from "../../lib/tools/index.js";
+  import datGui from "../../lib/util/dat.gui.js";
+  
+  import {Stats} from '../../lib/util/Stats.js'
+  window.onload = () => {
+    init();
+  };
+
+let autoScale = false;
+var s = 0
+var last = Date.now(); // Last time that this function was called
+function animate(angle) {
+    var now = Date.now();   // Calculate the elapsed time
+    var elapsed = now - last;
+    last = now;
+    var newAngle = angle + (ANGLE_STEP * elapsed) / 1000.0;
+    return newAngle % 360;
+}
+var ANGLE_STEP = 100.0; // Rotation angle (degrees/second)
+  
+  function init() {
+    const renderer = initRenderer();
+  
+    const stats = new Stats();
+    stats.showPanel(0);
+    document.getElementById('webgl-output').append(stats.dom)
+    renderer.autoClear = false;
+    const camera = new PerspectiveCamera(75,window.innerWidth / window.innerHeight,0.1,10000);
+    camera.position.set(3, 3, 63);
+    camera.lookAt(10, 0, 0);
+    const scene = new Scene();
+    renderer.setClearColor(0x000000);
+  
+    const controls = new OrbitControls(camera, renderer.domElement);
+    const viewHelper = new ViewHelper(camera, renderer.domElement);
+    const {mesh} = draw(scene,renderer);
+    resize(renderer, camera);
+  
+    render();
+    function render() {
+      stats.begin()
+      controls.update();
+      renderer.clear();
+      renderer.render(scene, camera);
+      viewHelper.render(renderer);
+      if(autoScale){
+        s = animate(s);
+        const scale = Math.sin(angle2Radians(s));
+        mesh.scale.set(scale,scale,scale);
+      }
+      stats.end()
+      requestAnimationFrame(render);
+    }
+  
+    window.camera = camera;
+    window.scene = scene;
+  }
+  
+  function draw(scene,renderer) {
+    const canvas = createCanvasTexture();
+    
+    const material = new PointsMaterial({
+        size: 3,
+        color: 0xffffff,
+        map:canvas,
+        depthTest: true,
+        depthWrite: false,
+        transparent: true,
+        blending:AdditiveBlending
+    });
+    const geometry = new SphereGeometry(16,16,16);
+    const mesh = new Points(geometry, material);
+    scene.add(mesh);
+
+
+
+    const controls = {
+        radius:16,
+        widthSegments:16,
+        heightSegments:16,
+        background:'#000000',
+        size:material.size,
+        autoScale
+     };
+
+    function createCanvasTexture(){
+        const canvas = document.createElement('canvas');
+        canvas.width = 20;
+        canvas.height = 20;
+        const context = canvas.getContext('2d');
+        const gradient = context.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+        gradient.addColorStop(0.2, 'rgba(0, 255, 0, 1)');
+        gradient.addColorStop(0.4, 'rgba(0, 120, 20, 1)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        const texture = new Texture(canvas);
+        texture.needsUpdate = true;
+        return texture;
+    }
+
+    // GUI
+
+    const gui = new datGui.GUI();
+    const geometryFolder =  gui.addFolder('Geometry');
+    geometryFolder.open();
+    geometryFolder.add(controls, "radius", 1, 64, 0.1).onChange((e) => {
+        updateGeometry()
+    });
+    geometryFolder.add(controls, "widthSegments", 1, 64, 1).onChange((e) => {
+        updateGeometry()
+    });
+    geometryFolder.add(controls, "heightSegments", 1, 64, 1).onChange((e) => {
+        updateGeometry()
+    });
+    const materialFolder = gui.addFolder('Material');
+    materialFolder.open();
+    materialFolder.add(controls,'size',1,30,0.1).onChange(e=>{
+        material.size = e;
+    })
+    gui.addColor(controls,'background').onChange(e=>{
+        renderer.setClearColor(e)
+    })
+    gui.add(controls,'autoScale').onChange(e=>{
+        autoScale = e;
+    })
+
+    function updateGeometry(){
+        mesh.geometry.dispose();
+        mesh.geometry = new SphereGeometry(controls.radius,controls.widthSegments,controls.heightSegments);
+    }
+
+    return {mesh};
+  }
+  

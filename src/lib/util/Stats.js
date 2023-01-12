@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Stats = function () {
+export var Stats = function () {
 
 	var mode = 0;
 
