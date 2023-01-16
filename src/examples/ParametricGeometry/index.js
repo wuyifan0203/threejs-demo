@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-10 16:30:17
+ * @LastEditTime: 2023-01-14 11:18:06
  * @FilePath: /threejs-demo/src/examples/ParametricGeometry/index.js
  */
 import {
@@ -163,7 +163,7 @@ var funcList = {
 };
 
 function draw(scene) {
-  const parametric = new ParametricGeometry(funcList.RadialWave, 50, 50);
+  const parametric = new ParametricGeometry(funcList.Custom2, 50, 50);
   const material = new MeshNormalMaterial({
     depthTest: true,
     side: 2,
