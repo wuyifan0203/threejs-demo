@@ -32,9 +32,9 @@ function initRenderer() {
 }
 
 function initPerspectiveCamera(initialPosition) {
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  var camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000000);
+  const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
@@ -45,9 +45,9 @@ function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  var camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 100000);
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 100000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 

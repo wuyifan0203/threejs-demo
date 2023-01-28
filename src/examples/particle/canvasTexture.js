@@ -1,25 +1,16 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-28 16:55:02
+ * @LastEditTime: 2023-01-28 17:06:45
  * @FilePath: /threejs-demo/src/examples/particle/canvasTexture.js
  */
 import {
     Scene,
-    Mesh,
-    MeshBasicMaterial,
-    SphereBufferGeometry,
     TextureLoader,
-    BackSide,
     PerspectiveCamera,
-    Sprite,
-    SpriteMaterial,
-    Raycaster,
-    Vector2,
     BufferGeometry,
     PointsMaterial,
     Float32BufferAttribute,
-    Color,
     Points,
     CanvasTexture,
   } from "../../lib/three/three.module.js";
