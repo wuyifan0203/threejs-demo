@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-11 17:06:32
+ * @LastEditTime: 2023-01-28 16:57:41
  * @FilePath: /threejs-demo/src/examples/house/index.js
  */
 import {
@@ -23,14 +23,14 @@ import {
     initRenderer,
 } from '../../lib/tools/index.js';
 
-var basePath = '../../resources/texture/'
+var basePath = '../../resources/texture/house/'
 var url = {
     livingRoom: basePath + 'livingRoom.jpg',
     livingRoom2: basePath + 'livingRoom2.jpg',
     masterBedroom: basePath + 'masterBedroom.jpg',
     guestBedroom: basePath + 'guestRoom.jpg',
     toilet: basePath + 'toilet.jpg',
-    arrow: basePath + 'arrow.jpg'
+    arrow: '../../resources/texture/others/' + 'arrow.jpg'
 };
 
 var loader = new TextureLoader();

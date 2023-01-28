@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-12 17:17:14
+ * @LastEditTime: 2023-01-28 16:55:02
  * @FilePath: /threejs-demo/src/examples/particle/canvasTexture.js
  */
 import {
@@ -131,7 +131,7 @@ import {
     }
 
     function createImageTexture() {
-        const url = '../../resources/texture/heart.png'
+        const url = '../../resources/texture/others/heart.png'
         const loader = new TextureLoader();
        return loader.load(url)
     }
