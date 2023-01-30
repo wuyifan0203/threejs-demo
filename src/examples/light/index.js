@@ -4,7 +4,7 @@ import {
   initOrthographicCamera,
   createAxesHelper,
   addLargeGroundPlane,
-  resize
+  resize,
 } from '../../lib/tools/index.js';
 import {
   Scene,
@@ -23,7 +23,7 @@ import {
   DirectionalLightHelper,
   AmbientLight,
   PointLightHelper,
-  SpotLightHelper
+  SpotLightHelper,
 
 } from '../../lib/three/three.module.js';
 
@@ -32,7 +32,7 @@ const params = {
   opacity: 1,
   depthTest: true,
   depthWrite: true,
-  alphaTest: 0
+  alphaTest: 0,
 };
 
 const materialList = {
@@ -40,7 +40,7 @@ const materialList = {
   lambert: new MeshLambertMaterial(params),
   matcap: new MeshMatcapMaterial(params),
   phong: new MeshPhongMaterial(params),
-  physical: new MeshPhysicalMaterial(params)
+  physical: new MeshPhysicalMaterial(params),
 };
 
 const directionalLight = new DirectionalLight();
@@ -51,20 +51,20 @@ const rectAreaLight = new RectAreaLight();
 const lightList = {
   directional: {
     light: directionalLight,
-    helper: new DirectionalLightHelper(directionalLight, 5)
+    helper: new DirectionalLightHelper(directionalLight, 5),
   },
   point: {
     light: pointLight,
-    helper: new PointLightHelper(pointLight, 1)
+    helper: new PointLightHelper(pointLight, 1),
   },
   spot: {
     light: spotLight,
-    helper: new SpotLightHelper(spotLight)
+    helper: new SpotLightHelper(spotLight),
   },
   rectArea: {
-    light: rectAreaLight
+    light: rectAreaLight,
     // helper: new SpotLightHelper(rectAreaLight)
-  }
+  },
 };
 
 const materialSelect = document.querySelector('#material');

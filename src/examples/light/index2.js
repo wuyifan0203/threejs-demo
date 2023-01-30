@@ -6,7 +6,7 @@ import {
   createAxesHelper,
   // addLargeGroundPlane,
   // initCamera,
-  resize
+  resize,
 } from '../../lib/tools/index.js';
 import {
   Scene,
@@ -28,7 +28,7 @@ import {
   PointLightHelper,
   SpotLightHelper,
   OrthographicCamera,
-  BufferAttribute
+  BufferAttribute,
 } from '../../lib/three/three.module.js';
 
 let scene;
@@ -36,7 +36,7 @@ const params = {
   opacity: 1,
   depthTest: true,
   depthWrite: true,
-  alphaTest: 0
+  alphaTest: 0,
 };
 
 const materialList = {
@@ -44,7 +44,7 @@ const materialList = {
   lambert: new MeshLambertMaterial(params),
   matcap: new MeshMatcapMaterial(params),
   phong: new MeshPhongMaterial(params),
-  physical: new MeshPhysicalMaterial(params)
+  physical: new MeshPhysicalMaterial(params),
 };
 
 const directionalLight = new DirectionalLight();
@@ -55,20 +55,20 @@ const rectAreaLight = new RectAreaLight();
 const lightList = {
   directional: {
     light: directionalLight,
-    helper: new DirectionalLightHelper(directionalLight, 5)
+    helper: new DirectionalLightHelper(directionalLight, 5),
   },
   point: {
     light: pointLight,
-    helper: new PointLightHelper(pointLight, 1)
+    helper: new PointLightHelper(pointLight, 1),
   },
   spot: {
     light: spotLight,
-    helper: new SpotLightHelper(spotLight)
+    helper: new SpotLightHelper(spotLight),
   },
   rectArea: {
-    light: rectAreaLight
+    light: rectAreaLight,
     // helper: new SpotLightHelper(rectAreaLight)
-  }
+  },
 };
 
 const materialSelect = document.querySelector('#material');
@@ -131,8 +131,6 @@ const init = () => {
     const { x, y, z } = camera.position;
     light.position.set(x + 50, y + 50, z + 50);
   }
-
-  console.log(scene);
 };
 
 materialSelect.addEventListener('change', () => {
@@ -152,10 +150,9 @@ lightSelect.addEventListener('change', () => {
   scene.remove(light);
   helper && scene.remove(helper);
   setLight();
-  console.log(scene);
 });
 
-var position = [
+const position = [
   -1, -1, 1, 1, -1, 1, 1, 1, 1, // front face
   1, 1, 1, -1, 1, 1, -1, -1, 1,
   1, -1, 1, 1, -1, -1, 1, 1, -1, // right face
@@ -167,7 +164,7 @@ var position = [
   -1, 1, 1, 1, 1, 1, 1, 1, -1, // top face
   1, 1, -1, -1, 1, -1, -1, 1, 1,
   1, -1, 1, -1, -1, 1, -1, -1, -1, // bottom face
-  -1, -1, -1, 1, -1, -1, 1, -1, 1
+  -1, -1, -1, 1, -1, -1, 1, -1, 1,
 ];
 
 function draw(scene) {
@@ -195,7 +192,7 @@ function draw(scene) {
   mesh2.renderOrder = 2;
   scene.add(mesh2);
 
-  const light = lightList['directional'].light;
+  const { light } = lightList.directional;
   light.target = mesh;
   light.shadow.mapSize.width = 1024;
   light.shadow.mapSize.height = 1024;
@@ -233,9 +230,9 @@ function initReflectOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  var camera = new OrthographicCamera(-s, s, -s * (h / w), +s * (h / w), 1, 100000);
+  const camera = new OrthographicCamera(-s, s, -s * (h / w), +s * (h / w), 1, 100000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
