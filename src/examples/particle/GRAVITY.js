@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-13 18:32:53
+ * @LastEditTime: 2023-01-31 17:56:36
  * @FilePath: /threejs-demo/src/examples/particle/GRAVITY.js
  */
 import {
@@ -15,12 +15,10 @@ import {
   MeshLambertMaterial,
   Float32BufferAttribute,
   AmbientLight,
-  MeshBasicMaterial,
-  Mesh,
-} from "../../lib/three/three.module.js";
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
-import { GLTFLoader } from "../../lib/three/GLTFLoader.js";
-import { initRenderer, resize } from "../../lib/tools/index.js";
+} from '../../lib/three/three.module.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { GLTFLoader } from '../../lib/three/GLTFLoader.js';
+import { initRenderer, resize } from '../../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -34,7 +32,7 @@ function init() {
     45,
     window.innerWidth / window.innerHeight,
     0.1,
-    10000
+    10000,
   );
   camera.position.set(0, 0, 120);
   camera.lookAt(0, 0, 0);
@@ -71,10 +69,11 @@ function init() {
   window.camera = camera;
   window.scene = scene;
 }
+const random = (min, max) => min + Math.random() * (max - min);
 
-function draw(scene,camera) {
+function draw(scene, camera) {
   // particle
-  let particleNum = 5000;
+  const particleNum = 5000;
   const particleMaterial = new PointsMaterial({
     size: 1,
     color: 0xffffff,
@@ -91,10 +90,10 @@ function draw(scene,camera) {
       vertex.push(
         random(20, 30) * Math.cos(p),
         random(20, 30) * Math.sin(p),
-        random(-1500, 0)
+        random(-1500, 0),
       );
     }
-    geometry.setAttribute("position", new Float32BufferAttribute(vertex, 3));
+    geometry.setAttribute('position', new Float32BufferAttribute(vertex, 3));
     return geometry;
   };
   const particleGeometry = createParticleGeometry();
@@ -103,7 +102,7 @@ function draw(scene,camera) {
   scene.add(particleSystem);
 
   // model
-  const modelPath = "../../resources/models/astronaut.glb";
+  const modelPath = '../../resources/models/astronaut.glb';
   const loader = new GLTFLoader();
   let modelMesh = null;
 
@@ -115,16 +114,16 @@ function draw(scene,camera) {
     scene.add(modelMesh);
   };
   const onError = (e) => {
-    console.error("load resources fail !", e.stack);
+    console.error('load resources fail !', e.stack);
   };
 
   loader.load(modelPath, modelOnLoad, null, onError);
 
-  const updateParticles = (camera, t) => {
+  const updateParticles = (camera) => {
     particleSystem.rotation.z += 0.015;
     // camera.lookAt(particleSystem.position);
     // camera.updateProjectionMatrix();
-    const vertex = particleGeometry.getAttribute("position").array;
+    const vertex = particleGeometry.getAttribute('position').array;
     for (let i = 0; i < vertex.length; i++) {
       if ((i + 1) % 3 === 0) {
         const dist = vertex[i] - camera.position.z;
@@ -137,14 +136,14 @@ function draw(scene,camera) {
   };
   const updateModelMesh = (camera, t) => {
     if (modelMesh) {
-      modelMesh.position.z =0.03 * Math.sin(t * 0.05) + (camera.position.z - 0.2);
+      modelMesh.position.z = 0.03 * Math.sin(t * 0.05) + (camera.position.z - 0.2);
       modelMesh.rotation.x += 0.01;
       modelMesh.rotation.y += 0.01;
       modelMesh.rotation.z += 0.01;
     }
   };
 
-  window.addEventListener('mousemove', e => {
+  window.addEventListener('mousemove', (e) => {
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 2;
     const dx = -1 * ((cx - e.clientX) / cx);
@@ -156,8 +155,5 @@ function draw(scene,camera) {
     modelMesh.position.y = dy * 5;
   });
 
-
-  return { updateParticles, updateModelMesh, };
+  return { updateParticles, updateModelMesh };
 }
-
-const random = (min, max) => min + Math.random() * (max - min);

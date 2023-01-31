@@ -1,33 +1,27 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-12 17:18:17
+ * @LastEditTime: 2023-01-31 17:45:10
  * @FilePath: /threejs-demo/src/examples/particle/common.js
  */
 import {
   Scene,
-  Mesh,
-  MeshBasicMaterial,
-  SphereBufferGeometry,
-  TextureLoader,
-  BackSide,
   PerspectiveCamera,
   Sprite,
   SpriteMaterial,
-  Raycaster,
-  Vector2,
   BufferGeometry,
   PointsMaterial,
   Float32BufferAttribute,
   Color,
   Points,
-} from "../../lib/three/three.module.js";
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
-import { ViewHelper } from "../../lib/three/viewHelper.js";
-import { initRenderer, resize } from "../../lib/tools/index.js";
-import datGui from "../../lib/util/dat.gui.js";
+} from '../../lib/three/three.module.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { ViewHelper } from '../../lib/three/viewHelper.js';
+import { initRenderer, resize } from '../../lib/tools/index.js';
+import datGui from '../../lib/util/dat.gui.js';
 
-import {Stats} from '../../lib/util/Stats.js'
+import { Stats } from '../../lib/util/Stats.js';
+
 window.onload = () => {
   init();
 };
@@ -37,9 +31,9 @@ function init() {
 
   const stats = new Stats();
   stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom)
+  document.getElementById('webgl-output').append(stats.dom);
   renderer.autoClear = false;
-  const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1,10000000);
+  const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000000);
   camera.position.set(3, 3, 63);
   camera.lookAt(10, 0, 0);
   const scene = new Scene();
@@ -53,13 +47,13 @@ function init() {
 
   render();
   function render() {
-    stats.begin()
+    stats.begin();
     controls.update();
     requestAnimationFrame(render);
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    stats.end()
+    stats.end();
   }
 
   window.camera = camera;
@@ -68,19 +62,19 @@ function init() {
 
 function draw(scene) {
   const gui = new datGui.GUI();
-  var controls = {
+  const controls = {
     row: 30,
     col: 20,
     drawFunc: createParticlesBySprite,
-    color:'#ffffff'
+    color: '#ffffff',
   };
   createParticlesBySprite();
-  gui.add(controls, "row", 1, 500, 1).onChange((e) => {change(scene);});
-  gui.add(controls, "col", 1, 500, 1).onChange((e) => {change(scene);});
-  gui.add(controls, "drawFunc", {
-      Sprite: createParticlesBySprite,
-      Points: createParticlesByPoints,
-  }).onChange((e) => {change(scene);});
+  gui.add(controls, 'row', 1, 500, 1).onChange(() => { change(scene); });
+  gui.add(controls, 'col', 1, 500, 1).onChange(() => { change(scene); });
+  gui.add(controls, 'drawFunc', {
+    Sprite: createParticlesBySprite,
+    Points: createParticlesByPoints,
+  }).onChange(() => { change(scene); });
 
   function createParticlesBySprite() {
     const hx = controls.row / 2;
@@ -106,8 +100,8 @@ function draw(scene) {
       vertexColors: true,
       color: 0xffffff,
     });
-    let veticsFloat32Array = [];
-    let veticsColors = [];
+    const veticsFloat32Array = [];
+    const veticsColors = [];
     for (let x = 0; x < controls.row; x++) {
       for (let y = 0; y < controls.col; y++) {
         veticsFloat32Array.push((x - hx) * 4, (y - hy) * 4, 0);
@@ -136,7 +130,8 @@ function draw(scene) {
     }
     scene.children.length = 0;
 
-    const F = eval("(" + controls.drawFunc + ")");
+    // eslint-disable-next-line no-eval
+    const F = eval(`(${controls.drawFunc})`);
     F(scene);
   }
 }

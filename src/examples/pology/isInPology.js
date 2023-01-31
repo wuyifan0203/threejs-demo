@@ -1,12 +1,12 @@
 /*
  * @Date: 2022-11-29 19:08:50
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2022-11-29 20:16:07
- * @FilePath: /aquaman/example/pology/isInPology.js
+ * @LastEditTime: 2023-01-31 18:06:47
+ * @FilePath: /threejs-demo/src/examples/pology/isInPology.js
  */
 
 export {
-  pointInPolygon
+  pointInPolygon,
 };
 
 function pointInPolygon(point, vs) {
@@ -23,19 +23,17 @@ function pointInPolygon(point, vs) {
           wn++;
         }
       }
-    } else {
-      if (yi <= y) {
-        if (isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
-          wn--;
-        }
+    } else if (yi <= y) {
+      if (isLeft([xj, yj], [xi, yi], [x, y]) < 0) {
+        wn--;
       }
     }
   }
   return wn !== 0;
-};
+}
 
 function isLeft(P0, P1, P2) {
-  const res = ((P1[0] - P0[0]) * (P2[1] - P0[1]) -
-            (P2[0] - P0[0]) * (P1[1] - P0[1]));
+  const res = ((P1[0] - P0[0]) * (P2[1] - P0[1])
+            - (P2[0] - P0[0]) * (P1[1] - P0[1]));
   return res;
 }

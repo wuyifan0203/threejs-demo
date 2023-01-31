@@ -1,172 +1,171 @@
+/* eslint-disable no-param-reassign */
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-28 16:57:41
+ * @LastEditTime: 2023-01-31 17:23:13
  * @FilePath: /threejs-demo/src/examples/house/index.js
  */
 import {
-    Scene,
-    Mesh,
-    MeshBasicMaterial,
-    SphereBufferGeometry,
-    TextureLoader,
-    BackSide,
-    PerspectiveCamera,
-    Sprite,
-    SpriteMaterial,
-    Raycaster,
-    Vector2
+  Scene,
+  Mesh,
+  MeshBasicMaterial,
+  SphereBufferGeometry,
+  TextureLoader,
+  BackSide,
+  PerspectiveCamera,
+  Sprite,
+  SpriteMaterial,
+  Raycaster,
+  Vector2,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 import {
-    initRenderer,
+  initRenderer,
 } from '../../lib/tools/index.js';
 
-var basePath = '../../resources/texture/house/'
-var url = {
-    livingRoom: basePath + 'livingRoom.jpg',
-    livingRoom2: basePath + 'livingRoom2.jpg',
-    masterBedroom: basePath + 'masterBedroom.jpg',
-    guestBedroom: basePath + 'guestRoom.jpg',
-    toilet: basePath + 'toilet.jpg',
-    arrow: '../../resources/texture/others/' + 'arrow.jpg'
+const basePath = '../../resources/texture/house/';
+const url = {
+  livingRoom: `${basePath}livingRoom.jpg`,
+  livingRoom2: `${basePath}livingRoom2.jpg`,
+  masterBedroom: `${basePath}masterBedroom.jpg`,
+  guestBedroom: `${basePath}guestRoom.jpg`,
+  toilet: `${basePath}toilet.jpg`,
+  arrow: '../../resources/texture/others/arrow.jpg',
 };
 
-var loader = new TextureLoader();
+const loader = new TextureLoader();
 
-var texture = {
-    livingRoom:loader.load(url.livingRoom),
-    livingRoom2:loader.load(url.livingRoom2),
-    masterBedroom:loader.load(url.masterBedroom),
-    guestBedroom:loader.load(url.guestBedroom),
-    toilet:loader.load(url.toilet),
-    arrow: loader.load(url.arrow)
-}
+const texture = {
+  livingRoom: loader.load(url.livingRoom),
+  livingRoom2: loader.load(url.livingRoom2),
+  masterBedroom: loader.load(url.masterBedroom),
+  guestBedroom: loader.load(url.guestBedroom),
+  toilet: loader.load(url.toilet),
+  arrow: loader.load(url.arrow),
+};
 
-var location = 'livingRoom';
+let location = 'livingRoom';
 
-var material = new MeshBasicMaterial({
-    map:texture[location],
-    side:BackSide
+const material = new MeshBasicMaterial({
+  map: texture[location],
+  side: BackSide,
 });
 
-var spriteMaterial = new SpriteMaterial({map:texture.arrow});
+const spriteMaterial = new SpriteMaterial({ map: texture.arrow });
 
-var spriteList = {
-    livingRoom:createSprite(),
-    livingRoom2:createSprite(),
-    masterBedroom:createSprite(),
-    guestBedroom:createSprite(),
-    toilet:createSprite(),
+const spriteList = {
+  livingRoom: createSprite(),
+  livingRoom2: createSprite(),
+  masterBedroom: createSprite(),
+  guestBedroom: createSprite(),
+  toilet: createSprite(),
 };
 
-var raycaster = new Raycaster();
-var pointer = new Vector2();
+const raycaster = new Raycaster();
+const pointer = new Vector2();
 
-var positionMap = {
-    livingRoom:{
-        toilet:[2.54,0,-9],
-        livingRoom2:[6.6,-3.5,-6]
-    },
-    toilet:{
-        livingRoom:[4,0,8]
-    },
-    livingRoom2:{
-        livingRoom:[8,-3.5,-4],
-        masterBedroom:[-6,0,7],
-        guestBedroom:[-9,0,0]
-    },
-    masterBedroom:{
-        livingRoom2:[-6.5,0,6]
-    },
-    guestBedroom:{
-        livingRoom2:[-7,0,-5.5]
-    }
+const positionMap = {
+  livingRoom: {
+    toilet: [2.54, 0, -9],
+    livingRoom2: [6.6, -3.5, -6],
+  },
+  toilet: {
+    livingRoom: [4, 0, 8],
+  },
+  livingRoom2: {
+    livingRoom: [8, -3.5, -4],
+    masterBedroom: [-6, 0, 7],
+    guestBedroom: [-9, 0, 0],
+  },
+  masterBedroom: {
+    livingRoom2: [-6.5, 0, 6],
+  },
+  guestBedroom: {
+    livingRoom2: [-7, 0, -5.5],
+  },
 };
 
-
-    (function () {
-        init();
-    })();
+(function () {
+  init();
+}());
 
 function init() {
-    const renderer = initRenderer();
-    renderer.autoClear = false;
-    const camera = new PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
-    camera.position.z = 0.5;
-    camera.lookAt(10,0,0)
-    const scene = new Scene();;
-    renderer.setClearColor(0xffffff);
+  const renderer = initRenderer();
+  renderer.autoClear = false;
+  const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 0.5;
+  camera.lookAt(10, 0, 0);
+  const scene = new Scene();
+  renderer.setClearColor(0xffffff);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.maxDistance = 50;
-    draw(scene);
-    const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.maxDistance = 50;
+  draw(scene);
+  const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    render();
-    function render() {
-        controls.update();
-        requestAnimationFrame(render);
-        renderer.clear();
-        renderer.render(scene, camera);
-        viewHelper.render(renderer);
+  render();
+  function render() {
+    controls.update();
+    requestAnimationFrame(render);
+    renderer.clear();
+    renderer.render(scene, camera);
+    viewHelper.render(renderer);
+  }
+  // document.addEventListener('dblclick')
+
+  renderer.domElement.addEventListener('dblclick', (event) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    raycaster.setFromCamera(pointer, camera);
+
+    const intersects = raycaster.intersectObjects(Object.values(spriteList));
+    if (intersects.length) {
+      updateTexture(intersects);
+      updateSpritePosition();
     }
-    // document.addEventListener('dblclick')
-
-    renderer.domElement.addEventListener('dblclick',(event)=>{
-        pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-        raycaster.setFromCamera( pointer, camera );
-
-        const intersects = raycaster.intersectObjects( Object.values(spriteList) );
-        if(intersects.length){
-            updateTexture(intersects);
-            updateSpritePosition();
-        }
-    })
+  });
 }
 
 function draw(scene) {
-    const sphere = new SphereBufferGeometry(10, 64, 32);
-    initSprite(scene)
+  const sphere = new SphereBufferGeometry(10, 64, 32);
+  initSprite(scene);
 
-    const mesh = new Mesh(sphere,material);
-    scene.add(mesh);
+  const mesh = new Mesh(sphere, material);
+  scene.add(mesh);
 }
 
 function initSprite(scene) {
-   updateSpritePosition()
+  updateSpritePosition();
 
-    Object.keys(spriteList).forEach(key => {
-        const sprite = spriteList[key]
-        sprite.name = key;
-        scene.add(sprite)
-    });
+  Object.keys(spriteList).forEach((key) => {
+    const sprite = spriteList[key];
+    sprite.name = key;
+    scene.add(sprite);
+  });
 }
 
 function createSprite() {
-    return new Sprite(spriteMaterial)
+  return new Sprite(spriteMaterial);
 }
 
 function updateTexture(intersects) {
-    const {object:target} = intersects.find(intersect=>intersect.object.visible === true);
-    material.map = texture[target.name];
-    location = target.name;   
+  const { object: target } = intersects.find((intersect) => intersect.object.visible === true);
+  material.map = texture[target.name];
+  location = target.name;
 }
 
 function updateSpritePosition() {
-    Object.values(spriteList).forEach(sprite=>{
-        sprite.visible = false;
-    });
+  Object.values(spriteList).forEach((sprite) => {
+    sprite.visible = false;
+  });
 
-    const position = positionMap[location];
-    Object.keys(position).forEach((key)=>{
-        const sprite = spriteList[key]
-        sprite.visible = true;
-        sprite.position.set(...position[key])
-    })
+  const position = positionMap[location];
+  Object.keys(position).forEach((key) => {
+    const sprite = spriteList[key];
+    sprite.visible = true;
+    sprite.position.set(...position[key]);
+  });
 }
-

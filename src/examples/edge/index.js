@@ -1,9 +1,10 @@
+/* eslint-disable max-len */
 /* eslint-disable no-unused-vars */
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2022-12-23 17:27:35
- * @FilePath: /aquaman/example/edge/index.js
+ * @LastEditTime: 2023-01-31 17:14:44
+ * @FilePath: /threejs-demo/src/examples/edge/index.js
  */
 
 import {
@@ -24,12 +25,12 @@ import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
-  createAxesHelper
+  createAxesHelper,
 } from '../../lib/tools/index.js';
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -69,13 +70,15 @@ function createMesh(l, x, y, z, scene) {
     transparent: true,
     opacity: 0.1,
     color: '#bbb',
-    depthTest: false });
+    depthTest: false,
+  });
 
   const gm = new MeshBasicMaterial({
     transparent: true,
     opacity: 0.1,
     color: 'green',
-    depthTest: false });
+    depthTest: false,
+  });
   const lm = new LineBasicMaterial({ color: '#000' });
 
   const [xMax, xMin, yMax, yMin, zMax, zMin] = [2, 4, 3, 1, 2, 3];
@@ -133,7 +136,7 @@ function createPML(x, y, xMax, xMin, yMax, yMin, h, isTop = true) {
     -(x + xMin), y + yMax, -hh,
     -(x + xMin), -(y + yMin), -hh,
     x + xMax, -(y + yMin), -hh,
-    x + xMax, y + yMax, -hh
+    x + xMax, y + yMax, -hh,
   ];
 
   const topVertex = [
@@ -144,7 +147,7 @@ function createPML(x, y, xMax, xMin, yMax, yMin, h, isTop = true) {
     -x, y, -hh, // 4
     -x, -y, -hh, // 5,
     x, -y, -hh, // 6
-    x, y, -hh// 7
+    x, y, -hh, // 7
   ];
 
   const index = [
@@ -153,7 +156,7 @@ function createPML(x, y, xMax, xMin, yMax, yMin, h, isTop = true) {
     1, 7, 6, 1, 6, 2, // right
     4, 0, 3, 4, 3, 5, // left
     0, 4, 7, 0, 7, 1, // front
-    5, 3, 2, 5, 2, 6 // back
+    5, 3, 2, 5, 2, 6, // back
   ];
 
   const g = new BufferGeometry();

@@ -1,31 +1,36 @@
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-tabs */
+/* eslint-disable no-nested-ternary */
+/* eslint-disable prefer-destructuring */
 /**
  * Port from https://github.com/mapbox/earcut (v2.2.2)
  */
 
 const EarCut = {
 
-  triangulate: function(data, holeIndices, dim) {
+  triangulate(data, holeIndices, dim) {
     dim = dim || 2;
 
     const hasHoles = holeIndices && holeIndices.length;
-    const outerLen = hasHoles ? holeIndices[ 0 ] * dim : data.length;
+    const outerLen = hasHoles ? holeIndices[0] * dim : data.length;
     let outerNode = linkedList(data, 0, outerLen, dim, true);
     const triangles = [];
 
     if (!outerNode || outerNode.next === outerNode.prev) return triangles;
 
-    let minX, minY, maxX, maxY, x, y, invSize;
+    let minX; let minY; let maxX; let maxY; let x; let y; let
+      invSize;
 
     if (hasHoles) outerNode = eliminateHoles(data, holeIndices, outerNode, dim);
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
     if (data.length > 80 * dim) {
-      minX = maxX = data[ 0 ];
-      minY = maxY = data[ 1 ];
+      minX = maxX = data[0];
+      minY = maxY = data[1];
 
       for (let i = dim; i < outerLen; i += dim) {
-        x = data[ i ];
-        y = data[ i + 1 ];
+        x = data[i];
+        y = data[i + 1];
         if (x < minX) minX = x;
         if (y < minY) minY = y;
         if (x > maxX) maxX = x;
@@ -40,18 +45,19 @@ const EarCut = {
     earcutLinked(outerNode, triangles, dim, minX, minY, invSize);
 
     return triangles;
-  }
+  },
 
 };
 
 // create a circular doubly linked list from polygon points in the specified winding order
 function linkedList(data, start, end, dim, clockwise) {
-  let i, last;
+  let i; let
+    last;
 
   if (clockwise === (signedArea(data, start, end, dim) > 0)) {
-    for (i = start; i < end; i += dim) last = insertNode(i, data[ i ], data[ i + 1 ], last);
+    for (i = start; i < end; i += dim) last = insertNode(i, data[i], data[i + 1], last);
   } else {
-    for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[ i ], data[ i + 1 ], last);
+    for (i = end - dim; i >= start; i -= dim) last = insertNode(i, data[i], data[i + 1], last);
   }
 
   if (last && equals(last, last.next)) {
@@ -150,8 +156,7 @@ function isEar(ear) {
   let p = ear.next.next;
 
   while (p !== ear.prev) {
-    if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-			area(p.prev, p, p.next) >= 0) return false;
+    if (pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.next;
   }
 
@@ -180,30 +185,22 @@ function isEarHashed(ear, minX, minY, invSize) {
 
   // look for points inside the triangle in both directions
   while (p && p.z >= minZ && n && n.z <= maxZ) {
-    if (p !== ear.prev && p !== ear.next &&
-			pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-			area(p.prev, p, p.next) >= 0) return false;
+    if (p !== ear.prev && p !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.prevZ;
 
-    if (n !== ear.prev && n !== ear.next &&
-			pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
-			area(n.prev, n, n.next) >= 0) return false;
+    if (n !== ear.prev && n !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
     n = n.nextZ;
   }
 
   // look for remaining points in decreasing z-order
   while (p && p.z >= minZ) {
-    if (p !== ear.prev && p !== ear.next &&
-			pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) &&
-			area(p.prev, p, p.next) >= 0) return false;
+    if (p !== ear.prev && p !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, p.x, p.y) && area(p.prev, p, p.next) >= 0) return false;
     p = p.prevZ;
   }
 
   // look for remaining points in increasing z-order
   while (n && n.z <= maxZ) {
-    if (n !== ear.prev && n !== ear.next &&
-			pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) &&
-			area(n.prev, n, n.next) >= 0) return false;
+    if (n !== ear.prev && n !== ear.next && pointInTriangle(a.x, a.y, b.x, b.y, c.x, c.y, n.x, n.y) && area(n.prev, n, n.next) >= 0) return false;
     n = n.nextZ;
   }
 
@@ -266,11 +263,12 @@ function splitEarcut(start, triangles, dim, minX, minY, invSize) {
 // link every hole into the outer loop, producing a single-ring polygon without holes
 function eliminateHoles(data, holeIndices, outerNode, dim) {
   const queue = [];
-  let i, len, start, end, list;
+  let i; let len; let start; let end; let
+    list;
 
   for (i = 0, len = holeIndices.length; i < len; i++) {
-    start = holeIndices[ i ] * dim;
-    end = i < len - 1 ? holeIndices[ i + 1 ] * dim : data.length;
+    start = holeIndices[i] * dim;
+    end = i < len - 1 ? holeIndices[i + 1] * dim : data.length;
     list = linkedList(data, start, end, dim, false);
     if (list === list.next) list.steiner = true;
     queue.push(getLeftmost(list));
@@ -280,7 +278,7 @@ function eliminateHoles(data, holeIndices, outerNode, dim) {
 
   // process holes from left to right
   for (i = 0; i < queue.length; i++) {
-    eliminateHole(queue[ i ], outerNode);
+    eliminateHole(queue[i], outerNode);
     outerNode = filterPoints(outerNode, outerNode.next);
   }
 
@@ -345,8 +343,7 @@ function findHoleBridge(hole, outerNode) {
   p = m;
 
   do {
-    if (hx >= p.x && p.x >= mx && hx !== p.x &&
-				pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
+    if (hx >= p.x && p.x >= mx && hx !== p.x && pointInTriangle(hy < my ? hx : qx, hy, mx, my, hy < my ? qx : hx, hy, p.x, p.y)) {
       tan = Math.abs(hy - p.y) / (hx - p.x); // tangential
 
       if (locallyInside(p, hole) && (tan < tanMin || (tan === tanMin && (p.x > m.x || (p.x === m.x && sectorContainsSector(m, p)))))) {
@@ -467,17 +464,17 @@ function getLeftmost(start) {
 
 // check if a point lies within a convex triangle
 function pointInTriangle(ax, ay, bx, by, cx, cy, px, py) {
-  return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0 &&
-			(ax - px) * (by - py) - (bx - px) * (ay - py) >= 0 &&
-			(bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
+  return (cx - px) * (ay - py) - (ax - px) * (cy - py) >= 0
+			&& (ax - px) * (by - py) - (bx - px) * (ay - py) >= 0
+			&& (bx - px) * (cy - py) - (cx - px) * (by - py) >= 0;
 }
 
 // check if a diagonal between two polygon nodes is valid (lies in polygon interior)
 function isValidDiagonal(a, b) {
-  return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) && // dones't intersect other edges
-		(locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) && // locally visible
-		(area(a.prev, a, b.prev) || area(a, b.prev, b)) || // does not create opposite-facing sectors
-		equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
+  return a.next.i !== b.i && a.prev.i !== b.i && !intersectsPolygon(a, b) // dones't intersect other edges
+		&& (locallyInside(a, b) && locallyInside(b, a) && middleInside(a, b) // locally visible
+		&& (area(a.prev, a, b.prev) || area(a, b.prev, b)) // does not create opposite-facing sectors
+		|| equals(a, b) && area(a.prev, a, a.next) > 0 && area(b.prev, b, b.next) > 0); // special zero-length case
 }
 
 // signed area of a triangle
@@ -520,8 +517,8 @@ function sign(num) {
 function intersectsPolygon(a, b) {
   let p = a;
   do {
-    if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i &&
-				intersects(p, p.next, a, b)) return true;
+    if (p.i !== a.i && p.next.i !== a.i && p.i !== b.i && p.next.i !== b.i
+				&& intersects(p, p.next, a, b)) return true;
     p = p.next;
   } while (p !== a);
 
@@ -542,8 +539,8 @@ function middleInside(a, b) {
   const px = (a.x + b.x) / 2;
   const py = (a.y + b.y) / 2;
   do {
-    if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y &&
-				(px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x)) { inside = !inside; }
+    if (((p.y > py) !== (p.next.y > py)) && p.next.y !== p.y
+				&& (px < (p.next.x - p.x) * (py - p.y) / (p.next.y - p.y) + p.x)) { inside = !inside; }
     p = p.next;
   } while (p !== a);
 
@@ -624,7 +621,7 @@ function Node(i, x, y) {
 function signedArea(data, start, end, dim) {
   let sum = 0;
   for (let i = start, j = end - dim; i < end; i += dim) {
-    sum += (data[ j ] - data[ i ]) * (data[ i + 1 ] + data[ j + 1 ]);
+    sum += (data[j] - data[i]) * (data[i + 1] + data[j + 1]);
     j = i;
   }
 

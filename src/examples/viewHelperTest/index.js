@@ -2,8 +2,8 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-04 11:07:33
- * @FilePath: /aquaman/example/viewHelperTest/index.js
+ * @LastEditTime: 2023-01-31 18:10:37
+ * @FilePath: /threejs-demo/src/examples/viewHelperTest/index.js
  */
 
 import {
@@ -25,7 +25,7 @@ import {
   initOrthographicCamera,
   initCustomGrid,
   createAxesHelper,
-  angle2Radians
+  angle2Radians,
 } from '../../lib/tools/index.js';
 
 function circle(x, r2) {
@@ -244,13 +244,13 @@ function makeCircle(r, angle, h, width) {
 
   return [
     innerPart,
-    outerPart
+    outerPart,
   ];
 }
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -284,11 +284,13 @@ function draw(scene) {
   const total = drawArc(scene);
   const buffer = new BufferAttribute(new Float32Array(total), 3);
   const g = new BufferGeometry().setAttribute('position', buffer);
-  const m = new MeshBasicMaterial({ side: DoubleSide,
+  const m = new MeshBasicMaterial({
+    side: DoubleSide,
     transparent: true,
     opacity: 0.3,
     color: 'green',
-    depthTest: false });
+    depthTest: false,
+  });
   const mesh = new Mesh(g, m);
   const e = new EdgesGeometry(g);
   const lm = new LineBasicMaterial({ color: 'black' });
@@ -317,10 +319,10 @@ function drawLine(scene) {
   const oBuffer = new BufferGeometry();
   oBuffer.setAttribute('position', new BufferAttribute(new Float32Array([...vertices2]), 3));
   const lineMaterial = new LineBasicMaterial({
-    color: 0xff0000
+    color: 0xff0000,
   });
   const lineMaterial2 = new LineBasicMaterial({
-    color: 0x0000ff
+    color: 0x0000ff,
   });
   const inLine = new LineSegments(iBuffer, lineMaterial);
   const outLine = new LineSegments(oBuffer, lineMaterial2);
@@ -334,7 +336,7 @@ function drawArc(params) {
   const [group3, group4] = makeCircle(r, angle, -1, 1);
 
   const totalVertices = [];
-  const length = group1.length;
+  const { length } = group1;
 
   for (let index = 1; index < length; index++) {
     const [prev, current] = [index - 1, index];
@@ -374,7 +376,7 @@ function createPartVertices(p1, p4, p5, p6, p2, p3, p8, p7) {
     x1, y1, z1, x5, y5, z5, x8, y8, z8, x1, y1, z1, x8, y8, z8, x2, y2, z2, // left
     x3, y3, z3, x7, y7, z7, x6, y6, z6, x3, y3, z3, x6, y6, z6, x4, y4, z4, // right
     x5, y5, z5, x6, y6, z6, x7, y7, z7, x5, y5, z5, x7, y7, z7, x8, y8, z8, // up
-    x1, y1, z1, x3, y3, z3, x4, y4, z4, x1, y1, z1, x2, y2, z2, x3, y3, z3// down
+    x1, y1, z1, x3, y3, z3, x4, y4, z4, x1, y1, z1, x2, y2, z2, x3, y3, z3, // down
   ];
   return vertices;
 }
@@ -394,7 +396,7 @@ function createFrontVertices(p1, p4, p5, p6) {
 
   return [
     x1, y1, z1, x4, y4, z4, x5, y5, z5,
-    x5, y5, z5, x4, y4, z4, x6, y6, z6
+    x5, y5, z5, x4, y4, z4, x6, y6, z6,
   ];
 }
 
@@ -412,7 +414,6 @@ function createBackVertices(p2, p3, p8, p7) {
   const { x: x8, y: y8, z: z8 } = p8;
   return [
     x2, y2, z2, x8, y8, z8, x7, y7, z7,
-    x2, y2, z2, x7, y7, z7, x3, y3, z3
+    x2, y2, z2, x7, y7, z7, x3, y3, z3,
   ];
 }
-

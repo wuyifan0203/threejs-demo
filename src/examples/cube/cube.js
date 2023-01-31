@@ -2,8 +2,8 @@
 /*
  * @Date: 2023-01-05 18:14:24
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-06 15:03:22
- * @FilePath: /aquaman/example/cube/cube.js
+ * @LastEditTime: 2023-01-31 18:11:34
+ * @FilePath: /threejs-demo/src/examples/cube/cube.js
  */
 
 import {
@@ -18,7 +18,7 @@ import {
   LineBasicMaterial,
   EdgesGeometry,
   LineSegments,
-  Color
+  Color,
 } from '../../lib/three/three.module.js';
 
 const lineMaterial = new LineBasicMaterial({ color: '#000000' });
@@ -29,7 +29,7 @@ const colors = [
   '#ffff3a',
   '#ffffff',
   '#00af57',
-  '#00afee'
+  '#00afee',
 ];
 function Cube(level, size, offset = 0) {
   this.level = level;
@@ -46,11 +46,11 @@ function getMaterial(index) {
     depthWrite: true,
     polygonOffset: true,
     polygonOffsetFactor: -4,
-    color: colors[index]
+    color: colors[index],
   });
 }
 
-Cube.prototype.createCube = function() {
+Cube.prototype.createCube = function () {
   const geometry = new BoxBufferGeometry(this.size, this.size, this.size);
   const materials = [
     getMaterial(0),
@@ -58,7 +58,7 @@ Cube.prototype.createCube = function() {
     getMaterial(2),
     getMaterial(3),
     getMaterial(4),
-    getMaterial(5)
+    getMaterial(5),
   ];
   // console.log(materials);
   const group = new Group();
@@ -67,7 +67,7 @@ Cube.prototype.createCube = function() {
       const mesh = new Mesh(geometry, materials);
       const [w, h, d] = [Math.floor(j / this.level), j % this.level, i];
       mesh.userData.index = [w, h, d];
-      mesh.name = w + '-' + h + '-' + d;
+      mesh.name = `${w}-${h}-${d}`;
       this.getPosition(mesh);
       this.getEdge(mesh);
       group.add(mesh);
@@ -77,9 +77,9 @@ Cube.prototype.createCube = function() {
   return group;
 };
 
-Cube.prototype.getPosition = function(mesh) {
+Cube.prototype.getPosition = function (mesh) {
   const [w, h, d] = mesh.userData.index;
-  const level = this.level;
+  const { level } = this;
   function getRealIndex(num) {
     const center = Math.floor(level / 2);
     return num - center;
@@ -91,7 +91,7 @@ Cube.prototype.getPosition = function(mesh) {
   mesh.applyMatrix4(new Matrix4().makeTranslation(x, y, z));
 };
 
-Cube.prototype.makeGroup = function(group) {
+Cube.prototype.makeGroup = function (group) {
   this.width = {};
   this.height = {};
   this.depth = {};
@@ -100,17 +100,17 @@ Cube.prototype.makeGroup = function(group) {
   console.log(matrix);
 };
 
-Cube.prototype.getEdge = function(mesh) {
+Cube.prototype.getEdge = function (mesh) {
   const edge = new EdgesGeometry(mesh.geometry);
   mesh.add(new LineSegments(edge, lineMaterial));
 };
 
-Cube.prototype.rotate = function(direction, index) {
+Cube.prototype.rotate = function (direction, index) {
 
 };
 
 function makeMatrix(children, level) {
-  if (children.length <= 1 || level === 1) return;
+  if (children.length <= 1 || level === 1) return [];
   const matrix = [];
   for (let i = 0; i < level; i++) {
     matrix.push([]);
@@ -122,17 +122,6 @@ function makeMatrix(children, level) {
     }
   }
   return matrix;
-}
-
-function slice(target, direction, inner) {
-  const len = target.length;
-  for (let d = 0; d < len; d++) {
-    inner[d] = [];
-    for (let i = 0; i < len; i++) {
-      for (let j = 0; j < len; j++) {
-      }
-    }
-  }
 }
 
 export { Cube };

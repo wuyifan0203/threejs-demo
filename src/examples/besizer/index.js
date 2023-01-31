@@ -1,4 +1,3 @@
-
 import {
   WebGLRenderer,
   PCFSoftShadowMap,
@@ -17,13 +16,13 @@ import {
   LineBasicMaterial,
   Line,
   CubicBezierCurve3,
-  BufferAttribute
+  BufferAttribute,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -47,10 +46,10 @@ function init() {
 }
 
 function initRenderer() {
-  var props = {
-    antialias: true
+  const props = {
+    antialias: true,
   };
-  var renderer = new WebGLRenderer(props);
+  const renderer = new WebGLRenderer(props);
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
@@ -64,24 +63,24 @@ function initRenderer() {
 }
 
 function initCamera(initialPosition) {
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  var camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
   return camera;
 }
 
-function addLargeGroundPlane(scene, useTexture) {
+function addLargeGroundPlane(scene) {
   //   var withTexture = (useTexture !== undefined) ? useTexture : false;
 
   // create the ground plane
-  var planeGeometry = new PlaneGeometry(10000, 10000);
-  var planeMaterial = new MeshPhongMaterial({
-    color: 0xffffff
+  const planeGeometry = new PlaneGeometry(10000, 10000);
+  const planeMaterial = new MeshPhongMaterial({
+    color: 0xffffff,
   });
-  var plane = new Mesh(planeGeometry, planeMaterial);
+  const plane = new Mesh(planeGeometry, planeMaterial);
   plane.receiveShadow = true;
 
   // rotate and position the plane
@@ -96,9 +95,9 @@ function addLargeGroundPlane(scene, useTexture) {
 }
 
 function initDefaultLighting(scene, initialPosition) {
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
 
-  var spotLight = new SpotLight(0xffffff);
+  const spotLight = new SpotLight(0xffffff);
   spotLight.position.copy(position);
   spotLight.shadow.mapSize.width = 2048;
   spotLight.shadow.mapSize.height = 2048;
@@ -119,7 +118,7 @@ function createAxesHelper(scene) {
   const arrowHelper = new Group();
   arrowHelper.name = 'arrowHelper';
 
-  ['X', 'Y', 'Z'].forEach(e => {
+  ['X', 'Y', 'Z'].forEach((e) => {
     const pos = { X: [1, 0, 0], Y: [0, 1, 0], Z: [0, 0, 1] }[e];
     const size = { X: 1000 * 0.5, Y: 1000 * 0.5, Z: 1000 * 0.5 }[e];
     const color = { X: 'red', Y: 'green', Z: 'blue' }[e];
@@ -139,21 +138,18 @@ function draw(scene) {
     new Vector3(0, 0, 8),
     new Vector3(4.4153, 0, 8),
     new Vector3(8, 0, 4.4153),
-    new Vector3(8, 0, 0)
+    new Vector3(8, 0, 0),
   ];
 
   const VectorMap2 = [
     new Vector3(0, 1, 8),
     new Vector3(4.4153, 1, 8),
     new Vector3(8, 1, 4.4153),
-    new Vector3(8, 1, 0)
+    new Vector3(8, 1, 0),
   ];
 
   const [group1, , group2] = makeCurve(VectorMap, d);
   const [group3, , group4] = makeCurve(VectorMap2, d2, 1);
-
-  console.log(group1);
-  console.log(group2);
 
   const mesh = drawArcWaveGude([group1, group2, group3, group4]);
 
@@ -199,21 +195,21 @@ function makeCurve(VectorMap, d, h = 0) {
   return [
     group1,
     points,
-    group2
+    group2,
   ];
 }
 
 function drawLine(points, color) {
   const geometry = new BufferGeometry().setFromPoints(points);
   const material = new LineBasicMaterial({
-    color: color
+    color,
   });
   return new Line(geometry, material);
 }
 
 function drawArcWaveGude(group) {
   const [group1, group2, group3, group4] = group;
-  const length = group1.length;
+  const { length } = group1;
 
   const totalVertices = [];
 
@@ -236,7 +232,7 @@ function drawArcWaveGude(group) {
       // transparent: false,
       // depthTest: false,
       // color: 0x049ef4
-    })
+    }),
   );
 
   return mesh;
@@ -256,7 +252,7 @@ function createPartVertices(...points) {
     x1, y1, z1, x5, y5, z5, x8, y8, z8, x1, y1, z1, x8, y8, z8, x2, y2, z2, // left
     x3, y3, z3, x7, y7, z7, x6, y6, z6, x3, y3, z3, x6, y6, z6, x4, y4, z4, // right
     x5, y5, z5, x6, y6, z6, x7, y7, z7, x5, y5, z5, x7, y7, z7, x8, y8, z8, // up
-    x1, y1, z1, x3, y3, z3, x4, y4, z4, x1, y1, z1, x2, y2, z2, x3, y3, z3// down
+    x1, y1, z1, x3, y3, z3, x4, y4, z4, x1, y1, z1, x2, y2, z2, x3, y3, z3, // down
   ];
   return vertices;
 }
@@ -269,7 +265,7 @@ function addFront(p1, p4, p5, p6) {
 
   return [
     x1, y1, z1, x4, y4, z4, x5, y5, z5,
-    x5, y5, z5, x4, y4, z4, x6, y6, z6
+    x5, y5, z5, x4, y4, z4, x6, y6, z6,
   ];
 }
 
@@ -280,7 +276,6 @@ function addBack(p2, p3, p8, p7) {
   const { x: x8, y: y8, z: z8 } = p8;
   return [
     x2, y2, z2, x8, y8, z8, x7, y7, z7,
-    x2, y2, z2, x7, y7, z7, x3, y3, z3
+    x2, y2, z2, x7, y7, z7, x3, y3, z3,
   ];
 }
-

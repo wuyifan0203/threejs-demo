@@ -1,14 +1,15 @@
 /*
  * @Date: 2023-01-04 10:59:15
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-04 11:00:26
- * @FilePath: /aquaman/example/viewHelperTest/index2.js
+ * @LastEditTime: 2023-01-31 18:10:52
+ * @FilePath: /threejs-demo/src/examples/viewHelperTest/index2.js
  */
 import * as THREE from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 
-let mesh, renderer, scene, camera, controls, helper;
+let mesh; let renderer; let scene; let camera; let controls; let
+  helper;
 
 init();
 animate();
@@ -51,7 +52,7 @@ function init() {
     color: 0x00ffff,
     flatShading: true,
     transparent: true,
-    opacity: 0.7
+    opacity: 0.7,
   });
 
   // mesh

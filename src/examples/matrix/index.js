@@ -17,7 +17,7 @@ import {
   Euler,
   Quaternion,
   Points,
-  PointsMaterial
+  PointsMaterial,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 
@@ -29,14 +29,12 @@ import {
   initDefaultLighting,
   rotationFormula,
   createMirrorMatrix,
-  normal2Euler
+  normal2Euler,
 } from '../../lib/tools/index.js';
 
-
-
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -68,7 +66,7 @@ function draw(scene) {
     opacity: 1,
     depthTest: false,
     color: 0xcddc39,
-    wireframe: true
+    wireframe: true,
   });
 
   const box = new BoxBufferGeometry(4, 4, 4);

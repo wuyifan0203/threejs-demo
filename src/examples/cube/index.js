@@ -2,8 +2,8 @@
 /*
  * @Date: 2023-01-05 17:20:07
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-06 16:59:36
- * @FilePath: /aquaman/example/cube/index.js
+ * @LastEditTime: 2023-01-31 17:33:13
+ * @FilePath: /threejs-demo/src/examples/cube/index.js
  */
 import {
   Vector3,
@@ -12,20 +12,20 @@ import {
   Mesh,
   MeshPhongMaterial,
   MeshBasicMaterial,
-  Group
+  Group,
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   createAxesHelper,
-  initCustomGrid
+  initCustomGrid,
 } from '../../lib/tools/index.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { Cube } from './cube.js';
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -56,4 +56,3 @@ function draw(scene) {
   scene.add(cube);
   console.log(scene);
 }
-

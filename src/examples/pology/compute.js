@@ -1,8 +1,8 @@
 /*
  * @Date: 2022-11-30 13:47:02
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2022-11-30 17:54:15
- * @FilePath: /aquaman/example/pology/compute.js
+ * @LastEditTime: 2023-01-31 17:57:12
+ * @FilePath: /threejs-demo/src/examples/pology/compute.js
  */
 
 function innerPoints(p1, p, p2, l) {
@@ -80,5 +80,5 @@ function isConvex(vec20, vec21) {
 
 export {
   innerPoints,
-  expendPoints
+  expendPoints,
 };

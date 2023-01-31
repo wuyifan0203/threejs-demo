@@ -1,32 +1,26 @@
-/* eslint-disable no-unused-vars */
 /*
  * @Date: 2022-11-29 19:36:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2022-12-20 14:08:59
- * @FilePath: /aquaman/example/pology/index.js
+ * @LastEditTime: 2023-01-31 18:05:51
+ * @FilePath: /threejs-demo/src/examples/pology/index.js
  */
-import { data, data1, data2, data3, data4, data5, data6, data7, data8, data9 } from './data.js';
-import { pointInPolygon } from './isInPology.js';
+import {
+  // eslint-disable-next-line no-unused-vars
+  data, data1, data2, data3, data4, data5, data6, data7, data8, data9,
+} from './data.js';
 import {
   Scene,
   Mesh,
   BufferGeometry,
   Vector3,
-  DoubleSide,
   LineBasicMaterial,
   EdgesGeometry,
   BufferAttribute,
   LineSegments,
-  MeshBasicMaterial,
-  BoxBufferGeometry,
   MeshLambertMaterial,
   Matrix4,
-  Euler,
-  Quaternion,
-  Points,
-  PointsMaterial,
   AmbientLight,
-  DirectionalLight
+  DirectionalLight,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
@@ -35,17 +29,18 @@ import {
   initCustomGrid,
   createAxesHelper,
   angle2Radians,
-  rotationFormula
+  rotationFormula,
 } from '../../lib/tools/index.js';
 import { innerPoints } from './compute.js';
 
 import { EarCut } from './Earcut.js';
+// eslint-disable-next-line no-unused-vars
 import { VertexNormalsHelper } from '../../lib/three/VertexNormalsHelper.js';
 import { Arrow } from '../../lib/three/Arrow.js';
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
@@ -184,7 +179,7 @@ function draw(scene) {
     opacity: 0.5,
     depthTest: false,
     depthWrite: false,
-    transparent: true
+    transparent: true,
     // wireframe: true
   });
 
@@ -205,7 +200,7 @@ function draw(scene) {
 function splicePoint(data) {
   const pointList = [];
   if (data.length) {
-    for (let i = 0; i <= data.length - 1; i = i + 2) {
+    for (let i = 0; i <= data.length - 1; i += 2) {
       pointList.push([data[i], data[i + 1]]);
     }
   }
@@ -219,7 +214,7 @@ function addAllSide(top, bottom, map) {
 
   const up = vertex2PointList(top);
   const down = vertex2PointList(bottom);
-  const length = up.length;
+  const { length } = up;
   for (let i = 0; i < length - 1; i++) {
     const upOneIndex = map.get(JSON.stringify(up[i]));
     const upTwoIndex = map.get(JSON.stringify(up[i + 1]));
@@ -235,7 +230,7 @@ function addAllSide(top, bottom, map) {
 }
 
 function vertex2PointList(vertex) {
-  const length = vertex.length;
+  const { length } = vertex;
   const pointList = [];
   for (let i = 0; i < length - 2; i += 3) {
     pointList.push([vertex[i], vertex[i + 1], vertex[i + 2]]);
@@ -243,6 +238,7 @@ function vertex2PointList(vertex) {
   return pointList;
 }
 
+// eslint-disable-next-line no-unused-vars
 function addOneSideIndex(upOneIndex, upTwoIndex, downOneIndex, downTwoIndex) {
   return [upOneIndex, downTwoIndex, upTwoIndex, upOneIndex, downOneIndex, downTwoIndex];
 }
@@ -252,7 +248,7 @@ function addOneSideIndexInverse(upOneIndex, upTwoIndex, downOneIndex, downTwoInd
 
 function vec2ToVec3Vertex(pointList, h = 0) {
   const vertices = [];
-  const length = pointList.length;
+  const { length } = pointList;
   for (let index = 0; index < length; index++) {
     vertices.push(...pointList[index], h);
   }
@@ -261,7 +257,7 @@ function vec2ToVec3Vertex(pointList, h = 0) {
 
 function expendWidth(pointList, width) {
   const result = [];
-  const length = pointList.length;
+  const { length } = pointList;
   for (let i = 0, j = length - 1; i < length; j = i++) {
     const q = i === length - 1 ? 0 : i + 1;
     result.push(innerPoints(pointList[j], pointList[i], pointList[q], width));
@@ -276,8 +272,7 @@ function convertIndex(index, offset = 0) {
   for (let i = 0; i < length; i += 3) {
     newIndex.push(index[i + 2] + offset);
     newIndex.push(index[i + 1] + offset);
-    newIndex.push(index[i ] + offset);
+    newIndex.push(index[i] + offset);
   }
   return newIndex;
 }
-

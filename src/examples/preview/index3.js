@@ -8,19 +8,21 @@ import {
   LineBasicMaterial,
   EdgesGeometry,
   BufferAttribute,
-  LineSegments
+  LineSegments,
   // MeshBasicMaterial
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { initRenderer, initCamera, initDefaultLighting, createAxesHelper } from '../../lib/tools/index.js';
+import {
+  initRenderer, initDefaultLighting, createAxesHelper, initPerspectiveCamera,
+} from '../../lib/tools/index.js';
 
-(function() {
+(function () {
   init();
-})();
+}());
 
 function init() {
   const renderer = initRenderer();
-  const camera = initCamera();
+  const camera = initPerspectiveCamera();
   const scene = new Scene();
   //   const groundPlane = addLargeGroundPlane(scene);
   //   groundPlane.position.y = -0.01;
@@ -41,7 +43,7 @@ function init() {
 
 function draw(scene) {
   const lineMaterial = new LineBasicMaterial({
-    color: 0xffffff
+    color: 0xffffff,
   });
 
   // const basicMaterial = new MeshBasicMaterial({ color: 0xff98ff });
@@ -81,7 +83,7 @@ function draw(scene) {
     x4: 10,
     y4: -10,
     x5: 10,
-    y5: -10
+    y5: -10,
   };
 
   const points2 = {
@@ -113,7 +115,7 @@ function draw(scene) {
     x4: 1,
     y4: -1,
     x5: 2,
-    y5: -2
+    y5: -2,
   };
 
   const vertices = createVertices(points);
@@ -128,13 +130,15 @@ function draw(scene) {
 }
 
 function createVertices(attrs) {
-  const { x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8 } = attrs;
+  const {
+    x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4, x5, y5, z5, x6, y6, z6, x7, y7, z7, x8, y8, z8,
+  } = attrs;
   return [
     x1, y1, z1, x2, y2, z2, x3, y3, z3, x1, y1, z1, x3, y3, z3, x4, y4, z4, // up
     x8, y8, z8, x5, y5, z5, x6, y6, z6, x8, y8, z8, x6, y6, z6, x7, y7, z7, // down
     x1, y1, z1, x8, y8, z8, x2, y2, z2, x2, y2, z2, x8, y8, z8, x7, y7, z7, // left
     x3, y3, z3, x5, y5, z5, x4, y4, z4, x3, y3, z3, x6, y6, z6, x5, y5, z5, // right
     x2, y2, z2, x7, y7, z7, x3, y3, z3, x7, y7, z7, x6, y6, z6, x3, y3, z3, // front
-    x1, y1, z1, x5, y5, z5, x8, y8, z8, x1, y1, z1, x4, y4, z4, x5, y5, z5 // back
+    x1, y1, z1, x5, y5, z5, x8, y8, z8, x1, y1, z1, x4, y4, z4, x5, y5, z5, // back
   ];
 }

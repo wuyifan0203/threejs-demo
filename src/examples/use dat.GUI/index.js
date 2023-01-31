@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-11 15:14:48
+ * @LastEditTime: 2023-01-31 18:10:09
  * @FilePath: /threejs-demo/src/examples/use dat.GUI/index.js
  */
 import {
@@ -10,20 +10,21 @@ import {
   Mesh,
   MeshBasicMaterial,
   SphereGeometry,
-  Color
-} from "../../lib/three/three.module.js";
+  Color,
+} from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   createAxesHelper,
   initCustomGrid,
   resize,
-} from "../../lib/tools/index.js";
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
-import { ViewHelper } from "../../lib/three/viewHelper.js";
-import dat from "../../lib/util/dat.gui.js";
+} from '../../lib/tools/index.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { ViewHelper } from '../../lib/three/viewHelper.js';
+import dat from '../../lib/util/dat.gui.js';
 
-import {addMaterialGUI} from '../../lib/tools/datGUIutils.js'
+import { addMaterialGUI } from '../../lib/tools/datGUIutils.js';
+
 window.onload = function () {
   init();
 };
@@ -56,31 +57,30 @@ function init() {
 
 function draw(scene) {
   const material = new MeshBasicMaterial();
-  const sphereGeometry = new SphereGeometry(5,32,32)
-  const mesh = new Mesh(sphereGeometry,material);
+  const sphereGeometry = new SphereGeometry(5, 32, 32);
+  const mesh = new Mesh(sphereGeometry, material);
 
-  const position = sphereGeometry.getAttribute('position')
   console.log(sphereGeometry.getFace());
 
-  scene.add(mesh)
+  scene.add(mesh);
 
   const controls = {
     test: material.color.getStyle(),
     scaleX: mesh.scale.x,
     speed: 0.1,
-    autoUpdate:true,
-    update:function (param){
+    autoUpdate: true,
+    update(param) {
       console.log(param);
     },
     material,
     mesh,
-    redraw(){
-      if(mesh) scene.remove(controls.mesh);
-      const newMesh = new Mesh(sphereGeometry,material);
+    redraw() {
+      if (mesh) scene.remove(controls.mesh);
+      const newMesh = new Mesh(sphereGeometry, material);
       controls.mesh = newMesh;
       scene.add(newMesh);
-      newMesh.scale.set(controls.scaleX,mesh.scale.y,mesh.scale.z)
-    }
+      newMesh.scale.set(controls.scaleX, mesh.scale.y, mesh.scale.z);
+    },
   };
 
   // 创建 gui 对象
@@ -92,20 +92,20 @@ function draw(scene) {
   // 保存本地
   gui.saveToLocalStorageIfPossible(); // 好像没生效
   // 设置gui 位置
-  gui.domElement.style.position = "absolute";
+  gui.domElement.style.position = 'absolute';
 
   /// UI操作
   // 如果添加了不存在的属性会报错！！
   // 添加文件夹
   // 原码查看 folder 继承 gui类
   // addFolder 返回一个 GUI 对象
-  const folder = gui.addFolder("folder name");
+  const folder = gui.addFolder('folder name');
   // 展开文件夹
   folder.open();
 
   // 文件夹添加颜色选择控件
-  folder.addColor(controls, "test").onChange(e=>{
-    material.color.set(new Color(controls.test))
+  folder.addColor(controls, 'test').onChange(() => {
+    material.color.set(new Color(controls.test));
   });
 
   //  add(控件对象变量名，对象属性名，其它参数),会返回一个controller 对象
@@ -116,18 +116,18 @@ function draw(scene) {
   // String——文本输入框、下拉菜单
   // Object——下拉菜单
 
-  //添加缩放系数拖动条菜单选项
-  const slider = folder.add(controls, "scaleX", 0.1, 2.5);
-  //添加转速下拉菜单选项
-  folder.add(controls, "speed", { low: 0.005, middle: 0.01, height: 0.1 });
+  // 添加缩放系数拖动条菜单选项
+  const slider = folder.add(controls, 'scaleX', 0.1, 2.5);
+  // 添加转速下拉菜单选项
+  folder.add(controls, 'speed', { low: 0.005, middle: 0.01, height: 0.1 });
   // 添加checkbox
-  gui.add(controls,'autoUpdate');
+  gui.add(controls, 'autoUpdate');
   // 添加按钮
-  folder.add(controls,'update','params')
+  folder.add(controls, 'update', 'params');
 
   // 控件添加事件
-  slider.onChange(e=>{
+  slider.onChange(() => {
     controls.redraw();
-  })
-  addMaterialGUI(gui,controls,material);
+  });
+  addMaterialGUI(gui, controls, material);
 }
