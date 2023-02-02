@@ -107,6 +107,7 @@ function createAxesHelper(scene) {
   });
   arrowHelper.position.set(0, 0, 0);
   scene.add(arrowHelper);
+  return arrowHelper;
 }
 
 function resize(render, camera) {

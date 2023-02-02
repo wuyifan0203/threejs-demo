@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 18:00:18
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 18:08:22
+ * @LastEditTime: 2023-02-01 17:20:32
  * @FilePath: /threejs-demo/.eslintrc.js
  */
 module.exports = {
@@ -54,5 +54,9 @@ module.exports = {
     'no-mixed-operators': 0,
     // 使用 continue
     'no-continue': 0,
+    // 使用指定语法
+    'no-restricted-syntax': 0,
+    // for in 是否做校验
+    'guard-for-in': 0,
   },
 };
