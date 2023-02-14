@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:14:17
+ * @LastEditTime: 2023-02-06 17:17:35
  * @FilePath: /threejs-demo/src/examples/edge/index2.js
  */
 
@@ -24,6 +24,7 @@ import {
 import { LineMaterial } from '../../lib/three/LineMaterial.js';
 import { LineSegments2 } from '../../lib/three/LineSegments2.js';
 import { LineSegmentsGeometry } from '../../lib/three/LineSegmentsGeometry.js';
+import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
 
 (function () {
   init();
@@ -72,6 +73,9 @@ function draw(scene) {
   //   line.computeLineDistances();
   // 7. 添加到场景
   scene.add(line, l);
+
+  const fn = new FaceNormalsHelper(line);
+  scene.add(fn);
 
   console.log(scene);
 }

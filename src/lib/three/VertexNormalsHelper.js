@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-01-09 14:37:51
+ * @LastEditors: wuyifan wuyifan@max-optics.com
+ * @LastEditTime: 2023-02-06 16:23:46
+ * @FilePath: /threejs-demo/src/lib/three/VertexNormalsHelper.js
+ */
 /* eslint-disable constructor-super */
 import {
   BufferGeometry,

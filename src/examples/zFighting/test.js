@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-01 18:05:24
+ * @LastEditTime: 2023-02-10 14:34:32
  * @FilePath: /threejs-demo/src/examples/zFighting/test.js
  */
 import {
@@ -12,13 +12,14 @@ import {
   Mesh,
   PlaneGeometry,
   DirectionalLight,
+  BoxGeometry,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 import {
   initRenderer, resize,
 } from '../../lib/tools/index.js';
-import datGui from '../../lib/util/dat.gui.js';
+import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
 
 import { Stats } from '../../lib/util/Stats.js';
 
@@ -61,8 +62,9 @@ function init() {
     side: DoubleSide,
     transparent: true,
     opacity: 0.5,
-    // depthTest: false,
-    // depthWrite: false,
+    depthTest: false,
+    depthWrite: true,
+    wireframe: true,
   };
 
   function addLight(x, y, z) {
@@ -85,35 +87,18 @@ function init() {
     planeMesh4: new Mesh(plane, createMaterial('green')),
   };
 
-  scene.add(
-    meshes.planeMesh1,
-    meshes.planeMesh2,
-    // meshes.planeMesh3,
-    // meshes.planeMesh4,
-  );
-  const queen = () => {
-    let i = -2;
-    for (const key in meshes) {
-      const mesh = meshes[key];
-      console.log(mesh);
-      mesh.rotation.set(0, 0, 0);
-      mesh.position.set(i, i, i);
-      i++;
-    }
-  };
+  // scene.add(
+  // meshes.planeMesh1,
+  // meshes.planeMesh2,
+  // meshes.planeMesh3,
+  // meshes.planeMesh4,
+  // );
 
-  const union = () => {
-    let i = 0;
-    for (const key in meshes) {
-      const mesh = meshes[key];
-      console.log(mesh);
-      mesh.rotation.set(i * 40, 0, 0);
-      mesh.position.set(0, 0, 0);
-      i++;
-    }
-  };
+  const boxMesh = new Mesh(new BoxGeometry(3, 3, 3), createMaterial('yellow'));
 
-  union();
-
-  const gui = new datGui.GUI();
+  scene.add(boxMesh);
+  console.log(boxMesh);
+  boxMesh.geometry.computeVertexNormals();
+  const fn = new FaceNormalsHelper(boxMesh, 1);
+  scene.add(fn);
 }
