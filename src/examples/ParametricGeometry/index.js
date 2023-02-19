@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-14 17:16:32
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-19 16:45:42
  * @FilePath: /threejs-demo/src/examples/ParametricGeometry/index.js
  */
 import {
@@ -20,6 +20,7 @@ import {
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 import { ParametricGeometry } from '../../lib/three/ParametricGeometry.js';
+import dat from '../../lib/util/dat.gui.js';
 
 window.onload = () => {
   init();
@@ -50,8 +51,8 @@ function init() {
     requestAnimationFrame(render);
   }
 
-  console.log(scene);
-  console.log(camera);
+  // console.log(scene);
+  // console.log(camera);
   window.camera = camera;
 }
 
@@ -159,13 +160,29 @@ const funcList = {
 };
 
 function draw(scene) {
-  const parametric = new ParametricGeometry(funcList.RadialWave, 50, 50);
+  const list = Object.keys(funcList);
+
   const material = new MeshNormalMaterial({
     depthTest: true,
     side: 2,
     // wireframe:true
   });
+
+  const controls = {
+    material,
+    drawFunc:list[0]
+  }
+  let parametric = new ParametricGeometry(funcList[controls.drawFunc], 50, 50);
+
   const mesh = new Mesh(parametric, material);
+
+  const gui = new dat.GUI();
+
+  gui.add(controls,'drawFunc',list).onChange(e=>{
+    parametric.dispose();
+    mesh.geometry = new ParametricGeometry(funcList[e], 50, 50);
+  })
+  gui.add(controls.material,'wireframe')
 
   scene.add(mesh);
 }
