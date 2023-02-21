@@ -116,7 +116,7 @@ function resize(render, camera) {
     render.setSize(window.innerWidth, window.innerHeight);
     if (camera.type === 'OrthographicCamera') {
       camera.top = 15 * (h / w);
-      camera.bottom = 15 * (h / w);
+      camera.bottom =  - 15 * (h / w);
     } else if (camera.type === 'PerspectiveCamera') {
       camera.aspect = window.innerWidth / window.innerHeight;
     }

@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 /*
  * @Date: 2022-11-16 15:00:21
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 18:10:37
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-21 13:19:46
  * @FilePath: /threejs-demo/src/examples/viewHelperTest/index.js
  */
 
@@ -21,6 +21,7 @@ import {
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 import {
+  resize,
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
@@ -267,6 +268,8 @@ function init() {
   draw(scene);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
   console.log(camera);
+
+  resize(renderer,camera)
 
   render();
   function render() {
