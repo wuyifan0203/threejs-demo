@@ -5,6 +5,7 @@ const vpTemp = new THREE.Vector4();
 class ViewHelper extends THREE.Object3D {
   constructor(editorCamera, dom) {
     super();
+    this.editorCamera = editorCamera
 
     this.isViewHelper = true;
 
@@ -78,11 +79,11 @@ class ViewHelper extends THREE.Object3D {
     const turnRate = 2 * Math.PI; // turn rate in angles per second
 
     this.render = function(renderer) {
-      this.quaternion.copy(editorCamera.quaternion).invert();
+      this.quaternion.copy(this.editorCamera.quaternion).invert();
       this.updateMatrixWorld();
 
       point.set(0, 0, 1);
-      point.applyQuaternion(editorCamera.quaternion);
+      point.applyQuaternion(this.editorCamera.quaternion);
 
       if (point.x >= 0) {
         posXAxisHelper.material.opacity = 1;
@@ -163,11 +164,11 @@ class ViewHelper extends THREE.Object3D {
       // animate position by doing a slerp and then scaling the position on the unit sphere
 
       q1.rotateTowards(q2, step);
-      editorCamera.position.set(0, 0, 1).applyQuaternion(q1).multiplyScalar(radius).add(focusPoint);
+      this.editorCamera.position.set(0, 0, 1).applyQuaternion(q1).multiplyScalar(radius).add(focusPoint);
 
       // animate orientation
 
-      editorCamera.quaternion.rotateTowards(targetQuaternion, step);
+      this.editorCamera.quaternion.rotateTowards(targetQuaternion, step);
 
       if (q1.angleTo(q2) === 0) {
         this.animating = false;
@@ -234,12 +235,12 @@ class ViewHelper extends THREE.Object3D {
 
       //
 
-      radius = editorCamera.position.distanceTo(focusPoint);
+      radius = this.editorCamera.position.distanceTo(focusPoint);
       targetPosition.multiplyScalar(radius).add(focusPoint);
 
       dummy.position.copy(focusPoint);
 
-      dummy.lookAt(editorCamera.position);
+      dummy.lookAt(this.editorCamera.position);
       q1.copy(dummy.quaternion);
 
       dummy.lookAt(targetPosition);
