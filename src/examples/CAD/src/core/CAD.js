@@ -1,14 +1,13 @@
 import { ViewHelper } from '../helper/ViewHelper.js';
 import { OrbitControls } from '../controls/OrbitControls.js';
-import { OrthographicCamera, Scene, Raycaster, WebGLRenderer,MOUSE, Vector2 } from '../lib/three.module.js';
+import { OrthographicCamera, Raycaster, WebGLRenderer,MOUSE, Vector2} from '../lib/three.module.js';
 import { TransformControls } from '../controls/TransformControls.js';
 import { Stats } from '../utils/Stats.js';
 import { GPUStatsPanel } from '../utils/GPUStatsPanel.js';
 import { RenderPass } from '../postprocessing/RenderPass.js';
 import { EffectComposer } from '../postprocessing/EffectComposer.js';
 import {S,VIEWPOSITION,MOUSESTYLE} from '../lib/constant.js';
-import { CustomGridHelper } from '../helper/CustomGridHelper.js';
-import { CoordinateHelper } from '../helper/coordinateHelper.js';
+import { Collector } from './Collector.js';
 
 const raycaster = new Raycaster();
 const raycastObjects = [];
@@ -19,7 +18,7 @@ class CAD {
         this.width = width || window.innerWidth;
         this._container = container;
         container.style.position = 'absolute'
-        this.scene = new Scene();
+        this.collector = new Collector();
         this.renderer = new WebGLRenderer({ antialias: true });
         this.renderer.setClearColor('#ffffff');
         this.renderer.setSize(this.width, this.height)
@@ -52,19 +51,26 @@ class CAD {
         container.appendChild(this.stats.dom);
         container.appendChild(this.renderer.domElement);
         this.composer = new EffectComposer(this.renderer);
-        this.renderPass = new RenderPass(this.scene, this.mainCamera);
+        this.renderPass = new RenderPass(this.collector.scene, this.mainCamera);
         this.composer.addPass(this.renderPass);
         this.mode = 'SELECT';
         this.setMode(this.mode);
-        this.listenerCollect();
+        this.listenerControl();
         this.selectChange = ()=>{};
     }
 
     add(object) {
-        this.scene.add(object);
+        this.collector.track(object);
     }
 
-    remove() { }
+    remove(object) {
+        this.collector.track(object);
+    }
+
+    removeById(id){
+        const object = this.collector.scene.getObjectById(id);
+        this.remove(object);
+    }
 
     setView(viewName) {
         this.mainView = viewName;
@@ -130,7 +136,7 @@ class CAD {
         this.width = width;
         this.height = height;
         this.renderer.setSize(this.width, this.height);
-        const aspect = s * height / width
+        const aspect = S * height / width
         Object.values(this.cameras).forEach(camera => {
             camera.top = aspect;
             camera.bottom = - aspect;
@@ -138,15 +144,14 @@ class CAD {
         });
     }
 
-    listenerCollect(){
+    listenerControl(){
         const pointer = new Vector2();
         this.renderer.domElement.addEventListener('click',(event)=>{
             pointer.x = ( event.clientX / this.width ) * 2 - 1;
-			pointer.y = - ( event.clientY /this.height ) * 2 + 1;
-       
+			pointer.y = - ( event.clientY /this.height ) * 2 + 1;  
             raycaster.setFromCamera(pointer,this.mainCamera);
             raycastObjects.length = [];
-            raycaster.intersectObjects(this.scene.children,true,raycastObjects);
+            raycaster.intersectObjects(this.collector.pool,true,raycastObjects);
             this.selectChange(raycastObjects)
         })
 

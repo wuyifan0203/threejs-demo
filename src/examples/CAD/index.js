@@ -45,8 +45,10 @@ const init = () => {
     cad.selectChange = (obj)=>{
         console.log(obj);
     }
+cad.collector.exclusion = ['CoordinateHelper','CustomGridHelper']
 
     console.log(cad);
+
     window.cad = cad;
 }
 

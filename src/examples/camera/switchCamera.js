@@ -1,120 +1,141 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-22 10:29:53
+ * @LastEditTime: 2023-02-22 16:56:46
  * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
  */
 import {
-    Vector3,
-    Scene,
-    Mesh,
-    MeshNormalMaterial,
-    SphereGeometry,
-    BoxGeometry,
-    Matrix4,
-  } from '../../lib/three/three.module.js';
-  import {
-    initRenderer,
-    initPerspectiveCamera,
-    createAxesHelper,
-    initCustomGrid,
-    resize,
-  } from '../../lib/tools/index.js';
-  import { OrbitControls } from '../../lib/three/OrbitControls.js';
-  import { ViewHelper } from '../../lib/three/viewHelper.js';
-  import dat from '../../lib/util/dat.gui.js';
-  import { EffectComposer } from '../../lib/three/EffectComposer.js';
-  import { RenderPass} from '../../lib/three/RenderPass.js'
-  
-  window.onload = () => {
-    init();
-  };
-  
-  function init() {
-    const renderer = initRenderer();
-    const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
-    const scene = new Scene();
-    renderer.setClearColor(0xffffff);
-    renderer.autoClear = false;
-    camera.up.set(0, 0, 1);
-    resize(renderer, camera);
-    initCustomGrid(scene, 100, 100);
-    createAxesHelper(scene);
-  
-    const controls = new OrbitControls(camera, renderer.domElement);
-    const viewHelper = new ViewHelper(camera, renderer.domElement);
+  Vector3,
+  Scene,
+  Mesh,
+  MeshNormalMaterial,
+  SphereGeometry,
+  BoxGeometry,
+  Matrix4,
+} from '../../lib/three/three.module.js';
+import {
+  initRenderer,
+  initPerspectiveCamera,
+  createAxesHelper,
+  initCustomGrid,
+  resize,
+  initOrthographicCamera,
+} from '../../lib/tools/index.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { ViewHelper } from '../../lib/three/viewHelper.js';
+import dat from '../../lib/util/dat.gui.js';
+import { EffectComposer } from '../../lib/three/EffectComposer.js';
+import { RenderPass } from '../../lib/three/RenderPass.js'
 
-    const composer = new EffectComposer(renderer);
-    const renderPass =  new RenderPass(scene, camera);
-    composer.addPass(renderPass)
-  
-  
-    render();
-    function render() {
-      renderer.clear();
-      controls.update();
-      composer.render();
-      viewHelper.render(renderer);
-      requestAnimationFrame(render);
-    }
+window.onload = () => {
+  init();
+};
 
-    const sphere1 = new SphereGeometry(5, 20, 16);
-    const sphere2 = new SphereGeometry(3, 20, 16);
-    const box = new BoxGeometry(4, 4, 4);
-  
-    const material = new MeshNormalMaterial({ wireframe: true });
-  
-    const sphere1Mesh = new Mesh(sphere1, material);
-    const sphere2Mesh = new Mesh(sphere2, material);
-    const boxMesh = new Mesh(box, material);
-  
-    sphere1Mesh.position.set(-6, 0, 0);
-    sphere2Mesh.position.set(4, 0, 0);
-    scene.add(sphere1Mesh, sphere2Mesh, boxMesh);
+function init() {
+  const renderer = initRenderer();
+  const pcamera = initPerspectiveCamera(new Vector3(10, -10, 10));
+  const scene = new Scene();
+  renderer.setClearColor(0xffffff);
+  renderer.autoClear = false;
+  pcamera.up.set(0, 0, 1);
+  initCustomGrid(scene, 100, 100);
+  createAxesHelper(scene);
 
-    const camera2 = initPerspectiveCamera(new Vector3(100,0,0));
-    camera2.up.set(0,0,1)
+  const controls = new OrbitControls(pcamera, renderer.domElement);
+  const viewHelper = new ViewHelper(pcamera, renderer.domElement);
 
-    const controler = {
-        camera,
-        camera2,
-        current:'3D'
-    }
-
-    const gui = new dat.GUI();
-
-    gui.add(controler,'current',['3D','XY','XZ','YZ']).onChange(e=>{
-        console.log(e);
-        switchCamera(e)
-    })
+  const composer = new EffectComposer(renderer);
+  const renderPass = new RenderPass(scene, pcamera);
+  composer.addPass(renderPass)
 
 
-    const map = {
-      'XY':new Vector3(0,0,100),
-      'XZ':new Vector3(0,100,0),
-      'YZ':new Vector3(100,0,0)
-    }
-
-
-
-    function switchCamera(e) {
-      let camera
-      if(e==='3D'){
-        camera = controler.camera;
-      }else{
-        camera = controler.camera2;
-        camera.position.copy(map[e])
-      }
-        controls.object = camera;
-        controls.update();
-        viewHelper.editorCamera = camera;
-    //    composer.render() 
-    renderPass.camera = camera;
-    }
-
-
-
-
-
+  render();
+  function render() {
+    renderer.clear();
+    controls.update();
+    composer.render();
+    viewHelper.render(renderer);
+    requestAnimationFrame(render);
   }
-  
+
+  const sphere1 = new SphereGeometry(5, 20, 16);
+  const sphere2 = new SphereGeometry(3, 20, 16);
+  const box = new BoxGeometry(4, 4, 4);
+
+  const material = new MeshNormalMaterial({ wireframe: true });
+
+  const sphere1Mesh = new Mesh(sphere1, material);
+  const sphere2Mesh = new Mesh(sphere2, material);
+  const boxMesh = new Mesh(box, material);
+
+  sphere1Mesh.position.set(-6, 0, 0);
+  sphere2Mesh.position.set(4, 0, 0);
+  scene.add(sphere1Mesh, sphere2Mesh, boxMesh);
+
+  const pcamera1 = initPerspectiveCamera(new Vector3(20, 0, 0));
+  pcamera1.up.set(0, 0, 1);
+
+  const ocamera = initOrthographicCamera(new Vector3(10,-10,10));
+  ocamera.up.set(0, 0, 1);
+
+  const ocamera1 = initOrthographicCamera(new Vector3(20,0,0));
+  ocamera1.up.set(0, 0, 1)
+
+  const controler = {
+    p: {
+      pcamera,
+      pcamera1,
+    },
+    o: {
+      ocamera,
+      ocamera1
+    },
+    type: 'p',
+    current: '3D'
+  }
+
+  const gui = new dat.GUI();
+  gui.width = 330
+
+  gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange(e => {
+    switchCamera()
+  });
+
+  gui.add(controler,'type',{PerspectiveCamera:'p',OrthographicCamera:'o'}).name('Camera Type:').onChange(e=>{
+    switchCamera()
+  })
+
+
+  const map = {
+    'XY': new Vector3(0, 0, 20),
+    'XZ': new Vector3(0, 20, 0),
+    'YZ': new Vector3(20, 0, 0)
+  }
+
+
+
+  function switchCamera() {
+    let cameras,camera;
+    if(controler.type === 'p'){
+      cameras = controler.p;
+    }else{
+      cameras = controler.o;
+    }
+    if (controler.current === '3D') {
+      camera =cameras[controler.type + 'camera'];
+      controls.enableRotate = true;
+    } else {
+      controls.enableRotate = false;
+      camera = cameras[controler.type + 'camera1'];
+      camera.position.copy(map[controler.current]);
+      camera.updateProjectionMatrix();
+    }
+    controls.object = camera;
+    controls.update();
+    viewHelper.editorCamera = camera;
+    renderPass.camera = camera;
+  }
+
+  resize(renderer, pcamera);
+}
+
