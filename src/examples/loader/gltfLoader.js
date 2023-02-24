@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-02 18:31:16
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-24 12:38:57
  * @FilePath: /threejs-demo/src/examples/loader/gltfLoader.js
  */
 import {
@@ -37,7 +37,7 @@ function init() {
     0.1,
     10000,
   );
-  camera.position.set(0, 0, 120);
+  camera.position.set(-43, 13, 0.6);
   camera.lookAt(0, 0, 0);
   const scene = new Scene();
   renderer.setClearColor(0xffffff);
@@ -82,6 +82,7 @@ function draw(scene, camera) {
       color: '#ffe8a3',
       depthTest: true,
     });
+    modelMesh.scale.set(20,20,20)
     scene.add(modelMesh);
   };
   const onError = (e) => {

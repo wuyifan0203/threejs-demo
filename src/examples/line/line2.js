@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-06 17:17:35
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-24 11:04:09
  * @FilePath: /threejs-demo/src/examples/edge/index2.js
  */
 
@@ -11,7 +11,7 @@ import {
   LineBasicMaterial,
   EdgesGeometry,
   LineSegments,
-  BoxBufferGeometry,
+  BoxGeometry,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
@@ -54,7 +54,7 @@ function draw(scene) {
 //   const [x, y, z] = [6, 10, 4];
 
   // 2. 创建 LineGeometry，并设置空间点
-  const g = new BoxBufferGeometry(5, 6, 4);
+  const g = new BoxGeometry(5, 6, 4);
   const edge = new EdgesGeometry(g);
   const l = new LineSegments(edge, new LineBasicMaterial({ color: 'green' }));
   const geometry = new LineSegmentsGeometry();
@@ -74,8 +74,8 @@ function draw(scene) {
   // 7. 添加到场景
   scene.add(line, l);
 
-  const fn = new FaceNormalsHelper(line);
-  scene.add(fn);
+  // const fn = new FaceNormalsHelper(line);
+  // scene.add(fn);
 
   console.log(scene);
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-04 10:59:15
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 18:10:52
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-24 13:29:52
  * @FilePath: /threejs-demo/src/examples/viewHelperTest/index2.js
  */
 import * as THREE from '../../lib/three/three.module.js';
@@ -19,7 +19,7 @@ function init() {
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
-  renderer.autoClear = false;
+  renderer.autoClear = false; // 1
   document.body.appendChild(renderer.domElement);
 
   // scene
@@ -66,9 +66,9 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
-  renderer.clear();
+  renderer.clear(); // 2
 
   renderer.render(scene, camera);
 
-  helper.render(renderer);
+  helper.render(renderer); // 3
 }

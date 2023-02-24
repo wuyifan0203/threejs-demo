@@ -1,4 +1,4 @@
-import {Stats} from './stats.js';
+import {Stats} from './stats.js.js';
 
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query/
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/

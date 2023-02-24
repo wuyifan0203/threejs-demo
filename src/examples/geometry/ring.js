@@ -265,7 +265,6 @@ function init() {
 }
 
 function draw(scene) {
-//   drawLine(scene);
   const total = drawArc(scene);
   const buffer = new BufferAttribute(new Float32Array(total), 3);
   const g = new BufferGeometry().setAttribute('position', buffer);
@@ -281,38 +280,6 @@ function draw(scene) {
   const lm = new LineBasicMaterial({ color: 'black' });
   const l = new LineSegments(e, lm);
   scene.add(mesh, l);
-}
-
-// eslint-disable-next-line no-unused-vars
-function drawLine(scene) {
-  const r = 5;
-  const width = 2;
-  const [innerPart, outerPart] = makeCircle(r, 360, 0, width);
-
-  const [vertices1, vertices2] = [[], []];
-
-  for (let index = 1; index < innerPart.length; index++) {
-    const ip = innerPart[index - 1];
-    const op = outerPart[index - 1];
-    const ipl = innerPart[index];
-    const opl = outerPart[index];
-    vertices1.push(...ip.toArray(), ...ipl.toArray());
-    vertices2.push(...op.toArray(), ...opl.toArray());
-  }
-
-  const iBuffer = new BufferGeometry();
-  iBuffer.setAttribute('position', new BufferAttribute(new Float32Array([...vertices1]), 3));
-  const oBuffer = new BufferGeometry();
-  oBuffer.setAttribute('position', new BufferAttribute(new Float32Array([...vertices2]), 3));
-  const lineMaterial = new LineBasicMaterial({
-    color: 0xff0000,
-  });
-  const lineMaterial2 = new LineBasicMaterial({
-    color: 0x0000ff,
-  });
-  const inLine = new LineSegments(iBuffer, lineMaterial);
-  const outLine = new LineSegments(oBuffer, lineMaterial2);
-  scene.add(inLine, outLine);
 }
 
 function drawArc() {
