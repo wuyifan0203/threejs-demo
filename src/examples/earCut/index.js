@@ -1,11 +1,10 @@
 /*
  * @Date: 2022-11-29 19:36:35
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 18:05:51
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2023-02-24 15:03:59
  * @FilePath: /threejs-demo/src/examples/pology/index.js
  */
 import {
-  // eslint-disable-next-line no-unused-vars
   data, data1, data2, data3, data4, data5, data6, data7, data8, data9,
 } from './data.js';
 import {
@@ -13,14 +12,8 @@ import {
   Mesh,
   BufferGeometry,
   Vector3,
-  LineBasicMaterial,
-  EdgesGeometry,
   BufferAttribute,
-  LineSegments,
-  MeshLambertMaterial,
-  Matrix4,
-  AmbientLight,
-  DirectionalLight,
+  MeshBasicMaterial,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
@@ -29,14 +22,12 @@ import {
   initCustomGrid,
   createAxesHelper,
   angle2Radians,
-  rotationFormula,
 } from '../../lib/tools/index.js';
 import { innerPoints } from './compute.js';
 
 import { EarCut } from './Earcut.js';
-// eslint-disable-next-line no-unused-vars
-import { VertexNormalsHelper } from '../../lib/three/VertexNormalsHelper.js';
-import { Arrow } from '../../lib/three/Arrow.js';
+import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
+import dat from '../../lib/util/dat.gui.js'
 
 (function () {
   init();
@@ -52,150 +43,98 @@ function init() {
   initCustomGrid(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
-  scene.add(new AmbientLight());
-  const light = new DirectionalLight(0xffffff, 1);
-  scene.add(light);
-  light.target = scene;
-  light.shadow.mapSize.width = 1024;
-  light.shadow.mapSize.height = 1024;
   draw(scene);
 
   render();
   function render() {
     controls.update();
     requestAnimationFrame(render);
-
     renderer.render(scene, camera);
-    light.position.set(camera.position);
   }
 }
 
 function draw(scene) {
-  const testData = data9;
-  // 一维点二维化
-  const pointList = splicePoint(testData);
-  // 二维点转三维点
-  const bottomVertex = vec2ToVec3Vertex(pointList, 0.25);
-
-  // 耳切法算出索引
-  const bottomIndex = EarCut.triangulate(testData);
-  // const bottomMaterial = new MeshBasicMaterial({
-  //   color: 'green',
-  //   // wireframe: true,
-  //   side: 2
-  // });
-  // const bottomBuffer = new BufferGeometry();
-
-  // bottomBuffer.setAttribute('position', new BufferAttribute(new Float32Array(bottomVertex), 3));
-  // bottomBuffer.setIndex(bottomIndex);
-
-  // const bottomMesh = new Mesh(bottomBuffer, bottomMaterial);
-  // bottomBuffer.computeVertexNormals();
-
-  // const bottomNormalHelper = new VertexNormalsHelper(bottomMesh, 0.5);
-  // scene.add(bottomNormalHelper);
-
-  // scene.add(bottomMesh);
-
-  let d = 0;
-
-  const angle = Math.abs(105);
-
-  if (angle > 90) {
-    d = 0.25 / Math.tan(angle2Radians(angle - 90));
-  } else {
-    d = -0.25 / Math.tan(angle2Radians(angle));
-  }
-
-  const before = new Vector3(0, 0, 1);
-  const l = bottomVertex.length / 3 - 1;
-  const b = bottomVertex;
-
-  for (let i = 1; i < l; i++) {
-    const pp = (i - 1) * 3;
-    const dd = i * 3;
-    const p = [b[pp], b[pp + 1], b[pp + 2]];
-    const p1 = [b[dd], b[dd + 1], b[dd + 2]];
-    // console.log(p, p1);
-    const after = new Vector3().subVectors(new Vector3(...p1), new Vector3(...p));
-
-    const arrow = new Arrow();
-    const r = rotationFormula(before, after);
-    r.multiply(new Matrix4().makeTranslation(...p));
-    arrow.applyMatrix4(r);
-    scene.add(arrow);
-  }
-
-  const expendResult = expendWidth(pointList, d);
-
-  // console.log(expendResult);
-
-  const topVertex = vec2ToVec3Vertex(expendResult, -0.25);
-
-  // console.log(topVertex);
-
-  const topIndex = EarCut.triangulate(testData);
-  // const topMaterial = new MeshBasicMaterial({
-  //   color: 'skyblue',
-  //   // wireframe: true,
-  //   side: 2
-  // });
-  // const topBuffer = new BufferGeometry();
-  // topBuffer.setAttribute('position', new BufferAttribute(new Float32Array(topVertex), 3));
-  // topBuffer.setIndex(topIndex);
-
-  // const topMesh = new Mesh(topBuffer, topMaterial);
-  // console.log(topIndex.length);
-  // scene.add(topMesh);
-  // topBuffer.computeVertexNormals();
-  // const topNormalHelper = new VertexNormalsHelper(topMesh, 0.5);
-  // scene.add(topNormalHelper);
-
-  const totalVertices = bottomVertex.concat(topVertex);
-
-  const pointMap = new Map();
-
-  for (let i = 0; i < totalVertices.length - 2; i += 3) {
-    pointMap.set(JSON.stringify([totalVertices[i], totalVertices[i + 1], totalVertices[i + 2]]), i / 3);
-  }
-
-  // console.log(pointMap);
-
-  const dIndex = pointMap.size / 2;
-
-  const newTopIndex = convertIndex(topIndex, dIndex);
-
-  const totalIndex = bottomIndex.concat(newTopIndex);
-
-  const asideIndex = addAllSide(bottomVertex, topVertex, pointMap);
-
-  const newBuffer = new BufferGeometry();
-  newBuffer.setAttribute('position', new BufferAttribute(new Float32Array(totalVertices), 3));
-  newBuffer.setIndex(totalIndex.concat(asideIndex));
-  newBuffer.computeVertexNormals();
-  const newM = new MeshLambertMaterial({
-    color: 'green',
+  const newM = new MeshBasicMaterial({
     side: 2,
     opacity: 0.5,
     depthTest: false,
     depthWrite: false,
     transparent: true,
-    // wireframe: true
+    color: 'skyblue',
+    wireframe: false
   });
 
-  const newMesh = new Mesh(newBuffer, newM);
-  scene.add(newMesh);
+  const dataList = {
+    data,data1,data2,data3,data4,data5,data6,data7,data8,data9
+  }
 
-  const edges = new EdgesGeometry(newBuffer);
-  const edgeMesh = new LineSegments(edges, new LineBasicMaterial({ color: 0x000000 }));
-  scene.add(edgeMesh);
+  let mesh,meshNormal;
+  draw3DMesh(data1,90,0.5,0.2);
+  scene.add(mesh);
+  scene.add(meshNormal);
 
-  // const meshNormal = new VertexNormalsHelper(newMesh, 0.5);
+  function draw3DMesh(data,angle,h) {
+    const bufferG = new BufferGeometry();
+    const halfH = h/2;
+    const testData = data;
+    // 一维点二维化
+    const pointList = splicePoint(testData);
+    // 二维点转三维点
+    const bottomVertex = vec2ToVec3Vertex(pointList, halfH);
+    // 耳切法算出索引
+    const bottomIndex = EarCut.triangulate(testData);
+    let d = 0;
+    if (angle > 90) {
+      d = halfH / Math.tan(angle2Radians(angle - 90));
+    } else {
+      d = -halfH / Math.tan(angle2Radians(angle));
+    }
+    const expendResult = expendWidth(pointList, d);
+    const topVertex = vec2ToVec3Vertex(expendResult, -halfH);
+    const topIndex = EarCut.triangulate(testData);
+    const totalVertices = bottomVertex.concat(topVertex);
+    const pointMap = new Map();
+    for (let i = 0; i < totalVertices.length - 2; i += 3) {
+      pointMap.set(JSON.stringify([totalVertices[i], totalVertices[i + 1], totalVertices[i + 2]]), i / 3);
+    }
+    const dIndex = pointMap.size / 2;
+    const newTopIndex = convertIndex(topIndex, dIndex);
+    const totalIndex = bottomIndex.concat(newTopIndex);
+    const asideIndex = addAllSide(bottomVertex, topVertex, pointMap);
 
-  // scene.add(meshNormal);
+    bufferG.setAttribute('position', new BufferAttribute(new Float32Array(totalVertices), 3));
+    bufferG.setIndex(totalIndex.concat(asideIndex));
+    bufferG.computeVertexNormals();
 
-  console.log(scene);
+    mesh = new Mesh(bufferG, newM);
+    meshNormal = new FaceNormalsHelper(mesh, 1);
+  }
+
+  const orbject = {
+    data:'data1',
+    angle:90,
+    height:0.5,
+  }
+
+  const gui = new dat.GUI();
+
+  gui.add(orbject,'data',Object.keys(dataList)).name('Data Source').onChange(e=>update());
+  gui.add(orbject,'angle',1,179,1).name('Angle').onChange(e=>update());
+  gui.add(orbject,'height',0.1,10,0.1).name('Height').onChange(e=>update());
+  gui.add(newM,'wireframe').name('Material Wireframe');
+  gui.add(meshNormal,'visible').name('Normal helper');
+
+
+  function update() {
+    scene.remove(mesh);
+    scene.remove(meshNormal)
+    draw3DMesh(dataList[orbject.data] ,orbject.angle,orbject.height);
+    scene.add(mesh);
+    scene.add(meshNormal)
+  }
 }
+
+
 
 function splicePoint(data) {
   const pointList = [];
@@ -223,7 +162,6 @@ function addAllSide(top, bottom, map) {
     asideIndex.push(...addOneSideIndexInverse(upOneIndex, upTwoIndex, downOneIndex, downTwoIndex));
   }
 
-  console.log(down[0]);
   asideIndex.push(...addOneSideIndexInverse(map.get(JSON.stringify(up[length - 1])), map.get(JSON.stringify(up[0])), map.get(JSON.stringify(down[length - 1])), map.get(JSON.stringify(down[0]))));
 
   return asideIndex;

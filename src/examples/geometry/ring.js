@@ -20,6 +20,8 @@ import {
   angle2Radians,
 } from '../../lib/tools/index.js';
 
+import dat from '../../lib/util/dat.gui.js'
+
 function circle(x, r2) {
   return Math.sqrt(r2 - x * x);
 }
@@ -265,9 +267,7 @@ function init() {
 }
 
 function draw(scene) {
-  const total = drawArc(scene);
-  const buffer = new BufferAttribute(new Float32Array(total), 3);
-  const g = new BufferGeometry().setAttribute('position', buffer);
+  const lm = new LineBasicMaterial({ color: 'black' });
   const m = new MeshBasicMaterial({
     side: DoubleSide,
     transparent: true,
@@ -275,18 +275,56 @@ function draw(scene) {
     color: 'green',
     depthTest: false,
   });
-  const mesh = new Mesh(g, m);
-  const e = new EdgesGeometry(g);
-  const lm = new LineBasicMaterial({ color: 'black' });
-  const l = new LineSegments(e, lm);
-  scene.add(mesh, l);
+
+  let mesh,lineMesh;
+
+  function draw3DMesh(r,angle,height,width) {
+    const g = new BufferGeometry().setAttribute('position', new BufferAttribute(new Float32Array( drawArc(r,angle,height,width)), 3));
+    mesh = new Mesh(g, m);
+    const e = new EdgesGeometry(g);
+    lineMesh = new LineSegments(e, lm);
+    scene.add(mesh, lineMesh);
+  }
+
+  const object = {
+    angle:360,
+    r:5,
+    height:2,
+    width:1
+  }
+
+  draw3DMesh(object.r,object.angle,object.height,object.width);
+
+  const gui = new dat.GUI();
+
+  gui.add(object,'angle',0,360,1).onChange(e=>{
+    scene.remove(lineMesh,mesh);
+    draw3DMesh(object.r,object.angle,object.height,object.width)
+  })
+
+  gui.add(object,'height',0,100,0.1).onChange(e=>{
+    scene.remove(lineMesh,mesh);
+    draw3DMesh(object.r,object.angle,object.height,object.width)
+  })
+
+
+  gui.add(object,'width',0,100,0.1).onChange(e=>{
+    scene.remove(lineMesh,mesh);
+    draw3DMesh(object.r,object.angle,object.height,object.width)
+  })
+
+
+  gui.add(object,'r',0,100,0.1).onChange(e=>{
+    scene.remove(lineMesh,mesh);
+    draw3DMesh(object.r,object.angle,object.height,object.width)
+  })
+
 }
 
-function drawArc() {
-  const r = 5;
-  const angle = 360;
-  const [group1, group2] = makeCircle(r, angle, 1, 1);
-  const [group3, group4] = makeCircle(r, angle, -1, 1);
+function drawArc(r,angle,height,width) {
+  const halfH = height /2;
+  const [group1, group2] = makeCircle(r, angle, halfH, width);
+  const [group3, group4] = makeCircle(r, angle, -halfH, width);
 
   const totalVertices = [];
   const { length } = group1;

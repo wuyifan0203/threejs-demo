@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-24 11:04:09
+ * @LastEditTime: 2023-02-24 15:34:15
  * @FilePath: /threejs-demo/src/examples/edge/index2.js
  */
 
@@ -24,7 +24,7 @@ import {
 import { LineMaterial } from '../../lib/three/LineMaterial.js';
 import { LineSegments2 } from '../../lib/three/LineSegments2.js';
 import { LineSegmentsGeometry } from '../../lib/three/LineSegmentsGeometry.js';
-import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
+import dat from '../../lib/util/dat.gui.js'
 
 (function () {
   init();
@@ -63,7 +63,7 @@ function draw(scene) {
   const material = new LineMaterial({
     color: 0xff0000,
     linewidth: 3,
-    // wireframe: true
+    wireframe: false
   });
   // 4. 设置材质分辨率
   material.resolution.set(window.innerWidth, window.innerHeight);
@@ -73,9 +73,9 @@ function draw(scene) {
   //   line.computeLineDistances();
   // 7. 添加到场景
   scene.add(line, l);
-
-  // const fn = new FaceNormalsHelper(line);
-  // scene.add(fn);
-
   console.log(scene);
+
+  const gui = new dat.GUI();
+  gui.add(material,'linewidth',0.5,10,0.1);
+  gui.add(material,'wireframe');
 }
