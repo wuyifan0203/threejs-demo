@@ -1,10 +1,10 @@
 
-import { CustomGridHelper } from './src/helper/CustomGridHelper.js';
-import { CoordinateHelper } from './src/helper/coordinateHelper.js';
-import { CAD } from './src/core/CAD.js';
+// import { CustomGridHelper } from '../src/helper/CustomGridHelper.js';
+// import { CoordinateHelper } from '../src/helper/coordinateHelper.js';
+// import { CAD } from '../src/core/CAD.js';
+import {CAD,CoordinateHelper,CustomGridHelper} from '../build/cad.esm.js'
 
-
-import dat from './src/utils/dat.gui.js';
+import dat from '../src/utils/dat.gui.js';
 
 
 const dom = document.querySelector('#cad')
