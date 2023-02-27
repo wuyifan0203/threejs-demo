@@ -1,5 +1,6 @@
 // rollup.config.js
-import {terser} from 'rollup-plugin-terser'
+import {terser} from 'rollup-plugin-terser';
+import resolve from '@rollup/plugin-node-resolve';
 export default {
     input: 'src/index.js',
     output: [
@@ -15,9 +16,21 @@ export default {
             file: 'build/cad.min.js',
             format: 'iife',
             name: 'version',
-            plugins: [terser()]
+            plugins: [terser()],
+            globals: {
+                three: 'THREE'
+              }
           }
     ],
     plugins:[
-    ]
+        resolve({
+            // 将自定义选项传递给解析插件
+            customResolveOptions: {
+                moduleDirectories: ['node_modules']
+            },
+            browser: true,
+          })
+    ],
+    
+    external: ['three']
   };

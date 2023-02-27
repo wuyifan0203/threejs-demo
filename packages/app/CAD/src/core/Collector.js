@@ -1,4 +1,4 @@
-import { Object3D, Scene } from "../lib/three.module.js";
+import { Scene } from "three";
 
 let currentAncestorId = null;
 let currentParentId = null;

@@ -5,7 +5,7 @@ import {
   Float32BufferAttribute,
   BufferGeometry,
   Color
-} from '../lib/three.module.js';
+} from 'three';
 
 class CustomGridHelper extends LineSegments {
   constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {

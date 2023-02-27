@@ -1,6 +1,6 @@
 import { ViewHelper } from '../helper/ViewHelper.js';
 import { OrbitControls } from '../controls/OrbitControls.js';
-import { OrthographicCamera, Raycaster, WebGLRenderer,MOUSE, Vector2} from '../lib/three.module.js';
+import { OrthographicCamera, Raycaster, WebGLRenderer,MOUSE, Vector2} from 'three';
 import { TransformControls } from '../controls/TransformControls.js';
 import { Stats } from '../utils/Stats.js';
 import { GPUStatsPanel } from '../utils/GPUStatsPanel.js';

@@ -1,4 +1,4 @@
-import { Vector3 } from "./three.module.js";
+import { Vector3 } from "three";
 
 export const MOUSESTYLE = {
     SELECT:'default',

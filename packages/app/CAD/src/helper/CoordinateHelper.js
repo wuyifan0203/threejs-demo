@@ -1,4 +1,4 @@
-import { ArrowHelper, Group, Vector3 } from '../lib/three.module.js';
+import { ArrowHelper, Group, Vector3 } from 'three';
 class CoordinateHelper extends Group {
   constructor(colors = { x: 'red', y: 'green', z: 'blue' }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
     super();
