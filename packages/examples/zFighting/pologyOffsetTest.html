@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pologyOffsetTest</title>
+    <style>
+        body{
+            margin: 0;
+        }
+        .info{
+            z-index: 100;
+            font-size: 16px;
+            text-align: left;
+            position: absolute;
+            padding: 1em;
+            top: 0px;
+            left:50%;
+        }
+        .r{ color:red}
+    </style>
+</head>
+<body>
+    <div class="info">
+        方法1:<br>
+        <!-- transparent: <span class="r">true</span> <br>
+        opacity:<span class="r">1</span><br> -->
+        depthTest:<span class="r">false</span><br>
+        方法2:<br>
+        ...
+
+    </div>
+    <div id="webgl-output"></div>
+    <script src="./pologyOffsetTest.js" type="module"></script>
+</body>
+</html>
