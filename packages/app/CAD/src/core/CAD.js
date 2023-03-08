@@ -1,6 +1,6 @@
 import { ViewHelper } from '../helper/ViewHelper.js';
 import { OrbitControls } from '../controls/OrbitControls.js';
-import { OrthographicCamera, Raycaster, WebGLRenderer,MOUSE, Vector2} from '../lib/three.module.js';
+import { OrthographicCamera, Raycaster, WebGLRenderer,MOUSE, Vector2, Scene} from '../lib/three.module.js';
 import { TransformControls } from '../controls/TransformControls.js';
 import { Stats } from '../utils/Stats.js';
 import { GPUStatsPanel } from '../utils/GPUStatsPanel.js';
@@ -19,6 +19,7 @@ class CAD {
         this._container = container;
         container.style.position = 'absolute'
         this.collector = new Collector();
+        // this.scene = new Scene();
         this.renderer = new WebGLRenderer({ antialias: true });
         this.renderer.setClearColor('#ffffff');
         this.renderer.setSize(this.width, this.height)
@@ -51,7 +52,7 @@ class CAD {
         container.appendChild(this.stats.dom);
         container.appendChild(this.renderer.domElement);
         this.composer = new EffectComposer(this.renderer);
-        this.renderPass = new RenderPass(this.collector.scene, this.mainCamera);
+        this.renderPass = new RenderPass( this.collector.scene, this.mainCamera);
         this.composer.addPass(this.renderPass);
         this.mode = 'SELECT';
         this.setMode(this.mode);
@@ -60,16 +61,15 @@ class CAD {
     }
 
     add(object) {
-        this.collector.track(object);
+        this.collector.track(object)
     }
 
     remove(object) {
-        this.collector.track(object);
+       this.collector.release(object)
     }
 
     removeById(id){
-        const object = this.collector.scene.getObjectById(id);
-        this.remove(object);
+        this.remove(this.collector.scene.getObjectById(id))
     }
 
     setView(viewName) {
@@ -154,7 +154,6 @@ class CAD {
             raycaster.intersectObjects(this.collector.pool,true,raycastObjects);
             this.selectChange(raycastObjects)
         })
-
     }
 
 }

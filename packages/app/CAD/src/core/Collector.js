@@ -1,4 +1,4 @@
-import { Object3D, Scene } from "../lib/three.module.js";
+import { Scene } from "../lib/three.module.js";
 
 let currentAncestorId = null;
 let currentParentId = null;
@@ -33,11 +33,8 @@ export class Collector{
     }
 
 
-
-    track(object3D,isAdded = false){
-        !isAdded && this.scene.add(object3D);
-        currentAncestorId = object3D.id;
-        this.collect(object3D);
+    track(object3D){
+        this.scene.add(object3D);
         if(!this._exclusion.includes(object3D.type)){
             this.pool.push(object3D);
         }
@@ -81,20 +78,17 @@ export class Collector{
         material.specularMap && inTextures(material.specularMap);
     }
 
-    clear(){
-
-
-    }
-
-    dispose(){
-
-    }
-
-    findType(){
-
-    }
-
-    findById(){
-
+    release(object){
+        this.scene.remove(object);
+        if(object.geometry){
+            object.geometry.dispose()
+        }
+        if( object.material){
+            if(Array.isArray(object.material)){
+                object.material.forEach(m=>m.dispose())
+            }else{
+                object.material.dispose()
+            }
+        }
     }
 }
