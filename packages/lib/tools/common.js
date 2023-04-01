@@ -15,11 +15,8 @@ import {
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 
-function initRenderer() {
-  var props = {
-    antialias: true
-  };
-  var renderer = new WebGLRenderer(props);
+function initRenderer(props = {}) {
+  const renderer = new WebGLRenderer(Object.assign({antialias: true},props));
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
@@ -47,7 +44,7 @@ function initOrthographicCamera(initialPosition) {
   const w = window.innerWidth;
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 100000);
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
