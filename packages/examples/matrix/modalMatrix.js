@@ -9,15 +9,13 @@ import {
     MeshBasicMaterial,
     TextureLoader,
     Matrix4,
-    Quaternion
+    Quaternion,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 
 import {
     initRenderer,
     initOrthographicCamera,
-    initCustomGrid,
-    createAxesHelper,
 } from '../../lib/tools/index.js';
 
 
@@ -38,8 +36,7 @@ function init() {
     const scene = new Scene();
 
     renderer.setClearColor(0xffffff);
-    initCustomGrid(scene);
-    createAxesHelper(scene);
+
     const orbitControl = new OrbitControls(camera, renderer.domElement);
 
     const sphere = new SphereGeometry(1, 32, 32);
@@ -93,53 +90,66 @@ function init() {
         Uranus: getTexture('uranus.jpg'),
         Neptune: getTexture('neptune.jpg')
     }
-    let modalMatrix = new Matrix4()
+
 
     Object.keys(plants).forEach((key, i) => {
         const mesh = plants[key]
-        // 3.set plant radius
-        mesh.setMultiplyScale(plantsScale[i]);
-        // 4.set plant position
-        mesh.rotateX(Math.PI / 2);
-        mesh.position.x = plantsPosition[i];
-        // 5.set texture for plant
+        // 3.set texture for plant
         mesh.material.map = texture[key];
+        mesh.name = key
     })
 
-
-    let position;
-    const axis = new Vector3(0,0,1);
-    const translate = new Vector3();
-    const quaternion = new Quaternion();
-    const scale = new Vector3()
-
-    // const modalMatrix = new Matrix4()
+    const axisX = new Vector3(1,0,0);
+    const axisZ = new Vector3(0,0,1);
+    const PI = Math.PI
+    const HalfPI = PI / 2;
     const clock = new Clock();
+    let t,pos;
+
+    const tarnslateMat4 = new Matrix4();
+    const rotateMat4 = new Matrix4();
+    const rotateZMat4 = new Matrix4();
+    const rotateXMat4 = new Matrix4().makeRotationAxis(axisX,HalfPI);
+    const scaleMat4 = new Matrix4();
+    const modalMatrix = new Matrix4()
+
+    const position = new Vector3();
+    const rotate = new Quaternion();
+    const scale = new Vector3();
+
+    function animatePosition() {
+        t = clock.getElapsedTime();
+        const delta = clock.getDelta();
+ 
+        Object.keys(plants).forEach((key, i) => {
+            modalMatrix.identity();
+            rotateMat4.identity();
+            scaleMat4.identity();
+            tarnslateMat4.identity();
+            rotateZMat4.identity();
+            const mesh = plants[key];
+            pos = circlingMotion(plantsPosition[i],1/plantsRevolution[i],t,0,0);
+            tarnslateMat4.makeTranslation(pos.x,pos.y,0);
+            rotateMat4.premultiply(rotateXMat4).premultiply(rotateZMat4.makeRotationZ(t))
+            scaleMat4.makeScale(plantsScale[i],plantsScale[i],plantsScale[i]);
+            modalMatrix.multiply(tarnslateMat4.multiply(rotateMat4.multiply(scaleMat4)))
+            modalMatrix.decompose(position,rotate,scale)
+            mesh.position.copy(position);
+            mesh.quaternion.copy(rotate);
+            mesh.scale.copy(scale);
+        })
+    }
+
+
     render();
     function render() {
         orbitControl.update();
-        requestAnimationFrame(render);
         renderer.render(scene, camera);
-        animatePosition()
+        animatePosition();
+        requestAnimationFrame(render);
+
     }
 
-
-
-    function animatePosition() {
-        const t = clock.getElapsedTime();
-        const delta = clock.getDelta();
-        // Object.keys(plants).forEach((key, i) => {
-            const mesh = plants.Venus
-            // position = circlingMotion(plantsPosition[i], 1 / plantsRevolution[i], t, 0, 0);
-            // mesh.applyMatrix4(modalMatrix.makeRotationAxis(axis,delta * Math.PI))
-            translate.set(plantsPosition[2],0,0);
-            quaternion.setFromAxisAngle(axis,delta * plantsRevolution[2]);
-            scale.multiplyScalar(plantsScale[2]);
-            mesh.applyMatrix4(modalMatrix.compose(translate,quaternion,scale))
-            console.log(modalMatrix);
-            // mesh.position.set(position.x, position.y, 0)
-        // })
-    }
 
     window.camera = camera;
     window.scene = scene;
