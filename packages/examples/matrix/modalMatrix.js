@@ -10,6 +10,10 @@ import {
     TextureLoader,
     Matrix4,
     Quaternion,
+    BufferGeometry,
+    BufferAttribute,
+    LineBasicMaterial,
+    LineLoop,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 
@@ -48,36 +52,24 @@ function init() {
     // Distance                  0  :   0.39  : 0.72  :   1   : 1.52 :  5.20   :  9.58  :  19.18 :  30.07  (1 AU)
     // period of revolution         :   0.24  : 0.62  :   1   : 1.88 :  11.86  :  29.46 :  84.01 :  164.8  (1 Earth Year) 
     // Direction of revolution      :    C    :  AC   :   C   :   C  :    C    :    C   :    AC  :    C
-    // period of rotational         :   58.6  :  243  :   1   : 1.03 :  0.41   :  0.44  :   0.72 :  0.67   (1 Earth Day)
-    // Direction of rotational      :    C    :  AC   :   C   :   C  :    C    :    C   :    AC  :    AC   
+    // period of rotation           :   58.6  :  243  :   1   : 1.03 :  0.41   :  0.44  :   0.72 :  0.67   (1 Earth Day)
+    // Direction of rotation        :    C    :  AC   :   C   :   C  :    C    :    C   :    AC  :    AC   
 
-    // 0.set background
+    // set background
     const basePath = '../../resources/texture/plants/2k_';
     const loader = new TextureLoader();
     const getTexture = (path) => loader.load(basePath + path);
     scene.background = getTexture('stars_milky_way.jpg');
 
 
-    // 1.create plants
-    const plants = {
-        Sun: new Mesh(sphere, createMaterial()),
-        Mercury: new Mesh(sphere, createMaterial()),
-        Venus: new Mesh(sphere, createMaterial()),
-        Earth: new Mesh(sphere, createMaterial()),
-        Mars: new Mesh(sphere, createMaterial()),
-        Jupiter: new Mesh(sphere, createMaterial()),
-        Saturn: new Mesh(sphere, createMaterial()),
-        Uranus: new Mesh(sphere, createMaterial()),
-        Neptune: new Mesh(sphere, createMaterial()),
-    }
-
-    // 2.add to scene
-    scene.add(...Object.values(plants));
-
     const plantsScale = [10, 0.4, 0.94, 1, 0.65, 2.5, 3.5, 2.98, 2.86];
     const plantsPosition = [0, 16, 20, 25, 29, 35, 44, 54, 64];
-    const plantsRevolution = [1, 0.24, 0.62, 1, 1.88, 11.86, 29.46, 84.01, 164.8]
+    const plantsRevolutionAngularSpeed = [0, 4.147, -1.625, 1, 0.531, 0.0843, 0.0336, -0.0117, 0.0059];
+    const plantsRotationAngularSpeed = [0, 6.138, -1.481, 1, 0.971, 0.096, 0.106, -0.718, -0.671];
 
+    const orbits = {};
+    const plants = {};
+    const orbitMaterial = new LineBasicMaterial({ color: '#ffffff' });
 
     const texture = {
         Sun: getTexture('sun.jpg'),
@@ -91,25 +83,38 @@ function init() {
         Neptune: getTexture('neptune.jpg')
     }
 
+    Object.keys(texture).forEach((key, i) => {
+        // create plant Mesh
+        const plantMesh = new Mesh(sphere, createMaterial());
+        // set texture for plant
+        plantMesh.material.map = texture[key];
+        plantMesh.name = key;
+        // add plant Mesh
+        scene.add(plantMesh);
+        plants[key] = plantMesh;
 
-    Object.keys(plants).forEach((key, i) => {
-        const mesh = plants[key]
-        // 3.set texture for plant
-        mesh.material.map = texture[key];
-        mesh.name = key
+        // create orbit geometry and LineLoop
+        const orbitGeometry = new BufferGeometry();
+        orbitGeometry.setAttribute('position', new BufferAttribute(getPlantOrbitPosition(plantsPosition[i]), 3));
+        const orbitMesh = new LineLoop(orbitGeometry, orbitMaterial);
+        // add orbit LineLoop
+        scene.add(orbitMesh);
+        orbits[key] = orbitMesh;
     })
 
-    const axisX = new Vector3(1,0,0);
-    const axisZ = new Vector3(0,0,1);
+    // 常量
+    const axisX = new Vector3(1, 0, 0);
+    const axisZ = new Vector3(0, 0, 1);
     const PI = Math.PI
     const HalfPI = PI / 2;
-    const clock = new Clock();
-    let t,pos;
+    const PI2 = 2 * Math.PI;
 
+    let t, pos;
+    const clock = new Clock();
     const tarnslateMat4 = new Matrix4();
     const rotateMat4 = new Matrix4();
     const rotateZMat4 = new Matrix4();
-    const rotateXMat4 = new Matrix4().makeRotationAxis(axisX,HalfPI);
+    const rotateXMat4 = new Matrix4().makeRotationAxis(axisX, HalfPI);
     const scaleMat4 = new Matrix4();
     const modalMatrix = new Matrix4()
 
@@ -119,21 +124,27 @@ function init() {
 
     function animatePosition() {
         t = clock.getElapsedTime();
-        const delta = clock.getDelta();
- 
-        Object.keys(plants).forEach((key, i) => {
+        Object.keys(texture).forEach((key, i) => {
+            // 初始化
             modalMatrix.identity();
             rotateMat4.identity();
             scaleMat4.identity();
             tarnslateMat4.identity();
             rotateZMat4.identity();
+
             const mesh = plants[key];
-            pos = circlingMotion(plantsPosition[i],1/plantsRevolution[i],t,0,0);
-            tarnslateMat4.makeTranslation(pos.x,pos.y,0);
-            rotateMat4.premultiply(rotateXMat4).premultiply(rotateZMat4.makeRotationZ(t))
-            scaleMat4.makeScale(plantsScale[i],plantsScale[i],plantsScale[i]);
-            modalMatrix.multiply(tarnslateMat4.multiply(rotateMat4.multiply(scaleMat4)))
-            modalMatrix.decompose(position,rotate,scale)
+            // 计算公转
+            pos = circlingMotion(plantsPosition[i], plantsRevolutionAngularSpeed[i], t, 0, 0);
+            tarnslateMat4.makeTranslation(pos.x, pos.y, 0);
+            // 计算自转
+            rotateMat4.premultiply(rotateXMat4).premultiply(rotateZMat4.makeRotationZ(t * plantsRotationAngularSpeed[i]))
+            // 对应缩放比例
+            scaleMat4.makeScale(plantsScale[i], plantsScale[i], plantsScale[i]);
+            // 计算模型矩阵
+            modalMatrix.multiply(tarnslateMat4.multiply(rotateMat4.multiply(scaleMat4)));
+            // 分解模型矩阵
+            modalMatrix.decompose(position, rotate, scale)
+            // 分别赋值
             mesh.position.copy(position);
             mesh.quaternion.copy(rotate);
             mesh.scale.copy(scale);
@@ -141,13 +152,14 @@ function init() {
     }
 
 
+
     render();
     function render() {
         orbitControl.update();
         renderer.render(scene, camera);
+        // 计算位置
         animatePosition();
         requestAnimationFrame(render);
-
     }
 
 
@@ -156,6 +168,23 @@ function init() {
 
     function circlingMotion(r, w, t, x, y) {
         return { x: x + r * Math.cos(w * t), y: y + r * Math.sin(w * t) };
+    }
+
+    function getPlantOrbitPosition(radius) {
+        return drawCirCling(0, 0, radius, 64)
+    }
+
+    function drawCirCling(x, y, radius, segment = 32) {
+        const { PI, sin, cos } = Math;
+        const position = new Float32Array(segment * 3);
+        let theta = 0;
+        for (let index = 0; index < segment; index++) {
+            theta = (index / segment) * PI * 2;
+            position[index * 3] = x + radius * cos(theta);
+            position[index * 3 + 1] = y + radius * sin(theta);
+            position[index * 3 + 2] = 0;
+        }
+        return position
     }
 
 }
