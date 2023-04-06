@@ -21,6 +21,7 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
     initRenderer,
     initOrthographicCamera,
+    resize
 } from '../../lib/tools/index.js';
 
 
@@ -47,6 +48,8 @@ function init() {
     const sphere = new SphereGeometry(1, 32, 32);
 
     const createMaterial = (params = {color:'#fff'}) => new MeshBasicMaterial(params);
+
+    resize(renderer, camera);
 
     //                          Sun : Mercury : Venus : Earth : Mars : Jupiter : Saturn : Uranus : Neptune   Unit
     // Radius                   109 :   0.38  : 0.94  :   1   : 0.53 : 10.97   :  9.14  :  3.98  :  3.86   (6,371 km)
@@ -103,6 +106,7 @@ function init() {
         orbits[key] = orbitMesh;
     })
 
+    // 添加土星环
     const ringGeometry = new RingGeometry(1.1,1.8,30,1,0,Math.PI * 2);
     const saturnRingMesh = new Mesh(ringGeometry,createMaterial({color:'#837c71',side:2}));
     plants.Saturn.add(saturnRingMesh);
