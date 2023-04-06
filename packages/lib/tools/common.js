@@ -15,6 +15,11 @@ import {
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 
+/**
+ * @description: 初始化渲染器
+ * @param {object} props
+ * @return {WebGLRenderer}
+ */
 function initRenderer(props = {}) {
   const renderer = new WebGLRenderer(Object.assign({antialias: true},props));
   renderer.shadowMap.enabled = true;
@@ -28,6 +33,11 @@ function initRenderer(props = {}) {
   return renderer;
 }
 
+/**
+ * @description: 创建透视相机
+ * @param {Vector3} initialPosition
+ * @return {PerspectiveCamera}
+ */
 function initPerspectiveCamera(initialPosition) {
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
@@ -38,6 +48,11 @@ function initPerspectiveCamera(initialPosition) {
   return camera;
 }
 
+/**
+ * @description: 创建正交相机
+ * @param {Vector3} initialPosition
+ * @return {OrthographicCamera}
+ */
 function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
@@ -51,10 +66,12 @@ function initOrthographicCamera(initialPosition) {
   return camera;
 }
 
-function addLargeGroundPlane(scene, useTexture) {
-  //   var withTexture = (useTexture !== undefined) ? useTexture : false;
-
-  // create the ground plane
+/**
+ * @description: 添加平面
+ * @param {Scene} scene
+ * @return {Mesh}
+ */
+function addLargeGroundPlane(scene) {
   const planeGeometry = new PlaneGeometry(100, 100);
   const planeMaterial = new MeshPhongMaterial({
     color: 0xffffff
@@ -68,6 +85,12 @@ function addLargeGroundPlane(scene, useTexture) {
   return plane;
 }
 
+/**
+ * @description: 添加默认灯光
+ * @param {Scene} scene
+ * @param {Vector3} initialPosition
+ * @return {SpotLight}
+ */
 function initDefaultLighting(scene, initialPosition) {
   var position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
 
@@ -90,6 +113,11 @@ function initDefaultLighting(scene, initialPosition) {
   return spotLight;
 }
 
+/**
+ * @description: 添加坐标轴
+ * @param {Scene} scene
+ * @return {Group}
+ */
 function createAxesHelper(scene) {
   const arrowHelper = new Group();
   arrowHelper.name = 'arrowHelper';
@@ -107,6 +135,12 @@ function createAxesHelper(scene) {
   return arrowHelper;
 }
 
+/**
+ * @description: 窗口自适应
+ * @param {WebGLRenderer} render
+ * @param {Camera} camera
+ * @return {void}
+ */
 function resize(render, camera) {
   window.addEventListener('resize', () => {
     const [w, h] = [window.innerWidth, window.innerHeight];
@@ -121,8 +155,15 @@ function resize(render, camera) {
   });
 }
 
-function initCustomGrid(scene, width = 50, height = 50, color) {
-  const grid = new CustomGrid(width, height, 1, 1, color);
+/**
+ * @description: 添加网格
+ * @param {Scene} scene
+ * @param {number} width 默认50
+ * @param {number} height 默认50
+ * @return {CustomGrid}
+ */
+function initCustomGrid(scene, width = 50, height = 50) {
+  const grid = new CustomGrid(width, height, 1, 1);
   grid.name = 'grid';
 
   scene.add(grid);
