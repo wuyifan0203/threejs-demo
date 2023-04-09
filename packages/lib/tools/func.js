@@ -61,7 +61,7 @@ const generateMirrorModalMatrix2 = (normalVec3, d) => {
 
 const createMirrorMatrix = (normal, origin) => {
   const normalize = normal.normalize();
-  const [,,, d] = planeFunctionParams(normalize, origin);
+  const [, , , d] = planeFunctionParams(normalize, origin);
   return generateMirrorModalMatrix(normalize, d);
 };
 
@@ -164,6 +164,68 @@ function radians2Angle(radians) {
   return radians * 180 * Math.PI;
 }
 
+/**
+ * @description: canvas coordinates are converted to 2D screen coordinates
+ * @param {number} canvasX
+ * @param {number} canvasY
+ * @param {number} canvasWidth
+ * @param {number} canvasHeight
+ * @return {{x:number,y:number}}
+ */
+function CC2SSC(canvasX, canvasY, canvasWidth, canvasHeight) {
+  return {
+    x: canvasX - canvasWidth / 2,
+    y: -canvasY + canvasHeight / 2
+  }
+}
+
+/**
+ * @description: 判断是否为简单多边型(既图形是否打结)
+ * @param {Array<Vector3>} points 围成多边形的所有点，按先后顺序组成的数组
+ * @return {boolean}
+ */
+function isSamplePolygon(points) {
+  const v1 = new Vector3();
+  const v2 = new Vector3();
+  const direction = new Vector3()
+
+  /**
+   * 工具函数二
+   * @description: 
+   * @param {Vector3} point1
+   * @param {Vector3} center
+   * @param {Vector3} point2
+   * @return {Vector3}
+   */
+  function getCrossDirection(point1, center, point2) {
+    v1.subVectors(point1, center);
+    v2.subVectors(point2, center);
+    return direction.crossVectors(v1, v2);
+  }
+
+  // 最小图案为三角形
+  if (points.length > 2) {
+    // 第一个点为center
+    const targetDirection = getCrossDirection(points.at(-1), points[0], points[1]).clone();
+    if (!targetDirection.equals(getCrossDirection(points.at(-2), points.at(-1), points[0]))) {
+      return false
+    }
+
+    for (let index = 1, length = points.length - 1; index < length; index++) {
+      if (!targetDirection.equals(getCrossDirection(points[index - 1], points[index], points[index + 1]))) {
+        return false
+      }
+    }
+    return true
+  } else {
+    return false
+  }
+}
+
+
+
+
+
 export {
   translateVertices,
   planeFunctionParams,
@@ -179,5 +241,7 @@ export {
   createMirrorMatrix,
   normal2Euler,
   angle2Radians,
-  radians2Angle
+  radians2Angle,
+  CC2SSC,
+  isSamplePolygon
 };
