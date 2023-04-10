@@ -200,7 +200,7 @@ function isSamplePolygon(points) {
   function getCrossDirection(point1, center, point2) {
     v1.subVectors(point1, center);
     v2.subVectors(point2, center);
-    return direction.crossVectors(v1, v2);
+    return direction.crossVectors(v1, v2).normalize();
   }
 
   // 最小图案为三角形

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-10 01:11:56
+ * @LastEditTime: 2023-04-10 16:09:44
  * @FilePath: /threejs-demo/src/examples/ParametricGeometry/index.js
  */
 import {
@@ -74,7 +74,14 @@ import {
         new Vector3(5,5,0),
     ];
 
-    const testList = {test1,test2,test3,test4};
+    const test5 = [
+      new Vector3(-2,2,0),
+      new Vector3(-4,-2,0),
+      new Vector3(4,-2,0),
+      new Vector3(2,2,0),
+  ];
+
+    const testList = {test1,test2,test3,test4,test5};
 
     let geometry = new BufferGeometry();
     const material = new LineBasicMaterial({color:'orange'});
