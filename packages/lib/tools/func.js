@@ -181,46 +181,69 @@ function CC2SSC(canvasX, canvasY, canvasWidth, canvasHeight) {
 
 /**
  * @description: 判断是否为简单多边型(既图形是否打结)
- * @param {Array<Vector3>} points 围成多边形的所有点，按先后顺序组成的数组
+ * @param {Array<Vector2>} points 围成多边形的所有点，按先后顺序组成的数组
  * @return {boolean}
  */
-function isSamplePolygon(points) {
-  const v1 = new Vector3();
-  const v2 = new Vector3();
-  const direction = new Vector3()
 
-  /**
-   * 工具函数二
-   * @description: 
-   * @param {Vector3} point1
-   * @param {Vector3} center
-   * @param {Vector3} point2
-   * @return {Vector3}
-   */
-  function getCrossDirection(point1, center, point2) {
-    v1.subVectors(point1, center);
-    v2.subVectors(point2, center);
-    return direction.crossVectors(v1, v2).normalize();
+/**
+ * 叉乘
+ */
+const crossProduct = (v1, v2) => {
+  const [v1x, v1y] = v1;
+  const [v2x, v2y] = v2;
+  return v1x * v2y - v2x * v1y;
+};
+
+/**
+ * 是否可以相交
+ * @param baseEedge
+ * @param targetEdge
+ */
+const isIntersection = (baseEedge, targetEdge) => {
+  const [basePointA, basePointB] = baseEedge;
+  const [targetPointC, targetPointD] = targetEdge;
+
+  const vBase = [basePointA.x - basePointB.x, basePointA.y - basePointB.y];
+  const vBaseC = [basePointA.x - targetPointC.x, basePointA.y - targetPointC.y];
+  const vBaseD = [basePointA.x - targetPointD.x, basePointA.y - targetPointD.y];
+  return crossProduct(vBase, vBaseC) * crossProduct(vBase, vBaseD) <= 0;
+};
+
+/**
+ * 提取数组元素
+ */
+const extractArray = (array, startIndex, length) => {
+  const arr = [];
+  for (let i = 0; i < length; i++) {
+    arr.push(array[(startIndex + i) % array.length]);
   }
+  return arr;
+};
 
-  // 最小图案为三角形
-  if (points.length > 2) {
-    // 第一个点为center
-    const targetDirection = getCrossDirection(points.at(-1), points[0], points[1]).clone();
-    if (!targetDirection.equals(getCrossDirection(points.at(-2), points.at(-1), points[0]))) {
-      return false
-    }
+/**
+ * 是否是复杂多边形
+ * @param points 多边形的顶点
+ */
+const isComplexPolygon = (points) => {
+  const length = points.length;
+  if (length < 4) return false;
+  const edges = points.reduce((edges, startPoint, i, array) => {
+    const endPoint = array[(i + 1) % length];
+    edges.push([startPoint, endPoint]); // [起始点, 结束点]
+    return edges;
+  }, []);
 
-    for (let index = 1, length = points.length - 1; index < length; index++) {
-      if (!targetDirection.equals(getCrossDirection(points[index - 1], points[index], points[index + 1]))) {
-        return false
-      }
-    }
-    return true
-  } else {
-    return false
+
+  // 逐边判断 相邻的边无需判断
+  for (const [i, baseEdge] of Object.entries(edges)) {
+    const nonadjacentEdge = extractArray(edges, Number(i) + 2, edges.length - 3);
+    const flag = nonadjacentEdge.some(
+      (edge) => isIntersection(baseEdge, edge) && isIntersection(edge, baseEdge)
+    );
+    if (flag) return true;
   }
-}
+  return false;
+};
 
 
 
@@ -243,5 +266,5 @@ export {
   angle2Radians,
   radians2Angle,
   CC2SSC,
-  isSamplePolygon
+  isComplexPolygon
 };
