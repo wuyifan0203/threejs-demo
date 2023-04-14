@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>view Port</title>
+    <style>
+        body{
+            margin: 0;
+        }
+        .tip{
+            z-index: 100;
+            font-size: 16px;
+            text-align: left;
+            position: absolute;
+            padding: 1em;
+            top: 0px;
+            left:30%;
+        }
+        #webgl-output2{
+            position: absolute;
+            top: 0px;
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="tip">
+        <div>该事例用来展示相机始终有红蓝网格且不随相机的位置而改变</div>
+        <div>黑线网格始终出现在屏幕中，随相机的位置而移动</div>
+        <div>物体位置始终为0，0，0，添加对照镜头</div>
+    </div>
+    <div id="webgl-output"></div>
+    <div id="webgl-output2"></div>
+
+
+    <script src="./viewPort.js" type="module"></script>
+</body>
+</html>
