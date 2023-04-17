@@ -1,8 +1,8 @@
 /*
- * @Date: 2023-01-10 09:37:35
+ * @Date: 2023-04-13 13:42:58
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-14 18:10:25
- * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
+ * @LastEditTime: 2023-04-17 17:37:02
+ * @FilePath: /threejs-demo/src/examples/geometry/splitMesh.js
  */
 import {
   Vector3,
@@ -10,8 +10,6 @@ import {
   Mesh,
   MeshNormalMaterial,
   SphereGeometry,
-  BoxGeometry,
-  Matrix4,
   Plane,
   PlaneGeometry,
   BufferGeometry,
@@ -21,24 +19,19 @@ import {
   LineSegments,
   LineBasicMaterial,
   ShapePath,
-  ExtrudeBufferGeometry,
+  TorusGeometry,
+  ExtrudeGeometry,
+  Sphere,
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   createAxesHelper,
-  initCustomGrid,
   resize,
 } from '../../lib/tools/index.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
-import { CSG } from '../../lib/other/CSGMesh.js';
-const { round } = math;
 const { EPSILON } = Number
-
-console.log(round(2.5000000004, 4));
-
 
 window.onload = () => {
   init();
@@ -71,13 +64,12 @@ function init() {
 }
 
 function draw(scene) {
-  const sphere = new SphereGeometry(5, 64, 32);
-  const plane = new PlaneGeometry(20, 20);
-
+  const geometry = new TorusGeometry(10, 5, 3,100, Math.PI * 2);
+  // const geometry = new SphereGeometry(10,32,64)
   const material = new MeshNormalMaterial({ side: 2, wireframe: true });
+  const mesh = new Mesh(geometry, material);
 
-  const sphereMesh = new Mesh(sphere, material);
-  const planeMesh = new Mesh(plane, material);
+  scene.add(mesh)
 
 
   const getAllTrangles = (geometry) => {
@@ -100,15 +92,6 @@ function draw(scene) {
     }
     return vertex
   }
-
-
-  const q = []
-  const t = getAllTrangles(sphere);
-  for (let j = 0; j < t.length; j = j + 3) {
-    q.push(new Vector3(t[j], t[j + 1], t[j + 2]))
-  }
-
-  console.log('->->', q);
 
   function r(num) {
     return Number(num.toFixed(16))
@@ -134,15 +117,14 @@ function draw(scene) {
       // if (i === trangles.length - 9) {
       //   debugger
       // }
-
+      // debugger
       filterTrangle(point1, point2, point3, planeNormal, planePoint, intersecting);
       // console.log(intersecting);
-      // debugger
+
 
     }
     return intersecting
   }
-  let i = 0;
   const isSame = (a, b) => Math.abs(a - b) < 1e-14;
   // a > b
   const greaterThan = (a, b) => a > (b + 0);
@@ -180,10 +162,8 @@ function draw(scene) {
         const B = formatVector3(temp[edge[1]]);
 
 
-        const can = createCan([A, B], [pointA, pointB, pointC], [dis1, dis2, dis3])
-        if (!checkIsSameSegment(can)) {
+        if (!checkIsSameSegment([A, B])) {
           array.push(A, B)
-          cans.push(can)
           segments.push([A, B])
         }
       } else if (point[0].length) {
@@ -197,11 +177,9 @@ function draw(scene) {
         const B = formatVector3(insertPoint);
 
 
-        const can = createCan([A, B], [pointA, pointB, pointC], [dis1, dis2, dis3])
-        if (!checkIsSameSegment(can)) {
+        if (!checkIsSameSegment([A, B])) {
           array.push(A, B)
           segments.push([A, B])
-          cans.push(can)
         }
 
       } else {
@@ -218,16 +196,11 @@ function draw(scene) {
         const A = formatVector3(insertPoint1);
         const B = formatVector3(insertPoint2);
 
-        const can = createCan([A, B], [pointA, pointB, pointC], [dis1, dis2, dis3])
-        if (!checkIsSameSegment(can)) {
+        if (!checkIsSameSegment([A, B])) {
           array.push(A, B)
           segments.push([A, B])
-          cans.push(can)
         }
       }
-      // if (isTarget(pointA, pointB, pointC)) {
-      //   debugger
-      // }
     }
   }
 
@@ -248,7 +221,6 @@ function draw(scene) {
     const s = isSeparation(a, b, c);
     const o = isOnPlane(a, b, c);
     const t = isTangentOnPoint(a, b, c);
-    // console.log(s,o,t);
     return s || o || t
   }
 
@@ -289,22 +261,13 @@ function draw(scene) {
     }
   }
 
-  var cans = [];
-  function createCan(segment, trangle, distance) {
-    return {
-      segment,
-      trangle,
-      distance
-    }
-  }
-
   function checkIsSameSegment(value) {
-    if (cans.length === 0) {
+    if (segments.length === 0) {
       return false
     } else {
-      for (let index = 0, length = cans.length; index < length; index++) {
-        const copmpler = cans[index].segment;
-        const result = isSameLines(value.segment, copmpler);
+      for (let index = 0, length = segments.length; index < length; index++) {
+        const copmpler = segments[index];
+        const result = isSameLines(value, copmpler);
         if (result) {
           return true
         }
@@ -329,52 +292,59 @@ function draw(scene) {
 
   function formatVector3(vec3) {
     return vec3.set(
-      Math.abs(vec3.x) < 1e-15 ? 0 : vec3.x,
-      Math.abs(vec3.y) < 1e-15 ? 0 : vec3.y,
-      Math.abs(vec3.z) < 1e-15 ? 0 : vec3.z
+      Math.abs(vec3.x) < 1e-14 ? 0 : vec3.x,
+      Math.abs(vec3.y) < 1e-14 ? 0 : vec3.y,
+      Math.abs(vec3.z) < 1e-14 ? 0 : vec3.z
     )
   }
-
-  //   dis1: -1.2003637414763671e-16
-  // dis2: -0.09561097621917725
-  // dis3: -1.4997597572211942e-31
-
-  // console.log(Number.EPSILON < );
-
-  // console.log(6666666,checkPositiveOrNegative(-1.2003637414763671e-16,-0.09561097621917725,-1.4997597572211942e-31));
 
   const plantNormal = new Vector3(0, 0, 1);
   const planePoint = new Vector3(0, 0, 0);
 
-  const res = isIntersectingPlane(sphere, plantNormal, planePoint);
+  const res = isIntersectingPlane(geometry, plantNormal, planePoint);
   console.log('result ->', res);
 
-  console.log(segments);
+  console.log('segments -> ', segments);
 
   function sortSegmentToLoop(segment) {
-    const loop = [];
+    const result = [[]];
     let remainingSegments = [...segment];
 
 
     let currentSegment = remainingSegments.shift();
+    let loop = result[0]
     loop.push(currentSegment);
 
     while (remainingSegments.length > 0) {
-      const {index,order} = findJoinableSegmentIndex(currentSegment, remainingSegments);
+
+      const { index, order } = findJoinableSegmentIndex(currentSegment, remainingSegments);
       // 如果找不到可拼接的线段，则回路无法完成
       if (index === -1) {
-        return loop;
+        if (areLoopConnectivity(currentSegment, loop[0])) {
+          if (remainingSegments.length > 0) {
+            loop = [];
+            result.push(loop);
+            currentSegment = remainingSegments.shift();
+            loop.push(currentSegment)
+            continue;
+          } if (remainingSegments.length === 0) {
+            return result;
+          }
+        } else {
+          console.warn('找不到对应的点，无法形成回路');
+          return result;
+        }
       }
       let nextSegment = remainingSegments.splice(index, 1)[0];
-      if(order === 1){
+      if (order === 1) {
         loop.push(nextSegment);
-      }else{
+      } else {
         loop.push(nextSegment.reverse())
       }
       currentSegment = nextSegment;
     }
 
-    return loop
+    return result
   }
 
   function areSegmentsJoinable(segment1, segment2) {
@@ -384,14 +354,14 @@ function draw(scene) {
     let order = 0;
     const positiveOrder = (Math.abs(x2 - x3) <= 1e-14 && Math.abs(y2 - y3) <= 1e-14);
     const negetiveOrder = (Math.abs(x2 - x4) <= 1e-14 && Math.abs(y2 - y4) <= 1e-14);
-    if(positiveOrder){
+    if (positiveOrder) {
       order = 1;
-    }else if(negetiveOrder){
+    } else if (negetiveOrder) {
       order = -1
     }
 
     return {
-      enable:positiveOrder || negetiveOrder,
+      enable: positiveOrder || negetiveOrder,
       order
     }
   }
@@ -399,32 +369,112 @@ function draw(scene) {
   function findJoinableSegmentIndex(currentSegment, remainingSegments) {
     for (let i = 0; i < remainingSegments.length; i++) {
       let nextSegment = remainingSegments[i];
-      const {order,enable} = areSegmentsJoinable(currentSegment, nextSegment)
+      const { order, enable } = areSegmentsJoinable(currentSegment, nextSegment)
       if (enable) {
         return {
-          index:i,
+          index: i,
           order
         };
       }
     }
     return {
-      index:-1,
-      order:0
+      index: -1,
+      order: 0
     };
   }
 
-  function areSegmentsEqual(segment1, segment2) {
+  function areLoopConnectivity(segment1, segment2) {
     const { x: x1, y: y1 } = segment1[0];
     const { x: x2, y: y2 } = segment1[1];
     const { x: x3, y: y3 } = segment2[0];
     const { x: x4, y: y4 } = segment2[1];
 
+    const condition1 = (Math.abs(x1 - x3) <= 1e-14 && Math.abs(y1 - y3) <= 1e-14);
+    const condition2 = (Math.abs(x1 - x4) <= 1e-14 && Math.abs(y1 - y4) <= 1e-14);
+    const condition3 = (Math.abs(x2 - x3) <= 1e-14 && Math.abs(y2 - y3) <= 1e-14);
+    const condition4 = (Math.abs(x2 - x4) <= 1e-14 && Math.abs(y2 - y4) <= 1e-14);
 
+    return condition1 || condition2 || condition3 || condition4
   }
+
+  function formateLoops(loops) {
+    const areas = loops.map(loop=>getLoopArea(loop));
+    const bodyIndex = getBodyIndex(areas);
+
+    const holes = [];
+    for (let index = 0; index < loops.length; index++) {
+      if(index === bodyIndex){
+        continue;
+      }
+      holes.push(convertLoopDirection(loops[index],'C'))
+    }
+
+    return {
+      body:convertLoopDirection(loops[bodyIndex],'AC'),
+      holes
+    }
+  }
+
+  function convertLoopDirection(loop,direction = 'AC') {
+    const last = loop.at(-1);
+    const first = loop[0]
+    const subA = new Vector3();
+    const subB = new Vector3();
+    subA.subVectors(last[0],last[1]);
+    subB.subVectors(first[1],first[0]);
+    let sum = crossProduct(subA,subB);
+    for (let i = 1; i < loop.length; i++) {
+      const pre = loop[i -1];
+      const current = loop[i]
+      subA.subVectors(pre[0],pre[1]);
+      subB.subVectors(current[1],current[0]);
+      sum += crossProduct(subA,subB);
+    }
+
+    if(direction === 'AC'){
+      if(sum > 0){
+        return loop
+      }if(sum < 0){
+        loop.reverse();
+        loop.forEach(segment => {
+          segment.reverse();
+        });
+        return loop
+      }
+    }else if(direction === 'C'){
+      if(sum > 0){
+        loop.reverse();
+        loop.forEach(segment => {
+          segment.reverse();
+        });
+        return loop
+      }if(sum < 0){
+       return loop
+      }
+    }
+  }
+
+  function crossProduct(v1, v2){
+    const {x:v1x, y:v1y} = v1;
+    const {x:v2x, y:v2y} = v2;
+    return v1x * v2y - v2x * v1y;
+  };
+
+
 
   const loops = sortSegmentToLoop(segments)
 
-  console.log('sortSegmentToLoop',loops );
+  console.log('sortSegmentToLoop result ->', loops);
+
+  let final
+
+  // if(loops.length > 1){
+  //   final = formateLoops(loops);
+  // }else {
+
+  // }
+
+  final = formateLoops(loops);
 
   const shapePath = new ShapePath();
   for (let i = 0; i < res.length; i = i + 2) {
@@ -441,9 +491,9 @@ function draw(scene) {
   const shape = shapePath.toShapes();
   // console.log(shape);
 
-  const extrude = new ExtrudeBufferGeometry(shape, { depth: 2 });
+  // const extrude = new ExtrudeGeometry(shape, { depth: 2 });
 
-  const extrudeMesh = new Mesh(extrude, new MeshNormalMaterial());
+  // const extrudeMesh = new Mesh(extrude, new MeshNormalMaterial());
 
   // scene.add(extrudeMesh)
 
@@ -453,24 +503,20 @@ function draw(scene) {
 
   scene.add(lineMesh)
 
-
-  // scene.add(sphereMesh, planeMesh)
-
   const bufferg = new BufferGeometry();
-  bufferg.setAttribute('position', new BufferAttribute(new Float32Array(getAllTrangles(sphere)), 3));
+  bufferg.setAttribute('position', new BufferAttribute(new Float32Array(getAllTrangles(geometry)), 3));
 
 
 
-  let gdsData = ''
-  loops.forEach((c) => {
-    const { x, y } = c[0];
-    gdsData = gdsData + String(x) + '  ' + String(y) + '\n'
-  })
+  // let gdsData = ''
+  // loops.forEach((c) => {
+  //   const { x, y } = c[0];
+  //   gdsData = gdsData + String(x) + '  ' + String(y) + '\n'
+  // })
 
-  console.log(gdsData);
+  // console.log(gdsData);
 
 
   // scene.add(new Mesh(bufferg, material))
 
-  console.log(math);
 }
