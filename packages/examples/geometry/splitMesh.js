@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-13 13:42:58
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-17 17:37:02
+ * @LastEditTime: 2023-04-20 13:23:58
  * @FilePath: /threejs-demo/src/examples/geometry/splitMesh.js
  */
 import {
@@ -9,19 +9,13 @@ import {
   Scene,
   Mesh,
   MeshNormalMaterial,
-  SphereGeometry,
   Plane,
-  PlaneGeometry,
   BufferGeometry,
-  BufferAttribute,
-  Triangle,
   Line3,
   LineSegments,
   LineBasicMaterial,
-  ShapePath,
   TorusGeometry,
-  ExtrudeGeometry,
-  Sphere,
+  SphereGeometry
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
@@ -31,6 +25,8 @@ import {
 } from '../../lib/tools/index.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
+import { GUI } from '../../lib/util/lil-gui.module.min.js';
+
 const { EPSILON } = Number
 
 window.onload = () => {
@@ -45,7 +41,6 @@ function init() {
   renderer.autoClear = false;
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
-  // initCustomGrid(scene, 100, 100);
   createAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
@@ -64,23 +59,27 @@ function init() {
 }
 
 function draw(scene) {
-  const geometry = new TorusGeometry(10, 5, 3,100, Math.PI * 2);
-  // const geometry = new SphereGeometry(10,32,64)
+  const torusGeometry = new TorusGeometry(8, 4, 3, 100, Math.PI * 2);
+  const sphereGeometry = new SphereGeometry(4, 32, 64);
   const material = new MeshNormalMaterial({ side: 2, wireframe: true });
-  const mesh = new Mesh(geometry, material);
+  const mesh = new Mesh(sphereGeometry, material);
 
-  scene.add(mesh)
+  const planeNormal = new Vector3(0, 0, 1);
+  const planePoint = new Vector3(0, 0, 0);
+
+
+  scene.add(mesh);
 
 
   const getAllTrangles = (geometry) => {
     let vertex = [];
     const index = geometry?.index?.array;
     const position = geometry?.attributes?.position?.array;
+    if (!position) {
+      console.warn('no position');
+      return []
+    }
     if (index) {
-      if (!position) {
-        console.warn('no position');
-        return []
-      }
       for (let i = 0, length = index.length; i < length; i++) {
         const idx = index[i] * 3;
         vertex.push(position[idx]);
@@ -107,7 +106,7 @@ function draw(scene) {
 
   function isIntersectingPlane(geometry, planeNormal, planePoint) {
     const trangles = getAllTrangles(geometry);
-    console.log(trangles);
+    // console.log(trangles);
     const intersecting = [];
     for (let i = 0, length = trangles.length; i < length; i = i + 9) {
       const point1 = new Vector3(r(trangles[i]), r(trangles[i + 1]), r(trangles[i + 2]));
@@ -141,21 +140,26 @@ function draw(scene) {
     const dis2 = rounds(getDistancefromPointToPlane(pointB, planeNormal, planePoint));
     const dis3 = rounds(getDistancefromPointToPlane(pointC, planeNormal, planePoint));
 
+    if (isNaN(dis1) || isNaN(dis2) || isNaN(dis3)) {
+      console.log('Nan => points', pointA, pointB, pointC);
+      console.log('Nan => plane', planeNormal, planePoint);
+    }
+
 
     const plane = new Plane().setFromNormalAndCoplanarPoint(planeNormal, planePoint);
 
     // 如果三点距离同时为正或者为负，则说明相离,如果三点都为0，说明共面，也需要排除
     // console.count('三角形个数');
     if (!checkPositiveOrNegative(dis1, dis2, dis3)) {
-      console.log('----------------------');
-      console.log('dis: ->', dis1, dis2, dis3);
+      // console.log('----------------------');
+      // console.log('dis: ->', dis1, dis2, dis3);
       // 如果有两个点距离为0 ，说明这个三角形与平面相切
       const edge = checkEdgeOnPlane(dis1, dis2, dis3);
       const point = checkPointOnPlane(dis1, dis2, dis3);
       const temp = [pointA, pointB, pointC];
-      console.log('三角形 :', temp);
+      // console.log('三角形 :', temp);
       if (edge.length) {
-        console.log('相切');
+        // console.log('相切');
         // 相切逻辑
 
         const A = formatVector3(temp[edge[0]]);
@@ -168,7 +172,7 @@ function draw(scene) {
         }
       } else if (point[0].length) {
         // 相交一个点
-        console.log('相切-个点');
+        // console.log('相切-个点');
         const line = new Line3(temp[point[1][0]], temp[point[1][1]]);
         const insertPoint = new Vector3()
         plane.intersectLine(line, insertPoint);
@@ -183,7 +187,7 @@ function draw(scene) {
         }
 
       } else {
-        console.log('相交两个点');
+        // console.log('相交两个点');
         // 相交于两个线段
         const segment = checkSegmentOnPlane(dis1, dis2, dis3);
         const line1 = new Line3(temp[segment[0][0]], temp[segment[0][1]]);
@@ -215,7 +219,6 @@ function draw(scene) {
   function isTangentOnPoint(a, b, c) {
     return (isSame(a, 0) && greaterThan(b * c, 0)) || (isSame(b, 0) && greaterThan(a * c, 0)) || (isSame(c, 0) && greaterThan(a * b, 0))
   }
-
 
   function checkPositiveOrNegative(a, b, c) {
     const s = isSeparation(a, b, c);
@@ -298,13 +301,11 @@ function draw(scene) {
     )
   }
 
-  const plantNormal = new Vector3(0, 0, 1);
-  const planePoint = new Vector3(0, 0, 0);
 
-  const res = isIntersectingPlane(geometry, plantNormal, planePoint);
-  console.log('result ->', res);
+  const res = isIntersectingPlane(sphereGeometry, planeNormal, planePoint);
+  // console.log('result ->', res);
 
-  console.log('segments -> ', segments);
+  // console.log('segments -> ', segments);
 
   function sortSegmentToLoop(segment) {
     const result = [[]];
@@ -398,125 +399,151 @@ function draw(scene) {
   }
 
   function formateLoops(loops) {
-    const areas = loops.map(loop=>getLoopArea(loop));
+    const areas = loops.map(loop => getLoopArea(loop));
     const bodyIndex = getBodyIndex(areas);
 
     const holes = [];
     for (let index = 0; index < loops.length; index++) {
-      if(index === bodyIndex){
+      if (index === bodyIndex) {
         continue;
       }
-      holes.push(convertLoopDirection(loops[index],'C'))
+      holes.push(convertLoopDirection(loops[index], 'C'))
     }
 
     return {
-      body:convertLoopDirection(loops[bodyIndex],'AC'),
+      body: convertLoopDirection(loops[bodyIndex], 'AC'),
       holes
     }
   }
 
-  function convertLoopDirection(loop,direction = 'AC') {
+  function convertLoopDirection(loop, direction = 'AC') {
     const last = loop.at(-1);
     const first = loop[0]
     const subA = new Vector3();
     const subB = new Vector3();
-    subA.subVectors(last[0],last[1]);
-    subB.subVectors(first[1],first[0]);
-    let sum = crossProduct(subA,subB);
+    subA.subVectors(last[0], last[1]);
+    subB.subVectors(first[1], first[0]);
+    let sum = crossProduct(subA, subB);
     for (let i = 1; i < loop.length; i++) {
-      const pre = loop[i -1];
+      const pre = loop[i - 1];
       const current = loop[i]
-      subA.subVectors(pre[0],pre[1]);
-      subB.subVectors(current[1],current[0]);
-      sum += crossProduct(subA,subB);
+      subA.subVectors(pre[0], pre[1]);
+      subB.subVectors(current[1], current[0]);
+      sum += crossProduct(subA, subB);
     }
 
-    if(direction === 'AC'){
-      if(sum > 0){
+    if (direction === 'AC') {
+      if (sum > 0) {
         return loop
-      }if(sum < 0){
+      } if (sum < 0) {
         loop.reverse();
         loop.forEach(segment => {
           segment.reverse();
         });
         return loop
       }
-    }else if(direction === 'C'){
-      if(sum > 0){
+    } else if (direction === 'C') {
+      if (sum > 0) {
         loop.reverse();
         loop.forEach(segment => {
           segment.reverse();
         });
         return loop
-      }if(sum < 0){
-       return loop
+      } if (sum < 0) {
+        return loop
       }
     }
   }
 
-  function crossProduct(v1, v2){
-    const {x:v1x, y:v1y} = v1;
-    const {x:v2x, y:v2y} = v2;
+  function crossProduct(v1, v2) {
+    const { x: v1x, y: v1y } = v1;
+    const { x: v2x, y: v2y } = v2;
     return v1x * v2y - v2x * v1y;
   };
 
+  function getLoopArea(loop) {
+    const { max, min } = Math
+    let xmin = 0, xmax = 0, ymin = 0, ymax = 0;
+    for (let index = 0, length = loop.length; index < length; index++) {
+      const { x, y } = loop[index][0];
+      xmin = min(x, xmin);
+      xmax = max(x, xmax);
+      ymin = min(y, ymin);
+      ymax = max(y, ymax);
+    }
 
+    return (xmax - xmin) * (ymax - ymin);
+  }
+
+  function getBodyIndex(areas) {
+    let index, max = 0;
+    for (let i = 0, length = areas.length; i < length; i++) {
+      if (max < areas[i]) {
+        max = areas[i];
+        index = i
+      }
+    }
+    return index
+  }
 
   const loops = sortSegmentToLoop(segments)
 
   console.log('sortSegmentToLoop result ->', loops);
 
-  let final
+  let final = formateLoops(loops);
 
-  // if(loops.length > 1){
-  //   final = formateLoops(loops);
-  // }else {
 
-  // }
+  const lineMesh = new LineSegments(new BufferGeometry().setFromPoints(res), new LineBasicMaterial({ color: '#000000', side: 2 }));
 
-  final = formateLoops(loops);
+  scene.add(lineMesh);
 
-  const shapePath = new ShapePath();
-  for (let i = 0; i < res.length; i = i + 2) {
-    const v1 = res[i];
-    const v2 = res[i + 1];
-    shapePath.moveTo(v1.x, v1.y);
-    shapePath.lineTo(v2.x, v2.y);
+  var control = {
+    planeNormal,
+    planePoint,
+    sphereGeometry,
+    torusGeometry,
+    geometry: 'sphereGeometry',
   }
 
-  // console.log(shapePath);
+  const gui = new GUI();
 
-  // console.log(cans);
+  const planeNormalFolder = gui.addFolder('Plane Normal');
+  planeNormalFolder.add(control.planeNormal, 'x', -1, 1, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
+  planeNormalFolder.add(control.planeNormal, 'y', -1, 1, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
+  planeNormalFolder.add(control.planeNormal, 'z', -1, 1, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
 
-  const shape = shapePath.toShapes();
-  // console.log(shape);
+  const planePointFolder = gui.addFolder('Plane Point');
+  planePointFolder.add(control.planePoint, 'x', -3, 3, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
+  planePointFolder.add(control.planePoint, 'y', -3, 3, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
+  planePointFolder.add(control.planePoint, 'z', -3, 3, 0.1).onChange(e => {
+    updateSplitMeshLine()
+  })
 
-  // const extrude = new ExtrudeGeometry(shape, { depth: 2 });
-
-  // const extrudeMesh = new Mesh(extrude, new MeshNormalMaterial());
-
-  // scene.add(extrudeMesh)
-
-
-  const buffer = new BufferGeometry().setFromPoints(res)
-  const lineMesh = new LineSegments(buffer, new LineBasicMaterial({ color: '#00ff00' }));
-
-  scene.add(lineMesh)
-
-  const bufferg = new BufferGeometry();
-  bufferg.setAttribute('position', new BufferAttribute(new Float32Array(getAllTrangles(geometry)), 3));
-
-
-
-  // let gdsData = ''
-  // loops.forEach((c) => {
-  //   const { x, y } = c[0];
-  //   gdsData = gdsData + String(x) + '  ' + String(y) + '\n'
-  // })
-
-  // console.log(gdsData);
+  const MeshFolder = gui.addFolder('Mesh Folder');
+  MeshFolder.add(control, 'geometry', ['sphereGeometry', 'torusGeometry']).onChange(e => {
+    updateSplitMeshLine()
+  })
+  MeshFolder.add(mesh, 'visible').name('Target Mesh visible');
 
 
-  // scene.add(new Mesh(bufferg, material))
-
+  function updateSplitMeshLine() {
+    segments.length = 0;
+    mesh.geometry = control[control.geometry];
+    const segmentUnOrder = isIntersectingPlane(mesh.geometry, control.planeNormal, control.planePoint);
+    lineMesh.geometry.setFromPoints(segmentUnOrder);
+    lineMesh.geometry.attributes.position.needsUpdate = true;
+    const loops = sortSegmentToLoop(segments)
+    let result = formateLoops(loops);
+    console.log(result);
+  }
 }

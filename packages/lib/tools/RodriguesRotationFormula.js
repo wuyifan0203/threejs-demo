@@ -77,9 +77,9 @@ function dotProduct(vec31, vec32) {
 function rotateMatrix(rotateAngle, rotationAxis, target = new Matrix4()) {
   const norm = normalizeVec3(rotationAxis);
 
-  const Ux = rotationAxis.x / norm;
-  const Uy = rotationAxis.y / norm;
-  const Uz = rotationAxis.z / norm;
+  const Ux = isNaN(rotationAxis.x / norm) ? 0 :rotationAxis.x / norm;
+  const Uy = isNaN(rotationAxis.y / norm) ? 0 :rotationAxis.y / norm;
+  const Uz = isNaN(rotationAxis.z / norm) ? 0 :rotationAxis.z / norm;
 
   const cr = Math.cos(rotateAngle);
   const sr = Math.sin(rotateAngle);

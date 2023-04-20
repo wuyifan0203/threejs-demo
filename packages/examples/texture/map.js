@@ -1,10 +1,3 @@
-/* eslint-disable no-param-reassign */
-/*
- * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:23:13
- * @FilePath: /threejs-demo/src/examples/house/index.js
- */
 import {
   Scene,
   Mesh,
