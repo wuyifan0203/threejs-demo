@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 09:25:33
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-21 16:56:20
+ * @LastEditTime: 2023-04-21 17:32:28
  * @FilePath: /threejs-demo/packages/examples/texture/allTypeTexture.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -41,7 +41,6 @@ async function init() {
     renderer.setClearColor(0xffffff);
     scene.add(new AmbientLight());
     const light = new SpotLight();
-    // light.position.set(20,20,20);
     scene.add(light);
     scene.add(camera);
     camera.add(light);
