@@ -90,9 +90,9 @@ class CAD {
         this.mode = modeName;
         if(modeName === 'SELECT'){
             this.orbitControls.mouseButtons = {
-                LEFT:-1,
-                MIDDLE:MOUSE.PAN,
-                RIGHT:MOUSE.ROTATE
+                LEFT:MOUSE.ROTATE,
+                MIDDLE:MOUSE.DOLLY,
+                RIGHT:MOUSE.PAN
             }
             this._container.style.cursor = MOUSESTYLE.SELECT;
         }else if (modeName === 'ZOOM'){
