@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Common Texture</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        main{
+            display: flex;
+        }
+        #webgl-output{
+            width:1000px;
+            height: 100%;
+        }
+        .lil-gui.autoPlace {
+            left: 750px;
+        }
+        .right{
+            width: 100%;
+            height: 100%;
+        }
+        li{
+            height: 150px;
+            border: 1px solid #ccc;
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+        img{
+            height: 100%;
+        }
+        .tip{
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <div id="webgl-output"></div>
+        <div class="right">
+            <ul>
+               <li>
+                <img src="../../resources/texture/fruit/2K_Albedo.jpg" alt="">
+                <span class='tip'>
+                    <h3>反照率贴图</h3>
+                    <span>Albedo贴图是一种用于模拟物体表面颜色的纹理贴图。它通常包含了物体表面的颜色信息，但不包括任何阴影或高光等材质属性。</span>
+                </span>
+               </li> 
+               <li>
+                <img src="../../resources/texture/fruit/2K_Normal.jpg" alt="">
+                <span class='tip'>
+                    <h3>法线贴图</h3>
+                    <span>
+                        法线贴图是一种用于模拟物体表面微小凹凸纹理的纹理贴图。它可以通过调整物体表面的法线向量来模拟光线在物体表面上的反射和折射，从而增强物体表面的真实感。
+                    </span>
+                </span>
+               </li> 
+               <li>
+                <img src="../../resources/texture/fruit/2K_AO.jpg" alt="">
+                <span class='tip'>
+                    <h3>灰度贴图</h3>
+                    <span>
+                        用于控制材质表面在环境遮挡下的亮度，即在遮挡区域中更暗，在未遮挡区域中更亮。
+                        使用AO贴图可以使材质表面更真实地反映环境遮挡，从而增强场景的真实感和深度感。
+                    </span>
+                </span>
+               </li> 
+               <li>
+                <img src="../../resources/texture/fruit/2K_Roughness.jpg" alt="">
+                <span class='tip'>
+                    <h3>粗糙度贴图</h3>
+                    <span>
+                        粗糙度是指材质表面的光滑程度，通常用0到1之间的值表示，其中0表示光滑的表面，1表示非常粗糙的表面。
+                        它的像素值可以控制表面的粗糙度，比如在纹理的白色区域，表面会更光滑，而在黑色区域，表面会更粗糙。
+                    </span>
+                </span>
+               </li> 
+               <li>
+                <img src="../../resources/texture/fruit/2K_Displacement.jpg" alt="">
+                <span class='tip'>
+                    <h3>位移贴图</h3>
+                    <span>
+                        其中白色表示物体表面最高点，黑色表示物体表面最低点，灰色则表示中间值。
+                        可以使物体表面更真实地反映几何细节，从而增强场景的真实感和深度感。
+                    </span>
+                </span>
+               </li> 
+            </ul>
+        </div>
+    </main>
+    <script src="./commonTexture.js" type="module"></script>
+</body>
+</html>
