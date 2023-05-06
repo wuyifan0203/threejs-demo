@@ -1,30 +1,20 @@
 import {
   Scene,
-  PerspectiveCamera,
-  PointLight,
   Mesh,
   Color,
   BoxGeometry,
-  OrthographicCamera,
-  MeshLambertMaterial,
   Vector3,
   WebGLRenderer,
   MeshNormalMaterial,
-  Matrix4, Spherical,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { GridHelper } from '../../lib/three/GridHelper2.js';
 import {
   initRenderer, resize,
   initOrthographicCamera,
-  initCustomGrid,
 } from '../../lib/tools/index.js';
-import { CC2SSC } from '../../lib/tools/func.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
-import { rotationFormula } from '../../lib/tools/RodriguesRotationFormula.js';
 
 import { Stats } from '../../lib/util/Stats.js';
-import { CustomGrid } from '../../lib/three/customGrid.js';
 
 window.onload = () => {
   init();
@@ -49,16 +39,10 @@ function init() {
   customGrid.rotateX(Math.PI / 2);
   scene.add(customGrid);
 
-  // const cameraGrid = new GridHelper(50, 1);
-
-  //   camera.add(cameraGrid);
-  // cameraGrid.position.z = -40;
-  scene.add(camera);
-
   const customCamera = initOrthographicCamera(new Vector3(0, 0, 100));
   const customRenderer = new WebGLRenderer({ antialias: true });
 
-  const boxMesh = new Mesh(new BoxGeometry(3, 3, 3), new MeshNormalMaterial());
+  const boxMesh = new Mesh(new BoxGeometry(4, 4, 3), new MeshNormalMaterial());
   scene.add(boxMesh);
 
   customRenderer.setSize(300, 200);
@@ -70,9 +54,6 @@ function init() {
     orbitControls.update();
     renderer.render(scene, camera);
     customRenderer.render(scene, customCamera);
-    // customGrid.position.copy(orbitControls.target);
-    // const unit = (1 / camera.zoom) ** 2;
-    // customGrid.scale.set(unit, unit, unit);
     stats.end();
     requestAnimationFrame(render);
   }
@@ -81,27 +62,53 @@ function init() {
   window.scene = scene;
   window.orbitControls = orbitControls;
 
-  const originDirection = new Vector3(0, 0, 1);
+  // document.addEventListener('click', (e) => {
+  //   const { offsetX, offsetY } = e;
+  //   const { width, height } = dom.getBoundingClientRect();
+  //   const cpi = camera.projectionMatrixInverse.elements;
+  //   const { x, y, z } = camera.position;
 
-  document.addEventListener('click', (e) => {
-    const { offsetX, offsetY } = e;
-    const { width, height } = dom.getBoundingClientRect();
-    const cpi = camera.projectionMatrixInverse.elements;
-    const { x, y, z } = camera.position;
+  //   const MP0 = cpi[0];
+  //   const MP5 = cpi[5];
 
-    const MP0 = cpi[0];
-    const MP5 = cpi[5];
+  //   const [divisionX, divisionY] = [width / MP0 / 2, height / -MP5 / 2];
 
-    const [divisionX, divisionY] = [width / MP0 / 2, height / -MP5 / 2];
+  //   const zeroX = (width - x * width / MP0) / 2;
+  //   const zeroY = (height + y * height / MP5) / 2;
 
-    const zeroX = (width - x * width / MP0) / 2;
-    const zeroY = (height + y * height / MP5) / 2;
+  //   const posX = (offsetX - zeroX) / divisionX;
+  //   const posY = (offsetY - zeroY) / divisionY;
 
-    const posX = (offsetX - zeroX) / divisionX;
-    const posY = (offsetY - zeroY) / divisionY;
+  //   // console.log(posX, posY);
+  // });
 
-    // console.log(posX, posY);
-  });
+  const canvas = document.createElement('canvas');
+  canvas.width = 300;
+  canvas.height = 100;
+  canvas.style.position = 'fixed';
+  canvas.style.bottom = '50px';
+  const ctx = canvas.getContext('2d');
+  dom.append(canvas);
+  ctx.font = '15px serif';
+
+  function updateUnit(unit, gridUnit) {
+    // eslint-disable-next-line operator-assignment
+    unit = unit * gridUnit;
+    // console.log(unit, gridUnit);
+    ctx.clearRect(0, 0, 300, 100);
+    ctx.beginPath();
+    ctx.moveTo(20, 20);
+    ctx.lineTo(20 + unit, 20);
+    ctx.lineTo(20 + unit, 30);
+    ctx.lineTo(20, 30);
+    ctx.lineTo(20, 20);
+    ctx.fillStyle = '#808080';
+    ctx.fill();
+    ctx.strokeRect(20 + unit, 21, unit, 8);
+    ctx.strokeStyle = '#808080';
+    ctx.closePath();
+    ctx.fillText(`${gridUnit} um`, 20, 10);
+  }
 
   function getInterval(camera) {
     const { width, height } = dom.getBoundingClientRect();
@@ -115,22 +122,39 @@ function init() {
     };
   }
 
-  orbitControls.addEventListener('change', (e) => {
-    const { x } = getInterval(camera);
-    const y = getY(x);
+  orbitControls.addEventListener('change', () => {
+    const { x: unitX } = getInterval(camera);
+    const { x, y } = getY(unitX);
 
-    const unit = 1 / camera.zoom;
-    console.log(x * y * unit);
-    // const unit = x / y;
+    // console.log('unitX', unitX, 'Y', x * y, 'x', x, 'y', y);
     scene.remove(customGrid);
-    // console.log(unit * x * y);
-    customGrid = new GridHelper(50, 1.1 * unit);
-    scene.add(customGrid);
-    customGrid.rotateX(Math.PI / 2);
-    customGrid.position.copy(orbitControls.target);
-    // console.log(customGrid.position);
+    let gridUnit = 5;
+    if (y === 1) {
+      gridUnit = 1 * x;
+    } else if (y === 2) {
+      gridUnit = 2 * x;
+    } else if (y === 5) {
+      gridUnit = 4 * x;
+    }
 
-    // console.log(getY(x), x);
+    gridUnit = Number(gridUnit.toFixed(14));
+
+    // console.log('gridUnit', gridUnit);
+    customGrid = new GridHelper(50, gridUnit);
+    // 保证一直为虚线
+    customGrid.material.gapSize = x;
+    customGrid.material.dashSize = x;
+    customGrid.computeLineDistances();
+    customGrid.rotateX(Math.PI / 2);
+    scene.add(customGrid);
+
+    const { x: cx, y: cy } = orbitControls.target;
+    const dx = cx % gridUnit;
+    const dy = cy % gridUnit;
+    const dz = cy % gridUnit;
+    const pos = new Vector3().subVectors(orbitControls.target, new Vector3(dx, dy, dz));
+    customGrid.position.copy(pos);
+    updateUnit(unitX, gridUnit);
   });
 }
 
@@ -153,5 +177,8 @@ function getY(x) {
     scaledY = 1;
   }
 
-  return scaledY * (scaledX / x);
+  return {
+    y: scaledY,
+    x: scaledX / x,
+  };
 }
