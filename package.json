@@ -6,6 +6,7 @@
   "author": "Yifan Wu",
   "license": "MIT",
   "dependencies": {
+    "@tweenjs/tween.js": "^20.0.3",
     "three": "^0.148.0"
   },
   "devDependencies": {

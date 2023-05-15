@@ -57,6 +57,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@tweenjs/tween.js@^20.0.3":
+  version "20.0.3"
+  resolved "https://registry.npmmirror.com/@tweenjs/tween.js/-/tween.js-20.0.3.tgz#953dbcc1218a809869cca7c0983bf1e69819b46e"
+  integrity sha512-SYUe1UgY5HM05EB4+0B4arq2IPjvyzKXoklXKxSYrc2IFxGm1cBrqg5XbiB5uwbs0xY5j+rj986NAJMM0KZaUw==
+
 acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.npmmirror.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
