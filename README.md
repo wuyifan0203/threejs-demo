@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2023-05-15 13:56:23
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-05-15 16:46:53
+ * @FilePath: /threejs-demo/README.md
+-->
 # 开发计划
 
 ## noise
@@ -10,7 +16,8 @@
 
 ## Control
 
-* 第一人称控制器
+* 第三人称控制器
+* 第一人称控制器，支持无限旋转
 
 ## tween
 
