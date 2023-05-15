@@ -1,7 +1,4 @@
 node_modules
 *.code-workspace
 dist
-.vscode
-.idea
-.history
 .Ds_Store

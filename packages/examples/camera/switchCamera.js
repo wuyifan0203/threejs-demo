@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-22 16:56:46
- * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-05-15 16:41:42
+ * @FilePath: /threejs-demo/packages/examples/camera/switchCamera.js
  */
 import {
   Vector3,
@@ -11,7 +11,6 @@ import {
   MeshNormalMaterial,
   SphereGeometry,
   BoxGeometry,
-  Matrix4,
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
@@ -25,7 +24,7 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
 import dat from '../../lib/util/dat.gui.js';
 import { EffectComposer } from '../../lib/three/EffectComposer.js';
-import { RenderPass } from '../../lib/three/RenderPass.js'
+import { RenderPass } from '../../lib/three/RenderPass.js';
 
 window.onload = () => {
   init();
@@ -46,8 +45,7 @@ function init() {
 
   const composer = new EffectComposer(renderer);
   const renderPass = new RenderPass(scene, pcamera);
-  composer.addPass(renderPass)
-
+  composer.addPass(renderPass);
 
   render();
   function render() {
@@ -75,11 +73,11 @@ function init() {
   const pcamera1 = initPerspectiveCamera(new Vector3(20, 0, 0));
   pcamera1.up.set(0, 0, 1);
 
-  const ocamera = initOrthographicCamera(new Vector3(10,-10,10));
+  const ocamera = initOrthographicCamera(new Vector3(10, -10, 10));
   ocamera.up.set(0, 0, 1);
 
-  const ocamera1 = initOrthographicCamera(new Vector3(20,0,0));
-  ocamera1.up.set(0, 0, 1)
+  const ocamera1 = initOrthographicCamera(new Vector3(20, 0, 0));
+  ocamera1.up.set(0, 0, 1);
 
   const controler = {
     p: {
@@ -88,45 +86,42 @@ function init() {
     },
     o: {
       ocamera,
-      ocamera1
+      ocamera1,
     },
     type: 'p',
-    current: '3D'
-  }
+    current: '3D',
+  };
 
   const gui = new dat.GUI();
-  gui.width = 330
+  gui.width = 330;
 
-  gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange(e => {
-    switchCamera()
+  gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange((e) => {
+    switchCamera();
   });
 
-  gui.add(controler,'type',{PerspectiveCamera:'p',OrthographicCamera:'o'}).name('Camera Type:').onChange(e=>{
-    switchCamera()
-  })
-
+  gui.add(controler, 'type', { PerspectiveCamera: 'p', OrthographicCamera: 'o' }).name('Camera Type:').onChange((e) => {
+    switchCamera();
+  });
 
   const map = {
-    'XY': new Vector3(0, 0, 20),
-    'XZ': new Vector3(0, 20, 0),
-    'YZ': new Vector3(20, 0, 0)
-  }
-
-
+    XY: new Vector3(0, 0, 20),
+    XZ: new Vector3(0, 20, 0),
+    YZ: new Vector3(20, 0, 0),
+  };
 
   function switchCamera() {
-    let cameras,camera;
-    if(controler.type === 'p'){
+    let cameras; let camera;
+    if (controler.type === 'p') {
       cameras = controler.p;
-    }else{
+    } else {
       cameras = controler.o;
     }
     if (controler.current === '3D') {
-      camera =cameras[controler.type + 'camera'];
+      camera = cameras[`${controler.type}camera`];
       controls.enableRotate = true;
     } else {
       controls.enableRotate = false;
-      camera = cameras[controler.type + 'camera1'];
+      camera = cameras[`${controler.type}camera1`];
       camera.position.copy(map[controler.current]);
       camera.updateProjectionMatrix();
     }
@@ -138,4 +133,3 @@ function init() {
 
   resize(renderer, pcamera);
 }
-

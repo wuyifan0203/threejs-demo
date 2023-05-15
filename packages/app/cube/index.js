@@ -2,8 +2,8 @@
 /*
  * @Date: 2023-01-05 17:20:07
  * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:33:13
- * @FilePath: /threejs-demo/src/examples/cube/index.js
+ * @LastEditTime: 2023-05-15 13:57:20
+ * @FilePath: /threejs-demo/packages/app/cube/index.js
  */
 import {
   Vector3,
@@ -17,6 +17,7 @@ import {
 import {
   initRenderer,
   initOrthographicCamera,
+  initPerspectiveCamera,
   createAxesHelper,
   initCustomGrid,
 } from '../../lib/tools/index.js';
@@ -29,7 +30,7 @@ import { Cube } from './cube.js';
 
 function init() {
   const renderer = initRenderer();
-  const camera = initOrthographicCamera(new Vector3(100, -100, 100));
+  const camera = initPerspectiveCamera(new Vector3(10, 10, 10));
   camera.up.set(0, 0, 1);
   const scene = new Scene();
   renderer.setClearColor(0xffffff);
