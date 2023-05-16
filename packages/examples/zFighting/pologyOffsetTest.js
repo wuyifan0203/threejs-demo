@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 16:44:31
+ * @LastEditTime: 2023-05-16 13:09:06
  * @FilePath: /threejs-demo/packages/examples/zFighting/pologyOffsetTest.js
  */
 import {
@@ -90,48 +90,56 @@ function init() {
   gui.add(material, 'polygonOffset').onChange((e) => {
     mlist.forEach((m) => {
       m.polygonOffset = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'polygonOffsetFactor', -100, 100, 1).onChange((e) => {
     mlist.forEach((m) => {
       m.polygonOffsetFactor = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'polygonOffsetUnits', -100, 100, 0.1).onChange((e) => {
     mlist.forEach((m) => {
       m.polygonOffsetUnits = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'shininess', 0, 100, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.shininess = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'transparent').onChange((e) => {
     mlist.forEach((m) => {
       m.transparent = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'depthTest').onChange((e) => {
     mlist.forEach((m) => {
       m.depthTest = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'depthWrite', 0, 100, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.depthWrite = e;
+      m.needsUpdate = true
     });
   });
 
   gui.add(material, 'opacity', 0, 1, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.opacity = e;
+      m.needsUpdate = true
     });
   });
 }
