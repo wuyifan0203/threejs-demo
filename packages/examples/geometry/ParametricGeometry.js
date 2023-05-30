@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-19 16:45:42
- * @FilePath: /threejs-demo/src/examples/ParametricGeometry/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-05-17 16:11:09
+ * @FilePath: /threejs-demo/packages/examples/geometry/ParametricGeometry.js
  */
 import {
   Vector3,

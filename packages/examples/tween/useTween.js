@@ -2,10 +2,10 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 18:42:17
+ * @LastEditTime: 2023-05-17 17:57:46
  * @FilePath: /threejs-demo/packages/examples/tween/useTween.js
  */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from "../../lib/three/OrbitControls.js";
 import {
   AmbientLight,
   BoxGeometry,
@@ -15,17 +15,14 @@ import {
   PointLight,
   Scene,
   Vector3,
-} from '../../lib/three/three.module.js';
+} from "../../lib/three/three.module.js";
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initCustomGrid,
-} from '../../lib/tools/index.js';
-import {
-  Tween,
-  update,
-} from '../../lib/other/tween.esm.js';
+} from "../../lib/tools/index.js";
+import { Tween, update, Easing } from "../../lib/other/tween.esm.js";
 
 window.onload = () => {
   init();
@@ -51,13 +48,14 @@ function init() {
   const createMaterial = (color) => new MeshLambertMaterial({ color });
 
   const geometry = new BoxGeometry(1, 1, 1);
-  const mesh_test_to = new Mesh(geometry, createMaterial('green'));
-  const mesh_test_delay = new Mesh(geometry, createMaterial('red'));
+  const mesh_test_to = new Mesh(geometry, createMaterial("green"));
+  const mesh_test_delay = new Mesh(geometry, createMaterial("red"));
 
   scene.add(mesh_test_to);
   scene.add(mesh_test_delay);
 
-  useTweenTo(mesh_test_to);
+  useTo(mesh_test_to);
+  useDelay(mesh_test_delay);
 
   resize(renderer, camera);
 
@@ -74,7 +72,7 @@ function init() {
   window.camera = camera;
 }
 
-function useTweenTo(mesh) {
+function useTo(mesh) {
   const tween = new Tween({ x: -10 });
   const tween2 = new Tween({ x: 10 });
 
@@ -87,6 +85,31 @@ function useTweenTo(mesh) {
 
   tween.onUpdate(tweenUpdate);
 
+  tween2.onUpdate(tweenUpdate);
+
+  tween.chain(tween2);
+  tween2.chain(tween);
+
+  tween.start();
+}
+
+function useDelay(mesh) {
+  const tween = new Tween({ z: -10 });
+  const tween2 = new Tween({ z: 10 });
+
+  tween.to({ z: 10 }, 1000);
+  tween2.easing(Easing.Elastic.InOut);
+  tween.delay(2000);
+
+  tween2.to({ z: -10 }, 1000);
+  tween2.easing(Easing.Elastic.InOut);
+  tween2.delay(2000);
+
+  const tweenUpdate = (obj) => {
+    mesh.position.z = obj.z;
+  };
+
+  tween.onUpdate(tweenUpdate);
   tween2.onUpdate(tweenUpdate);
 
   tween.chain(tween2);
