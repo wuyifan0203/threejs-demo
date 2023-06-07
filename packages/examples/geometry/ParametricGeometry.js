@@ -13,7 +13,7 @@ import {
 import {
   initRenderer,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
   resize,
 } from '../../lib/tools/index.js';
@@ -35,7 +35,7 @@ function init() {
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
   initCustomGrid(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
@@ -170,19 +170,19 @@ function draw(scene) {
 
   const controls = {
     material,
-    drawFunc:list[0]
-  }
-  let parametric = new ParametricGeometry(funcList[controls.drawFunc], 50, 50);
+    drawFunc: list[0],
+  };
+  const parametric = new ParametricGeometry(funcList[controls.drawFunc], 50, 50);
 
   const mesh = new Mesh(parametric, material);
 
   const gui = new dat.GUI();
 
-  gui.add(controls,'drawFunc',list).onChange(e=>{
+  gui.add(controls, 'drawFunc', list).onChange((e) => {
     parametric.dispose();
     mesh.geometry = new ParametricGeometry(funcList[e], 50, 50);
-  })
-  gui.add(controls.material,'wireframe')
+  });
+  gui.add(controls.material, 'wireframe');
 
   scene.add(mesh);
 }

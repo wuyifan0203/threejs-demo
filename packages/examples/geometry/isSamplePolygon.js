@@ -11,15 +11,15 @@ import {
   BufferGeometry,
   LineBasicMaterial,
   BufferAttribute,
-  Vector2
+  Vector2,
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
   resize,
   initOrthographicCamera,
-  isComplexPolygon
+  isComplexPolygon,
 } from '../../lib/tools/index.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
@@ -39,7 +39,7 @@ function init() {
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
   initCustomGrid(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
@@ -66,7 +66,6 @@ function init() {
     new Vector3(0, 5, 0),
   ];
 
-
   const test4 = [
     new Vector3(0, 0, 0),
     new Vector3(5, 0, 0),
@@ -74,10 +73,10 @@ function init() {
   ];
 
   const test5 = [
-    new Vector2(-2, -1,0),
-    new Vector2(-4, -2,0),
-    new Vector2(4, -2,0),
-    new Vector2(2, 2,0),
+    new Vector2(-2, -1, 0),
+    new Vector2(-4, -2, 0),
+    new Vector2(4, -2, 0),
+    new Vector2(2, 2, 0),
   ];
 
   const test6 = [
@@ -92,10 +91,11 @@ function init() {
     new Vector3(10, 5, 0),
   ];
 
+  const testList = {
+    test1, test2, test3, test4, test5, test6, test7,
+  };
 
-  const testList = { test1, test2, test3, test4, test5,test6,test7 };
-
-  let geometry = new BufferGeometry();
+  const geometry = new BufferGeometry();
   const material = new LineBasicMaterial({ color: 'orange' });
   const lineLoop = new LineLoop(geometry, material);
 
@@ -107,42 +107,31 @@ function init() {
 
   function convertPosition(points) {
     position.length = 0;
-    points.forEach(p => {
-      position.push(p.x, p.y, p.z)
-    })
+    points.forEach((p) => {
+      position.push(p.x, p.y, p.z);
+    });
   }
 
   const controlers = {
     select: 'test1',
     log() {
       console.log(isComplexPolygon(testList[this.select]));
-    }
+    },
   };
 
   convertPosition(testList[controlers.select]);
   lineLoop.geometry.setAttribute('position', new BufferAttribute(new Float32Array(position), 3));
   lineLoop.geometry.getAttribute('position').needsUpdate = true;
 
-
-
-
   const gui = new GUI();
 
-  gui.add(controlers, 'select', Object.keys(testList)).onChange(e => {
+  gui.add(controlers, 'select', Object.keys(testList)).onChange((e) => {
     convertPosition(testList[e]);
     lineLoop.geometry.setAttribute('position', new BufferAttribute(new Float32Array(position), 3));
     lineLoop.geometry.getAttribute('position').needsUpdate = true;
   });
 
   gui.add(controlers, 'log').name('Log is Sample Polygon (press F12)');
-
-
-
-
-
-
-
-
 
   function render() {
     renderer.clear();

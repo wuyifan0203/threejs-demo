@@ -14,7 +14,7 @@ import {
 import {
   initRenderer,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
   resize,
 } from '../../lib/tools/index.js';
@@ -34,7 +34,7 @@ function init() {
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
   initCustomGrid(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new TrackballControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);

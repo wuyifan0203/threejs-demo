@@ -15,7 +15,7 @@ import {
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
   initPerspectiveCamera,
 } from '../../lib/tools/index.js';
@@ -29,11 +29,9 @@ function init() {
   const scene = new Scene();
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene, 100, 100);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const random = (a, b) => Math.random() * b - Math.random() * a;
-
-  console.log(random(0, 2));
 
   const cameras = [];
   for (let k = 0; k < 6; k++) {

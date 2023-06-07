@@ -32,7 +32,7 @@ function init() {
   groundPlane.position.y = -0.01;
 
   initDefaultLighting(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);
@@ -114,7 +114,7 @@ function initDefaultLighting(scene, initialPosition) {
   scene.add(ambientLight);
 }
 
-function createAxesHelper(scene) {
+function initAxesHelper(scene) {
   const arrowHelper = new Group();
   arrowHelper.name = 'arrowHelper';
 

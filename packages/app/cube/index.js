@@ -18,7 +18,7 @@ import {
   initRenderer,
   initOrthographicCamera,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
 } from '../../lib/tools/index.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
@@ -36,7 +36,7 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);

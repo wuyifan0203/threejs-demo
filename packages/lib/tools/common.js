@@ -118,7 +118,7 @@ function initDefaultLighting(scene, initialPosition) {
  * @param {Scene} scene
  * @return {Group}
  */
-function createAxesHelper(scene) {
+function initAxesHelper(scene) {
   const arrowHelper = new Group();
   arrowHelper.name = 'arrowHelper';
 
@@ -172,7 +172,7 @@ function initCustomGrid(scene, width = 50, height = 50) {
 }
 
 export {
-  createAxesHelper,
+  initAxesHelper,
   initDefaultLighting,
   initGroundPlane,
   initPerspectiveCamera,

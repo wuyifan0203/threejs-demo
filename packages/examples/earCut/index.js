@@ -20,7 +20,7 @@ import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
-  createAxesHelper,
+  initAxesHelper,
   angle2Radians,
 } from '../../lib/tools/index.js';
 import { innerPoints } from './compute.js';
@@ -38,7 +38,7 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(100, -100, 100));
   camera.up.set(0, 0, 1);
   const scene = new Scene();
-  createAxesHelper(scene);
+  initAxesHelper(scene);
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 

@@ -2,7 +2,7 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
-  createAxesHelper,
+  initAxesHelper,
   initGroundPlane,
   resize,
 } from '../../lib/tools/index.js';
@@ -107,7 +107,7 @@ const init = () => {
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
   scene = new Scene();
-  createAxesHelper(scene);
+  initAxesHelper(scene);
   scene.add(new AmbientLight());
 
   const groundPlane = initGroundPlane(scene);

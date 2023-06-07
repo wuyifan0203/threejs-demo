@@ -25,7 +25,7 @@ import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
-  createAxesHelper,
+  initAxesHelper,
   initDefaultLighting,
   rotationFormula,
   createMirrorMatrix,
@@ -45,7 +45,7 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
   const light = initDefaultLighting(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);

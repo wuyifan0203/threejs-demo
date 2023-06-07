@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
 /*
  * @Date: 2023-01-30 14:03:05
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-30 18:29:54
- * @FilePath: /threejs-demo/src/examples/light/shadow.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-07 10:11:23
+ * @FilePath: /threejs-demo/packages/examples/light/shadow.js
  */
 /* eslint-disable no-unused-vars */
 import dat from '../../lib/util/dat.gui.js';
@@ -11,7 +11,7 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initGroundPlane,
   resize,
 } from '../../lib/tools/index.js';
@@ -37,7 +37,7 @@ const init = () => {
   camera.up.set(0, 0, 1);
 
   const scene = new Scene();
-  createAxesHelper(scene);
+  initAxesHelper(scene);
   const ambientLight = new AmbientLight(0x3c3c3c);
   scene.add(ambientLight);
 

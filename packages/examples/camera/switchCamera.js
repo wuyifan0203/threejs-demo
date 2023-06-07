@@ -15,7 +15,7 @@ import {
 import {
   initRenderer,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initCustomGrid,
   resize,
   initOrthographicCamera,
@@ -38,7 +38,7 @@ function init() {
   renderer.autoClear = false;
   pcamera.up.set(0, 0, 1);
   initCustomGrid(scene, 100, 100);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(pcamera, renderer.domElement);
   const viewHelper = new ViewHelper(pcamera, renderer.domElement);

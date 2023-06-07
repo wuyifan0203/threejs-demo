@@ -13,7 +13,7 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
-  createAxesHelper,
+  initAxesHelper,
   initGroundPlane,
   resize,
 } from '../../lib/tools/index.js';
@@ -44,7 +44,7 @@ const init = () => {
   camera.up.set(0, 0, 1);
 
   const scene = new Scene();
-  createAxesHelper(scene);
+  initAxesHelper(scene);
   const ambientLight = new AmbientLight(0x3c3c3c);
   scene.add(ambientLight);
 

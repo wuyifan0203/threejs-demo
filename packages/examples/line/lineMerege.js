@@ -13,7 +13,7 @@ import {
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
-  initRenderer, initDefaultLighting, createAxesHelper, initPerspectiveCamera,
+  initRenderer, initDefaultLighting, initAxesHelper, initPerspectiveCamera,
 } from '../../lib/tools/index.js';
 
 (function () {
@@ -28,7 +28,7 @@ function init() {
   //   groundPlane.position.y = -0.01;
 
   initDefaultLighting(scene);
-  createAxesHelper(scene);
+  initAxesHelper(scene);
 
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);
