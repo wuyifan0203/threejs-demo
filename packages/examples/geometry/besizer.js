@@ -28,7 +28,7 @@ function init() {
   const renderer = initRenderer();
   const camera = initCamera();
   const scene = new Scene();
-  const groundPlane = addLargeGroundPlane(scene);
+  const groundPlane = initGroundPlane(scene);
   groundPlane.position.y = -0.01;
 
   initDefaultLighting(scene);
@@ -72,7 +72,7 @@ function initCamera(initialPosition) {
   return camera;
 }
 
-function addLargeGroundPlane(scene) {
+function initGroundPlane(scene) {
   //   var withTexture = (useTexture !== undefined) ? useTexture : false;
 
   // create the ground plane

@@ -3,7 +3,7 @@ import {
   initRenderer,
   initOrthographicCamera,
   createAxesHelper,
-  addLargeGroundPlane,
+  initGroundPlane,
   resize,
 } from '../../lib/tools/index.js';
 import {
@@ -110,7 +110,7 @@ const init = () => {
   createAxesHelper(scene);
   scene.add(new AmbientLight());
 
-  const groundPlane = addLargeGroundPlane(scene);
+  const groundPlane = initGroundPlane(scene);
   groundPlane.position.set(0, 0, 0);
   groundPlane.rotation.z = -0.5 * Math.PI;
 

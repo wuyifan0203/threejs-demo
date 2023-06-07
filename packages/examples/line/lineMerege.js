@@ -24,7 +24,7 @@ function init() {
   const renderer = initRenderer();
   const camera = initPerspectiveCamera();
   const scene = new Scene();
-  //   const groundPlane = addLargeGroundPlane(scene);
+  //   const groundPlane = initGroundPlane(scene);
   //   groundPlane.position.y = -0.01;
 
   initDefaultLighting(scene);

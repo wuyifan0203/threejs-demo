@@ -12,7 +12,7 @@ import {
   initRenderer,
   initPerspectiveCamera,
   createAxesHelper,
-  addLargeGroundPlane,
+  initGroundPlane,
   resize,
 } from '../../lib/tools/index.js';
 import {
@@ -50,7 +50,7 @@ const init = () => {
   const spotLightHelper = new SpotLightHelper(spotLight);
   scene.add(spotLightHelper);
 
-  const groundPlane = addLargeGroundPlane(scene);
+  const groundPlane = initGroundPlane(scene);
   groundPlane.position.set(0, 0, 0);
   groundPlane.rotation.z = -0.5 * Math.PI;
   // 2

@@ -71,10 +71,10 @@ function initOrthographicCamera(initialPosition) {
  * @param {Scene} scene
  * @return {Mesh}
  */
-function addLargeGroundPlane(scene) {
-  const planeGeometry = new PlaneGeometry(100, 100);
+function initGroundPlane(scene) {
+  const planeGeometry = new PlaneGeometry(200, 200);
   const planeMaterial = new MeshPhongMaterial({
-    color: 0xffffff
+    color: 0xd3d3d3
   });
   const plane = new Mesh(planeGeometry, planeMaterial);
   plane.name = 'LargeGroundPlane';
@@ -174,7 +174,7 @@ function initCustomGrid(scene, width = 50, height = 50) {
 export {
   createAxesHelper,
   initDefaultLighting,
-  addLargeGroundPlane,
+  initGroundPlane,
   initPerspectiveCamera,
   initRenderer,
   initOrthographicCamera,
