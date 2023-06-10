@@ -14,6 +14,7 @@ import {
   OrthographicCamera
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
+import { OrbitControls } from '../three/OrbitControls.js';
 
 /**
  * @description: 初始化渲染器
@@ -171,6 +172,10 @@ function initCustomGrid(scene, width = 50, height = 50) {
   return grid;
 }
 
+function initOrbitControls(camera,container) {
+  return new OrbitControls(camera,container);
+}
+
 export {
   initAxesHelper,
   initDefaultLighting,
@@ -179,5 +184,6 @@ export {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
+  initOrbitControls,
   resize
 };
