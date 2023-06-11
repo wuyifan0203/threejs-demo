@@ -1,56 +1,39 @@
 /*
  * @Date: 2023-06-10 16:00:40
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-10 18:40:27
+ * @LastEditTime: 2023-06-11 12:08:39
  * @FilePath: /threejs-demo/packages/examples/triangle/poly2triTest.js
  */
-import { SweepContext, Point } from '../../lib/other/poly2tri.js';
+import { SweepContext, Point } from "../../lib/other/poly2tri.js";
+import { GUI } from "../../lib/util/lil-gui.module.min.js";
+import { ShapeUtils } from "../../lib/three/ShapeUtils.js";
 
 import {
-  Mesh, MeshBasicMaterial, Scene, BufferAttribute, Vector3, BufferGeometry,
-} from '../../lib/three/three.module.js';
+  Mesh,
+  MeshBasicMaterial,
+  Scene,
+  BufferAttribute,
+  Vector3,
+  BufferGeometry,
+  Shape,
+  Vector2,
+  Path,
+} from "../../lib/three/three.module.js";
 import {
-  initCustomGrid, initOrbitControls, initOrthographicCamera, initRenderer,
-} from '../../lib/tools/common.js';
+  initCustomGrid,
+  initOrbitControls,
+  initOrthographicCamera,
+  initRenderer,
+} from "../../lib/tools/common.js";
 
 const data1 = {
-  path: [1, 1, 1, 3, 3, 3, 3, 1],
+  path: [0, 0, 0, 3, 3, 3, 3, 0],
 
   holes: [
-    2.00, 2.00,
-    2.00, 2.50,
-    2.50, 2.50,
+    [2.0, 2.0, 2.0, 2.5, 2.5, 2.5],
+    [1, 1, 1, 1.4, 1.4, 1.4],
   ],
 };
-
-const contour = [
-  new Point(1, 1),
-  new Point(1, 3),
-  new Point(3, 3),
-  new Point(3, 1),
-];
-
-const swctx = new SweepContext(contour);
-
-const hole = [
-  new Point(2.00, 2.00),
-  new Point(2.00, 2.50),
-  new Point(2.50, 2.50),
-];
-swctx.addHole(hole);
-
-swctx.triangulate();
-
-const triangles = swctx.getTriangles();
-
-const array = [];
-triangles.forEach((t) => {
-  t.getPoints().forEach((p) => {
-    array.push(p.x, p.y, 0);
-  });
-});
-
-console.log(array);
 
 window.onload = () => {
   init();
@@ -65,9 +48,15 @@ function init() {
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-  const material = new MeshBasicMaterial({ color: '#ff0000', wireframe: true });
+  const material = new MeshBasicMaterial({
+    color: "#ff0000",
+    wireframe: false,
+  });
 
-  const plane = new BufferGeometry().setAttribute('position', new BufferAttribute(new Float32Array(array), 3));
+  const plane = new BufferGeometry().setAttribute(
+    "position",
+    new BufferAttribute(new Float32Array(useEarCut(data1)), 3)
+  );
 
   const mesh = new Mesh(plane, material);
 
@@ -84,4 +73,77 @@ function init() {
   }
 
   render();
+}
+
+function usePoly2tri(data) {
+  const { path, holes } = data;
+
+  const pathArray = [];
+  for (let i = 0, j = path.length; i < j; i += 2) {
+    pathArray.push(new Point(path[i], path[i + 1]));
+  }
+
+  const holeArray = [];
+
+  if (holes.length) {
+    for (let i = 0, j = holes.length; i < j; i++) {
+      const hole = [];
+      const current = holes[i];
+      for (let k = 0, l = current.length; k < l; k += 2) {
+        hole.push(new Point(current[k], current[k + 1]));
+      }
+      holeArray.push(hole);
+    }
+  }
+
+  console.log(pathArray);
+
+  console.log(holeArray);
+
+  const swctx = new SweepContext(pathArray);
+
+  swctx.addHoles(holeArray);
+
+  swctx.triangulate();
+
+  const result = [];
+
+  swctx.getTriangles().forEach((t) => {
+    t.getPoints().forEach((p) => {
+      result.push(p.x, p.y, 0);
+    });
+  });
+
+  return result;
+}
+
+function useEarCut(data) {
+  const { path, holes } = data;
+  const points = [];
+  for (let i = 0, j = path.length; i < j; i += 2) {
+    points.push(new Vector2(path[i], path[i + 1]));
+  }
+
+  const holesArray = [];
+  for (let i = 0, j = holes.length; i < j; i++) {
+    const current = holes[i];
+    const hole = [];
+    for (let k = 0, l = current.length; k < l; k += 2) {
+      hole.push(current[i], current[i + 1]);
+    }
+
+    console.log(hole);
+    holesArray.push(new Path(hole));
+  }
+
+  console.log(holesArray);
+
+  const shape = new Shape(points);
+  shape.holes = holesArray;
+
+  const shapes = ShapeUtils.triangulateShape(shape.getPoints(),shape.holes)
+
+  console.log(shape);
+
+  return;
 }
