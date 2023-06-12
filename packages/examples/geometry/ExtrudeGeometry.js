@@ -78,12 +78,17 @@ const funcList = {
         [-8, -8],
         [8, -8],
       ],
-      hole: [
-        [2, 2],
-        [-2, 2],
-        [-2, -2],
-        [2, -2],
-      ],
+      holes: [[
+        [1, 1],
+        [0, 1],
+        [-1, -1],
+        [1, -1],
+      ],[
+        [3,3],
+        [3,2],
+        [2,2],
+        [2,3]
+      ]],
     };
   },
 
@@ -112,13 +117,14 @@ function draw(scene) {
   };
 
   function getShape(func) {
-    const { path, hole } = func();
+    const { path, holes } = func();
 
     const pathArray = path.map((vec2) => new Vector2(...vec2));
     const shape = new Shape(pathArray);
-    if (hole) {
-      const holeArray = hole.map((vec2) => new Vector2(...vec2));
-      shape.holes = [new Path(holeArray)];
+    if (holes) {
+      holes.forEach(hole => {
+        shape.holes.push(new Path(hole.map(v=>new Vector2(...v))))
+      });
     }
     return shape;
   }
