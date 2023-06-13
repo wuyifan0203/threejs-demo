@@ -1,7 +1,13 @@
+/*
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:24:06
+ * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/ShaderPass.js
+ */
 import {
 	ShaderMaterial,
 	UniformsUtils
-} from '../lib/three.module.js';
+} from 'three';
 import { Pass, FullScreenQuad } from './Pass.js';
 
 class ShaderPass extends Pass {

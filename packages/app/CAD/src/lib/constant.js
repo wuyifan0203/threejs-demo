@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-04-03 17:25:42
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-15 15:22:17
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:23:55
  * @FilePath: /threejs-demo/packages/app/CAD/src/lib/constant.js
  */
-import { Vector3 } from './three.module.js';
+import { Vector3 } from 'three';
 
 export const MOUSESTYLE = {
   SELECT: 'default',

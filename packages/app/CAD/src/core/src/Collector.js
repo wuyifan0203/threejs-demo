@@ -1,4 +1,10 @@
-import { Scene } from "../lib/three.module.js";
+/*
+ * @Date: 2023-04-03 18:22:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:22:53
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Collector.js
+ */
+import { Scene } from "three";
 
 let currentAncestorId = null;
 let currentParentId = null;
@@ -17,7 +23,7 @@ export class Collector{
         this.scene = new Scene()
         this.textures = new Map();
         this.materials = new Map();
-        this.geometrys = new Map();
+        this.geometries = new Map();
         this._exclusion = []
         this.pool = [];
     }
@@ -27,7 +33,7 @@ export class Collector{
         this._exclusion = newValue;
         this.textures.clear();
         this.materials.clear();
-        this.geometrys.clear();
+        this.geometries.clear();
         this.pool.length = 0;
         this.scene.children.forEach(obj=>this.track(obj,true));
     }
@@ -52,7 +58,7 @@ export class Collector{
             currentParentId = object?.parent?.id;
         }
         if(object.geometry !== undefined){
-            this.geometrys.set(new Tip(selfId,currentParentId,currentAncestorId),object.geometry);
+            this.geometries.set(new Tip(selfId,currentParentId,currentAncestorId),object.geometry);
         }
         if(object.material !== undefined){
             const material = object.material;

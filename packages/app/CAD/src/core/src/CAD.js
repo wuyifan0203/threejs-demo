@@ -1,14 +1,14 @@
-import { ViewHelper } from '../helper/ViewHelper.js';
-import { OrbitControls } from '../controls/OrbitControls.js';
+import { ViewHelper } from '../../helper/src/ViewHelper.js';
+import { OrbitControls } from '../../controls/OrbitControls.js';
 import {
   OrthographicCamera, Raycaster, WebGLRenderer, MOUSE, Vector2, Scene,
-} from '../lib/three.module.js';
-import { TransformControls } from '../controls/TransformControls.js';
-import { Stats } from '../utils/Stats.js';
-import { GPUStatsPanel } from '../utils/GPUStatsPanel.js';
-import { RenderPass } from '../postprocessing/RenderPass.js';
-import { EffectComposer } from '../postprocessing/EffectComposer.js';
-import { S, VIEWPOSITION, MOUSESTYLE } from '../lib/constant.js';
+} from 'three';
+import { TransformControls } from '../../controls/TransformControls.js';
+import { Stats } from '../../utils/Stats.js';
+import { GPUStatsPanel } from '../../utils/GPUStatsPanel.js';
+import { RenderPass } from '../../postprocessing/RenderPass.js';
+import { EffectComposer } from '../../postprocessing/EffectComposer.js';
+import { S, VIEWPOSITION, MOUSESTYLE } from '../../lib/constant.js';
 import { Collector } from './Collector.js';
 
 const raycaster = new Raycaster();

@@ -1,6 +1,12 @@
+/*
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:23:43
+ * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/RenderPass.js
+ */
 import {
 	Color
-} from '../lib/three.module.js';
+} from 'three';
 import { Pass } from './Pass.js';
 
 class RenderPass extends Pass {

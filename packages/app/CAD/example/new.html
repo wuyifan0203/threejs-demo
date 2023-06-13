@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 18:15:10
+ * @FilePath: /threejs-demo/packages/app/CAD/example/new.html
+-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,17 +20,18 @@
             width: 100vw;
             height: 100vh;
         }
-        header{
-            height: 30px;
-            width: 100%;
-            background-color: greenyellow;
-        }
     </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./three.module.js"
+            }
+        }
+    </script>
+
 </head>
 <body>
-    <header>
-    </header>
     <div id="cad" ></div>
 </body>
-<script type="module" src="./index.js"></script>
+<script type="module" src="./new.js"></script>
 </html>

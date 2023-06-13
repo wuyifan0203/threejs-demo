@@ -1,9 +1,15 @@
+/*
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:24:20
+ * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/Pass.js
+ */
 import {
 	BufferGeometry,
 	Float32BufferAttribute,
 	OrthographicCamera,
 	Mesh
-} from '../lib/three.module.js';
+} from 'three';
 
 class Pass {
 

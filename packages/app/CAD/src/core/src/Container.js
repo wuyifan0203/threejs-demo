@@ -1,7 +1,17 @@
-import { Scene } from "three";
+/*
+ * @Date: 2023-06-13 13:06:55
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 17:54:56
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
+ */
+/*
+ * @Date: 2023-06-13 13:06:55
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 17:37:05
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
+ */
 class Container {
   constructor() {
-    this.scene = new Scene();
     this.cameras = {};
     this.lights = {};
     this.objects = {};
@@ -12,7 +22,7 @@ class Container {
     this.textures = {};
   }
 
-  conllect(object) {
+  register(object) {
     if (object?.isCamera) {
       this.cameras[object.id] = object;
     } else if (object?.isLight) {
@@ -49,14 +59,7 @@ class Container {
     }
     delete this.objects[object.id];
   }
-
-  add(object) {
-    this.scene.add(object);
-  }
-
-  remove(object) {
-    this.scene.remove(object);
-  }
+  
 }
 
 export { Container };

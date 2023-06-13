@@ -2,13 +2,13 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-02-19 20:25:36
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 16:40:34
+ * @LastEditTime: 2023-06-13 13:36:43
  * @FilePath: /threejs-demo/packages/app/CAD/example/index.js
  */
 import { CAD, CoordinateHelper, CustomGridHelper } from '../build/cad.esm.js';
 import {
   BoxGeometry, Color, Mesh, MeshBasicMaterial,
-} from '../src/lib/three.module.js';
+} from 'three';
 
 import dat from '../src/utils/dat.gui.js';
 
