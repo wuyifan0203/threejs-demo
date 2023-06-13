@@ -8,3 +8,4 @@ export * from './src/Editor';
 export * from './src/Container';
 export * from './src/CAD'
 export * from './src/Collector'
+export * from './src/Control'

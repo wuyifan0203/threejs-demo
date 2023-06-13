@@ -1,9 +1,8 @@
 import { ViewHelper } from '../../helper/src/ViewHelper.js';
-import { OrbitControls } from '../../controls/OrbitControls.js';
 import {
   OrthographicCamera, Raycaster, WebGLRenderer, MOUSE, Vector2, Scene,
 } from 'three';
-import { TransformControls } from '../../controls/TransformControls.js';
+import { TransformControls ,OrbitControls} from '../../controls';
 import { Stats } from '../../utils/Stats.js';
 import { GPUStatsPanel } from '../../utils/GPUStatsPanel.js';
 import { RenderPass } from '../../postprocessing/RenderPass.js';
