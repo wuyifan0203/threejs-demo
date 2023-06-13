@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-04-03 17:25:42
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-15 15:24:35
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 01:16:17
  * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CoordinateHelper.js
  */
-import { ArrowHelper, Group, Vector3 } from '../lib/three.module.js';
+import { ArrowHelper, Group, Vector3 } from 'three';
 
 class CoordinateHelper extends Group {
   constructor(colors = { x: 'red', y: 'green', z: 'blue' }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {

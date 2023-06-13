@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-02-27 11:55:59
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 01:15:55
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CustomGridHelper.js
+ */
 
 import {
   LineSegments,
@@ -5,7 +11,7 @@ import {
   Float32BufferAttribute,
   BufferGeometry,
   Color
-} from '../lib/three.module.js';
+} from 'three';
 
 class CustomGridHelper extends LineSegments {
   constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {

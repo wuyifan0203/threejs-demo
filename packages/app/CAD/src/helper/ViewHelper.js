@@ -1,4 +1,4 @@
-import * as THREE from '../lib/three.module.js';
+import * as THREE from 'three';
 
 const vpTemp = new THREE.Vector4();
 

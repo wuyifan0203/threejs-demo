@@ -2,9 +2,6 @@
     "liveServer.settings.port": 5502,
     "editor.fontSize": 14,
     "workbench.iconTheme": "vscode-icons",
-    "beautify.config": {
-      "indent_size": 4
-    },
   
     "editor.quickSuggestions": {
       "comments": "on",
@@ -43,8 +40,6 @@
       "source.fixAll.eslint": true,
       "source.fixAll.stylelint": true
     },
-    "stylelint.snippet": ["css", "less", "postcss"],
-    "stylelint.validate": ["css", "scss", "vue"],
     "[html]": {
       "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
