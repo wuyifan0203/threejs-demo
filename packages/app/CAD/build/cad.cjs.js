@@ -85,132 +85,486 @@ class Container {
   
 }
 
-/*
- * @Date: 2023-06-13 01:00:30
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 16:31:34
- * @FilePath: /threejs-demo/packages/app/CAD/src/config/default.js
+/*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
+/*global define:false, require:false, exports:false, module:false, signals:false */
+
+/** @license
+ * JS Signals <http://millermedeiros.github.com/js-signals/>
+ * Released under the MIT license
+ * Author: Miller Medeiros
+ * Version: 1.0.0 - Build: 268 (2012/11/29 05:48 PM)
  */
 
-const DEFAULT_PERSPECTIVE_CAMERA = new THREE.PerspectiveCamera(50, 1, 0.01, 1000 );
-DEFAULT_PERSPECTIVE_CAMERA.position.set(0,5,10);
-DEFAULT_PERSPECTIVE_CAMERA.name = 'default_perspective_camera';
-DEFAULT_PERSPECTIVE_CAMERA.lookAt(new THREE.Vector3());
+    // SignalBinding -------------------------------------------------
+    //================================================================
+
+    /**
+     * Object that represents a binding between a Signal and a listener function.
+     * <br />- <strong>This is an internal constructor and shouldn't be called by regular users.</strong>
+     * <br />- inspired by Joa Ebert AS3 SignalBinding and Robert Penner's Slot classes.
+     * @author Miller Medeiros
+     * @constructor
+     * @internal
+     * @name SignalBinding
+     * @param {Signal} signal Reference to Signal object that listener is currently bound to.
+     * @param {Function} listener Handler function bound to the signal.
+     * @param {boolean} isOnce If binding should be executed just once.
+     * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+     * @param {Number} [priority] The priority level of the event listener. (default = 0).
+     */
+    function SignalBinding(signal, listener, isOnce, listenerContext, priority) {
+
+        /**
+         * Handler function bound to the signal.
+         * @type Function
+         * @private
+         */
+        this._listener = listener;
+
+        /**
+         * If binding should be executed just once.
+         * @type boolean
+         * @private
+         */
+        this._isOnce = isOnce;
+
+        /**
+         * Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @memberOf SignalBinding.prototype
+         * @name context
+         * @type Object|undefined|null
+         */
+        this.context = listenerContext;
+
+        /**
+         * Reference to Signal object that listener is currently bound to.
+         * @type Signal
+         * @private
+         */
+        this._signal = signal;
+
+        /**
+         * Listener priority
+         * @type Number
+         * @private
+         */
+        this._priority = priority || 0;
+    }
+
+    SignalBinding.prototype = {
+
+        /**
+         * If binding is active and should be executed.
+         * @type boolean
+         */
+        active : true,
+
+        /**
+         * Default parameters passed to listener during `Signal.dispatch` and `SignalBinding.execute`. (curried parameters)
+         * @type Array|null
+         */
+        params : null,
+
+        /**
+         * Call listener passing arbitrary parameters.
+         * <p>If binding was added using `Signal.addOnce()` it will be automatically removed from signal dispatch queue, this method is used internally for the signal dispatch.</p>
+         * @param {Array} [paramsArr] Array of parameters that should be passed to the listener
+         * @return {*} Value returned by the listener.
+         */
+        execute : function (paramsArr) {
+            var handlerReturn, params;
+            if (this.active && !!this._listener) {
+                params = this.params? this.params.concat(paramsArr) : paramsArr;
+                handlerReturn = this._listener.apply(this.context, params);
+                if (this._isOnce) {
+                    this.detach();
+                }
+            }
+            return handlerReturn;
+        },
+
+        /**
+         * Detach binding from signal.
+         * - alias to: mySignal.remove(myBinding.getListener());
+         * @return {Function|null} Handler function bound to the signal or `null` if binding was previously detached.
+         */
+        detach : function () {
+            return this.isBound()? this._signal.remove(this._listener, this.context) : null;
+        },
+
+        /**
+         * @return {Boolean} `true` if binding is still bound to the signal and have a listener.
+         */
+        isBound : function () {
+            return (!!this._signal && !!this._listener);
+        },
+
+        /**
+         * @return {boolean} If SignalBinding will only be executed once.
+         */
+        isOnce : function () {
+            return this._isOnce;
+        },
+
+        /**
+         * @return {Function} Handler function bound to the signal.
+         */
+        getListener : function () {
+            return this._listener;
+        },
+
+        /**
+         * @return {Signal} Signal that listener is currently bound to.
+         */
+        getSignal : function () {
+            return this._signal;
+        },
+
+        /**
+         * Delete instance properties
+         * @private
+         */
+        _destroy : function () {
+            delete this._signal;
+            delete this._listener;
+            delete this.context;
+        },
+
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[SignalBinding isOnce:' + this._isOnce +', isBound:'+ this.isBound() +', active:' + this.active + ']';
+        }
+
+    };
+
+
+/*global SignalBinding:false*/
+
+    // Signal --------------------------------------------------------
+    //================================================================
+
+    function validateListener(listener, fnName) {
+        if (typeof listener !== 'function') {
+            throw new Error( 'listener is a required param of {fn}() and should be a Function.'.replace('{fn}', fnName) );
+        }
+    }
+
+    /**
+     * Custom event broadcaster
+     * <br />- inspired by Robert Penner's AS3 Signals.
+     * @name Signal
+     * @author Miller Medeiros
+     * @constructor
+     */
+    function Signal() {
+        /**
+         * @type Array.<SignalBinding>
+         * @private
+         */
+        this._bindings = [];
+        this._prevParams = null;
+
+        // enforce dispatch to aways work on same context (#47)
+        var self = this;
+        this.dispatch = function(){
+            Signal.prototype.dispatch.apply(self, arguments);
+        };
+    }
+
+    Signal.prototype = {
+
+        /**
+         * Signals Version Number
+         * @type String
+         * @const
+         */
+        VERSION : '1.0.0',
+
+        /**
+         * If Signal should keep record of previously dispatched parameters and
+         * automatically execute listener during `add()`/`addOnce()` if Signal was
+         * already dispatched before.
+         * @type boolean
+         */
+        memorize : false,
+
+        /**
+         * @type boolean
+         * @private
+         */
+        _shouldPropagate : true,
+
+        /**
+         * If Signal is active and should broadcast events.
+         * <p><strong>IMPORTANT:</strong> Setting this property during a dispatch will only affect the next dispatch, if you want to stop the propagation of a signal use `halt()` instead.</p>
+         * @type boolean
+         */
+        active : true,
+
+        /**
+         * @param {Function} listener
+         * @param {boolean} isOnce
+         * @param {Object} [listenerContext]
+         * @param {Number} [priority]
+         * @return {SignalBinding}
+         * @private
+         */
+        _registerListener : function (listener, isOnce, listenerContext, priority) {
+
+            var prevIndex = this._indexOfListener(listener, listenerContext),
+                binding;
+
+            if (prevIndex !== -1) {
+                binding = this._bindings[prevIndex];
+                if (binding.isOnce() !== isOnce) {
+                    throw new Error('You cannot add'+ (isOnce? '' : 'Once') +'() then add'+ (!isOnce? '' : 'Once') +'() the same listener without removing the relationship first.');
+                }
+            } else {
+                binding = new SignalBinding(this, listener, isOnce, listenerContext, priority);
+                this._addBinding(binding);
+            }
+
+            if(this.memorize && this._prevParams){
+                binding.execute(this._prevParams);
+            }
+
+            return binding;
+        },
+
+        /**
+         * @param {SignalBinding} binding
+         * @private
+         */
+        _addBinding : function (binding) {
+            //simplified insertion sort
+            var n = this._bindings.length;
+            do { --n; } while (this._bindings[n] && binding._priority <= this._bindings[n]._priority);
+            this._bindings.splice(n + 1, 0, binding);
+        },
+
+        /**
+         * @param {Function} listener
+         * @return {number}
+         * @private
+         */
+        _indexOfListener : function (listener, context) {
+            var n = this._bindings.length,
+                cur;
+            while (n--) {
+                cur = this._bindings[n];
+                if (cur._listener === listener && cur.context === context) {
+                    return n;
+                }
+            }
+            return -1;
+        },
+
+        /**
+         * Check if listener was attached to Signal.
+         * @param {Function} listener
+         * @param {Object} [context]
+         * @return {boolean} if Signal has the specified listener.
+         */
+        has : function (listener, context) {
+            return this._indexOfListener(listener, context) !== -1;
+        },
+
+        /**
+         * Add a listener to the signal.
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        add : function (listener, listenerContext, priority) {
+            validateListener(listener, 'add');
+            return this._registerListener(listener, false, listenerContext, priority);
+        },
+
+        /**
+         * Add listener to the signal that should be removed after first execution (will be executed only once).
+         * @param {Function} listener Signal handler function.
+         * @param {Object} [listenerContext] Context on which listener will be executed (object that should represent the `this` variable inside listener function).
+         * @param {Number} [priority] The priority level of the event listener. Listeners with higher priority will be executed before listeners with lower priority. Listeners with same priority level will be executed at the same order as they were added. (default = 0)
+         * @return {SignalBinding} An Object representing the binding between the Signal and listener.
+         */
+        addOnce : function (listener, listenerContext, priority) {
+            validateListener(listener, 'addOnce');
+            return this._registerListener(listener, true, listenerContext, priority);
+        },
+
+        /**
+         * Remove a single listener from the dispatch queue.
+         * @param {Function} listener Handler function that should be removed.
+         * @param {Object} [context] Execution context (since you can add the same handler multiple times if executing in a different context).
+         * @return {Function} Listener handler function.
+         */
+        remove : function (listener, context) {
+            validateListener(listener, 'remove');
+
+            var i = this._indexOfListener(listener, context);
+            if (i !== -1) {
+                this._bindings[i]._destroy(); //no reason to a SignalBinding exist if it isn't attached to a signal
+                this._bindings.splice(i, 1);
+            }
+            return listener;
+        },
+
+        /**
+         * Remove all listeners from the Signal.
+         */
+        removeAll : function () {
+            var n = this._bindings.length;
+            while (n--) {
+                this._bindings[n]._destroy();
+            }
+            this._bindings.length = 0;
+        },
+
+        /**
+         * @return {number} Number of listeners attached to the Signal.
+         */
+        getNumListeners : function () {
+            return this._bindings.length;
+        },
+
+        /**
+         * Stop propagation of the event, blocking the dispatch to next listeners on the queue.
+         * <p><strong>IMPORTANT:</strong> should be called only during signal dispatch, calling it before/after dispatch won't affect signal broadcast.</p>
+         * @see Signal.prototype.disable
+         */
+        halt : function () {
+            this._shouldPropagate = false;
+        },
+
+        /**
+         * Dispatch/Broadcast Signal to all listeners added to the queue.
+         * @param {...*} [params] Parameters that should be passed to each handler.
+         */
+        dispatch : function (params) {
+            if (! this.active) {
+                return;
+            }
+
+            var paramsArr = Array.prototype.slice.call(arguments),
+                n = this._bindings.length,
+                bindings;
+
+            if (this.memorize) {
+                this._prevParams = paramsArr;
+            }
+
+            if (! n) {
+                //should come after memorize
+                return;
+            }
+
+            bindings = this._bindings.slice(); //clone array in case add/remove items during dispatch
+            this._shouldPropagate = true; //in case `halt` was called before dispatch or during the previous dispatch.
+
+            //execute all callbacks until end of the list or until a callback returns `false` or stops propagation
+            //reverse loop since listeners with higher priority will be added at the end of the list
+            do { n--; } while (bindings[n] && this._shouldPropagate && bindings[n].execute(paramsArr) !== false);
+        },
+
+        /**
+         * Forget memorized arguments.
+         * @see Signal.memorize
+         */
+        forget : function(){
+            this._prevParams = null;
+        },
+
+        /**
+         * Remove all bindings from signal and destroy any reference to external objects (destroy Signal object).
+         * <p><strong>IMPORTANT:</strong> calling any method on the signal instance after calling dispose will throw errors.</p>
+         */
+        dispose : function () {
+            this.removeAll();
+            delete this._bindings;
+            delete this._prevParams;
+        },
+
+        /**
+         * @return {string} String representation of the object.
+         */
+        toString : function () {
+            return '[Signal active:'+ this.active +' numListeners:'+ this.getNumListeners() +']';
+        }
+
+    };
 
 /*
- * @Date: 2023-04-03 17:25:42
+ * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 01:16:17
- * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CoordinateHelper.js
+ * @LastEditTime: 2023-06-14 13:45:54
+ * @FilePath: /threejs-demo/packages/app/CAD/src/lib/initialization.js
  */
 
-class CoordinateHelper extends THREE.Group {
-  constructor(colors = { x: 'red', y: 'green', z: 'blue' }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
-    super();
-    this.colors = colors;
-    this.axesLength = axesLength;
-    this.arrowsLength = arrowsLength;
-    this.arrowsWidth = arrowsWidth;
-    this.type = 'CoordinateHelper';
-    const pos = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
-    const origin = new THREE.Vector3();
-    ['x', 'y', 'z'].forEach((key) => {
-      const arrow = new THREE.ArrowHelper(new THREE.Vector3(...pos[key]), origin, axesLength, colors[key], arrowsLength, arrowsWidth);
-      arrow.renderOrder = Infinity;
-      this.add(arrow);
-    });
-  }
+function initPerspectiveCamera(initialPosition) {
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 1000);
 
-  setLength(axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
-    this.traverse((child) => {
-      child.setLength(axesLength, arrowsLength, arrowsWidth);
-    });
-  }
+  const position = (initialPosition !== undefined) ? initialPosition : new THREE.Vector3(0,5,10);
+  camera.position.copy(position);
 
-  dispose() {
-    this.traverse((child) => {
-      child.dispose();
-    });
-  }
+  camera.name = 'default_perspective_camera';
+  camera.lookAt(new THREE.Vector3());
+  return camera
+}
+
+function initRenderer(options = {}) {
+    const renderer = new THREE.WebGLRenderer(Object.assign({antialias: true},options));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.setClearColor(0xaaaaaa);
+
+    return renderer
+}
+
+
+function initScene() {
+    return new THREE.Scene()
 }
 
 /*
- * @Date: 2023-02-27 11:55:59
+ * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 01:15:55
- * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CustomGridHelper.js
+ * @LastEditTime: 2023-06-14 17:59:29
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
-class CustomGridHelper extends THREE.LineSegments {
-  constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {
-    const geometry = new THREE.BufferGeometry();
-    const material = new THREE.LineBasicMaterial({ vertexColors: true, toneMapped: false });
-    super(geometry, material);
-    this.type = 'CustomGridHelper';
-    this.centerColor = new THREE.Color(centerColor);
-    this.baseColor = new THREE.Color(baseColor);
-    this.divsionColor = new THREE.Color(divsionColor);
-
-    this.width = width;
-    this.height = height;
-    this.divsion = divsion;
-    this.splice = splice;
-
-    this.update();
+class Editor {
+  constructor(target) {
+    this.state = {};
+    this.signals = {
+      rendererCreate:new Signal()
+    };
+    this.target = target;
+    this.container = new Container();
+    this.scene = initScene();
+    this.sceneHelper = initScene();
+    this.camera = initPerspectiveCamera();
   }
 
-  update() {
-    let delta;
-    if (this.splice === 1) {
-      delta = 1;
-    } else {
-      delta = 1 / this.splice;
-    }
 
-    const { centerColor, baseColor, divsionColor, width, height, splice, divsion } = this;
-    const [timesX, timesY] = [width / divsion * splice, height / divsion * splice];
-
-    const vertices = [];
-    const colors = [];
-    let color, j10, isCenter,c =0;
-
-    function loop(half, center, times, delta, axis) {
-      const o = {};
-      o.x = (k, half) => vertices.push(-half, k, 0, half, k, 0);
-      o.y = (k, half) => vertices.push(k, -half, 0, k, half, 0);
-      for (let j = 0, k = -half; j <= times; j++, k += delta) {
-        o[axis](k, half);
-        j10 = j % splice === 0;
-        isCenter = j === center;
-        
-        color = divsionColor;
-        if (isCenter) {
-          color = centerColor;
-        } else {
-          if (j10 && !isCenter) {
-            color = baseColor;
-          }
-        }
-
-        color.toArray(colors, c); c += 3;
-        color.toArray(colors, c); c += 3;
-      }
-
-    }
-
-    loop(width/2, timesX / 2, timesX, delta, 'x');
-    loop(height/2, timesY / 2, timesY, delta, 'y');
-
-    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-    this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-
-    this.geometry.attributes.position.needUpdate = true;
-    this.geometry.attributes.color.needUpdate = true;
+  addObject(object,parent,index) {
+    this.container.register(object);
+    this.scene.add(object);
+  }
+  removeObject(object) {
+    this.container.discard(object);
+    this.scene.remove(object);
   }
 
-  dispose(){
-    this.geometry.dispose();
-    this.material.dispose();
+  getObjectById(id) {
+    this.container.findById(id);
+  }
+
+  setSize(width, height) {
+    this.renderer.setSize(width, height);
   }
 }
 
@@ -489,51 +843,6 @@ class ViewHelper extends THREE__namespace.Object3D {
 
       return new THREE__namespace.SpriteMaterial({ map: texture, toneMapped: false });
     }
-  }
-}
-
-/*
- * @Date: 2023-06-12 23:25:01
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-14 00:24:22
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
- */
-
-class Editor {
-  constructor(target) {
-    this.state = {};
-    this.target = target;
-    this.container = new Container();
-    this.scene = new THREE.Scene();
-    this.camera = DEFAULT_PERSPECTIVE_CAMERA.clone();
-    this.renderer = new THREE.WebGLRenderer({ antialias: true });
-    this.renderer.autoClear = false;
-    this.viewHelper = new ViewHelper(this.camera, target);
-
-    target.append(this.renderer.domElement);
-  }
-
-  render() {
-    this.renderer.clear();
-    this.viewHelper.render(this.renderer);
-    this.renderer.render(this.scene, this.camera);
-  }
-
-  addObject(object) {
-    this.container.register(object);
-    this.scene.add(object);
-  }
-  removeObject(object) {
-    this.container.discard(object);
-    this.scene.remove(object);
-  }
-
-  getObjectById(id) {
-    this.container.findById(id);
-  }
-
-  setSize(width, height) {
-    this.renderer.setSize(width, height);
   }
 }
 
@@ -943,6 +1252,7 @@ class OrbitControls extends THREE.EventDispatcher {
     }
 
     function dollyIn(dollyScale) {
+      console.log(dollyScale);
       if (scope.object.isPerspectiveCamera) {
         scale *= dollyScale;
       } else if (scope.object.isOrthographicCamera) {
@@ -4288,6 +4598,525 @@ class Control {
     }
 }
 
+/*
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 01:16:17
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CoordinateHelper.js
+ */
+
+class CoordinateHelper extends THREE.Group {
+  constructor(colors = { x: 'red', y: 'green', z: 'blue' }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
+    super();
+    this.colors = colors;
+    this.axesLength = axesLength;
+    this.arrowsLength = arrowsLength;
+    this.arrowsWidth = arrowsWidth;
+    this.type = 'CoordinateHelper';
+    const pos = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
+    const origin = new THREE.Vector3();
+    ['x', 'y', 'z'].forEach((key) => {
+      const arrow = new THREE.ArrowHelper(new THREE.Vector3(...pos[key]), origin, axesLength, colors[key], arrowsLength, arrowsWidth);
+      arrow.renderOrder = Infinity;
+      this.add(arrow);
+    });
+  }
+
+  setLength(axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
+    this.traverse((child) => {
+      child.setLength(axesLength, arrowsLength, arrowsWidth);
+    });
+  }
+
+  dispose() {
+    this.traverse((child) => {
+      child.dispose();
+    });
+  }
+}
+
+/*
+ * @Date: 2023-02-27 11:55:59
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 01:15:55
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CustomGridHelper.js
+ */
+
+class CustomGridHelper extends THREE.LineSegments {
+  constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {
+    const geometry = new THREE.BufferGeometry();
+    const material = new THREE.LineBasicMaterial({ vertexColors: true, toneMapped: false });
+    super(geometry, material);
+    this.type = 'CustomGridHelper';
+    this.centerColor = new THREE.Color(centerColor);
+    this.baseColor = new THREE.Color(baseColor);
+    this.divsionColor = new THREE.Color(divsionColor);
+
+    this.width = width;
+    this.height = height;
+    this.divsion = divsion;
+    this.splice = splice;
+
+    this.update();
+  }
+
+  update() {
+    let delta;
+    if (this.splice === 1) {
+      delta = 1;
+    } else {
+      delta = 1 / this.splice;
+    }
+
+    const { centerColor, baseColor, divsionColor, width, height, splice, divsion } = this;
+    const [timesX, timesY] = [width / divsion * splice, height / divsion * splice];
+
+    const vertices = [];
+    const colors = [];
+    let color, j10, isCenter,c =0;
+
+    function loop(half, center, times, delta, axis) {
+      const o = {};
+      o.x = (k, half) => vertices.push(-half, k, 0, half, k, 0);
+      o.y = (k, half) => vertices.push(k, -half, 0, k, half, 0);
+      for (let j = 0, k = -half; j <= times; j++, k += delta) {
+        o[axis](k, half);
+        j10 = j % splice === 0;
+        isCenter = j === center;
+        
+        color = divsionColor;
+        if (isCenter) {
+          color = centerColor;
+        } else {
+          if (j10 && !isCenter) {
+            color = baseColor;
+          }
+        }
+
+        color.toArray(colors, c); c += 3;
+        color.toArray(colors, c); c += 3;
+      }
+
+    }
+
+    loop(width/2, timesX / 2, timesX, delta, 'x');
+    loop(height/2, timesY / 2, timesY, delta, 'y');
+
+    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+    this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+
+    this.geometry.attributes.position.needUpdate = true;
+    this.geometry.attributes.color.needUpdate = true;
+  }
+
+  dispose(){
+    this.geometry.dispose();
+    this.material.dispose();
+  }
+}
+
+class EditorControls extends THREE__namespace.EventDispatcher {
+  constructor(object, domElement) {
+    super();
+
+    // API
+
+    this.enabled = true;
+    this.center = new THREE__namespace.Vector3();
+    this.panSpeed = 0.002;
+    this.zoomSpeed = 1.0;
+    this.rotationSpeed = 0.005;
+	this.maxZoom = Infinity;
+	this.minZoom = 0;
+
+    // internals
+
+    var scope = this;
+    var vector = new THREE__namespace.Vector3();
+    var delta = new THREE__namespace.Vector3();
+    var box = new THREE__namespace.Box3();
+
+    var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
+    var state = STATE.NONE;
+
+    var center = this.center;
+    var normalMatrix = new THREE__namespace.Matrix3();
+    var pointer = new THREE__namespace.Vector2();
+    var pointerOld = new THREE__namespace.Vector2();
+    var spherical = new THREE__namespace.Spherical();
+    var sphere = new THREE__namespace.Sphere();
+
+    // events
+
+    var changeEvent = { type: "change" };
+
+    this.focus = function (target) {
+      var distance;
+
+      box.setFromObject(target);
+
+      if (box.isEmpty() === false) {
+        box.getCenter(center);
+        distance = box.getBoundingSphere(sphere).radius;
+      } else {
+        // Focusing on an Group, AmbientLight, etc
+
+        center.setFromMatrixPosition(target.matrixWorld);
+        distance = 0.1;
+      }
+
+      delta.set(0, 0, 1);
+      delta.applyQuaternion(object.quaternion);
+      delta.multiplyScalar(distance * 4);
+
+      object.position.copy(center).add(delta);
+
+      scope.dispatchEvent(changeEvent);
+    };
+
+    this.pan = function (delta) {
+      var distance = object.position.distanceTo(center);
+
+      delta.multiplyScalar(distance * scope.panSpeed);
+      delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
+
+      object.position.add(delta);
+      center.add(delta);
+
+      scope.dispatchEvent(changeEvent);
+    };
+
+	const _eye = new THREE__namespace.Vector3();
+    this.zoom = function (delta) {
+		console.log(delta);
+    //   var distance = object.position.distanceTo(center);
+
+    //   delta.multiplyScalar(distance * scope.zoomSpeed);
+
+    //   if (delta.length() > distance) return;
+
+    //   delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
+
+    //   object.position.add(delta);
+	if(object.type === 'PerspectiveCamera'){
+		_eye.copy( object.position ).sub( scope.center );
+	}else if(object.type === 'OrthographicCamera'){
+		object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom,  delta.z > 0 ? object.zoom * Math.pow(0.95, scope.zoomSpeed ): object.zoom / Math.pow(0.95, scope.zoomSpeed)));
+		object.updateProjectionMatrix();
+	}
+
+
+      scope.dispatchEvent(changeEvent);
+    };
+
+    this.rotate = function (delta) {
+      vector.copy(object.position).sub(center);
+
+      spherical.setFromVector3(vector);
+
+      spherical.theta += delta.x * scope.rotationSpeed;
+      spherical.phi += delta.y * scope.rotationSpeed;
+
+      spherical.makeSafe();
+
+      vector.setFromSpherical(spherical);
+
+      object.position.copy(center).add(vector);
+
+      object.lookAt(center);
+
+      scope.dispatchEvent(changeEvent);
+    };
+
+    //
+
+    function onPointerDown(event) {
+      if (scope.enabled === false) return;
+
+      switch (event.pointerType) {
+        case "mouse":
+        case "pen":
+          onMouseDown(event);
+          break;
+
+        // TODO touch
+      }
+
+      domElement.ownerDocument.addEventListener("pointermove", onPointerMove);
+      domElement.ownerDocument.addEventListener("pointerup", onPointerUp);
+    }
+
+    function onPointerMove(event) {
+      if (scope.enabled === false) return;
+
+      switch (event.pointerType) {
+        case "mouse":
+        case "pen":
+          onMouseMove(event);
+          break;
+
+        // TODO touch
+      }
+    }
+
+    function onPointerUp(event) {
+      switch (event.pointerType) {
+        case "mouse":
+        case "pen":
+          onMouseUp();
+          break;
+
+        // TODO touch
+      }
+
+      domElement.ownerDocument.removeEventListener(
+        "pointermove",
+        onPointerMove
+      );
+      domElement.ownerDocument.removeEventListener("pointerup", onPointerUp);
+    }
+
+    // mouse
+
+    function onMouseDown(event) {
+      if (event.button === 0) {
+        state = STATE.ROTATE;
+      } else if (event.button === 1) {
+        state = STATE.ZOOM;
+      } else if (event.button === 2) {
+        state = STATE.PAN;
+      }
+
+      pointerOld.set(event.clientX, event.clientY);
+    }
+
+    function onMouseMove(event) {
+      pointer.set(event.clientX, event.clientY);
+
+      var movementX = pointer.x - pointerOld.x;
+      var movementY = pointer.y - pointerOld.y;
+
+      if (state === STATE.ROTATE) {
+        scope.rotate(delta.set(-movementX, -movementY, 0));
+      } else if (state === STATE.ZOOM) {
+        scope.zoom(delta.set(0, 0, movementY));
+      } else if (state === STATE.PAN) {
+        scope.pan(delta.set(-movementX, movementY, 0));
+      }
+
+      pointerOld.set(event.clientX, event.clientY);
+    }
+
+    function onMouseUp() {
+      state = STATE.NONE;
+    }
+
+    function onMouseWheel(event) {
+      if (scope.enabled === false) return;
+
+      event.preventDefault();
+
+      // Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
+      scope.zoom(delta.set(0, 0, event.deltaY > 0 ? 1 : -1));
+    }
+
+    function contextmenu(event) {
+      event.preventDefault();
+    }
+
+    this.dispose = function () {
+      domElement.removeEventListener("contextmenu", contextmenu);
+      domElement.removeEventListener("dblclick", onMouseUp);
+      domElement.removeEventListener("wheel", onMouseWheel);
+
+      domElement.removeEventListener("pointerdown", onPointerDown);
+
+      domElement.removeEventListener("touchstart", touchStart);
+      domElement.removeEventListener("touchmove", touchMove);
+    };
+
+    domElement.addEventListener("contextmenu", contextmenu);
+    domElement.addEventListener("dblclick", onMouseUp);
+    domElement.addEventListener("wheel", onMouseWheel);
+
+    domElement.addEventListener("pointerdown", onPointerDown);
+
+    // touch
+
+    var touches = [
+      new THREE__namespace.Vector3(),
+      new THREE__namespace.Vector3(),
+      new THREE__namespace.Vector3(),
+    ];
+    var prevTouches = [
+      new THREE__namespace.Vector3(),
+      new THREE__namespace.Vector3(),
+      new THREE__namespace.Vector3(),
+    ];
+
+    var prevDistance = null;
+
+    function touchStart(event) {
+      if (scope.enabled === false) return;
+
+      switch (event.touches.length) {
+        case 1:
+          touches[0]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          touches[1]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          break;
+
+        case 2:
+          touches[0]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          touches[1]
+            .set(event.touches[1].pageX, event.touches[1].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          prevDistance = touches[0].distanceTo(touches[1]);
+          break;
+      }
+
+      prevTouches[0].copy(touches[0]);
+      prevTouches[1].copy(touches[1]);
+    }
+
+    function touchMove(event) {
+      if (scope.enabled === false) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+
+      function getClosest(touch, touches) {
+        var closest = touches[0];
+
+        for (var touch2 of touches) {
+          if (closest.distanceTo(touch) > touch2.distanceTo(touch))
+            closest = touch2;
+        }
+
+        return closest;
+      }
+
+      switch (event.touches.length) {
+        case 1:
+          touches[0]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          touches[1]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          scope.rotate(
+            touches[0]
+              .sub(getClosest(touches[0], prevTouches))
+              .multiplyScalar(-1)
+          );
+          break;
+
+        case 2:
+          touches[0]
+            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          touches[1]
+            .set(event.touches[1].pageX, event.touches[1].pageY, 0)
+            .divideScalar(window.devicePixelRatio);
+          var distance = touches[0].distanceTo(touches[1]);
+          scope.zoom(delta.set(0, 0, prevDistance - distance));
+          prevDistance = distance;
+
+          var offset0 = touches[0]
+            .clone()
+            .sub(getClosest(touches[0], prevTouches));
+          var offset1 = touches[1]
+            .clone()
+            .sub(getClosest(touches[1], prevTouches));
+          offset0.x = -offset0.x;
+          offset1.x = -offset1.x;
+
+          scope.pan(offset0.add(offset1));
+
+          break;
+      }
+
+      prevTouches[0].copy(touches[0]);
+      prevTouches[1].copy(touches[1]);
+    }
+
+    domElement.addEventListener("touchstart", touchStart);
+    domElement.addEventListener("touchmove", touchMove);
+  }
+}
+
+/*
+ * @Date: 2023-06-14 10:44:51
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-14 16:50:32
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
+ */
+
+class ViewPort {
+  constructor(editor) {
+    editor.signal;
+
+    const renderer = initRenderer();
+    const camera = editor.camera;
+    const scene = editor.scene;
+    const sceneHelper = editor.sceneHelper;
+    const target = editor.target;
+
+    target.append(renderer.domElement);
+
+    const gridHelper = new THREE.GridHelper(50, 50, 0x888888);
+    gridHelper.isHelper = true;
+    const viewHelper = new ViewHelper(camera, target);
+
+    sceneHelper.add(gridHelper);
+
+ 
+
+    new THREE.Clock();
+    
+    const controls = new EditorControls(camera,target);
+    controls.addEventListener( 'change', function () {
+        render();
+	} );
+
+
+
+    const render = () => {
+      performance.now();
+
+      renderer.render(scene, camera);
+      renderer.autoClear = false;
+      renderer.render(sceneHelper, camera);
+      viewHelper.render(renderer);
+      renderer.autoClear = true;
+      performance.now();
+    };
+
+    const resize = () => {
+      const { width, height } = target.getBoundingClientRect();
+      renderer.setSize(width, height);
+
+      if (camera.type === "OrthographicCamera") {
+        camera.top = 15 * (height / width);
+        camera.bottom = -15 * (height / width);
+      } else if (camera.type === "PerspectiveCamera") {
+        camera.aspect = width / height;
+      }
+      camera.updateProjectionMatrix();
+    };
+
+
+    resize();
+    render();
+
+  }
+}
+
 exports.CAD = CAD;
 exports.Collector = Collector;
 exports.Container = Container;
@@ -4296,3 +5125,4 @@ exports.CoordinateHelper = CoordinateHelper;
 exports.CustomGridHelper = CustomGridHelper;
 exports.Editor = Editor;
 exports.ViewHelper = ViewHelper;
+exports.ViewPort = ViewPort;
