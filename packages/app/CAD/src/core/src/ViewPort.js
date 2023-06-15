@@ -75,7 +75,6 @@ class ViewPort {
 
       if (camera.type === "OrthographicCamera") {
         camera.top = 15 * (height / width);
-
         camera.bottom = -15 * (height / width);
       } else if (camera.type === "PerspectiveCamera") {
         camera.aspect = width / height;

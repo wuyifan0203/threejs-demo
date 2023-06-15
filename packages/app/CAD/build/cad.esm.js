@@ -668,7 +668,7 @@ class CustomGridHelper extends LineSegments {
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-15 15:13:02
+ * @LastEditTime: 2023-06-16 01:56:06
  * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelper.js
  */
 
@@ -820,7 +820,7 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
         const intersection = intersects[ 0 ];
         const object = intersection.object;
 
-        prepareAnimationData(object, this.controls.center);
+        prepareAnimationData.call(this,object, this.controls.center);
 
         this.animating = true;
 
@@ -908,6 +908,8 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
 
       //
 
+      console.log(this.editorCamera);
+
       radius = this.editorCamera.position.distanceTo(focusPoint);
       targetPosition.multiplyScalar(radius).add(focusPoint);
 
@@ -950,38 +952,41 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
   }
 };
 
-class ViewHelper extends ViewHelper$1{
-    constructor(camera,dom){
-        super(camera,dom);
+/*
+ * @Date: 2023-06-16 00:45:30
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-16 01:56:35
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelperExtend.js
+ */
 
-        const viewHelperDom = document.createElement('div');
-        viewHelperDom.setAttribute('id','viewHelper');
+class ViewHelper extends ViewHelper$1 {
+  constructor(editorCamera, container) {
+    super(editorCamera, container);
 
-        const style = {
-            position:'absolute',
-            right:'0px',
-            bottom:'0px',
-            height:'128px',
-            width:'128px'
-        };
-        Object.assign(viewHelperDom.style,style);
-        dom.append(viewHelperDom);
+    const viewHelperDom = document.createElement("div");
+    viewHelperDom.setAttribute("id", "viewHelper");
 
-        viewHelperDom.addEventListener( 'pointerup', ( event ) => {
+    const style = {
+      position: "absolute",
+      right: "0px",
+      bottom: "0px",
+      height: "128px",
+      width: "128px",
+    };
+    Object.assign(viewHelperDom.style, style);
+    container.append(viewHelperDom);
 
-			event.stopPropagation();
+    viewHelperDom.addEventListener("pointerup", (event) => {
+      event.stopPropagation();
 
-			this.handleClick( event );
 
-		} );
+      this.handleClick(event);
+    });
 
-		viewHelperDom.addEventListener( 'pointerdown', function ( event ) {
-
-			event.stopPropagation();
-
-		} );
-
-    }
+    viewHelperDom.addEventListener("pointerdown", function (event) {
+      event.stopPropagation();
+    });
+  }
 }
 
 /* eslint-disable eqeqeq */
@@ -5141,7 +5146,6 @@ class ViewPort {
 
       if (camera.type === "OrthographicCamera") {
         camera.top = 15 * (height / width);
-
         camera.bottom = -15 * (height / width);
       } else if (camera.type === "PerspectiveCamera") {
         camera.aspect = width / height;

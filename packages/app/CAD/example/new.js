@@ -13,7 +13,6 @@ window.onload = ()=>{
 
 function init() {
     const dom = document.getElementById('cad');
-    const {width,height} = dom.getBoundingClientRect()
     const editor = new Editor(dom);
     const viewPort = new ViewPort(editor)
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-15 15:13:02
+ * @LastEditTime: 2023-06-16 01:56:06
  * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelper.js
  */
 import * as THREE from 'three';
@@ -154,7 +154,7 @@ class ViewHelper extends THREE.Object3D {
         const intersection = intersects[ 0 ];
         const object = intersection.object;
 
-        prepareAnimationData(object, this.controls.center);
+        prepareAnimationData.call(this,object, this.controls.center);
 
         this.animating = true;
 
@@ -241,6 +241,8 @@ class ViewHelper extends THREE.Object3D {
       }
 
       //
+
+      console.log(this.editorCamera);
 
       radius = this.editorCamera.position.distanceTo(focusPoint);
       targetPosition.multiplyScalar(radius).add(focusPoint);
