@@ -1,4 +1,4 @@
-import { ViewHelper } from '../../helper/src/ViewHelper.js';
+import { ViewHelper } from '../../helper';
 import {
   OrthographicCamera, Raycaster, WebGLRenderer, MOUSE, Vector2, Scene,
 } from 'three';

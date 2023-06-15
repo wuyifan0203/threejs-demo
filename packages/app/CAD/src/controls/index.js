@@ -7,3 +7,4 @@
 export * from "./src/OrbitControls";
 export * from "./src/TransformControls";
 export * from "./src/TrackballControls";
+export * from './src/EditorControls'

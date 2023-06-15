@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-06-13 13:06:55
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-15 15:13:02
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelper.js
+ */
 import * as THREE from 'three';
 
 const vpTemp = new THREE.Vector4();
@@ -278,4 +284,4 @@ class ViewHelper extends THREE.Object3D {
   }
 }
 
-export { ViewHelper };
+export { ViewHelper as ViewHelperBase };

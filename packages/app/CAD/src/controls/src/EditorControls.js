@@ -9,10 +9,10 @@ class EditorControls extends THREE.EventDispatcher {
     this.enabled = true;
     this.center = new THREE.Vector3();
     this.panSpeed = 0.002;
-    this.zoomSpeed = 1.0;
+    this.zoomSpeed = 0.5;
     this.rotationSpeed = 0.005;
-	this.maxZoom = Infinity;
-	this.minZoom = 0;
+    this.maxZoom = Infinity;
+    this.minZoom = 0;
 
     // internals
 
@@ -71,25 +71,25 @@ class EditorControls extends THREE.EventDispatcher {
       scope.dispatchEvent(changeEvent);
     };
 
-	const _eye = new THREE.Vector3()
     this.zoom = function (delta) {
-		console.log(delta);
-    //   var distance = object.position.distanceTo(center);
-
-    //   delta.multiplyScalar(distance * scope.zoomSpeed);
-
-    //   if (delta.length() > distance) return;
-
-    //   delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
-
-    //   object.position.add(delta);
-	if(object.type === 'PerspectiveCamera'){
-		_eye.copy( object.position ).sub( scope.center );
-	}else if(object.type === 'OrthographicCamera'){
-		object.zoom = Math.max(scope.minZoom, Math.min(scope.maxZoom,  delta.z > 0 ? object.zoom * Math.pow(0.95, scope.zoomSpeed ): object.zoom / Math.pow(0.95, scope.zoomSpeed)));
-		object.updateProjectionMatrix();
-	}
-
+      if (object.type === "PerspectiveCamera") {
+        var distance = object.position.distanceTo(center);
+        delta.multiplyScalar(distance * scope.zoomSpeed);
+        if (delta.length() > distance) return;
+        delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
+        object.position.add(delta);
+      } else if (object.type === "OrthographicCamera") {
+        object.zoom = Math.max(
+          scope.minZoom,
+          Math.min(
+            scope.maxZoom,
+            delta.z > 0
+              ? object.zoom * Math.pow(0.95, scope.zoomSpeed)
+              : object.zoom / Math.pow(0.95, scope.zoomSpeed)
+          )
+        );
+        object.updateProjectionMatrix();
+      }
 
       scope.dispatchEvent(changeEvent);
     };
