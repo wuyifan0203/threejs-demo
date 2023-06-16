@@ -9,9 +9,7 @@ import {
   Scene,
   Vector3,
   LineBasicMaterial,
-  EdgesGeometry,
   LineSegments,
-  BoxGeometry,
   BufferGeometry,
   BufferAttribute,
   Path,
@@ -22,7 +20,6 @@ import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
-  initCustomGrid,
   initAxesHelper,
 } from '../../lib/tools/index.js';
 

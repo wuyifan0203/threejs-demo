@@ -1,11 +1,11 @@
 /*
  * @Date: 2022-11-29 19:36:35
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-24 15:03:59
- * @FilePath: /threejs-demo/src/examples/pology/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-15 18:14:24
+ * @FilePath: /threejs-demo/packages/examples/earCut/index.js
  */
 import {
-  data, data1, data2, data3, data4, data5, data6, data7, data8, data9,
+  data, data1, data2, data3, data4, data5, data6, data7, data8, data9,data10
 } from './data.js';
 import {
   Scene,
@@ -65,11 +65,11 @@ function draw(scene) {
   });
 
   const dataList = {
-    data,data1,data2,data3,data4,data5,data6,data7,data8,data9
+    data,data1,data2,data3,data4,data5,data6,data7,data8,data9,data10
   }
 
   let mesh,meshNormal;
-  draw3DMesh(data1,90,0.5,0.2);
+  draw3DMesh(data10,90,0.5,0.2);
   scene.add(mesh);
   scene.add(meshNormal);
 
@@ -109,6 +109,8 @@ function draw(scene) {
     mesh = new Mesh(bufferG, newM);
     meshNormal = new FaceNormalsHelper(mesh, 1);
   }
+
+
 
   const orbject = {
     data:'data1',
