@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-15 18:37:02
+ * @LastEditTime: 2023-06-16 13:46:52
  * @FilePath: /threejs-demo/packages/examples/line/pathPreview.js
  */
 import {
@@ -25,7 +25,7 @@ import {
     initCustomGrid,
   } from '../../lib/tools/index.js';
 
-  import {innerPoints} from '../earCut/compute.js' 
+  import {innerPoints} from '../polygonScale/compute.js' 
   
   
   (function () {
@@ -42,6 +42,7 @@ import {
     initCustomGrid(scene)
   
     const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableRotate = false
     draw(scene);
   
     render();
@@ -158,6 +159,7 @@ import {
   
 
   function useVec2Array(data,height) {
+    console.log(data.length);
     const vertex = [];
     for (let i = 0; i < data.length; i++) {
         const [x,y] = data[i]

@@ -1,8 +1,8 @@
 /*
  * @Date: 2022-11-30 13:47:02
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:57:12
- * @FilePath: /threejs-demo/src/examples/pology/compute.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-19 13:12:07
+ * @FilePath: /threejs-demo/packages/examples/polygonScale/compute.js
  */
 
 function innerPoints(p1, p, p2, l) {
@@ -26,7 +26,7 @@ function innerPoints(p1, p, p2, l) {
   const nv2y = v2y / n2;
 
   // cos = a.b/ |a|.|b|
-  const cos = (nv1x * nv2x + nv1y * nv2y);
+  const cos = nv1x * nv2x + nv1y * nv2y;
 
   const expend = -l / Math.sqrt((1 - cos) / 2);
 
@@ -75,10 +75,7 @@ function normal(x, y) {
 }
 
 function isConvex(vec20, vec21) {
-  return (vec20[0] * vec21[1] - vec20[1] * vec21[0]) > 0;
+  return vec20[0] * vec21[1] - vec20[1] * vec21[0] > 0;
 }
 
-export {
-  innerPoints,
-  expendPoints,
-};
+export { innerPoints, expendPoints };

@@ -245,6 +245,21 @@ const isComplexPolygon = (points) => {
   return false;
 };
 
+/**
+ * @description: 判断是否顺时针
+ * @param {Array<{x:number,y:number}>} loop
+ * @return {boolean}
+ */
+function isClockWise(loop) {
+  let area = 0;
+  for (let i = 0; i < loop.length; i++) {
+    const p1 = loop[i];
+    const p2 = loop[(i + 1) % loop.length];
+    area += (p2.x - p1.x) * (p2.y + p1.y);
+  }
+  return area < 0;
+}
+
 
 
 
@@ -266,5 +281,6 @@ export {
   angle2Radians,
   radians2Angle,
   CC2SSC,
-  isComplexPolygon
+  isComplexPolygon,
+  isClockWise
 };

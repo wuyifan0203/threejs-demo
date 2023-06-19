@@ -260,7 +260,7 @@ const colorMap = [
 
 
 const getColor = (index) => {
-  let color = colorMap[index];
+  let color = colorMap[index % 256];
   const r = parseInt(color[0]).toString(16);
   const g = parseInt(color[1]).toString(16);
   const b = parseInt(color[2]).toString(16);

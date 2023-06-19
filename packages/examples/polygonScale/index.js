@@ -1,8 +1,8 @@
 /*
  * @Date: 2022-11-29 19:36:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-15 18:14:24
- * @FilePath: /threejs-demo/packages/examples/earCut/index.js
+ * @LastEditTime: 2023-06-19 14:32:30
+ * @FilePath: /threejs-demo/packages/examples/polygonScale/index.js
  */
 import {
   data, data1, data2, data3, data4, data5, data6, data7, data8, data9,data10
