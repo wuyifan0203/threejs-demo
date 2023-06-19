@@ -5099,16 +5099,15 @@ class Control {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-15 14:31:34
+ * @LastEditTime: 2023-06-19 17:50:23
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
-
-
 
 class ViewPort {
   constructor(editor) {
     editor.signal;
     const renderer = initRenderer();
+    renderer.setAnimationLoop(animate);
     const camera = editor.camera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
@@ -5214,7 +5213,19 @@ class ViewPort {
       }
     }
 
+    const clock = new THREE.Clock();
 
+    function animate() {
+      let needsUpdate = false;
+      const delta = clock.getDelta();
+
+      if (viewHelper.animating === true) {
+        viewHelper.update(delta);
+        needsUpdate = true;
+      }
+
+      if (needsUpdate === true) onRender();
+    }
 
     onResize();
     onRender();
