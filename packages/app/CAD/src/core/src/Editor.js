@@ -13,7 +13,7 @@ class Editor {
   constructor(target) {
     this.state = {};
     this.signals = {
-      rendererCreate:new Signal()
+      windowResize:new Signal()
     }
     this.target = target;
     this.container = new Container();

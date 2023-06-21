@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-19 17:50:23
+ * @LastEditTime: 2023-06-21 18:23:16
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -12,7 +12,7 @@ import { EditorControls, TransformControls } from "../../controls";
 
 class ViewPort {
   constructor(editor) {
-    const signal = editor.signal;
+    const signals = editor.signals;
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
     const camera = editor.camera;
@@ -68,6 +68,7 @@ class ViewPort {
     }
 
     function onResize() {
+      console.log(2);
       const { width, height } = target.getBoundingClientRect();
 
       renderer.setSize(width, height);
@@ -142,8 +143,13 @@ class ViewPort {
       if (needsUpdate === true) onRender();
     }
 
-    onResize();
-    onRender();
+    signals.windowResize.add(()=>{
+      console.log('editor resized');
+      onResize();
+      onRender();
+    })
+
+    signals.windowResize.dispatch();
   }
 }
 
