@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-21 18:27:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 18:31:11
+ * @LastEditTime: 2023-06-25 09:55:18
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/log.js
  */
 
@@ -13,3 +13,12 @@ function print(msg) {
     console.log(msg)
 }
 
+function printDebugger(key) {
+    console.count('debugger:'+key)
+}
+
+export {
+    print,
+    printInfo,
+    printDebugger
+}

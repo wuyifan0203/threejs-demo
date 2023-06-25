@@ -7,23 +7,28 @@
 
 import { Container } from "./Container";
 import { Signal } from "../../lib/signals";
-import { initOrthographicCamera, initPerspectiveCamera, initScene } from "../../lib/initialization";
+import { Selector } from "./Selector";
+import { initPerspectiveCamera, initScene } from "../../lib/initialization";
 
 class Editor {
   constructor(target) {
     this.state = {};
     this.signals = {
-      windowResize:new Signal()
-    }
+      windowResize: new Signal(),
+      objectSelected: new Signal(),
+      intersectionsDetected: new Signal(),
+    };
     this.target = target;
     this.container = new Container();
     this.scene = initScene();
     this.sceneHelper = initScene();
     this.camera = initPerspectiveCamera();
+
+    this.selector = new Selector(this);
+    this.selected = [];
   }
 
-
-  addObject(object,parent,index) {
+  addObject(object, parent, index) {
     this.container.register(object);
     this.scene.add(object);
   }

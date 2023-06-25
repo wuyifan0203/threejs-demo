@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 18:23:16
+ * @LastEditTime: 2023-06-25 18:29:24
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -9,12 +9,15 @@ import { Box3Helper, Raycaster, GridHelper, Vector2, Box3, Clock } from "three";
 import { initRenderer } from "../../lib/initialization";
 import { ViewHelper } from "../../helper";
 import { EditorControls, TransformControls } from "../../controls";
+import { print, printDebugger, printInfo } from "../../utils/log";
 
 class ViewPort {
   constructor(editor) {
     const signals = editor.signals;
+
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
+
     const camera = editor.camera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
@@ -25,13 +28,12 @@ class ViewPort {
     const gridHelper = new GridHelper(50, 50, 0x888888);
     gridHelper.isHelper = true;
 
-    let objectPositionOnDown = null;
-    let objectRotationOnDown = null;
-    let objectScaleOnDown = null;
-
     const transformControls = new TransformControls(camera, target);
     transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
+    transformControls.addEventListener(
+      "mouseDown",
+      onTransformControlsMouseDown
+    );
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
@@ -48,10 +50,9 @@ class ViewPort {
     selectionBox.material.depthTest = false;
     sceneHelper.add(selectionBox);
 
-    const raycaster = new Raycaster();
-    const mouse = new Vector2();
-
     let startTime, endTime;
+
+    // main
 
     function onRender() {
       startTime = performance.now();
@@ -68,7 +69,6 @@ class ViewPort {
     }
 
     function onResize() {
-      console.log(2);
       const { width, height } = target.getBoundingClientRect();
 
       renderer.setSize(width, height);
@@ -82,6 +82,12 @@ class ViewPort {
 
       camera.updateProjectionMatrix();
     }
+
+    // TransformControls
+
+    let objectPositionOnDown = null;
+    let objectRotationOnDown = null;
+    let objectScaleOnDown = null;
 
     function onTransformControlsChange() {
       const object = transformControls.object;
@@ -129,6 +135,53 @@ class ViewPort {
       }
     }
 
+    // Selection
+
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+
+    function getIntersects(point) {
+      mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
+      raycaster.setFromCamera(mouse,camera);
+
+
+      // 筛选需要检测的对象
+      const objects = [];
+    }
+
+    // Mouse
+
+    const onDownPosition = new Vector2();
+    const onUpPosition = new Vector2();
+    const onDoubleClickPosition = new Vector2();
+
+    function getMousePosition(x, y) {
+      const { left, top, width, height } = target.getBoundingClientRect();
+      return [(x - left) / width, (y - top) / height];
+    }
+
+    function onMouseDown(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onDownPosition.fromArray(mousePosition);
+
+      renderer.domElement.addEventListener("mouseup", onMouseUp);
+    }
+
+    function onMouseUp(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onUpPosition.fromArray(mousePosition);
+
+      handelClick();
+
+      renderer.domElement.removeEventListener("mouseup", onMouseUp);
+    }
+
+    function handelClick() {
+      if (onUpPosition.distanceTo(onDownPosition) === 0) {
+        const intersects = get;
+      }
+    }
+
     const clock = new Clock();
 
     function animate() {
@@ -143,11 +196,11 @@ class ViewPort {
       if (needsUpdate === true) onRender();
     }
 
-    signals.windowResize.add(()=>{
-      console.log('editor resized');
+    signals.windowResize.add(() => {
+      printInfo("editor resized");
       onResize();
       onRender();
-    })
+    });
 
     signals.windowResize.dispatch();
   }

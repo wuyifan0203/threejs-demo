@@ -496,6 +496,59 @@ class Container {
 
     };
 
+function isSameValue(v1,v2) {
+    return stringify(v1) === stringify(v2)
+}
+
+function stringify(v) {
+    return JSON.stringify(v)
+}
+
+/*
+ * @Date: 2023-06-25 10:27:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-25 13:06:11
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
+ */
+
+class Selector {
+  constructor(editor) {
+    // 是否为多选模式
+    this.multipleSelect = false;
+    this.editor = editor;
+    this.signals = editor.signals;
+
+    this.signals.intersectionsDetected.add((selectIds) => {
+      if (selectIds.length > 0) {
+        if (!this.multipleSelect) {
+          // 多选模式会全部选择
+          this.select(selectIds);
+        } else {
+          // 非多选模式只会选择最近的物体
+          this.select([selectIds[0]]);
+        }
+      } else {
+        this.select(null);
+      }
+    });
+  }
+
+  select(selectIds) {
+    if (isSameValue(this.editor.selected, selectIds)) return;
+    this.editor.selected = selectIds;
+
+    if (selectIds.length === 1) {
+      this.signals.objectSelected.dispatch(selectIds);
+    } else {
+      this.signals.objectSelected.dispatch([]);
+    }
+  }
+
+  detach() {
+    this.select([]);
+  }
+}
+
 /*
  * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
@@ -540,17 +593,21 @@ class Editor {
   constructor(target) {
     this.state = {};
     this.signals = {
-      windowResize:new Signal()
+      windowResize: new Signal(),
+      objectSelected: new Signal(),
+      intersectionsDetected: new Signal(),
     };
     this.target = target;
     this.container = new Container();
     this.scene = initScene();
     this.sceneHelper = initScene();
     this.camera = initPerspectiveCamera();
+
+    this.selector = new Selector(this);
+    this.selected = [];
   }
 
-
-  addObject(object,parent,index) {
+  addObject(object, parent, index) {
     this.container.register(object);
     this.scene.add(object);
   }
@@ -5124,17 +5181,30 @@ class Control {
 }
 
 /*
+ * @Date: 2023-06-21 18:27:56
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-25 09:55:18
+ * @FilePath: /threejs-demo/packages/app/CAD/src/utils/log.js
+ */
+
+function printInfo(key) {
+    console.count('info:'+key);
+}
+
+/*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 18:23:16
+ * @LastEditTime: 2023-06-25 18:29:24
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
 class ViewPort {
   constructor(editor) {
     const signals = editor.signals;
+
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
+
     const camera = editor.camera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
@@ -5145,13 +5215,12 @@ class ViewPort {
     const gridHelper = new THREE.GridHelper(50, 50, 0x888888);
     gridHelper.isHelper = true;
 
-    let objectPositionOnDown = null;
-    let objectRotationOnDown = null;
-    let objectScaleOnDown = null;
-
     const transformControls = new TransformControls(camera, target);
     transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
+    transformControls.addEventListener(
+      "mouseDown",
+      onTransformControlsMouseDown
+    );
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
@@ -5168,8 +5237,7 @@ class ViewPort {
     selectionBox.material.depthTest = false;
     sceneHelper.add(selectionBox);
 
-    new THREE.Raycaster();
-    new THREE.Vector2();
+    // main
 
     function onRender() {
       performance.now();
@@ -5186,7 +5254,6 @@ class ViewPort {
     }
 
     function onResize() {
-      console.log(2);
       const { width, height } = target.getBoundingClientRect();
 
       renderer.setSize(width, height);
@@ -5200,6 +5267,12 @@ class ViewPort {
 
       camera.updateProjectionMatrix();
     }
+
+    // TransformControls
+
+    let objectPositionOnDown = null;
+    let objectRotationOnDown = null;
+    let objectScaleOnDown = null;
 
     function onTransformControlsChange() {
       const object = transformControls.object;
@@ -5241,6 +5314,17 @@ class ViewPort {
       }
     }
 
+    // Selection
+
+    new THREE.Raycaster();
+    new THREE.Vector2();
+
+    // Mouse
+
+    new THREE.Vector2();
+    new THREE.Vector2();
+    new THREE.Vector2();
+
     const clock = new THREE.Clock();
 
     function animate() {
@@ -5255,8 +5339,8 @@ class ViewPort {
       if (needsUpdate === true) onRender();
     }
 
-    signals.windowResize.add(()=>{
-      console.log('editor resized');
+    signals.windowResize.add(() => {
+      printInfo("editor resized");
       onResize();
       onRender();
     });
@@ -5267,7 +5351,6 @@ class ViewPort {
 
 exports.CAD = CAD;
 exports.Collector = Collector;
-exports.Container = Container;
 exports.Control = Control;
 exports.CoordinateHelper = CoordinateHelper;
 exports.CustomGridHelper = CustomGridHelper;
