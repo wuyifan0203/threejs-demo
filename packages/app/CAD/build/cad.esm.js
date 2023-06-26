@@ -21,7 +21,6 @@ class Container {
     this.geometries = {};
     this.materials = {};
     this.helpers = {};
-    this.groups = {};
     this.textures = {};
   }
 
@@ -38,8 +37,6 @@ class Container {
       this.helpers[object.id] = object;
     } else if (object?.isTexture) {
       this.textures[object.id] = object;
-    } else if (object?.isGroup) {
-      this.groups[object.id] = object;
     }
     this.objects[object.id] = object;
   }
@@ -57,8 +54,6 @@ class Container {
       delete this.helpers[object.id];
     } else if (object?.isTexture) {
       delete this.textures[object.id];
-    } else if (object?.isGroup) {
-      delete this.groups[object.id];
     }
     delete this.objects[object.id];
   }
@@ -487,7 +482,7 @@ function stringify(v) {
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-25 13:06:11
+ * @LastEditTime: 2023-06-26 16:34:19
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
@@ -508,7 +503,7 @@ class Selector {
           this.select([selectIds[0]]);
         }
       } else {
-        this.select(null);
+        this.select([]);
       }
     });
   }
@@ -588,16 +583,14 @@ class Editor {
   }
 
   addObject(object, parent, index) {
-    this.container.register(object);
     this.scene.add(object);
   }
   removeObject(object) {
-    this.container.discard(object);
     this.scene.remove(object);
   }
 
   getObjectById(id) {
-    this.container.findById(id);
+    return this.scene.getObjectById(id);
   }
 
   setSize(width, height) {
@@ -5174,7 +5167,7 @@ function printInfo(key) {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-25 18:29:24
+ * @LastEditTime: 2023-06-26 16:57:47
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5296,14 +5289,81 @@ class ViewPort {
 
     // Selection
 
-    new Raycaster();
-    new Vector2();
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+
+    function getIntersects(point) {
+      mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
+      raycaster.setFromCamera(mouse, camera);
+
+      // 筛选需要检测的对象
+      const objects = [];
+
+      scene.traverseVisible((child) => {
+        objects.push(child);
+      });
+
+      sceneHelper.traverseVisible((child) => {
+        // if ( child.name === 'picker' ) objects.push( child );
+      });
+
+      return raycaster.intersectObjects(objects, false);
+    }
 
     // Mouse
 
-    new Vector2();
-    new Vector2();
-    new Vector2();
+    const onDownPosition = new Vector2();
+    const onUpPosition = new Vector2();
+    const onDoubleClickPosition = new Vector2();
+
+    function getMousePosition(x, y) {
+      const { left, top, width, height } = target.getBoundingClientRect();
+      return [(x - left) / width, (y - top) / height];
+    }
+
+    function onMouseDown(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onDownPosition.fromArray(mousePosition);
+
+      target.addEventListener("mouseup", onMouseUp);
+    }
+
+    function onMouseUp(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onUpPosition.fromArray(mousePosition);
+
+      handelClick();
+
+      target.removeEventListener("mouseup", onMouseUp);
+    }
+
+    function handelClick() {
+      if (onUpPosition.distanceTo(onDownPosition) === 0) {
+        const intersects = getIntersects(onUpPosition);
+
+        signals.intersectionsDetected.dispatch(intersects.map((obj) => obj.id));
+
+        onRender();
+      }
+    }
+
+    function onDoubleClick(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onDoubleClickPosition.fromArray(mousePosition);
+
+      const intersects = getIntersects(onDoubleClickPosition);
+      if(intersects.length > 0){
+
+        intersects[0];
+        // TODO 物体聚焦
+        // signals.objectFocused.dispatch( intersect.object );
+      }
+    }
+
+    target.addEventListener('mousedown', onMouseDown);
+    target.addEventListener('dblclick', onDoubleClick);
+
+    // Animate
 
     const clock = new Clock();
 
@@ -5319,6 +5379,8 @@ class ViewPort {
       if (needsUpdate === true) onRender();
     }
 
+    // signals
+
     signals.windowResize.add(() => {
       printInfo("editor resized");
       onResize();
@@ -5326,6 +5388,23 @@ class ViewPort {
     });
 
     signals.windowResize.dispatch();
+
+    signals.objectSelected.add((selectIds)=>{
+      transformControls.detach();
+      selectionBox.visible = false;
+
+      const object = editor.getObjectById(selectIds[0]);
+
+      if(object !== null && object !== scene && object !== camera){
+        box.setFromObject(object,true);
+        
+        if(box.isEmpty() === false){
+          selectionBox.visible = true;
+        }
+
+        transformControls.attach(object);
+      }
+    });
   }
 }
 

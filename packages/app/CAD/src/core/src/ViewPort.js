@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-25 18:29:24
+ * @LastEditTime: 2023-06-26 16:57:47
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -142,11 +142,20 @@ class ViewPort {
 
     function getIntersects(point) {
       mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      raycaster.setFromCamera(mouse,camera);
-
+      raycaster.setFromCamera(mouse, camera);
 
       // 筛选需要检测的对象
       const objects = [];
+
+      scene.traverseVisible((child) => {
+        objects.push(child);
+      });
+
+      sceneHelper.traverseVisible((child) => {
+        // if ( child.name === 'picker' ) objects.push( child );
+      });
+
+      return raycaster.intersectObjects(objects, false);
     }
 
     // Mouse
@@ -164,7 +173,7 @@ class ViewPort {
       const mousePosition = getMousePosition(event.clientX, event.clientY);
       onDownPosition.fromArray(mousePosition);
 
-      renderer.domElement.addEventListener("mouseup", onMouseUp);
+      target.addEventListener("mouseup", onMouseUp);
     }
 
     function onMouseUp(event) {
@@ -173,14 +182,36 @@ class ViewPort {
 
       handelClick();
 
-      renderer.domElement.removeEventListener("mouseup", onMouseUp);
+      target.removeEventListener("mouseup", onMouseUp);
     }
 
     function handelClick() {
       if (onUpPosition.distanceTo(onDownPosition) === 0) {
-        const intersects = get;
+        const intersects = getIntersects(onUpPosition);
+
+        signals.intersectionsDetected.dispatch(intersects.map((obj) => obj.id));
+
+        onRender();
       }
     }
+
+    function onDoubleClick(event) {
+      const mousePosition = getMousePosition(event.clientX, event.clientY);
+      onDoubleClickPosition.fromArray(mousePosition);
+
+      const intersects = getIntersects(onDoubleClickPosition);
+      if(intersects.length > 0){
+
+        const intersect = intersects[0];
+        // TODO 物体聚焦
+        // signals.objectFocused.dispatch( intersect.object );
+      }
+    }
+
+    target.addEventListener('mousedown', onMouseDown)
+    target.addEventListener('dblclick', onDoubleClick)
+
+    // Animate
 
     const clock = new Clock();
 
@@ -196,6 +227,8 @@ class ViewPort {
       if (needsUpdate === true) onRender();
     }
 
+    // signals
+
     signals.windowResize.add(() => {
       printInfo("editor resized");
       onResize();
@@ -203,6 +236,23 @@ class ViewPort {
     });
 
     signals.windowResize.dispatch();
+
+    signals.objectSelected.add((selectIds)=>{
+      transformControls.detach();
+      selectionBox.visible = false;
+
+      const object = editor.getObjectById(selectIds[0]);
+
+      if(object !== null && object !== scene && object !== camera){
+        box.setFromObject(object,true);
+        
+        if(box.isEmpty() === false){
+          selectionBox.visible = true;
+        }
+
+        transformControls.attach(object)
+      }
+    })
   }
 }
 

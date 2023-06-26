@@ -18,7 +18,6 @@ class Container {
     this.geometries = {};
     this.materials = {};
     this.helpers = {};
-    this.groups = {};
     this.textures = {};
   }
 
@@ -35,8 +34,6 @@ class Container {
       this.helpers[object.id] = object;
     } else if (object?.isTexture) {
       this.textures[object.id] = object;
-    } else if (object?.isGroup) {
-      this.groups[object.id] = object;
     }
     this.objects[object.id] = object;
   }
@@ -54,8 +51,6 @@ class Container {
       delete this.helpers[object.id];
     } else if (object?.isTexture) {
       delete this.textures[object.id];
-    } else if (object?.isGroup) {
-      delete this.groups[object.id];
     }
     delete this.objects[object.id];
   }

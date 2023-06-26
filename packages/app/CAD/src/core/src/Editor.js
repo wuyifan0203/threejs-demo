@@ -29,16 +29,14 @@ class Editor {
   }
 
   addObject(object, parent, index) {
-    this.container.register(object);
     this.scene.add(object);
   }
   removeObject(object) {
-    this.container.discard(object);
     this.scene.remove(object);
   }
 
   getObjectById(id) {
-    this.container.findById(id);
+    return this.scene.getObjectById(id);
   }
 
   setSize(width, height) {

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-25 13:06:11
+ * @LastEditTime: 2023-06-26 16:34:19
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
@@ -24,7 +24,7 @@ class Selector {
           this.select([selectIds[0]]);
         }
       } else {
-        this.select(null);
+        this.select([]);
       }
     });
   }
