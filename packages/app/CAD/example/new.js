@@ -1,11 +1,11 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 18:22:32
+ * @LastEditTime: 2023-06-27 16:27:08
  * @FilePath: /threejs-demo/packages/app/CAD/example/new.js
  */
 import {ViewPort, Editor} from '../build/cad.esm.js'
-import {FogExp2, GridHelper} from 'three'
+import {FogExp2, GridHelper,Mesh ,BoxGeometry,MeshBasicMaterial,AmbientLight,PointLight} from 'three'
 
 window.onload = ()=>{
     init()
@@ -19,6 +19,12 @@ function init() {
     dom.addEventListener('resize',()=>{
         editor.signals.windowResize.dispatch()
     })
+
+    const boxGeometry = new BoxGeometry(2,2,2);
+    const boxMaterial = new MeshBasicMaterial({color:0xff00f0})
+    const boxMesh = new Mesh(boxGeometry,boxMaterial);
+
+    editor.addObject(boxMesh)
 
 
     window.editor = editor

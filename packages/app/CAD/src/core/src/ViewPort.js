@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-26 16:57:47
+ * @LastEditTime: 2023-06-27 18:26:37
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -30,10 +30,7 @@ class ViewPort {
 
     const transformControls = new TransformControls(camera, target);
     transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener(
-      "mouseDown",
-      onTransformControlsMouseDown
-    );
+    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
@@ -151,9 +148,14 @@ class ViewPort {
         objects.push(child);
       });
 
-      sceneHelper.traverseVisible((child) => {
-        // if ( child.name === 'picker' ) objects.push( child );
-      });
+      for (let i = 0,l = sceneHelper.children.length ; i < l; i++) {
+        const child = sceneHelper.children[i];
+        // 排除掉transformControl 和 selectionBox
+        const enablePicked = child.uuid !== transformControls.uuid && child.uuid !== selectionBox.uuid && child.visible
+        if(enablePicked){
+          objects.push(sceneHelper.children[i]);
+        }
+      }
 
       return raycaster.intersectObjects(objects, false);
     }
@@ -186,10 +188,14 @@ class ViewPort {
     }
 
     function handelClick() {
-      if (onUpPosition.distanceTo(onDownPosition) === 0) {
+      if (onDownPosition.distanceTo(onUpPosition) === 0) {
         const intersects = getIntersects(onUpPosition);
 
-        signals.intersectionsDetected.dispatch(intersects.map((obj) => obj.id));
+        console.log(intersects,'handelClick');
+
+        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter(id => id !== undefined)
+
+        signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
 
         onRender();
       }
@@ -241,9 +247,10 @@ class ViewPort {
       transformControls.detach();
       selectionBox.visible = false;
 
-      const object = editor.getObjectById(selectIds[0]);
+      const object = editor.getObjectByUUID(selectIds[0]);
+      print('signals.objectSelected->',object);
 
-      if(object !== null && object !== scene && object !== camera){
+      if(object !== undefined && object !== scene && object !== camera){
         box.setFromObject(object,true);
         
         if(box.isEmpty() === false){
@@ -252,6 +259,10 @@ class ViewPort {
 
         transformControls.attach(object)
       }
+    })
+
+    signals.sceneGraphChanged.add(()=>{
+      onRender()
     })
   }
 }

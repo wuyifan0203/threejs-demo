@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-14 17:59:29
+ * @LastEditTime: 2023-06-27 16:39:41
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -17,9 +17,11 @@ class Editor {
       windowResize: new Signal(),
       objectSelected: new Signal(),
       intersectionsDetected: new Signal(),
+      objectAdded: new Signal(),
+      sceneGraphChanged:new Signal(),
     };
     this.target = target;
-    this.container = new Container();
+    this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
     this.camera = initPerspectiveCamera();
@@ -29,18 +31,56 @@ class Editor {
   }
 
   addObject(object, parent, index) {
-    this.scene.add(object);
+    object.traverse((child)=>{
+      if(child.geometry !== undefined) this.addGeometry(child.geometry);
+      if(child.material !== undefined) this.addMaterial(child.material);
+
+      this.container.addObject(child)
+
+      // TODO 
+      // addCamera
+      // addHelper
+    })
+
+    if(parent === undefined){
+      this.scene.add(object);
+    }else{
+      if(index === undefined){
+        parent.add(object);
+      }else{
+        parent.children.slice(index,0,object);
+      }
+      object.parent = parent
+    }
+
+    this.signals.objectAdded.dispatch(object);
+    this.signals.sceneGraphChanged.dispatch();
   }
+
+  addGeometry(geometry){
+    this.container.addGeometry(geometry)
+  }
+
+  addMaterial(geometry){
+    this.container.addMaterial(geometry)
+  }
+
   removeObject(object) {
     this.scene.remove(object);
   }
 
-  getObjectById(id) {
-    return this.scene.getObjectById(id);
+  getObjectByUUID(uuid,isGlobal = false) {
+    return isGlobal ? this.scene.getObjectByProperty('uuid',uuid) : this.container.getObjectByUUID(uuid);
   }
 
-  setSize(width, height) {
-    this.renderer.setSize(width, height);
+  getObjectsByProperty(key,value){
+    let result = this.scene.getObjectsByProperty(key,value);
+    const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key,value);
+    if(sceneHelperResult.length > 0){
+      result = result.concat(sceneHelperResult)
+    } 
+
+    return result
   }
 }
 

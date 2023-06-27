@@ -4,60 +4,177 @@ import { PerspectiveCamera, Vector3, WebGLRenderer, PCFSoftShadowMap, Scene, Gro
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 17:54:56
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
- */
-/*
- * @Date: 2023-06-13 13:06:55
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 17:37:05
+ * @LastEditTime: 2023-06-27 14:40:11
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
  */
 class Container {
   constructor() {
-    this.cameras = {};
-    this.lights = {};
-    this.objects = {};
-    this.geometries = {};
-    this.materials = {};
-    this.helpers = {};
-    this.textures = {};
+    this.cameras = new Map();
+    this.lights = new Map();
+    this.objects = new Map();
+    this.geometries = new Map();
+    this.materials = new Map();
+    this.helpers = new Map();
+    this.textures = new Map();
+
+    this.geometriesRefCounter = new Map();
+    this.materialsRefCounter = new Map();
+    this.texturesRefCounter = new Map();
   }
 
-  register(object) {
-    if (object?.isCamera) {
-      this.cameras[object.id] = object;
-    } else if (object?.isLight) {
-      this.lights[object.id] = object;
-    } else if (object?.isBufferGeometry) {
-      this.geometries[object.id] = object;
-    } else if (object?.isMaterial) {
-      this.materials[object.id] = object;
-    } else if (object?.isHelper) {
-      this.helpers[object.id] = object;
-    } else if (object?.isTexture) {
-      this.textures[object.id] = object;
+  // camera
+  addCamera(camera) {
+    if (camera?.isCamera) {
+      this.cameras.set(camera.uuid, camera);
+    } else {
+      console.error("Editor.Container.addCamera: object not an instance of THREE.Camera.",camera);
     }
-    this.objects[object.id] = object;
   }
 
-  discard(object) {
-    if (object?.isCamera) {
-      delete this.cameras[object.id];
-    } else if (object?.isLight) {
-      delete this.lights[object.id];
-    } else if (object?.isBufferGeometry) {
-      delete this.geometries[object.id];
-    } else if (object?.isMaterial) {
-      delete this.materials[object.id];
-    } else if (object?.isHelper) {
-      delete this.helpers[object.id];
-    } else if (object?.isTexture) {
-      delete this.textures[object.id];
-    }
-    delete this.objects[object.id];
+  removeCamera(camera) {
+    this.cameras.delete(camera?.uuid);
   }
-  
+
+  // light
+  addLight(light) {
+    if (light?.isLight) {
+      this.lights.set(lights.uuid, lights);
+    } else {
+      console.error("Editor.Container.addLight: object not an instance of THREE.Light.",light);
+    }
+  }
+
+  removeLight(light) {
+    this.lights.delete(light?.uuid);
+  }
+
+  // object
+
+  addObject(object) {
+    if (object?.isObject3D) {
+      this.objects.set(object.uuid, object);
+    } else {
+      console.error("Editor.Container.addObject: object not an instance of THREE.Object3D.",object);
+    }
+  }
+
+  removeObject(object) {
+    this.objects.delete(object?.uuid);
+  }
+
+  getObjectByUUID(uuid){
+    return this.objects.get(uuid)
+  }
+
+  // geometry
+
+  addGeometry(geometry) {
+    if(geometry?.isBufferGeometry){
+      this.addObjectToRefCounter(geometry,this.geometriesRefCounter,this.geometries);
+    }else {
+      console.error("Editor.Container.addGeometry: object not an instance of THREE.BufferGeometry.",geometry);
+    }
+  }
+
+  removeGeometry(geometry) {
+    this.removeObjectToRefCounter(geometry,this.geometriesRefCounter,this.geometries);
+  }
+
+  getGeometryByUUID(uuid){
+    return this.geometries.get(uuid)
+  }
+
+  // material
+
+  addMaterial(material) {
+    if (Array.isArray(material)) {
+      for (let i = 0, l = material.length; i < l; i++) {
+        if(material[i]?.isMaterial){
+          this.addObjectToRefCounter(material[i],this.materialsRefCounter,this.materials);
+        }else {
+          console.error("Editor.Container.addMaterial: object not an instance of THREE.Material in Material Array.",material[i]);
+          break;
+        }
+      }
+    } else {
+      if(material?.isMaterial){
+        this.addObjectToRefCounter(material,this.materialsRefCounter,this.materials);
+      }else {
+        console.error("Editor.Container.addMaterial: object not an instance of THREE.Material.",material);
+      }
+    }
+  }
+
+  removeMaterial(material){
+    if (Array.isArray(material)) {
+      for (let i = 0, l = material.length; i < l; i++) {
+        this.removeObjectToRefCounter(material[i],this.materialsRefCounter,this.materials);
+      }
+    } else {
+      this.removeObjectToRefCounter(material,this.materialsRefCounter,this.materials);
+    }
+  }
+
+  getMaterialByUUID(uuid){
+    return this.materials.get(uuid)
+  }
+
+  // texture
+
+  addTexture(texture) {
+    if (texture?.isTexture) {
+      this.addObjectToRefCounter(texture,this.texturesRefCounter,this.textures);
+    } else {
+      console.error("Editor.Container.addTexture: object not an instance of THREE.Texture.",texture);
+    }
+  }
+
+  removeTexture(texture) {
+    this.removeObjectToRefCounter(texture,this.texturesRefCounter,this.textures);
+  }
+
+  getTextureByUUID(uuid){
+    return this.textures.get(uuid)
+  }
+
+  // helper
+
+  addHelper(helper) {
+    this.helpers.set(helper?.uuid, helper);
+  }
+
+  removeHelper(helper) {
+    if (this.helpers.has(helper?.uuid)) {
+      this.helpers.delete(helper.uuid);
+    }
+  }
+
+  getHelperByUUID(uuid){
+    return this.helpers.get(uuid)
+  }
+
+  // counter
+
+  addObjectToRefCounter(object,counter,map){
+    let count = counter.get(object.uuid);
+    if (count === undefined) {
+      map.set(object.uuid, object);
+      counter.set(object.uuid, 1);
+    } else {
+      counter.set(object.uuid, count++);
+    }
+  }
+
+  removeObjectToRefCounter(object,counter,map){
+    let count = counter.get(object.uuid);
+    count--;
+    if(count === 0){
+      counter.delete(object.uuid);
+      map.delete(object.uuid);
+    }else {
+      counter.set(object.uuid,count);
+    }
+  }
 }
 
 /*jslint onevar:true, undef:true, newcap:true, regexp:true, bitwise:true, maxerr:50, indent:4, white:false, nomen:false, plusplus:false */
@@ -560,7 +677,7 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-14 17:59:29
+ * @LastEditTime: 2023-06-27 16:39:41
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -571,9 +688,11 @@ class Editor {
       windowResize: new Signal(),
       objectSelected: new Signal(),
       intersectionsDetected: new Signal(),
+      objectAdded: new Signal(),
+      sceneGraphChanged:new Signal(),
     };
     this.target = target;
-    this.container = new Container();
+    this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
     this.camera = initPerspectiveCamera();
@@ -583,18 +702,56 @@ class Editor {
   }
 
   addObject(object, parent, index) {
-    this.scene.add(object);
+    object.traverse((child)=>{
+      if(child.geometry !== undefined) this.addGeometry(child.geometry);
+      if(child.material !== undefined) this.addMaterial(child.material);
+
+      this.container.addObject(child);
+
+      // TODO 
+      // addCamera
+      // addHelper
+    });
+
+    if(parent === undefined){
+      this.scene.add(object);
+    }else {
+      if(index === undefined){
+        parent.add(object);
+      }else {
+        parent.children.slice(index,0,object);
+      }
+      object.parent = parent;
+    }
+
+    this.signals.objectAdded.dispatch(object);
+    this.signals.sceneGraphChanged.dispatch();
   }
+
+  addGeometry(geometry){
+    this.container.addGeometry(geometry);
+  }
+
+  addMaterial(geometry){
+    this.container.addMaterial(geometry);
+  }
+
   removeObject(object) {
     this.scene.remove(object);
   }
 
-  getObjectById(id) {
-    return this.scene.getObjectById(id);
+  getObjectByUUID(uuid,isGlobal = false) {
+    return isGlobal ? this.scene.getObjectByProperty('uuid',uuid) : this.container.getObjectByUUID(uuid);
   }
 
-  setSize(width, height) {
-    this.renderer.setSize(width, height);
+  getObjectsByProperty(key,value){
+    let result = this.scene.getObjectsByProperty(key,value);
+    const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key,value);
+    if(sceneHelperResult.length > 0){
+      result = result.concat(sceneHelperResult);
+    } 
+
+    return result
   }
 }
 
@@ -620,6 +777,7 @@ class CoordinateHelper extends Group {
       arrow.renderOrder = Infinity;
       this.add(arrow);
     });
+    this.isHelper = true;
   }
 
   setLength(axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
@@ -5135,28 +5293,9 @@ class CAD {
 }
 
 /*
- * @Date: 2023-06-13 23:12:26
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-14 00:20:42
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Control.js
- */
-
-class Control {
-    constructor(editor){
-        this.orbitControls  = new OrbitControls(editor.camera,editor.target);
-        this.tranformControls = new TransformControls(editor.camera,editor.target);
- 
-
-        this.orbitControls.addEventListener('change',()=>{
-            editor.render();
-        });
-    }
-}
-
-/*
  * @Date: 2023-06-21 18:27:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-25 09:55:18
+ * @LastEditTime: 2023-06-27 17:52:10
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/log.js
  */
 
@@ -5164,10 +5303,14 @@ function printInfo(key) {
     console.count('info:'+key);
 }
 
+function print(...msg) {
+    console.log(...msg);
+}
+
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-26 16:57:47
+ * @LastEditTime: 2023-06-27 18:26:37
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5190,10 +5333,7 @@ class ViewPort {
 
     const transformControls = new TransformControls(camera, target);
     transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener(
-      "mouseDown",
-      onTransformControlsMouseDown
-    );
+    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
@@ -5303,9 +5443,14 @@ class ViewPort {
         objects.push(child);
       });
 
-      sceneHelper.traverseVisible((child) => {
-        // if ( child.name === 'picker' ) objects.push( child );
-      });
+      for (let i = 0,l = sceneHelper.children.length ; i < l; i++) {
+        const child = sceneHelper.children[i];
+        // 排除掉transformControl 和 selectionBox
+        const enablePicked = child.uuid !== transformControls.uuid && child.uuid !== selectionBox.uuid && child.visible;
+        if(enablePicked){
+          objects.push(sceneHelper.children[i]);
+        }
+      }
 
       return raycaster.intersectObjects(objects, false);
     }
@@ -5338,10 +5483,14 @@ class ViewPort {
     }
 
     function handelClick() {
-      if (onUpPosition.distanceTo(onDownPosition) === 0) {
+      if (onDownPosition.distanceTo(onUpPosition) === 0) {
         const intersects = getIntersects(onUpPosition);
 
-        signals.intersectionsDetected.dispatch(intersects.map((obj) => obj.id));
+        console.log(intersects,'handelClick');
+
+        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter(id => id !== undefined);
+
+        signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
 
         onRender();
       }
@@ -5393,9 +5542,10 @@ class ViewPort {
       transformControls.detach();
       selectionBox.visible = false;
 
-      const object = editor.getObjectById(selectIds[0]);
+      const object = editor.getObjectByUUID(selectIds[0]);
+      print('signals.objectSelected->',object);
 
-      if(object !== null && object !== scene && object !== camera){
+      if(object !== undefined && object !== scene && object !== camera){
         box.setFromObject(object,true);
         
         if(box.isEmpty() === false){
@@ -5405,7 +5555,11 @@ class ViewPort {
         transformControls.attach(object);
       }
     });
+
+    signals.sceneGraphChanged.add(()=>{
+      onRender();
+    });
   }
 }
 
-export { CAD, Collector, Control, CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };
+export { CAD, Collector, CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };

@@ -21,6 +21,7 @@ class CoordinateHelper extends Group {
       arrow.renderOrder = Infinity;
       this.add(arrow);
     });
+    this.isHelper = true
   }
 
   setLength(axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
