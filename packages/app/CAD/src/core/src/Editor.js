@@ -1,14 +1,14 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 16:39:41
+ * @LastEditTime: 2023-06-28 15:22:12
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
 import { Container } from "./Container";
 import { Signal } from "../../lib/signals";
 import { Selector } from "./Selector";
-import { initPerspectiveCamera, initScene } from "../../lib/initialization";
+import { initPerspectiveCamera, initScene ,initOrthographicCamera} from "../../lib/initialization";
 
 class Editor {
   constructor(target) {
@@ -24,7 +24,11 @@ class Editor {
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
-    this.camera = initPerspectiveCamera();
+    this.cameras = {
+      perspective:initPerspectiveCamera(),
+      orthographic:initOrthographicCamera()
+    }
+    this.viewPortCamera = this.cameras.orthographic;
 
     this.selector = new Selector(this);
     this.selected = [];

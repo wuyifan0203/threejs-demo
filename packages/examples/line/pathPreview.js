@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-16 13:46:52
+ * @LastEditTime: 2023-06-28 14:41:14
  * @FilePath: /threejs-demo/packages/examples/line/pathPreview.js
  */
 import {
@@ -23,6 +23,7 @@ import {
     initOrthographicCamera,
     initAxesHelper,
     initCustomGrid,
+    getColor,
   } from '../../lib/tools/index.js';
 
   import {innerPoints} from '../polygonScale/compute.js' 
@@ -57,115 +58,85 @@ import {
 
 
     const data =[
-        [
-            0.4330127018922193,
-            0.9893670579228859
-        ],
-        [
-            0.4330127018922193,
-            -0.9893670579228859
-        ],
-        [
-            0.40079028275362316,
-            -0.9865336953787626
-        ],
-        [
-            0.3485021346338175,
-            -0.9816423589914869
-        ],
-        [
-            0.2962251122947749,
-            -0.9765025262326478
-        ],
-        [
-            0.24404761337211683,
-            -0.971061103396025
-        ],
-        [
-            0.19203387554648535,
-            -0.9652303161523892
-        ],
-        [
-            0.14033518772992054,
-            -0.9588667704084488
-        ],
-        [
-            0.08949813160242481,
-            -0.9517184099297983
-        ],
-        [
-            0.09044019968059458,
-            -0.9518865048398578
-        ],
-        [
-            0.040762671227949715,
-            0
-        ],
-        [
-            0.09044019968059458,
-            0.9518865048398578
-        ],
-        [
-            0.08949813160242481,
-            0.9517184099297983
-        ],
-        [
-            0.14033518772992054,
-            0.9588667704084488
-        ],
-        [
-            0.19203387554648535,
-            0.9652303161523892
-        ],
-        [
-            0.24404761337211683,
-            0.971061103396025
-        ],
-        [
-            0.2962251122947749,
-            0.9765025262326478
-        ],
-        [
-            0.3485021346338175,
-            0.9816423589914869
-        ],
-        [
-            0.40079028275362316,
-            0.9865336953787626
-        ]
+       [0.39500,	-0.41500],
+       [0.03000	,-0.05000],
+       [-0.44000,	-0.05000],
+       [-0.44000,	0.43500],
+       [0.38500,	0.43500],
+       [0.40500,	0.38500],
+       [0.22000	,0.20000],
+       [0.41000,	0.01000],
+       [0.74000	,0.34000],
+       [0.74000,	0.65000],
+       [-0.39000,	0.65000],
+       [-0.39000,	0.75000],
+       [0.84000,	0.75000],
+       [0.84000,	0.30000],
+       [0.41000	,-0.13000],
+       [0.08000,	0.20000],
+       [0.21500,	0.33500],
+       [-0.34000,	0.33500],
+       [-0.34000	,0.05000],
+       [0.07000,	0.05000],
+       [0.39500	,-0.27500],
+       [0.94000,	0.27000],
+       [0.94000	,0.78000],
+       [-0.42000,	0.78000],
+       [-0.42000,	0.58000],
+       [0.63000	,0.58000],
+       [0.63000	,0.37000],
+       [0.45000,	0.19000],
+       [0.45000,	0.19000],
+       [0.38000,	0.12000],
+       [0.31000,	0.19000],
+       [0.53000,	0.41000],
+       [0.53000,	0.48000],
+       [-0.52000	,0.48000],
+       [-0.52000,	0.88000],
+       [1.04000	,0.88000],
+       [1.04000	,0.23000]
     ]
 
   
     const LM1 = new LineBasicMaterial({ color:'green' });
-    const LM2 = new LineBasicMaterial({ color :'blue'});
 
-    const gM1 = new PointsMaterial({ color:'red',size:7 });
-    const gM2 = new PointsMaterial({ color :'yellow',size:7});
+    const gM1 = new PointsMaterial({ size:7 ,vertexColors :true});
 
-    const g1 = useVec2Array(data,3);
-    const g2 = useVec2Array(expendWidth(data,0.5),3)
+    const g1 = useVec2Array(data,1);
 
     const rl = new LineLoop(g1,LM1);
-    const el = new LineLoop(g2,LM2);
 
     const rP = new Points(g1,gM1);
-    const eP = new Points(g2,gM2);
   
-    scene.add(rl,el);  
-    scene.add(rP,eP); 
+    scene.add(rl,rP);  
 
 
   }
   
 
   function useVec2Array(data,height) {
-    console.log(data.length);
     const vertex = [];
+    const color = []
+    const b = 1 / data.length
     for (let i = 0; i < data.length; i++) {
         const [x,y] = data[i]
         vertex.push(x,y,height)
+        const r = b*i;
+        if(i === 0){
+            color.push(1,0,0)
+        }else if(i === data.length -1){
+            color.push(0,0,1)
+        }else{
+            color.push(r,r,r)
+        }
     }
-    return new BufferGeometry().setAttribute('position', new BufferAttribute(new Float32Array(vertex), 3));
+
+
+
+    const g = new BufferGeometry();
+    g.setAttribute('position', new BufferAttribute(new Float32Array(vertex), 3));
+    g.setAttribute('color', new BufferAttribute(new Float32Array(color), 3));
+    return g
   }
 
   function expendWidth(pointList, width) {

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 18:26:37
+ * @LastEditTime: 2023-06-28 15:30:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -18,7 +18,7 @@ class ViewPort {
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const camera = editor.camera;
+    const camera = editor.viewPortCamera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
     const target = editor.target;
@@ -38,7 +38,6 @@ class ViewPort {
     controls.addEventListener("change", () => onRender());
 
     const viewHelper = new ViewHelper(camera, target);
-    viewHelper.controls = controls;
 
     const box = new Box3();
     const selectionBox = new Box3Helper(box);

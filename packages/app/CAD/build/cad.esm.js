@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { PerspectiveCamera, Vector3, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, OrthographicCamera, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, ShaderMaterial, UniformsUtils, WebGLRenderTarget, Clock, GridHelper, Box3, Box3Helper } from 'three';
+import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, ShaderMaterial, UniformsUtils, WebGLRenderTarget, Clock, GridHelper, Box3, Box3Helper } from 'three';
 
 /*
  * @Date: 2023-06-13 13:06:55
@@ -659,6 +659,19 @@ function initPerspectiveCamera(initialPosition) {
   return camera
 }
 
+function initOrthographicCamera(initialPosition) {
+    const s = 15;
+    const h = window.innerHeight;
+    const w = window.innerWidth;
+    const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  
+    const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
+    camera.position.copy(position);
+    camera.lookAt(new Vector3(0, 0, 0));
+  
+    return camera;
+}
+
 function initRenderer(options = {}) {
     const renderer = new WebGLRenderer(Object.assign({antialias: true},options));
     renderer.shadowMap.enabled = true;
@@ -677,7 +690,7 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 16:39:41
+ * @LastEditTime: 2023-06-28 15:22:12
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -695,7 +708,11 @@ class Editor {
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
-    this.camera = initPerspectiveCamera();
+    this.cameras = {
+      perspective:initPerspectiveCamera(),
+      orthographic:initOrthographicCamera()
+    };
+    this.viewPortCamera = this.cameras.orthographic;
 
     this.selector = new Selector(this);
     this.selected = [];
@@ -5310,7 +5327,7 @@ function print(...msg) {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 18:26:37
+ * @LastEditTime: 2023-06-28 15:30:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5321,7 +5338,7 @@ class ViewPort {
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const camera = editor.camera;
+    const camera = editor.viewPortCamera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
     const target = editor.target;
@@ -5341,7 +5358,6 @@ class ViewPort {
     controls.addEventListener("change", () => onRender());
 
     const viewHelper = new ViewHelper(camera, target);
-    viewHelper.controls = controls;
 
     const box = new Box3();
     const selectionBox = new Box3Helper(box);

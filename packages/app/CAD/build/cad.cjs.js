@@ -679,6 +679,19 @@ function initPerspectiveCamera(initialPosition) {
   return camera
 }
 
+function initOrthographicCamera(initialPosition) {
+    const s = 15;
+    const h = window.innerHeight;
+    const w = window.innerWidth;
+    const position = (initialPosition !== undefined) ? initialPosition : new THREE.Vector3(-30, 40, 30);
+  
+    const camera = new THREE.OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
+    camera.position.copy(position);
+    camera.lookAt(new THREE.Vector3(0, 0, 0));
+  
+    return camera;
+}
+
 function initRenderer(options = {}) {
     const renderer = new THREE.WebGLRenderer(Object.assign({antialias: true},options));
     renderer.shadowMap.enabled = true;
@@ -697,7 +710,7 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 16:39:41
+ * @LastEditTime: 2023-06-28 15:22:12
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -715,7 +728,11 @@ class Editor {
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
-    this.camera = initPerspectiveCamera();
+    this.cameras = {
+      perspective:initPerspectiveCamera(),
+      orthographic:initOrthographicCamera()
+    };
+    this.viewPortCamera = this.cameras.orthographic;
 
     this.selector = new Selector(this);
     this.selected = [];
@@ -5330,7 +5347,7 @@ function print(...msg) {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 18:26:37
+ * @LastEditTime: 2023-06-28 15:30:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5341,7 +5358,7 @@ class ViewPort {
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const camera = editor.camera;
+    const camera = editor.viewPortCamera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
     const target = editor.target;
@@ -5361,7 +5378,6 @@ class ViewPort {
     controls.addEventListener("change", () => onRender());
 
     const viewHelper = new ViewHelper(camera, target);
-    viewHelper.controls = controls;
 
     const box = new THREE.Box3();
     const selectionBox = new THREE.Box3Helper(box);
