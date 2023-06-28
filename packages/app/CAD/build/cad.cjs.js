@@ -2,25 +2,6 @@
 
 var THREE = require('three');
 
-function _interopNamespaceDefault(e) {
-  var n = Object.create(null);
-  if (e) {
-    Object.keys(e).forEach(function (k) {
-      if (k !== 'default') {
-        var d = Object.getOwnPropertyDescriptor(e, k);
-        Object.defineProperty(n, k, d.get ? d : {
-          enumerable: true,
-          get: function () { return e[k]; }
-        });
-      }
-    });
-  }
-  n.default = e;
-  return Object.freeze(n);
-}
-
-var THREE__namespace = /*#__PURE__*/_interopNamespaceDefault(THREE);
-
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
@@ -664,7 +645,7 @@ class Selector {
 /*
  * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-14 13:45:54
+ * @LastEditTime: 2023-06-28 17:33:09
  * @FilePath: /threejs-demo/packages/app/CAD/src/lib/initialization.js
  */
 
@@ -683,11 +664,13 @@ function initOrthographicCamera(initialPosition) {
     const s = 15;
     const h = window.innerHeight;
     const w = window.innerWidth;
-    const position = (initialPosition !== undefined) ? initialPosition : new THREE.Vector3(-30, 40, 30);
+    const position = (initialPosition !== undefined) ? initialPosition : new THREE.Vector3(0,5000,10000);
   
     const camera = new THREE.OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
     camera.position.copy(position);
+    camera.zoom = 2.5;
     camera.lookAt(new THREE.Vector3(0, 0, 0));
+    camera.updateProjectionMatrix();
   
     return camera;
 }
@@ -710,27 +693,30 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 15:22:12
+ * @LastEditTime: 2023-06-28 18:35:26
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
 class Editor {
   constructor(target) {
-    this.state = {};
+    this.state = {
+      viewCameraType: "orthographic",
+    };
     this.signals = {
       windowResize: new Signal(),
       objectSelected: new Signal(),
       intersectionsDetected: new Signal(),
       objectAdded: new Signal(),
-      sceneGraphChanged:new Signal(),
+      sceneGraphChanged: new Signal(),
+      viewPortCameraChanged: new Signal(),
     };
     this.target = target;
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
     this.cameras = {
-      perspective:initPerspectiveCamera(),
-      orthographic:initOrthographicCamera()
+      perspective: initPerspectiveCamera(),
+      orthographic: initOrthographicCamera(),
     };
     this.viewPortCamera = this.cameras.orthographic;
 
@@ -739,24 +725,24 @@ class Editor {
   }
 
   addObject(object, parent, index) {
-    object.traverse((child)=>{
-      if(child.geometry !== undefined) this.addGeometry(child.geometry);
-      if(child.material !== undefined) this.addMaterial(child.material);
+    object.traverse((child) => {
+      if (child.geometry !== undefined) this.addGeometry(child.geometry);
+      if (child.material !== undefined) this.addMaterial(child.material);
 
       this.container.addObject(child);
 
-      // TODO 
+      // TODO
       // addCamera
       // addHelper
     });
 
-    if(parent === undefined){
+    if (parent === undefined) {
       this.scene.add(object);
-    }else {
-      if(index === undefined){
+    } else {
+      if (index === undefined) {
         parent.add(object);
-      }else {
-        parent.children.slice(index,0,object);
+      } else {
+        parent.children.slice(index, 0, object);
       }
       object.parent = parent;
     }
@@ -765,11 +751,11 @@ class Editor {
     this.signals.sceneGraphChanged.dispatch();
   }
 
-  addGeometry(geometry){
+  addGeometry(geometry) {
     this.container.addGeometry(geometry);
   }
 
-  addMaterial(geometry){
+  addMaterial(geometry) {
     this.container.addMaterial(geometry);
   }
 
@@ -777,18 +763,48 @@ class Editor {
     this.scene.remove(object);
   }
 
-  getObjectByUUID(uuid,isGlobal = false) {
-    return isGlobal ? this.scene.getObjectByProperty('uuid',uuid) : this.container.getObjectByUUID(uuid);
+  getObjectByUUID(uuid, isGlobal = false) {
+    return isGlobal
+      ? this.scene.getObjectByProperty("uuid", uuid)
+      : this.container.getObjectByUUID(uuid);
   }
 
-  getObjectsByProperty(key,value){
-    let result = this.scene.getObjectsByProperty(key,value);
-    const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key,value);
-    if(sceneHelperResult.length > 0){
+  getObjectsByProperty(key, value) {
+    let result = this.scene.getObjectsByProperty(key, value);
+    const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key, value);
+    if (sceneHelperResult.length > 0) {
       result = result.concat(sceneHelperResult);
-    } 
+    }
 
-    return result
+    return result;
+  }
+
+  toggleViewportCamera() {
+    let from, to;
+    if (this.getState("viewPortCamera") === "orthographic") {
+      this.viewPortCamera = this.cameras.perspective;
+      from = this.cameras.orthographic;
+      to = "perspective";
+    } else {
+      this.viewPortCamera = this.cameras.orthographic;
+      from = this.cameras.perspective;
+      to = "orthographic";
+    }
+    this.setState("viewPortCamera", to);
+    this.viewPortCamera.position.copy(from.position);
+    this.viewPortCamera.quaternion.copy(from.quaternion);
+    this.viewPortCamera.scale.copy(from.scale);
+    this.viewPortCamera.zoom = from.zoom;
+    this.viewPortCamera.updateProjectionMatrix();
+    this.viewPortCamera.updateMatrixWorld();
+
+    this.signals.sceneGraphChanged.dispatch();
+  }
+
+  setState(key, value) {}
+
+  getState(key) {
+    return this.state[key];
   }
 }
 
@@ -3830,341 +3846,6 @@ class TransformControlsPlane extends THREE.Mesh {
 
 }
 
-class EditorControls extends THREE__namespace.EventDispatcher {
-  constructor(object, domElement) {
-    super();
-
-    // API
-
-    this.enabled = true;
-    this.center = new THREE__namespace.Vector3();
-    this.panSpeed = 0.002;
-    this.zoomSpeed = 0.5;
-    this.rotationSpeed = 0.005;
-    this.maxZoom = Infinity;
-    this.minZoom = 0;
-
-    // internals
-
-    var scope = this;
-    var vector = new THREE__namespace.Vector3();
-    var delta = new THREE__namespace.Vector3();
-    var box = new THREE__namespace.Box3();
-
-    var STATE = { NONE: -1, ROTATE: 0, ZOOM: 1, PAN: 2 };
-    var state = STATE.NONE;
-
-    var center = this.center;
-    var normalMatrix = new THREE__namespace.Matrix3();
-    var pointer = new THREE__namespace.Vector2();
-    var pointerOld = new THREE__namespace.Vector2();
-    var spherical = new THREE__namespace.Spherical();
-    var sphere = new THREE__namespace.Sphere();
-
-    // events
-
-    var changeEvent = { type: "change" };
-
-    this.focus = function (target) {
-      var distance;
-
-      box.setFromObject(target);
-
-      if (box.isEmpty() === false) {
-        box.getCenter(center);
-        distance = box.getBoundingSphere(sphere).radius;
-      } else {
-        // Focusing on an Group, AmbientLight, etc
-
-        center.setFromMatrixPosition(target.matrixWorld);
-        distance = 0.1;
-      }
-
-      delta.set(0, 0, 1);
-      delta.applyQuaternion(object.quaternion);
-      delta.multiplyScalar(distance * 4);
-
-      object.position.copy(center).add(delta);
-
-      scope.dispatchEvent(changeEvent);
-    };
-
-    this.pan = function (delta) {
-      var distance = object.position.distanceTo(center);
-
-      delta.multiplyScalar(distance * scope.panSpeed);
-      delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
-
-      object.position.add(delta);
-      center.add(delta);
-
-      scope.dispatchEvent(changeEvent);
-    };
-
-    this.zoom = function (delta) {
-      if (object.type === "PerspectiveCamera") {
-        var distance = object.position.distanceTo(center);
-        delta.multiplyScalar(distance * scope.zoomSpeed);
-        if (delta.length() > distance) return;
-        delta.applyMatrix3(normalMatrix.getNormalMatrix(object.matrix));
-        object.position.add(delta);
-      } else if (object.type === "OrthographicCamera") {
-        object.zoom = Math.max(
-          scope.minZoom,
-          Math.min(
-            scope.maxZoom,
-            delta.z > 0
-              ? object.zoom * Math.pow(0.95, scope.zoomSpeed)
-              : object.zoom / Math.pow(0.95, scope.zoomSpeed)
-          )
-        );
-        object.updateProjectionMatrix();
-      }
-
-      scope.dispatchEvent(changeEvent);
-    };
-
-    this.rotate = function (delta) {
-      vector.copy(object.position).sub(center);
-
-      spherical.setFromVector3(vector);
-
-      spherical.theta += delta.x * scope.rotationSpeed;
-      spherical.phi += delta.y * scope.rotationSpeed;
-
-      spherical.makeSafe();
-
-      vector.setFromSpherical(spherical);
-
-      object.position.copy(center).add(vector);
-
-      object.lookAt(center);
-
-      scope.dispatchEvent(changeEvent);
-    };
-
-    //
-
-    function onPointerDown(event) {
-      if (scope.enabled === false) return;
-
-      switch (event.pointerType) {
-        case "mouse":
-        case "pen":
-          onMouseDown(event);
-          break;
-
-        // TODO touch
-      }
-
-      domElement.ownerDocument.addEventListener("pointermove", onPointerMove);
-      domElement.ownerDocument.addEventListener("pointerup", onPointerUp);
-    }
-
-    function onPointerMove(event) {
-      if (scope.enabled === false) return;
-
-      switch (event.pointerType) {
-        case "mouse":
-        case "pen":
-          onMouseMove(event);
-          break;
-
-        // TODO touch
-      }
-    }
-
-    function onPointerUp(event) {
-      switch (event.pointerType) {
-        case "mouse":
-        case "pen":
-          onMouseUp();
-          break;
-
-        // TODO touch
-      }
-
-      domElement.ownerDocument.removeEventListener(
-        "pointermove",
-        onPointerMove
-      );
-      domElement.ownerDocument.removeEventListener("pointerup", onPointerUp);
-    }
-
-    // mouse
-
-    function onMouseDown(event) {
-      if (event.button === 0) {
-        state = STATE.ROTATE;
-      } else if (event.button === 1) {
-        state = STATE.ZOOM;
-      } else if (event.button === 2) {
-        state = STATE.PAN;
-      }
-
-      pointerOld.set(event.clientX, event.clientY);
-    }
-
-    function onMouseMove(event) {
-      pointer.set(event.clientX, event.clientY);
-
-      var movementX = pointer.x - pointerOld.x;
-      var movementY = pointer.y - pointerOld.y;
-
-      if (state === STATE.ROTATE) {
-        scope.rotate(delta.set(-movementX, -movementY, 0));
-      } else if (state === STATE.ZOOM) {
-        scope.zoom(delta.set(0, 0, movementY));
-      } else if (state === STATE.PAN) {
-        scope.pan(delta.set(-movementX, movementY, 0));
-      }
-
-      pointerOld.set(event.clientX, event.clientY);
-    }
-
-    function onMouseUp() {
-      state = STATE.NONE;
-    }
-
-    function onMouseWheel(event) {
-      if (scope.enabled === false) return;
-
-      event.preventDefault();
-
-      // Normalize deltaY due to https://bugzilla.mozilla.org/show_bug.cgi?id=1392460
-      scope.zoom(delta.set(0, 0, event.deltaY > 0 ? 1 : -1));
-    }
-
-    function contextmenu(event) {
-      event.preventDefault();
-    }
-
-    this.dispose = function () {
-      domElement.removeEventListener("contextmenu", contextmenu);
-      domElement.removeEventListener("dblclick", onMouseUp);
-      domElement.removeEventListener("wheel", onMouseWheel);
-
-      domElement.removeEventListener("pointerdown", onPointerDown);
-
-      domElement.removeEventListener("touchstart", touchStart);
-      domElement.removeEventListener("touchmove", touchMove);
-    };
-
-    domElement.addEventListener("contextmenu", contextmenu);
-    domElement.addEventListener("dblclick", onMouseUp);
-    domElement.addEventListener("wheel", onMouseWheel);
-
-    domElement.addEventListener("pointerdown", onPointerDown);
-
-    // touch
-
-    var touches = [
-      new THREE__namespace.Vector3(),
-      new THREE__namespace.Vector3(),
-      new THREE__namespace.Vector3(),
-    ];
-    var prevTouches = [
-      new THREE__namespace.Vector3(),
-      new THREE__namespace.Vector3(),
-      new THREE__namespace.Vector3(),
-    ];
-
-    var prevDistance = null;
-
-    function touchStart(event) {
-      if (scope.enabled === false) return;
-
-      switch (event.touches.length) {
-        case 1:
-          touches[0]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          touches[1]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          break;
-
-        case 2:
-          touches[0]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          touches[1]
-            .set(event.touches[1].pageX, event.touches[1].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          prevDistance = touches[0].distanceTo(touches[1]);
-          break;
-      }
-
-      prevTouches[0].copy(touches[0]);
-      prevTouches[1].copy(touches[1]);
-    }
-
-    function touchMove(event) {
-      if (scope.enabled === false) return;
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      function getClosest(touch, touches) {
-        var closest = touches[0];
-
-        for (var touch2 of touches) {
-          if (closest.distanceTo(touch) > touch2.distanceTo(touch))
-            closest = touch2;
-        }
-
-        return closest;
-      }
-
-      switch (event.touches.length) {
-        case 1:
-          touches[0]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          touches[1]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          scope.rotate(
-            touches[0]
-              .sub(getClosest(touches[0], prevTouches))
-              .multiplyScalar(-1)
-          );
-          break;
-
-        case 2:
-          touches[0]
-            .set(event.touches[0].pageX, event.touches[0].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          touches[1]
-            .set(event.touches[1].pageX, event.touches[1].pageY, 0)
-            .divideScalar(window.devicePixelRatio);
-          var distance = touches[0].distanceTo(touches[1]);
-          scope.zoom(delta.set(0, 0, prevDistance - distance));
-          prevDistance = distance;
-
-          var offset0 = touches[0]
-            .clone()
-            .sub(getClosest(touches[0], prevTouches));
-          var offset1 = touches[1]
-            .clone()
-            .sub(getClosest(touches[1], prevTouches));
-          offset0.x = -offset0.x;
-          offset1.x = -offset1.x;
-
-          scope.pan(offset0.add(offset1));
-
-          break;
-      }
-
-      prevTouches[0].copy(touches[0]);
-      prevTouches[1].copy(touches[1]);
-    }
-
-    domElement.addEventListener("touchstart", touchStart);
-    domElement.addEventListener("touchmove", touchMove);
-  }
-}
-
 /**
  * @author mrdoob / http://mrdoob.com/
  */
@@ -5347,7 +5028,7 @@ function print(...msg) {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 15:30:08
+ * @LastEditTime: 2023-06-28 18:21:14
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5374,8 +5055,12 @@ class ViewPort {
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    const controls = new EditorControls(camera, target);
-    controls.addEventListener("change", () => onRender());
+    
+    const controls = new OrbitControls(camera, target);
+    let needsUpdate = false;
+    controls.addEventListener("change", () => {
+      needsUpdate = true;
+    });
 
     const viewHelper = new ViewHelper(camera, target);
 
@@ -5398,6 +5083,7 @@ class ViewPort {
       sceneHelper.remove(gridHelper);
       viewHelper.render(renderer);
       renderer.autoClear = true;
+      needsUpdate = false;
 
       performance.now();
     }
@@ -5553,7 +5239,6 @@ class ViewPort {
     const clock = new THREE.Clock();
 
     function animate() {
-      let needsUpdate = false;
       const delta = clock.getDelta();
 
       if (viewHelper.animating === true) {
@@ -5594,6 +5279,10 @@ class ViewPort {
 
     signals.sceneGraphChanged.add(()=>{
       onRender();
+    });
+
+    signals.viewPortCameraChanged.add(()=>{
+      
     });
   }
 }

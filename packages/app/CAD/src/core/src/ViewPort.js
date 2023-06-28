@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 17:35:33
+ * @LastEditTime: 2023-06-28 18:21:14
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -266,6 +266,10 @@ class ViewPort {
 
     signals.sceneGraphChanged.add(()=>{
       onRender()
+    })
+
+    signals.viewPortCameraChanged.add(()=>{
+      
     })
   }
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 16:27:08
+ * @LastEditTime: 2023-06-28 18:38:49
  * @FilePath: /threejs-demo/packages/app/CAD/example/new.js
  */
 import {ViewPort, Editor} from '../build/cad.esm.js'
@@ -25,6 +25,17 @@ function init() {
     const boxMesh = new Mesh(boxGeometry,boxMaterial);
 
     editor.addObject(boxMesh)
+
+
+    const btn = document.createElement('button')
+    btn.innerText = 'click'
+    btn.addEventListener('click',()=>{
+        editor.toggleViewportCamera()
+    })
+
+    document.body.append(btn)
+
+
 
 
     window.editor = editor
