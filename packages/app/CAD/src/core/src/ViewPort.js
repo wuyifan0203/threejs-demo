@@ -1,14 +1,14 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 15:30:08
+ * @LastEditTime: 2023-06-28 17:35:33
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
 import { Box3Helper, Raycaster, GridHelper, Vector2, Box3, Clock } from "three";
 import { initRenderer } from "../../lib/initialization";
 import { ViewHelper } from "../../helper";
-import { EditorControls, TransformControls } from "../../controls";
+import { EditorControls, TransformControls ,OrbitControls} from "../../controls";
 import { print, printDebugger, printInfo } from "../../utils/log";
 
 class ViewPort {
@@ -34,8 +34,12 @@ class ViewPort {
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    const controls = new EditorControls(camera, target);
-    controls.addEventListener("change", () => onRender());
+    
+    const controls = new OrbitControls(camera, target);
+    let needsUpdate = false;
+    controls.addEventListener("change", () => {
+      needsUpdate = true
+    });
 
     const viewHelper = new ViewHelper(camera, target);
 
@@ -60,6 +64,7 @@ class ViewPort {
       sceneHelper.remove(gridHelper);
       viewHelper.render(renderer);
       renderer.autoClear = true;
+      needsUpdate = false
 
       endTime = performance.now();
     }
@@ -221,7 +226,6 @@ class ViewPort {
     const clock = new Clock();
 
     function animate() {
-      let needsUpdate = false;
       const delta = clock.getDelta();
 
       if (viewHelper.animating === true) {
