@@ -6,5 +6,5 @@
  * @FilePath: /threejs-demo/packages/app/CAD/src/index.js
  */
 // export * from './core/CAD';
-export * from './core'
+export * from './core';
 export * from './helper';

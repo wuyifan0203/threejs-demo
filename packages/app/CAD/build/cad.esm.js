@@ -1,4 +1,4 @@
-import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, ShaderMaterial, UniformsUtils, WebGLRenderTarget, Clock, GridHelper, Box3, Box3Helper } from 'three';
+import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, GridHelper, Box3, Box3Helper, Clock } from 'three';
 
 /*
  * @Date: 2023-06-13 13:06:55
@@ -641,48 +641,47 @@ class Selector {
 /*
  * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 17:33:09
- * @FilePath: /threejs-demo/packages/app/CAD/src/lib/initialization.js
+ * @LastEditTime: 2023-06-29 18:04:12
+ * @FilePath: /threejs-demo/packages/app/CAD/src/utils/initialization.js
  */
 
 function initPerspectiveCamera(initialPosition) {
   const camera = new PerspectiveCamera(50, 1, 0.01, 1000);
 
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0,5,10);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5, 10);
   camera.position.copy(position);
 
   camera.lookAt(new Vector3());
-  return camera
+  return camera;
 }
 
 function initOrthographicCamera(initialPosition) {
-    const s = 15;
-    const h = window.innerHeight;
-    const w = window.innerWidth;
-    const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0,5000,10000);
-  
-    const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
-    camera.position.copy(position);
-    camera.zoom = 2.5;
-    camera.lookAt(new Vector3(0, 0, 0));
-    camera.updateProjectionMatrix();
-  
-    return camera;
+  const s = 15;
+  const h = window.innerHeight;
+  const w = window.innerWidth;
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5000, 10000);
+
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
+  camera.position.copy(position);
+  camera.zoom = 2.5;
+  camera.lookAt(new Vector3(0, 0, 0));
+  camera.updateProjectionMatrix();
+
+  return camera;
 }
 
 function initRenderer(options = {}) {
-    const renderer = new WebGLRenderer(Object.assign({antialias: true},options));
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMapSoft = true;
-    renderer.shadowMap.type = PCFSoftShadowMap;
-    renderer.setClearColor(0xaaaaaa);
+  const renderer = new WebGLRenderer({ antialias: true, ...options });
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMapSoft = true;
+  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.setClearColor(0xaaaaaa);
 
-    return renderer
+  return renderer;
 }
 
-
 function initScene() {
-    return new Scene()
+  return new Scene();
 }
 
 /*
@@ -802,6 +801,106 @@ class Editor {
 }
 
 /*
+ * @Date: 2023-04-03 18:22:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-13 13:22:53
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Collector.js
+ */
+
+let currentAncestorId = null;
+let currentParentId = null;
+let selfId = null;
+
+class Tip {
+    constructor(selfId,parentId,ancestorId){
+        this.id = selfId;
+        this.parentId = parentId;
+        this.ancestorId = ancestorId;
+    }
+}
+
+class Collector{
+    constructor(){
+        this.scene = new Scene();
+        this.textures = new Map();
+        this.materials = new Map();
+        this.geometries = new Map();
+        this._exclusion = [];
+        this.pool = [];
+    }
+
+
+    set exclusion(newValue){
+        this._exclusion = newValue;
+        this.textures.clear();
+        this.materials.clear();
+        this.geometries.clear();
+        this.pool.length = 0;
+        this.scene.children.forEach(obj=>this.track(obj,true));
+    }
+
+
+    track(object3D){
+        this.scene.add(object3D);
+        if(!this._exclusion.includes(object3D.type)){
+            this.pool.push(object3D);
+        }
+    }
+
+    collect(object){
+        selfId = object.id;
+        const isNeedCollect = object.children.length !== 0;
+        if(isNeedCollect){
+            object.children.forEach(o=>{
+                this.collect(o);
+                currentParentId = o.id;
+            });
+        }else {
+            currentParentId = object?.parent?.id;
+        }
+        if(object.geometry !== undefined){
+            this.geometries.set(new Tip(selfId,currentParentId,currentAncestorId),object.geometry);
+        }
+        if(object.material !== undefined){
+            const material = object.material;
+            if(Array.isArray(material)){
+                material.forEach(m=>{
+                    this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),m);
+                    this.collectTexture(m);
+                });
+            }else {
+                this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),material);
+                this.collectTexture(material);
+            }
+        }
+    }
+
+    collectTexture(material){
+        const inTextures = (texture)=>this.materials.set(new Tip(material.id,currentParentId,currentAncestorId),texture);
+        material.alphaMap && inTextures(material.alphaMap);
+        material.aoMap && inTextures(material.aoMap);
+        material.envMap && inTextures(material.envMap);
+        material.lightMap && inTextures(material.lightMap);
+        material.map && inTextures(material.map);
+        material.specularMap && inTextures(material.specularMap);
+    }
+
+    release(object){
+        this.scene.remove(object);
+        if(object.geometry){
+            object.geometry.dispose();
+        }
+        if( object.material){
+            if(Array.isArray(object.material)){
+                object.material.forEach(m=>m.dispose());
+            }else {
+                object.material.dispose();
+            }
+        }
+    }
+}
+
+/*
  * @Date: 2023-04-03 17:25:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
  * @LastEditTime: 2023-06-13 01:16:17
@@ -842,23 +941,23 @@ class CoordinateHelper extends Group {
 /*
  * @Date: 2023-02-27 11:55:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 01:15:55
- * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CustomGridHelper.js
+ * @LastEditTime: 2023-06-29 18:14:40
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/CustomGridHelper.js
  */
 
 class CustomGridHelper extends LineSegments {
-  constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {
+  constructor(width = 10, height = 10, division = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divisionColor = 0xeeeeee) {
     const geometry = new BufferGeometry();
     const material = new LineBasicMaterial({ vertexColors: true, toneMapped: false });
     super(geometry, material);
     this.type = 'CustomGridHelper';
     this.centerColor = new Color(centerColor);
     this.baseColor = new Color(baseColor);
-    this.divsionColor = new Color(divsionColor);
+    this.divisionColor = new Color(divisionColor);
 
     this.width = width;
     this.height = height;
-    this.divsion = divsion;
+    this.division = division;
     this.splice = splice;
 
     this.update();
@@ -873,9 +972,9 @@ class CustomGridHelper extends LineSegments {
     }
 
     const {
-      centerColor, baseColor, divsionColor, width, height, splice, divsion,
+      centerColor, baseColor, divisionColor, width, height, splice, division,
     } = this;
-    const [timesX, timesY] = [width / divsion * splice, height / divsion * splice];
+    const [timesX, timesY] = [width / division * splice, height / division * splice];
 
     const vertices = [];
     const colors = [];
@@ -890,7 +989,7 @@ class CustomGridHelper extends LineSegments {
         j10 = j % splice === 0;
         isCenter = j === center;
 
-        color = divsionColor;
+        color = divisionColor;
         if (isCenter) {
           color = centerColor;
         } else if (j10 && !isCenter) {
@@ -1194,10 +1293,11 @@ let ViewHelper$1 = class ViewHelper extends Object3D {
   }
 };
 
+/* eslint-disable max-classes-per-file */
 /*
  * @Date: 2023-06-29 15:12:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 16:58:32
+ * @LastEditTime: 2023-06-29 18:12:14
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/ui.js
  */
 function createElement(type) {
@@ -1209,31 +1309,31 @@ class UIElement {
     this.domElement = dom;
   }
 
-  add() {
-    for (let i = 0; i < arguments.length; i++) {
-      const uiElement = arguments[i];
+  add(...element) {
+    for (let i = 0; i < element.length; i++) {
+      const uiElement = element[i];
       if (uiElement instanceof UIElement) {
         this.domElement.append(uiElement.domElement);
       } else {
         console.warn(
-          "UIElement : ",
+          'UIElement : ',
           uiElement,
-          " is not an instance of UIElement"
+          ' is not an instance of UIElement',
         );
       }
     }
   }
 
-  remove() {
-    for (let i = 0; i < arguments.length; i++) {
-      const uiElement = arguments[i];
+  remove(...element) {
+    for (let i = 0; i < element.length; i++) {
+      const uiElement = element[i];
       if (uiElement instanceof UIElement) {
         this.domElement.removeChild(uiElement.domElement);
       } else {
         console.warn(
-          "UIElement : ",
+          'UIElement : ',
           uiElement,
-          " is not an instance of UIElement"
+          ' is not an instance of UIElement',
         );
       }
     }
@@ -1256,39 +1356,39 @@ class UIElement {
   }
 
   show() {
-    this.domElement.style.display = "block";
+    this.domElement.style.display = 'block';
   }
 
   hide() {
-    this.domElement.style.display = "none";
+    this.domElement.style.display = 'none';
   }
 }
 
 class UIDiv extends UIElement {
   constructor() {
-    super(createElement("div"));
+    super(createElement('div'));
   }
 }
 
 class UISpan extends UIElement {
   constructor() {
-    super(createElement("span"));
+    super(createElement('span'));
   }
 }
 
 class UIText extends UISpan {
   constructor() {
     super();
-    this.domElement.className = "UIText";
-    this.domElement.style.cursor = "default";
-    this.domElement.style.display = "inline-block";
-    this.domElement.style.fontSize = "12px";
+    this.domElement.className = 'UIText';
+    this.domElement.style.cursor = 'default';
+    this.domElement.style.display = 'inline-block';
+    this.domElement.style.fontSize = '12px';
   }
 }
 
 class UIBreak extends UIElement {
   constructor() {
-    super(createElement("br"));
+    super(createElement('br'));
   }
 }
 
@@ -3894,1170 +3994,6 @@ class TransformControlsPlane extends Mesh {
 
 }
 
-/**
- * @author mrdoob / http://mrdoob.com/
- */
-
-var Stats$1 = function () {
-
-	var mode = 0;
-
-	var container = document.createElement( 'div' );
-	container.style.cssText = 'position:fixed;top:0;left:0;cursor:pointer;opacity:0.9;z-index:10000';
-	container.addEventListener( 'click', function ( event ) {
-
-		event.preventDefault();
-		showPanel( ++ mode % container.children.length );
-
-	}, false );
-
-	//
-
-	function addPanel( panel ) {
-
-		container.appendChild( panel.dom );
-		return panel;
-
-	}
-
-	function showPanel( id ) {
-
-		for ( var i = 0; i < container.children.length; i ++ ) {
-
-			container.children[ i ].style.display = i === id ? 'block' : 'none';
-
-		}
-
-		mode = id;
-
-	}
-
-	//
-
-	var beginTime = ( performance || Date ).now(), prevTime = beginTime, frames = 0;
-
-	var fpsPanel = addPanel( new Stats$1.Panel( 'FPS', '#0ff', '#002' ) );
-	var msPanel = addPanel( new Stats$1.Panel( 'MS', '#0f0', '#020' ) );
-
-	if ( self.performance && self.performance.memory ) {
-
-		var memPanel = addPanel( new Stats$1.Panel( 'MB', '#f08', '#201' ) );
-
-	}
-
-	showPanel( 0 );
-
-	return {
-
-		REVISION: 16,
-
-		dom: container,
-
-		addPanel: addPanel,
-		showPanel: showPanel,
-
-		begin: function () {
-
-			beginTime = ( performance || Date ).now();
-
-		},
-
-		end: function () {
-
-			frames ++;
-
-			var time = ( performance || Date ).now();
-
-			msPanel.update( time - beginTime, 200 );
-
-			if ( time > prevTime + 1000 ) {
-
-				fpsPanel.update( ( frames * 1000 ) / ( time - prevTime ), 100 );
-
-				prevTime = time;
-				frames = 0;
-
-				if ( memPanel ) {
-
-					var memory = performance.memory;
-					memPanel.update( memory.usedJSHeapSize / 1048576, memory.jsHeapSizeLimit / 1048576 );
-
-				}
-
-			}
-
-			return time;
-
-		},
-
-		update: function () {
-
-			beginTime = this.end();
-
-		},
-
-		// Backwards Compatibility
-
-		domElement: container,
-		setMode: showPanel
-
-	};
-
-};
-
-Stats$1.Panel = function ( name, fg, bg ) {
-
-	var min = Infinity, max = 0, round = Math.round;
-	var PR = round( window.devicePixelRatio || 1 );
-
-	var WIDTH = 80 * PR, HEIGHT = 48 * PR,
-			TEXT_X = 3 * PR, TEXT_Y = 2 * PR,
-			GRAPH_X = 3 * PR, GRAPH_Y = 15 * PR,
-			GRAPH_WIDTH = 74 * PR, GRAPH_HEIGHT = 30 * PR;
-
-	var canvas = document.createElement( 'canvas' );
-	canvas.width = WIDTH;
-	canvas.height = HEIGHT;
-	canvas.style.cssText = 'width:80px;height:48px';
-
-	var context = canvas.getContext( '2d' );
-	context.font = 'bold ' + ( 9 * PR ) + 'px Helvetica,Arial,sans-serif';
-	context.textBaseline = 'top';
-
-	context.fillStyle = bg;
-	context.fillRect( 0, 0, WIDTH, HEIGHT );
-
-	context.fillStyle = fg;
-	context.fillText( name, TEXT_X, TEXT_Y );
-	context.fillRect( GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT );
-
-	context.fillStyle = bg;
-	context.globalAlpha = 0.9;
-	context.fillRect( GRAPH_X, GRAPH_Y, GRAPH_WIDTH, GRAPH_HEIGHT );
-
-	return {
-
-		dom: canvas,
-
-		update: function ( value, maxValue ) {
-
-			min = Math.min( min, value );
-			max = Math.max( max, value );
-
-			context.fillStyle = bg;
-			context.globalAlpha = 1;
-			context.fillRect( 0, 0, WIDTH, GRAPH_Y );
-			context.fillStyle = fg;
-			context.fillText( round( value ) + ' ' + name + ' (' + round( min ) + '-' + round( max ) + ')', TEXT_X, TEXT_Y );
-
-			context.drawImage( canvas, GRAPH_X + PR, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT, GRAPH_X, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT );
-
-			context.fillRect( GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, GRAPH_HEIGHT );
-
-			context.fillStyle = bg;
-			context.globalAlpha = 0.9;
-			context.fillRect( GRAPH_X + GRAPH_WIDTH - PR, GRAPH_Y, PR, round( ( 1 - ( value / maxValue ) ) * GRAPH_HEIGHT ) );
-
-		}
-
-	};
-
-};
-
-// https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query/
-// https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
-class GPUStatsPanel extends Stats$1.Panel {
-
-	constructor( context, name = 'GPU MS' ) {
-
-		super( name, '#f90', '#210' );
-
-		let isWebGL2 = true;
-		let extension = context.getExtension( 'EXT_disjoint_timer_query_webgl2' );
-		if ( extension === null ) {
-
-			isWebGL2 = false;
-			extension = context.getExtension( 'EXT_disjoint_timer_query' );
-
-			if ( extension === null ) {
-
-				console.warn( 'GPUStatsPanel: disjoint_time_query extension not available.' );
-
-			}
-
-		}
-
-		this.context = context;
-		this.extension = extension;
-		this.maxTime = 30;
-		this.activeQueries = 0;
-
-		this.startQuery = function () {
-
-			const gl = this.context;
-			const ext = this.extension;
-
-			if ( ext === null ) {
-
-				return;
-
-			}
-
-			// create the query object
-			let query;
-			if ( isWebGL2 ) {
-
-				query = gl.createQuery();
-				gl.beginQuery( ext.TIME_ELAPSED_EXT, query );
-
-			} else {
-
-				query = ext.createQueryEXT();
-				ext.beginQueryEXT( ext.TIME_ELAPSED_EXT, query );
-
-			}
-
-			this.activeQueries ++;
-
-			const checkQuery = () => {
-
-				// check if the query is available and valid
-				let available, disjoint, ns;
-				if ( isWebGL2 ) {
-
-					available = gl.getQueryParameter( query, gl.QUERY_RESULT_AVAILABLE );
-					disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-					ns = gl.getQueryParameter( query, gl.QUERY_RESULT );
-
-				} else {
-
-					available = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_AVAILABLE_EXT );
-					disjoint = gl.getParameter( ext.GPU_DISJOINT_EXT );
-					ns = ext.getQueryObjectEXT( query, ext.QUERY_RESULT_EXT );
-
-				}
-
-				const ms = ns * 1e-6;
-				if ( available ) {
-
-					// update the display if it is valid
-					if ( ! disjoint ) {
-
-						this.update( ms, this.maxTime );
-
-					}
-
-					this.activeQueries --;
-
-
-				} else if ( gl.isContextLost() === false ) {
-
-					// otherwise try again the next frame
-					requestAnimationFrame( checkQuery );
-
-				}
-
-			};
-
-			requestAnimationFrame( checkQuery );
-
-		};
-
-		this.endQuery = function () {
-
-			// finish the query measurement
-			const ext = this.extension;
-			const gl = this.context;
-
-			if ( ext === null ) {
-
-				return;
-
-			}
-
-			if ( isWebGL2 ) {
-
-				gl.endQuery( ext.TIME_ELAPSED_EXT );
-
-			} else {
-
-				ext.endQueryEXT( ext.TIME_ELAPSED_EXT );
-
-			}
-
-		};
-
-	}
-
-}
-
-/*
- * @Date: 2023-04-03 17:25:42
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:24:20
- * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/Pass.js
- */
-
-class Pass {
-
-	constructor() {
-
-		// if set to true, the pass is processed by the composer
-		this.enabled = true;
-
-		// if set to true, the pass indicates to swap read and write buffer after rendering
-		this.needsSwap = true;
-
-		// if set to true, the pass clears its buffer before rendering
-		this.clear = false;
-
-		// if set to true, the result of the pass is rendered to screen. This is set automatically by EffectComposer.
-		this.renderToScreen = false;
-
-	}
-
-	setSize( /* width, height */ ) {}
-
-	render( /* renderer, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
-
-		console.error( 'THREE.Pass: .render() must be implemented in derived pass.' );
-
-	}
-
-	dispose() {}
-
-}
-
-// Helper for passes that need to fill the viewport with a single quad.
-
-const _camera = new OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
-
-// https://github.com/mrdoob/three.js/pull/21358
-
-const _geometry = new BufferGeometry();
-_geometry.setAttribute( 'position', new Float32BufferAttribute( [ - 1, 3, 0, - 1, - 1, 0, 3, - 1, 0 ], 3 ) );
-_geometry.setAttribute( 'uv', new Float32BufferAttribute( [ 0, 2, 0, 0, 2, 0 ], 2 ) );
-
-class FullScreenQuad {
-
-	constructor( material ) {
-
-		this._mesh = new Mesh( _geometry, material );
-
-	}
-
-	dispose() {
-
-		this._mesh.geometry.dispose();
-
-	}
-
-	render( renderer ) {
-
-		renderer.render( this._mesh, _camera );
-
-	}
-
-	get material() {
-
-		return this._mesh.material;
-
-	}
-
-	set material( value ) {
-
-		this._mesh.material = value;
-
-	}
-
-}
-
-/*
- * @Date: 2023-04-03 17:25:42
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:23:43
- * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/RenderPass.js
- */
-
-class RenderPass extends Pass {
-
-	constructor( scene, camera, overrideMaterial, clearColor, clearAlpha ) {
-
-		super();
-
-		this.scene = scene;
-		this.camera = camera;
-
-		this.overrideMaterial = overrideMaterial;
-
-		this.clearColor = clearColor;
-		this.clearAlpha = ( clearAlpha !== undefined ) ? clearAlpha : 0;
-
-		this.clear = true;
-		this.clearDepth = false;
-		this.needsSwap = false;
-		this._oldClearColor = new Color();
-
-	}
-
-	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		const oldAutoClear = renderer.autoClear;
-		renderer.autoClear = false;
-
-		let oldClearAlpha, oldOverrideMaterial;
-
-		if ( this.overrideMaterial !== undefined ) {
-
-			oldOverrideMaterial = this.scene.overrideMaterial;
-
-			this.scene.overrideMaterial = this.overrideMaterial;
-
-		}
-
-		if ( this.clearColor ) {
-
-			renderer.getClearColor( this._oldClearColor );
-			oldClearAlpha = renderer.getClearAlpha();
-
-			renderer.setClearColor( this.clearColor, this.clearAlpha );
-
-		}
-
-		if ( this.clearDepth ) {
-
-			renderer.clearDepth();
-
-		}
-
-		renderer.setRenderTarget( this.renderToScreen ? null : readBuffer );
-
-		// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
-		if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-		renderer.render( this.scene, this.camera );
-
-		if ( this.clearColor ) {
-
-			renderer.setClearColor( this._oldClearColor, oldClearAlpha );
-
-		}
-
-		if ( this.overrideMaterial !== undefined ) {
-
-			this.scene.overrideMaterial = oldOverrideMaterial;
-
-		}
-
-		renderer.autoClear = oldAutoClear;
-
-	}
-
-}
-
-/**
- * Full-screen textured quad shader
- */
-
-const CopyShader = {
-
-	uniforms: {
-
-		'tDiffuse': { value: null },
-		'opacity': { value: 1.0 }
-
-	},
-
-	vertexShader: /* glsl */`
-
-		varying vec2 vUv;
-
-		void main() {
-
-			vUv = uv;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-		}`,
-
-	fragmentShader: /* glsl */`
-
-		uniform float opacity;
-
-		uniform sampler2D tDiffuse;
-
-		varying vec2 vUv;
-
-		void main() {
-
-			gl_FragColor = texture2D( tDiffuse, vUv );
-			gl_FragColor.a *= opacity;
-
-
-		}`
-
-};
-
-/*
- * @Date: 2023-04-03 17:25:42
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:24:06
- * @FilePath: /threejs-demo/packages/app/CAD/src/postprocessing/ShaderPass.js
- */
-
-class ShaderPass extends Pass {
-
-	constructor( shader, textureID ) {
-
-		super();
-
-		this.textureID = ( textureID !== undefined ) ? textureID : 'tDiffuse';
-
-		if ( shader instanceof ShaderMaterial ) {
-
-			this.uniforms = shader.uniforms;
-
-			this.material = shader;
-
-		} else if ( shader ) {
-
-			this.uniforms = UniformsUtils.clone( shader.uniforms );
-
-			this.material = new ShaderMaterial( {
-
-				defines: Object.assign( {}, shader.defines ),
-				uniforms: this.uniforms,
-				vertexShader: shader.vertexShader,
-				fragmentShader: shader.fragmentShader
-
-			} );
-
-		}
-
-		this.fsQuad = new FullScreenQuad( this.material );
-
-	}
-
-	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		if ( this.uniforms[ this.textureID ] ) {
-
-			this.uniforms[ this.textureID ].value = readBuffer.texture;
-
-		}
-
-		this.fsQuad.material = this.material;
-
-		if ( this.renderToScreen ) {
-
-			renderer.setRenderTarget( null );
-			this.fsQuad.render( renderer );
-
-		} else {
-
-			renderer.setRenderTarget( writeBuffer );
-			// TODO: Avoid using autoClear properties, see https://github.com/mrdoob/three.js/pull/15571#issuecomment-465669600
-			if ( this.clear ) renderer.clear( renderer.autoClearColor, renderer.autoClearDepth, renderer.autoClearStencil );
-			this.fsQuad.render( renderer );
-
-		}
-
-	}
-
-	dispose() {
-
-		this.material.dispose();
-
-		this.fsQuad.dispose();
-
-	}
-
-}
-
-class MaskPass extends Pass {
-
-	constructor( scene, camera ) {
-
-		super();
-
-		this.scene = scene;
-		this.camera = camera;
-
-		this.clear = true;
-		this.needsSwap = false;
-
-		this.inverse = false;
-
-	}
-
-	render( renderer, writeBuffer, readBuffer /*, deltaTime, maskActive */ ) {
-
-		const context = renderer.getContext();
-		const state = renderer.state;
-
-		// don't update color or depth
-
-		state.buffers.color.setMask( false );
-		state.buffers.depth.setMask( false );
-
-		// lock buffers
-
-		state.buffers.color.setLocked( true );
-		state.buffers.depth.setLocked( true );
-
-		// set up stencil
-
-		let writeValue, clearValue;
-
-		if ( this.inverse ) {
-
-			writeValue = 0;
-			clearValue = 1;
-
-		} else {
-
-			writeValue = 1;
-			clearValue = 0;
-
-		}
-
-		state.buffers.stencil.setTest( true );
-		state.buffers.stencil.setOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		state.buffers.stencil.setFunc( context.ALWAYS, writeValue, 0xffffffff );
-		state.buffers.stencil.setClear( clearValue );
-		state.buffers.stencil.setLocked( true );
-
-		// draw into the stencil buffer
-
-		renderer.setRenderTarget( readBuffer );
-		if ( this.clear ) renderer.clear();
-		renderer.render( this.scene, this.camera );
-
-		renderer.setRenderTarget( writeBuffer );
-		if ( this.clear ) renderer.clear();
-		renderer.render( this.scene, this.camera );
-
-		// unlock color and depth buffer for subsequent rendering
-
-		state.buffers.color.setLocked( false );
-		state.buffers.depth.setLocked( false );
-
-		// only render where stencil is set to 1
-
-		state.buffers.stencil.setLocked( false );
-		state.buffers.stencil.setFunc( context.EQUAL, 1, 0xffffffff ); // draw if == 1
-		state.buffers.stencil.setOp( context.KEEP, context.KEEP, context.KEEP );
-		state.buffers.stencil.setLocked( true );
-
-	}
-
-}
-
-class ClearMaskPass extends Pass {
-
-	constructor() {
-
-		super();
-
-		this.needsSwap = false;
-
-	}
-
-	render( renderer /*, writeBuffer, readBuffer, deltaTime, maskActive */ ) {
-
-		renderer.state.buffers.stencil.setLocked( false );
-		renderer.state.buffers.stencil.setTest( false );
-
-	}
-
-}
-
-class EffectComposer {
-
-	constructor( renderer, renderTarget ) {
-
-		this.renderer = renderer;
-
-		if ( renderTarget === undefined ) {
-
-			const size = renderer.getSize( new Vector2() );
-			this._pixelRatio = renderer.getPixelRatio();
-			this._width = size.width;
-			this._height = size.height;
-
-			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
-			renderTarget.texture.name = 'EffectComposer.rt1';
-
-		} else {
-
-			this._pixelRatio = 1;
-			this._width = renderTarget.width;
-			this._height = renderTarget.height;
-
-		}
-
-		this.renderTarget1 = renderTarget;
-		this.renderTarget2 = renderTarget.clone();
-		this.renderTarget2.texture.name = 'EffectComposer.rt2';
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-		this.renderToScreen = true;
-
-		this.passes = [];
-
-		this.copyPass = new ShaderPass( CopyShader );
-
-		this.clock = new Clock();
-
-	}
-
-	swapBuffers() {
-
-		const tmp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = tmp;
-
-	}
-
-	addPass( pass ) {
-
-		this.passes.push( pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
-
-	}
-
-	insertPass( pass, index ) {
-
-		this.passes.splice( index, 0, pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
-
-	}
-
-	removePass( pass ) {
-
-		const index = this.passes.indexOf( pass );
-
-		if ( index !== - 1 ) {
-
-			this.passes.splice( index, 1 );
-
-		}
-
-	}
-
-	isLastEnabledPass( passIndex ) {
-
-		for ( let i = passIndex + 1; i < this.passes.length; i ++ ) {
-
-			if ( this.passes[ i ].enabled ) {
-
-				return false;
-
-			}
-
-		}
-
-		return true;
-
-	}
-
-	render( deltaTime ) {
-
-		// deltaTime value is in seconds
-
-		if ( deltaTime === undefined ) {
-
-			deltaTime = this.clock.getDelta();
-
-		}
-
-		const currentRenderTarget = this.renderer.getRenderTarget();
-
-		let maskActive = false;
-
-		for ( let i = 0, il = this.passes.length; i < il; i ++ ) {
-
-			const pass = this.passes[ i ];
-
-			if ( pass.enabled === false ) continue;
-
-			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
-
-			if ( pass.needsSwap ) {
-
-				if ( maskActive ) {
-
-					const context = this.renderer.getContext();
-					const stencil = this.renderer.state.buffers.stencil;
-
-					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
-
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
-
-					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
-
-				}
-
-				this.swapBuffers();
-
-			}
-
-			if ( MaskPass !== undefined ) {
-
-				if ( pass instanceof MaskPass ) {
-
-					maskActive = true;
-
-				} else if ( pass instanceof ClearMaskPass ) {
-
-					maskActive = false;
-
-				}
-
-			}
-
-		}
-
-		this.renderer.setRenderTarget( currentRenderTarget );
-
-	}
-
-	reset( renderTarget ) {
-
-		if ( renderTarget === undefined ) {
-
-			const size = this.renderer.getSize( new Vector2() );
-			this._pixelRatio = this.renderer.getPixelRatio();
-			this._width = size.width;
-			this._height = size.height;
-
-			renderTarget = this.renderTarget1.clone();
-			renderTarget.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
-
-		}
-
-		this.renderTarget1.dispose();
-		this.renderTarget2.dispose();
-		this.renderTarget1 = renderTarget;
-		this.renderTarget2 = renderTarget.clone();
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-	}
-
-	setSize( width, height ) {
-
-		this._width = width;
-		this._height = height;
-
-		const effectiveWidth = this._width * this._pixelRatio;
-		const effectiveHeight = this._height * this._pixelRatio;
-
-		this.renderTarget1.setSize( effectiveWidth, effectiveHeight );
-		this.renderTarget2.setSize( effectiveWidth, effectiveHeight );
-
-		for ( let i = 0; i < this.passes.length; i ++ ) {
-
-			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
-
-		}
-
-	}
-
-	setPixelRatio( pixelRatio ) {
-
-		this._pixelRatio = pixelRatio;
-
-		this.setSize( this._width, this._height );
-
-	}
-
-	dispose() {
-
-		this.renderTarget1.dispose();
-		this.renderTarget2.dispose();
-
-		this.copyPass.dispose();
-
-	}
-
-}
-
-/*
- * @Date: 2023-04-03 17:25:42
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:23:55
- * @FilePath: /threejs-demo/packages/app/CAD/src/lib/constant.js
- */
-
-const MOUSESTYLE = {
-  SELECT: 'default',
-  PAN: 'move',
-  ZOOM: 'zoom-in',
-  ROTATE: 'alias',
-};
-
-const VIEWPOSITION = {
-  '3D': new Vector3(1000, 1000, 1000),
-  XY: new Vector3(0, 0, 1000),
-  XZ: new Vector3(0, 1000, 0),
-  YZ: new Vector3(1000, 0, 0),
-};
-
-const S = 15;
-
-/*
- * @Date: 2023-04-03 18:22:31
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:22:53
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Collector.js
- */
-
-let currentAncestorId = null;
-let currentParentId = null;
-let selfId = null;
-
-class Tip {
-    constructor(selfId,parentId,ancestorId){
-        this.id = selfId;
-        this.parentId = parentId;
-        this.ancestorId = ancestorId;
-    }
-}
-
-class Collector{
-    constructor(){
-        this.scene = new Scene();
-        this.textures = new Map();
-        this.materials = new Map();
-        this.geometries = new Map();
-        this._exclusion = [];
-        this.pool = [];
-    }
-
-
-    set exclusion(newValue){
-        this._exclusion = newValue;
-        this.textures.clear();
-        this.materials.clear();
-        this.geometries.clear();
-        this.pool.length = 0;
-        this.scene.children.forEach(obj=>this.track(obj,true));
-    }
-
-
-    track(object3D){
-        this.scene.add(object3D);
-        if(!this._exclusion.includes(object3D.type)){
-            this.pool.push(object3D);
-        }
-    }
-
-    collect(object){
-        selfId = object.id;
-        const isNeedCollect = object.children.length !== 0;
-        if(isNeedCollect){
-            object.children.forEach(o=>{
-                this.collect(o);
-                currentParentId = o.id;
-            });
-        }else {
-            currentParentId = object?.parent?.id;
-        }
-        if(object.geometry !== undefined){
-            this.geometries.set(new Tip(selfId,currentParentId,currentAncestorId),object.geometry);
-        }
-        if(object.material !== undefined){
-            const material = object.material;
-            if(Array.isArray(material)){
-                material.forEach(m=>{
-                    this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),m);
-                    this.collectTexture(m);
-                });
-            }else {
-                this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),material);
-                this.collectTexture(material);
-            }
-        }
-    }
-
-    collectTexture(material){
-        const inTextures = (texture)=>this.materials.set(new Tip(material.id,currentParentId,currentAncestorId),texture);
-        material.alphaMap && inTextures(material.alphaMap);
-        material.aoMap && inTextures(material.aoMap);
-        material.envMap && inTextures(material.envMap);
-        material.lightMap && inTextures(material.lightMap);
-        material.map && inTextures(material.map);
-        material.specularMap && inTextures(material.specularMap);
-    }
-
-    release(object){
-        this.scene.remove(object);
-        if(object.geometry){
-            object.geometry.dispose();
-        }
-        if( object.material){
-            if(Array.isArray(object.material)){
-                object.material.forEach(m=>m.dispose());
-            }else {
-                object.material.dispose();
-            }
-        }
-    }
-}
-
-const raycaster = new Raycaster();
-const raycastObjects = [];
-
-class CAD {
-  constructor(container, width, height) {
-    this.height = height || window.innerHeight;
-    this.width = width || window.innerWidth;
-    this._container = container;
-    container.style.position = 'absolute';
-    this.collector = new Collector();
-    // this.scene = new Scene();
-    this.renderer = new WebGLRenderer({ antialias: true });
-    this.renderer.setClearColor('#ffffff');
-    this.renderer.setSize(this.width, this.height);
-    this.renderer.setPixelRatio(window.devicePixelRatio);
-    this.renderer.autoClear = false;
-    const aspect = S * (this.height / this.width);
-    this.cameras = {
-      '3D': new OrthographicCamera(-S, S, aspect, -aspect, 1, 100000),
-      '2D': new OrthographicCamera(-S, S, aspect, -aspect, 1, 100000),
-    };
-    this.mainCamera = this.cameras['3D'];
-    this.cameras['3D'].up.set(0, 0, 1);
-    this.cameras['3D'].position.copy(VIEWPOSITION['3D']);
-    this.cameras['3D'].name = '3D';
-    this.deputyCamera = this.cameras['2D'];
-    this.cameras['2D'].up.set(0, 0, 1);
-    this.cameras['2D'].position.copy(VIEWPOSITION.XY);
-    this.cameras['2D'].name = '2D';
-    this.orbitControls = new OrbitControls(this.mainCamera, this.renderer.domElement);
-    this.trasnlater = new TransformControls(this.mainCamera, this.renderer.domElement);
-    this.viewHelper = new ViewHelper(this.mainCamera, this.renderer.domElement);
-    this.viewHelper.position.set(0.5, 0.5, 0);
-    this.stats = new Stats$1();
-    this.stats.dom.style.position = 'absolute';
-    this.gpuPanel = new GPUStatsPanel(this.renderer.getContext());
-    this.stats.addPanel(this.gpuPanel);
-    this.stats.showPanel(0);
-    this.userData = {};
-    this.mainView = '3D';
-    container.appendChild(this.stats.dom);
-    container.appendChild(this.renderer.domElement);
-    this.composer = new EffectComposer(this.renderer);
-    this.renderPass = new RenderPass(this.collector.scene, this.mainCamera);
-    this.composer.addPass(this.renderPass);
-    this.mode = 'SELECT';
-    this.setMode(this.mode);
-    this.listenerControl();
-    this.selectChange = () => {};
-  }
-
-  add(object) {
-    this.collector.track(object);
-  }
-
-  remove(object) {
-    this.collector.release(object);
-  }
-
-  removeById(id) {
-    this.remove(this.collector.scene.getObjectById(id));
-  }
-
-  setView(viewName) {
-    this.mainView = viewName;
-    if (viewName === '3D') {
-      this.mainCamera = this.cameras['3D'];
-      this.deputyCamera = this.cameras['2D'];
-    } else {
-      this.mainCamera = this.cameras['2D'];
-      this.mainCamera.position.copy(VIEWPOSITION[viewName]);
-      this.deputyCamera = this.cameras['3D'];
-      this.mainCamera.updateProjectionMatrix();
-    }
-    this.renderPass.camera = this.viewHelper.editorCamera = this.orbitControls.object = this.mainCamera;
-  }
-
-  setMode(modeName) {
-    this.mode = modeName;
-    if (modeName === 'SELECT') {
-      this.orbitControls.mouseButtons = {
-        LEFT: MOUSE.ROTATE,
-        MIDDLE: MOUSE.DOLLY,
-        RIGHT: MOUSE.PAN,
-      };
-      this._container.style.cursor = MOUSESTYLE.SELECT;
-    } else if (modeName === 'ZOOM') {
-      this.orbitControls.mouseButtons = {
-        LEFT: MOUSE.DOLLY,
-        MIDDLE: MOUSE.PAN,
-        RIGHT: MOUSE.ROTATE,
-      };
-      this._container.style.cursor = MOUSESTYLE.ZOOM;
-    } else if (modeName === 'PAN') {
-      this.orbitControls.mouseButtons = {
-        LEFT: MOUSE.PAN,
-        MIDDLE: MOUSE.DOLLY,
-        RIGHT: MOUSE.ROTATE,
-      };
-      this._container.style.cursor = MOUSESTYLE.PAN;
-    } else if (modeName === 'ROTATE') {
-      this.orbitControls.mouseButtons = {
-        LEFT: MOUSE.ROTATE,
-        MIDDLE: MOUSE.PAN,
-        RIGHT: -1,
-      };
-      this._container.style.cursor = MOUSESTYLE.ROTATE;
-    }
-  }
-
-  render() {
-    requestAnimationFrame(() => this.render());
-    this.gpuPanel.startQuery();
-    this.renderer.clear();
-    // main
-    this.composer.render();
-    // others
-    this.orbitControls.update();// !important
-    this.viewHelper.render(this.renderer);
-    this.stats.update();
-    this.gpuPanel.endQuery();
-  }
-
-  resize(width, height) {
-    this.width = width;
-    this.height = height;
-    this.renderer.setSize(this.width, this.height);
-    const aspect = S * height / width;
-    Object.values(this.cameras).forEach((camera) => {
-      camera.top = aspect;
-      camera.bottom = -aspect;
-      camera.updateProjectionMatrix();
-    });
-  }
-
-  listenerControl() {
-    const pointer = new Vector2();
-    this.renderer.domElement.addEventListener('click', (event) => {
-      pointer.x = (event.clientX / this.width) * 2 - 1;
-      pointer.y = -(event.clientY / this.height) * 2 + 1;
-      raycaster.setFromCamera(pointer, this.mainCamera);
-      raycastObjects.length = [];
-      raycaster.intersectObjects(this.collector.pool, true, raycastObjects);
-      this.selectChange(raycastObjects);
-    });
-  }
-}
-
 /* eslint-disable no-console */
 /*
  * @Date: 2023-06-21 18:27:56
@@ -5077,7 +4013,7 @@ function print(...msg) {
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:07:55
+ * @LastEditTime: 2023-06-29 18:31:38
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
  */
 
@@ -5100,41 +4036,42 @@ class Stats {
     dom.add(frameTimeCol);
 
     dom.setStyle({
-      bottom: "10px",
-      left: "10px",
-      position: "absolute",
+      bottom: '10px',
+      left: '10px',
+      position: 'absolute',
     });
-    dom.setId("Stats");
+    dom.setId('Stats');
 
     const [objLabel, vecLabel, triLabel, famLabel] = [
-      "objects : ",
-      "vertices : ",
-      "triangles : ",
-      "frameTime : ",
+      'objects : ',
+      'vertices : ',
+      'triangles : ',
+      'frameTime : ',
     ];
 
-    objectCol.setTextContent(objLabel + "0");
-    verticesCol.setTextContent(vecLabel + "0");
-    trianglesCol.setTextContent(triLabel + "0");
-    frameTimeCol.setTextContent(famLabel + "0 ms");
+    objectCol.setTextContent(`${objLabel}0`);
+    verticesCol.setTextContent(`${vecLabel}0`);
+    trianglesCol.setTextContent(`${triLabel}0`);
+    frameTimeCol.setTextContent(`${famLabel}0 ms`);
 
     this.domElement = dom.domElement;
 
-    this.update = function () {
-      const scene = editor.scene;
+    function update() {
+      const { scene } = editor;
 
-      let objects = 0,
-        vertices = 0,
-        triangles = 0;
+      let objects = 0;
+      let vertices = 0;
+      let triangles = 0;
 
       for (let i = 0, l = scene.children.length; i < l; i++) {
         const object = scene.children[i];
 
+        // eslint-disable-next-line no-loop-func
         object.traverseVisible((child) => {
           objects++;
 
           if (child?.isMesh || child?.isPoints) {
-            const geometry = child.geometry;
+            const { geometry } = child;
             vertices += geometry.attributes.position.count;
 
             if (child.isMesh) {
@@ -5151,20 +4088,19 @@ class Stats {
       objectCol.setTextContent(objLabel + objects);
       verticesCol.setTextContent(vecLabel + vertices);
       trianglesCol.setTextContent(triLabel + triangles);
-    };
+    }
 
     editor.signals.sceneRendered.add((frameTime) => {
-      frameTimeCol.setTextContent(famLabel + frameTime.toFixed(2) + " ms");
+      frameTimeCol.setTextContent(`${famLabel + frameTime.toFixed(2)} ms`);
     });
 
-    editor.signals.objectAdded.add(this.update);
+    editor.signals.objectAdded.add(update);
 
-    this.showStats = function () {
+    this.show = function () {
       dom.show();
-      this.update();
     };
 
-    this.hideStats = function () {
+    this.hide = function () {
       dom.hide();
     };
   }
@@ -5179,14 +4115,14 @@ class Stats {
 
 class ViewPort {
   constructor(editor) {
-    const signals = editor.signals;
+    const { signals } = editor;
 
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const scene = editor.scene;
-    const sceneHelper = editor.sceneHelper;
-    const target = editor.target;
+    const { scene } = editor;
+    const { sceneHelper } = editor;
+    const { target } = editor;
 
     target.append(renderer.domElement);
 
@@ -5194,15 +4130,14 @@ class ViewPort {
     gridHelper.isHelper = true;
 
     const transformControls = new TransformControls(editor.viewPortCamera, target);
-    transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
-    transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
+    transformControls.addEventListener('change', onTransformControlsChange);
+    transformControls.addEventListener('mouseDown', onTransformControlsMouseDown);
+    transformControls.addEventListener('mouseUp', onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    
     const controls = new OrbitControls(editor.viewPortCamera, target);
     let needsUpdate = false;
-    controls.addEventListener("change", () => {
+    controls.addEventListener('change', () => {
       needsUpdate = true;
     });
 
@@ -5220,7 +4155,8 @@ class ViewPort {
     target.append(this.stats.domElement);
 
     // main
-    let startTime, endTime;
+    let startTime; let
+      endTime;
     function onRender() {
       startTime = performance.now();
 
@@ -5243,10 +4179,10 @@ class ViewPort {
       const camera = editor.viewPortCamera;
       renderer.setSize(width, height);
 
-      if (camera.type === "OrthographicCamera") {
+      if (camera.type === 'OrthographicCamera') {
         camera.top = 15 * (height / width);
         camera.bottom = -15 * (height / width);
-      } else if (camera.type === "PerspectiveCamera") {
+      } else if (camera.type === 'PerspectiveCamera') {
         camera.aspect = width / height;
       }
 
@@ -5260,7 +4196,7 @@ class ViewPort {
     let objectScaleOnDown = null;
 
     function onTransformControlsChange() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         box.setFromObject(object, true);
@@ -5269,7 +4205,7 @@ class ViewPort {
     }
 
     function onTransformControlsMouseDown() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         objectPositionOnDown = object.position.clone();
@@ -5281,17 +4217,17 @@ class ViewPort {
     }
 
     function onTransformControlsMouseUp() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         switch (transformControls.getMode) {
-          case "translate":
+          case 'translate':
             if (!objectPositionOnDown.equals(object.position)) ;
             break;
-          case "rotate":
+          case 'rotate':
             if (!objectRotationOnDown.equals(object.rotation)) ;
             break;
-          case "scale":
+          case 'scale':
             if (!objectScaleOnDown.equals(object.scale)) ;
             break;
         }
@@ -5315,11 +4251,11 @@ class ViewPort {
         objects.push(child);
       });
 
-      for (let i = 0,l = sceneHelper.children.length ; i < l; i++) {
+      for (let i = 0, l = sceneHelper.children.length; i < l; i++) {
         const child = sceneHelper.children[i];
         // 排除掉transformControl 和 selectionBox
         const enablePicked = child.uuid !== transformControls.uuid && child.uuid !== selectionBox.uuid && child.visible;
-        if(enablePicked){
+        if (enablePicked) {
           objects.push(sceneHelper.children[i]);
         }
       }
@@ -5334,7 +4270,9 @@ class ViewPort {
     const onDoubleClickPosition = new Vector2();
 
     function getMousePosition(x, y) {
-      const { left, top, width, height } = target.getBoundingClientRect();
+      const {
+        left, top, width, height,
+      } = target.getBoundingClientRect();
       return [(x - left) / width, (y - top) / height];
     }
 
@@ -5342,7 +4280,7 @@ class ViewPort {
       const mousePosition = getMousePosition(event.clientX, event.clientY);
       onDownPosition.fromArray(mousePosition);
 
-      target.addEventListener("mouseup", onMouseUp);
+      target.addEventListener('mouseup', onMouseUp);
     }
 
     function onMouseUp(event) {
@@ -5351,16 +4289,16 @@ class ViewPort {
 
       handelClick();
 
-      target.removeEventListener("mouseup", onMouseUp);
+      target.removeEventListener('mouseup', onMouseUp);
     }
 
     function handelClick() {
       if (onDownPosition.distanceTo(onUpPosition) === 0) {
         const intersects = getIntersects(onUpPosition);
 
-        console.log(intersects,'handelClick');
+        console.log(intersects, 'handelClick');
 
-        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter(id => id !== undefined);
+        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter((id) => id !== undefined);
 
         signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
 
@@ -5373,8 +4311,7 @@ class ViewPort {
       onDoubleClickPosition.fromArray(mousePosition);
 
       const intersects = getIntersects(onDoubleClickPosition);
-      if(intersects.length > 0){
-
+      if (intersects.length > 0) {
         intersects[0];
         // TODO 物体聚焦
         // signals.objectFocused.dispatch( intersect.object );
@@ -5402,24 +4339,24 @@ class ViewPort {
     // signals
 
     signals.windowResize.add(() => {
-      printInfo("editor resized");
+      printInfo('editor resized');
       onResize();
       onRender();
     });
 
     signals.windowResize.dispatch();
 
-    signals.objectSelected.add((selectIds)=>{
+    signals.objectSelected.add((selectIds) => {
       transformControls.detach();
       selectionBox.visible = false;
 
       const object = editor.getObjectByUUID(selectIds[0]);
-      print('signals.objectSelected->',object);
+      print('signals.objectSelected->', object);
 
-      if(object !== undefined && object !== scene && object !== editor.viewPortCamera){
-        box.setFromObject(object,true);
-        
-        if(box.isEmpty() === false){
+      if (object !== undefined && object !== scene && object !== editor.viewPortCamera) {
+        box.setFromObject(object, true);
+
+        if (box.isEmpty() === false) {
           selectionBox.visible = true;
         }
 
@@ -5427,20 +4364,20 @@ class ViewPort {
       }
     });
 
-    signals.sceneGraphChanged.add(()=>{
+    signals.sceneGraphChanged.add(() => {
       onRender();
     });
 
-    signals.viewPortCameraChanged.add(()=>{
+    signals.viewPortCameraChanged.add(() => {
       transformControls.camera = editor.viewPortCamera;
       controls.object = editor.viewPortCamera;
       viewHelper.object = editor.viewPortCamera;
 
       editor.viewPortCamera.lookAt(controls.target);
-      
+
       onResize();
     });
   }
 }
 
-export { CAD, Collector, CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };
+export { Collector, CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };
