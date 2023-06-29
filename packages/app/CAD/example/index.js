@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:58:21
+ * @LastEditTime: 2023-06-29 18:27:45
  * @FilePath: /threejs-demo/packages/app/CAD/example/index.js
  */
 import { Mesh, BoxGeometry, MeshNormalMaterial } from 'three';
@@ -39,4 +39,5 @@ function init() {
   document.body.append(btn);
 
   window.editor = editor;
+  window.viewPort = viewPort;
 }
