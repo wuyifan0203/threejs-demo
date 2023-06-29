@@ -1,23 +1,22 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 18:35:26
+ * @LastEditTime: 2023-06-29 14:36:54
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
-import { Container } from "./Container";
-import { Signal } from "../../lib/signals";
-import { Selector } from "./Selector";
+import { Container } from './Container';
+import { Signal } from '../../lib/signals';
+import { Selector } from './Selector';
 import {
   initPerspectiveCamera,
   initScene,
   initOrthographicCamera,
-} from "../../lib/initialization";
+} from '../../utils/initialization';
 
 class Editor {
   constructor(target) {
     this.state = {
-      viewCameraType: "orthographic",
     };
     this.signals = {
       windowResize: new Signal(),
@@ -26,14 +25,16 @@ class Editor {
       objectAdded: new Signal(),
       sceneGraphChanged: new Signal(),
       viewPortCameraChanged: new Signal(),
+      sceneRendered: new Signal(),
     };
     this.target = target;
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
+
     this.cameras = {
-      perspective: initPerspectiveCamera(),
       orthographic: initOrthographicCamera(),
+      perspective: initPerspectiveCamera(),
     };
     this.viewPortCamera = this.cameras.orthographic;
 
@@ -68,6 +69,10 @@ class Editor {
     this.signals.sceneGraphChanged.dispatch();
   }
 
+  addCamera(camera) {
+    this.container.addCamera(camera);
+  }
+
   addGeometry(geometry) {
     this.container.addGeometry(geometry);
   }
@@ -82,7 +87,7 @@ class Editor {
 
   getObjectByUUID(uuid, isGlobal = false) {
     return isGlobal
-      ? this.scene.getObjectByProperty("uuid", uuid)
+      ? this.scene.getObjectByProperty('uuid', uuid)
       : this.container.getObjectByUUID(uuid);
   }
 
@@ -97,28 +102,21 @@ class Editor {
   }
 
   toggleViewportCamera() {
-    let from, to;
-    if (this.getState("viewPortCamera") === "orthographic") {
-      this.viewPortCamera = this.cameras.perspective;
-      from = this.cameras.orthographic
-      to = "perspective";
-    } else {
-      this.viewPortCamera = this.cameras.orthographic;
-      from = this.cameras.perspective
-      to = "orthographic";
-    }
-    this.setState("viewPortCamera", to);
-    this.viewPortCamera.position.copy(from.position);
-    this.viewPortCamera.quaternion.copy(from.quaternion)
-    this.viewPortCamera.scale.copy(from.scale);
-    this.viewPortCamera.zoom = from.zoom;
-    this.viewPortCamera.updateProjectionMatrix();
-    this.viewPortCamera.updateMatrixWorld();
+    const { orthographic, perspective } = this.cameras;
 
-    this.signals.sceneGraphChanged.dispatch()
+    if (orthographic === this.viewPortCamera) {
+      this.viewPortCamera = perspective;
+    } else {
+      this.viewPortCamera = orthographic;
+    }
+    this.signals.viewPortCameraChanged.dispatch();
+
+    this.signals.sceneGraphChanged.dispatch();
   }
 
-  setState(key, value) {}
+  setState(key, value) {
+    this.state[key] = value;
+  }
 
   getState(key) {
     return this.state[key];

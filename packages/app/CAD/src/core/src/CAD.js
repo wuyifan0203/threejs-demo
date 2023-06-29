@@ -3,11 +3,11 @@ import {
   OrthographicCamera, Raycaster, WebGLRenderer, MOUSE, Vector2, Scene,
 } from 'three';
 import { TransformControls ,OrbitControls} from '../../controls';
-import { Stats } from '../../utils/Stats.js';
-import { GPUStatsPanel } from '../../utils/GPUStatsPanel.js';
+import { Stats } from '../../lib/Stats.js';
+import { GPUStatsPanel } from '../../lib/GPUStatsPanel.js';
 import { RenderPass } from '../../postprocessing/RenderPass.js';
 import { EffectComposer } from '../../postprocessing/EffectComposer.js';
-import { S, VIEWPOSITION, MOUSESTYLE } from '../../lib/constant.js';
+import { S, VIEWPOSITION, MOUSESTYLE } from '../../utils/constant.js';
 import { Collector } from './Collector.js';
 
 const raycaster = new Raycaster();

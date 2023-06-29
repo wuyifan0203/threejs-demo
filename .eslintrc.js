@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 18:00:18
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-01 17:20:32
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-29 17:51:42
  * @FilePath: /threejs-demo/.eslintrc.js
  */
 module.exports = {
@@ -20,7 +20,7 @@ module.exports = {
   },
   rules: {
     // import plug
-    'import/extensions': ['error', 'never', { js: 'always' }],
+    'import/extensions': ['error', 'never', { js: 'never' }],
     'import/prefer-default-export': 0,
 
     // common
@@ -58,5 +58,7 @@ module.exports = {
     'no-restricted-syntax': 0,
     // for in 是否做校验
     'guard-for-in': 0,
+    //
+    'class-methods-use-this': 0,
   },
 };

@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
  * @Date: 2023-06-21 18:27:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
@@ -6,19 +7,19 @@
  */
 
 function printInfo(key) {
-    console.count('info:'+key)
+  console.count(`info:${key}`);
 }
 
 function print(...msg) {
-    console.log(...msg)
+  console.log(...msg);
 }
 
 function printDebugger(key) {
-    console.count('debugger:'+key)
+  console.count(`debugger:${key}`);
 }
 
 export {
-    print,
-    printInfo,
-    printDebugger
-}
+  print,
+  printInfo,
+  printDebugger,
+};

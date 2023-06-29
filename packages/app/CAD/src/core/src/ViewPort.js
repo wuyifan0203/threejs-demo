@@ -1,47 +1,48 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 18:21:14
+ * @LastEditTime: 2023-06-29 15:48:00
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
-import { Box3Helper, Raycaster, GridHelper, Vector2, Box3, Clock } from "three";
-import { initRenderer } from "../../lib/initialization";
-import { ViewHelper } from "../../helper";
-import { EditorControls, TransformControls ,OrbitControls} from "../../controls";
-import { print, printDebugger, printInfo } from "../../utils/log";
+import {
+  Box3Helper, Raycaster, GridHelper, Vector2, Box3, Clock,
+} from 'three';
+import { initRenderer } from '../../utils/initialization';
+import { ViewHelper } from '../../helper';
+import { EditorControls, TransformControls, OrbitControls } from '../../controls';
+import { print, printDebugger, printInfo } from '../../utils/log';
+import { Stats } from './Stats';
 
 class ViewPort {
   constructor(editor) {
-    const signals = editor.signals;
+    const { signals } = editor;
 
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const camera = editor.viewPortCamera;
-    const scene = editor.scene;
-    const sceneHelper = editor.sceneHelper;
-    const target = editor.target;
+    const { scene } = editor;
+    const { sceneHelper } = editor;
+    const { target } = editor;
 
     target.append(renderer.domElement);
 
     const gridHelper = new GridHelper(50, 50, 0x888888);
     gridHelper.isHelper = true;
 
-    const transformControls = new TransformControls(camera, target);
-    transformControls.addEventListener("change", onTransformControlsChange);
-    transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
-    transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
+    const transformControls = new TransformControls(editor.viewPortCamera, target);
+    transformControls.addEventListener('change', onTransformControlsChange);
+    transformControls.addEventListener('mouseDown', onTransformControlsMouseDown);
+    transformControls.addEventListener('mouseUp', onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    
-    const controls = new OrbitControls(camera, target);
+    const controls = new OrbitControls(editor.viewPortCamera, target);
     let needsUpdate = false;
-    controls.addEventListener("change", () => {
-      needsUpdate = true
+    controls.addEventListener('change', () => {
+      needsUpdate = true;
     });
 
-    const viewHelper = new ViewHelper(camera, target);
+    const viewHelper = new ViewHelper(editor.viewPortCamera, target);
 
     const box = new Box3();
     const selectionBox = new Box3Helper(box);
@@ -50,34 +51,39 @@ class ViewPort {
     selectionBox.material.depthTest = false;
     sceneHelper.add(selectionBox);
 
-    let startTime, endTime;
+    this.stats = new Stats(editor);
+
+    target.append(this.stats.domElement);
 
     // main
-
+    let startTime; let
+      endTime;
     function onRender() {
       startTime = performance.now();
 
-      renderer.render(scene, camera);
+      renderer.render(scene, editor.viewPortCamera);
       renderer.autoClear = false;
       sceneHelper.add(gridHelper);
-      renderer.render(sceneHelper, camera);
+      renderer.render(sceneHelper, editor.viewPortCamera);
       sceneHelper.remove(gridHelper);
       viewHelper.render(renderer);
       renderer.autoClear = true;
-      needsUpdate = false
+      needsUpdate = false;
 
       endTime = performance.now();
+
+      signals.sceneRendered.dispatch(endTime - startTime);
     }
 
     function onResize() {
       const { width, height } = target.getBoundingClientRect();
-
+      const camera = editor.viewPortCamera;
       renderer.setSize(width, height);
 
-      if (camera.type === "OrthographicCamera") {
+      if (camera.type === 'OrthographicCamera') {
         camera.top = 15 * (height / width);
         camera.bottom = -15 * (height / width);
-      } else if (camera.type === "PerspectiveCamera") {
+      } else if (camera.type === 'PerspectiveCamera') {
         camera.aspect = width / height;
       }
 
@@ -91,7 +97,7 @@ class ViewPort {
     let objectScaleOnDown = null;
 
     function onTransformControlsChange() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         box.setFromObject(object, true);
@@ -100,7 +106,7 @@ class ViewPort {
     }
 
     function onTransformControlsMouseDown() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         objectPositionOnDown = object.position.clone();
@@ -112,21 +118,21 @@ class ViewPort {
     }
 
     function onTransformControlsMouseUp() {
-      const object = transformControls.object;
+      const { object } = transformControls;
 
       if (object !== undefined) {
         switch (transformControls.getMode) {
-          case "translate":
+          case 'translate':
             if (!objectPositionOnDown.equals(object.position)) {
               // TODO command
             }
             break;
-          case "rotate":
+          case 'rotate':
             if (!objectRotationOnDown.equals(object.rotation)) {
               // TODO command
             }
             break;
-          case "scale":
+          case 'scale':
             if (!objectScaleOnDown.equals(object.scale)) {
               // TODO command
             }
@@ -143,7 +149,7 @@ class ViewPort {
 
     function getIntersects(point) {
       mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      raycaster.setFromCamera(mouse, camera);
+      raycaster.setFromCamera(mouse, editor.viewPortCamera);
 
       // 筛选需要检测的对象
       const objects = [];
@@ -152,11 +158,11 @@ class ViewPort {
         objects.push(child);
       });
 
-      for (let i = 0,l = sceneHelper.children.length ; i < l; i++) {
+      for (let i = 0, l = sceneHelper.children.length; i < l; i++) {
         const child = sceneHelper.children[i];
         // 排除掉transformControl 和 selectionBox
-        const enablePicked = child.uuid !== transformControls.uuid && child.uuid !== selectionBox.uuid && child.visible
-        if(enablePicked){
+        const enablePicked = child.uuid !== transformControls.uuid && child.uuid !== selectionBox.uuid && child.visible;
+        if (enablePicked) {
           objects.push(sceneHelper.children[i]);
         }
       }
@@ -171,7 +177,9 @@ class ViewPort {
     const onDoubleClickPosition = new Vector2();
 
     function getMousePosition(x, y) {
-      const { left, top, width, height } = target.getBoundingClientRect();
+      const {
+        left, top, width, height,
+      } = target.getBoundingClientRect();
       return [(x - left) / width, (y - top) / height];
     }
 
@@ -179,7 +187,7 @@ class ViewPort {
       const mousePosition = getMousePosition(event.clientX, event.clientY);
       onDownPosition.fromArray(mousePosition);
 
-      target.addEventListener("mouseup", onMouseUp);
+      target.addEventListener('mouseup', onMouseUp);
     }
 
     function onMouseUp(event) {
@@ -188,16 +196,16 @@ class ViewPort {
 
       handelClick();
 
-      target.removeEventListener("mouseup", onMouseUp);
+      target.removeEventListener('mouseup', onMouseUp);
     }
 
     function handelClick() {
       if (onDownPosition.distanceTo(onUpPosition) === 0) {
         const intersects = getIntersects(onUpPosition);
 
-        console.log(intersects,'handelClick');
+        console.log(intersects, 'handelClick');
 
-        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter(id => id !== undefined)
+        const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter((id) => id !== undefined);
 
         signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
 
@@ -210,16 +218,15 @@ class ViewPort {
       onDoubleClickPosition.fromArray(mousePosition);
 
       const intersects = getIntersects(onDoubleClickPosition);
-      if(intersects.length > 0){
-
+      if (intersects.length > 0) {
         const intersect = intersects[0];
         // TODO 物体聚焦
         // signals.objectFocused.dispatch( intersect.object );
       }
     }
 
-    target.addEventListener('mousedown', onMouseDown)
-    target.addEventListener('dblclick', onDoubleClick)
+    target.addEventListener('mousedown', onMouseDown);
+    target.addEventListener('dblclick', onDoubleClick);
 
     // Animate
 
@@ -239,38 +246,44 @@ class ViewPort {
     // signals
 
     signals.windowResize.add(() => {
-      printInfo("editor resized");
+      printInfo('editor resized');
       onResize();
       onRender();
     });
 
     signals.windowResize.dispatch();
 
-    signals.objectSelected.add((selectIds)=>{
+    signals.objectSelected.add((selectIds) => {
       transformControls.detach();
       selectionBox.visible = false;
 
       const object = editor.getObjectByUUID(selectIds[0]);
-      print('signals.objectSelected->',object);
+      print('signals.objectSelected->', object);
 
-      if(object !== undefined && object !== scene && object !== camera){
-        box.setFromObject(object,true);
-        
-        if(box.isEmpty() === false){
+      if (object !== undefined && object !== scene && object !== editor.viewPortCamera) {
+        box.setFromObject(object, true);
+
+        if (box.isEmpty() === false) {
           selectionBox.visible = true;
         }
 
-        transformControls.attach(object)
+        transformControls.attach(object);
       }
-    })
+    });
 
-    signals.sceneGraphChanged.add(()=>{
-      onRender()
-    })
+    signals.sceneGraphChanged.add(() => {
+      onRender();
+    });
 
-    signals.viewPortCameraChanged.add(()=>{
-      
-    })
+    signals.viewPortCameraChanged.add(() => {
+      transformControls.camera = editor.viewPortCamera;
+      controls.object = editor.viewPortCamera;
+      viewHelper.object = editor.viewPortCamera;
+
+      editor.viewPortCamera.lookAt(controls.target);
+
+      onResize();
+    });
   }
 }
 

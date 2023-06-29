@@ -5,7 +5,7 @@ var THREE = require('three');
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-27 14:40:11
+ * @LastEditTime: 2023-06-29 17:40:29
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
  */
 class Container {
@@ -28,7 +28,7 @@ class Container {
     if (camera?.isCamera) {
       this.cameras.set(camera.uuid, camera);
     } else {
-      console.error("Editor.Container.addCamera: object not an instance of THREE.Camera.",camera);
+      console.error('Editor.Container.addCamera: object not an instance of THREE.Camera.', camera);
     }
   }
 
@@ -39,9 +39,9 @@ class Container {
   // light
   addLight(light) {
     if (light?.isLight) {
-      this.lights.set(lights.uuid, lights);
+      this.lights.set(light.uuid, light);
     } else {
-      console.error("Editor.Container.addLight: object not an instance of THREE.Light.",light);
+      console.error('Editor.Container.addLight: object not an instance of THREE.Light.', light);
     }
   }
 
@@ -55,7 +55,7 @@ class Container {
     if (object?.isObject3D) {
       this.objects.set(object.uuid, object);
     } else {
-      console.error("Editor.Container.addObject: object not an instance of THREE.Object3D.",object);
+      console.error('Editor.Container.addObject: object not an instance of THREE.Object3D.', object);
     }
   }
 
@@ -63,26 +63,26 @@ class Container {
     this.objects.delete(object?.uuid);
   }
 
-  getObjectByUUID(uuid){
-    return this.objects.get(uuid)
+  getObjectByUUID(uuid) {
+    return this.objects.get(uuid);
   }
 
   // geometry
 
   addGeometry(geometry) {
-    if(geometry?.isBufferGeometry){
-      this.addObjectToRefCounter(geometry,this.geometriesRefCounter,this.geometries);
-    }else {
-      console.error("Editor.Container.addGeometry: object not an instance of THREE.BufferGeometry.",geometry);
+    if (geometry?.isBufferGeometry) {
+      this.addObjectToRefCounter(geometry, this.geometriesRefCounter, this.geometries);
+    } else {
+      console.error('Editor.Container.addGeometry: object not an instance of THREE.BufferGeometry.', geometry);
     }
   }
 
   removeGeometry(geometry) {
-    this.removeObjectToRefCounter(geometry,this.geometriesRefCounter,this.geometries);
+    this.removeObjectToRefCounter(geometry, this.geometriesRefCounter, this.geometries);
   }
 
-  getGeometryByUUID(uuid){
-    return this.geometries.get(uuid)
+  getGeometryByUUID(uuid) {
+    return this.geometries.get(uuid);
   }
 
   // material
@@ -90,52 +90,50 @@ class Container {
   addMaterial(material) {
     if (Array.isArray(material)) {
       for (let i = 0, l = material.length; i < l; i++) {
-        if(material[i]?.isMaterial){
-          this.addObjectToRefCounter(material[i],this.materialsRefCounter,this.materials);
-        }else {
-          console.error("Editor.Container.addMaterial: object not an instance of THREE.Material in Material Array.",material[i]);
+        if (material[i]?.isMaterial) {
+          this.addObjectToRefCounter(material[i], this.materialsRefCounter, this.materials);
+        } else {
+          console.error('Editor.Container.addMaterial: object not an instance of THREE.Material in Material Array.', material[i]);
           break;
         }
       }
+    } else if (material?.isMaterial) {
+      this.addObjectToRefCounter(material, this.materialsRefCounter, this.materials);
     } else {
-      if(material?.isMaterial){
-        this.addObjectToRefCounter(material,this.materialsRefCounter,this.materials);
-      }else {
-        console.error("Editor.Container.addMaterial: object not an instance of THREE.Material.",material);
-      }
+      console.error('Editor.Container.addMaterial: object not an instance of THREE.Material.', material);
     }
   }
 
-  removeMaterial(material){
+  removeMaterial(material) {
     if (Array.isArray(material)) {
       for (let i = 0, l = material.length; i < l; i++) {
-        this.removeObjectToRefCounter(material[i],this.materialsRefCounter,this.materials);
+        this.removeObjectToRefCounter(material[i], this.materialsRefCounter, this.materials);
       }
     } else {
-      this.removeObjectToRefCounter(material,this.materialsRefCounter,this.materials);
+      this.removeObjectToRefCounter(material, this.materialsRefCounter, this.materials);
     }
   }
 
-  getMaterialByUUID(uuid){
-    return this.materials.get(uuid)
+  getMaterialByUUID(uuid) {
+    return this.materials.get(uuid);
   }
 
   // texture
 
   addTexture(texture) {
     if (texture?.isTexture) {
-      this.addObjectToRefCounter(texture,this.texturesRefCounter,this.textures);
+      this.addObjectToRefCounter(texture, this.texturesRefCounter, this.textures);
     } else {
-      console.error("Editor.Container.addTexture: object not an instance of THREE.Texture.",texture);
+      console.error('Editor.Container.addTexture: object not an instance of THREE.Texture.', texture);
     }
   }
 
   removeTexture(texture) {
-    this.removeObjectToRefCounter(texture,this.texturesRefCounter,this.textures);
+    this.removeObjectToRefCounter(texture, this.texturesRefCounter, this.textures);
   }
 
-  getTextureByUUID(uuid){
-    return this.textures.get(uuid)
+  getTextureByUUID(uuid) {
+    return this.textures.get(uuid);
   }
 
   // helper
@@ -150,13 +148,13 @@ class Container {
     }
   }
 
-  getHelperByUUID(uuid){
-    return this.helpers.get(uuid)
+  getHelperByUUID(uuid) {
+    return this.helpers.get(uuid);
   }
 
   // counter
 
-  addObjectToRefCounter(object,counter,map){
+  addObjectToRefCounter(object, counter, map) {
     let count = counter.get(object.uuid);
     if (count === undefined) {
       map.set(object.uuid, object);
@@ -166,14 +164,14 @@ class Container {
     }
   }
 
-  removeObjectToRefCounter(object,counter,map){
+  removeObjectToRefCounter(object, counter, map) {
     let count = counter.get(object.uuid);
     count--;
-    if(count === 0){
+    if (count === 0) {
       counter.delete(object.uuid);
       map.delete(object.uuid);
-    }else {
-      counter.set(object.uuid,count);
+    } else {
+      counter.set(object.uuid, count);
     }
   }
 }
@@ -655,7 +653,6 @@ function initPerspectiveCamera(initialPosition) {
   const position = (initialPosition !== undefined) ? initialPosition : new THREE.Vector3(0,5,10);
   camera.position.copy(position);
 
-  camera.name = 'default_perspective_camera';
   camera.lookAt(new THREE.Vector3());
   return camera
 }
@@ -693,14 +690,13 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 18:35:26
+ * @LastEditTime: 2023-06-29 14:36:54
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
 class Editor {
   constructor(target) {
     this.state = {
-      viewCameraType: "orthographic",
     };
     this.signals = {
       windowResize: new Signal(),
@@ -709,14 +705,16 @@ class Editor {
       objectAdded: new Signal(),
       sceneGraphChanged: new Signal(),
       viewPortCameraChanged: new Signal(),
+      sceneRendered: new Signal(),
     };
     this.target = target;
     this.container = new Container(this);
     this.scene = initScene();
     this.sceneHelper = initScene();
+
     this.cameras = {
-      perspective: initPerspectiveCamera(),
       orthographic: initOrthographicCamera(),
+      perspective: initPerspectiveCamera(),
     };
     this.viewPortCamera = this.cameras.orthographic;
 
@@ -751,6 +749,10 @@ class Editor {
     this.signals.sceneGraphChanged.dispatch();
   }
 
+  addCamera(camera) {
+    this.container.addCamera(camera);
+  }
+
   addGeometry(geometry) {
     this.container.addGeometry(geometry);
   }
@@ -765,7 +767,7 @@ class Editor {
 
   getObjectByUUID(uuid, isGlobal = false) {
     return isGlobal
-      ? this.scene.getObjectByProperty("uuid", uuid)
+      ? this.scene.getObjectByProperty('uuid', uuid)
       : this.container.getObjectByUUID(uuid);
   }
 
@@ -780,28 +782,21 @@ class Editor {
   }
 
   toggleViewportCamera() {
-    let from, to;
-    if (this.getState("viewPortCamera") === "orthographic") {
-      this.viewPortCamera = this.cameras.perspective;
-      from = this.cameras.orthographic;
-      to = "perspective";
+    const { orthographic, perspective } = this.cameras;
+
+    if (orthographic === this.viewPortCamera) {
+      this.viewPortCamera = perspective;
     } else {
-      this.viewPortCamera = this.cameras.orthographic;
-      from = this.cameras.perspective;
-      to = "orthographic";
+      this.viewPortCamera = orthographic;
     }
-    this.setState("viewPortCamera", to);
-    this.viewPortCamera.position.copy(from.position);
-    this.viewPortCamera.quaternion.copy(from.quaternion);
-    this.viewPortCamera.scale.copy(from.scale);
-    this.viewPortCamera.zoom = from.zoom;
-    this.viewPortCamera.updateProjectionMatrix();
-    this.viewPortCamera.updateMatrixWorld();
+    this.signals.viewPortCameraChanged.dispatch();
 
     this.signals.sceneGraphChanged.dispatch();
   }
 
-  setState(key, value) {}
+  setState(key, value) {
+    this.state[key] = value;
+  }
 
   getState(key) {
     return this.state[key];
@@ -879,12 +874,14 @@ class CustomGridHelper extends THREE.LineSegments {
       delta = 1 / this.splice;
     }
 
-    const { centerColor, baseColor, divsionColor, width, height, splice, divsion } = this;
+    const {
+      centerColor, baseColor, divsionColor, width, height, splice, divsion,
+    } = this;
     const [timesX, timesY] = [width / divsion * splice, height / divsion * splice];
 
     const vertices = [];
     const colors = [];
-    let color, j10, isCenter,c =0;
+    let color; let j10; let isCenter; let c = 0;
 
     function loop(half, center, times, delta, axis) {
       const o = {};
@@ -894,24 +891,21 @@ class CustomGridHelper extends THREE.LineSegments {
         o[axis](k, half);
         j10 = j % splice === 0;
         isCenter = j === center;
-        
+
         color = divsionColor;
         if (isCenter) {
           color = centerColor;
-        } else {
-          if (j10 && !isCenter) {
-            color = baseColor;
-          }
+        } else if (j10 && !isCenter) {
+          color = baseColor;
         }
 
         color.toArray(colors, c); c += 3;
         color.toArray(colors, c); c += 3;
       }
-
     }
 
-    loop(width/2, timesX / 2, timesX, delta, 'x');
-    loop(height/2, timesY / 2, timesY, delta, 'y');
+    loop(width / 2, timesX / 2, timesX, delta, 'x');
+    loop(height / 2, timesY / 2, timesY, delta, 'y');
 
     this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     this.geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
@@ -920,330 +914,390 @@ class CustomGridHelper extends THREE.LineSegments {
     this.geometry.attributes.color.needUpdate = true;
   }
 
-  dispose(){
+  dispose() {
     this.geometry.dispose();
     this.material.dispose();
   }
 }
 
 let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
+  constructor(camera, domElement) {
+    super();
+
+    this.object = camera;
+
+    this.isViewHelper = true;
+
+    this.animating = false;
+    this.center = new THREE.Vector3();
+
+    const color1 = new THREE.Color('#ff3653');
+    const color2 = new THREE.Color('#8adb00');
+    const color3 = new THREE.Color('#2c8fff');
+
+    const interactiveObjects = [];
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    const dummy = new THREE.Object3D();
+
+    const orthoCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0, 4);
+    orthoCamera.position.set(0, 0, 2);
+
+    const geometry = new THREE.BoxGeometry(0.8, 0.05, 0.05).translate(0.4, 0, 0);
+
+    const xAxis = new THREE.Mesh(geometry, getAxisMaterial(color1));
+    const yAxis = new THREE.Mesh(geometry, getAxisMaterial(color2));
+    const zAxis = new THREE.Mesh(geometry, getAxisMaterial(color3));
+
+    yAxis.rotation.z = Math.PI / 2;
+    zAxis.rotation.y = -Math.PI / 2;
+
+    this.add(xAxis);
+    this.add(zAxis);
+    this.add(yAxis);
+
+    const posXAxisHelper = new THREE.Sprite(getSpriteMaterial(color1, 'X'));
+    posXAxisHelper.userData.type = 'posX';
+    const posYAxisHelper = new THREE.Sprite(getSpriteMaterial(color2, 'Y'));
+    posYAxisHelper.userData.type = 'posY';
+    const posZAxisHelper = new THREE.Sprite(getSpriteMaterial(color3, 'Z'));
+    posZAxisHelper.userData.type = 'posZ';
+    const negXAxisHelper = new THREE.Sprite(getSpriteMaterial(color1));
+    negXAxisHelper.userData.type = 'negX';
+    const negYAxisHelper = new THREE.Sprite(getSpriteMaterial(color2));
+    negYAxisHelper.userData.type = 'negY';
+    const negZAxisHelper = new THREE.Sprite(getSpriteMaterial(color3));
+    negZAxisHelper.userData.type = 'negZ';
+
+    posXAxisHelper.position.x = 1;
+    posYAxisHelper.position.y = 1;
+    posZAxisHelper.position.z = 1;
+    negXAxisHelper.position.x = -1;
+    negXAxisHelper.scale.setScalar(0.8);
+    negYAxisHelper.position.y = -1;
+    negYAxisHelper.scale.setScalar(0.8);
+    negZAxisHelper.position.z = -1;
+    negZAxisHelper.scale.setScalar(0.8);
+
+    this.add(posXAxisHelper);
+    this.add(posYAxisHelper);
+    this.add(posZAxisHelper);
+    this.add(negXAxisHelper);
+    this.add(negYAxisHelper);
+    this.add(negZAxisHelper);
 
-	constructor( camera, domElement ) {
+    interactiveObjects.push(posXAxisHelper);
+    interactiveObjects.push(posYAxisHelper);
+    interactiveObjects.push(posZAxisHelper);
+    interactiveObjects.push(negXAxisHelper);
+    interactiveObjects.push(negYAxisHelper);
+    interactiveObjects.push(negZAxisHelper);
 
-		super();
+    const point = new THREE.Vector3();
+    const dim = 128;
+    const turnRate = 2 * Math.PI; // turn rate in angles per second
 
-		this.isViewHelper = true;
+    const q1 = new THREE.Quaternion();
+    const q2 = new THREE.Quaternion();
+    const viewport = new THREE.Vector4();
+    let radius = 0;
 
-		this.animating = false;
-		this.center = new THREE.Vector3();
+    this.render = function (renderer) {
+      this.quaternion.copy(this.object.quaternion).invert();
+      this.updateMatrixWorld();
 
-		const color1 = new THREE.Color( '#ff3653' );
-		const color2 = new THREE.Color( '#8adb00' );
-		const color3 = new THREE.Color( '#2c8fff' );
+      point.set(0, 0, 1);
+      point.applyQuaternion(this.object.quaternion);
 
-		const interactiveObjects = [];
-		const raycaster = new THREE.Raycaster();
-		const mouse = new THREE.Vector2();
-		const dummy = new THREE.Object3D();
+      if (point.x >= 0) {
+        posXAxisHelper.material.opacity = 1;
+        negXAxisHelper.material.opacity = 0.5;
+      } else {
+        posXAxisHelper.material.opacity = 0.5;
+        negXAxisHelper.material.opacity = 1;
+      }
+
+      if (point.y >= 0) {
+        posYAxisHelper.material.opacity = 1;
+        negYAxisHelper.material.opacity = 0.5;
+      } else {
+        posYAxisHelper.material.opacity = 0.5;
+        negYAxisHelper.material.opacity = 1;
+      }
 
-		const orthoCamera = new THREE.OrthographicCamera( - 2, 2, 2, - 2, 0, 4 );
-		orthoCamera.position.set( 0, 0, 2 );
+      if (point.z >= 0) {
+        posZAxisHelper.material.opacity = 1;
+        negZAxisHelper.material.opacity = 0.5;
+      } else {
+        posZAxisHelper.material.opacity = 0.5;
+        negZAxisHelper.material.opacity = 1;
+      }
 
-		const geometry = new THREE.BoxGeometry( 0.8, 0.05, 0.05 ).translate( 0.4, 0, 0 );
+      //
 
-		const xAxis = new THREE.Mesh( geometry, getAxisMaterial( color1 ) );
-		const yAxis = new THREE.Mesh( geometry, getAxisMaterial( color2 ) );
-		const zAxis = new THREE.Mesh( geometry, getAxisMaterial( color3 ) );
+      const x = domElement.offsetWidth - dim;
 
-		yAxis.rotation.z = Math.PI / 2;
-		zAxis.rotation.y = - Math.PI / 2;
+      renderer.clearDepth();
 
-		this.add( xAxis );
-		this.add( zAxis );
-		this.add( yAxis );
+      renderer.getViewport(viewport);
+      renderer.setViewport(x, 0, dim, dim);
 
-		const posXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1, 'X' ) );
-		posXAxisHelper.userData.type = 'posX';
-		const posYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2, 'Y' ) );
-		posYAxisHelper.userData.type = 'posY';
-		const posZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3, 'Z' ) );
-		posZAxisHelper.userData.type = 'posZ';
-		const negXAxisHelper = new THREE.Sprite( getSpriteMaterial( color1 ) );
-		negXAxisHelper.userData.type = 'negX';
-		const negYAxisHelper = new THREE.Sprite( getSpriteMaterial( color2 ) );
-		negYAxisHelper.userData.type = 'negY';
-		const negZAxisHelper = new THREE.Sprite( getSpriteMaterial( color3 ) );
-		negZAxisHelper.userData.type = 'negZ';
+      renderer.render(this, orthoCamera);
 
-		posXAxisHelper.position.x = 1;
-		posYAxisHelper.position.y = 1;
-		posZAxisHelper.position.z = 1;
-		negXAxisHelper.position.x = - 1;
-		negXAxisHelper.scale.setScalar( 0.8 );
-		negYAxisHelper.position.y = - 1;
-		negYAxisHelper.scale.setScalar( 0.8 );
-		negZAxisHelper.position.z = - 1;
-		negZAxisHelper.scale.setScalar( 0.8 );
+      renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
+    };
 
-		this.add( posXAxisHelper );
-		this.add( posYAxisHelper );
-		this.add( posZAxisHelper );
-		this.add( negXAxisHelper );
-		this.add( negYAxisHelper );
-		this.add( negZAxisHelper );
+    const targetPosition = new THREE.Vector3();
+    const targetQuaternion = new THREE.Quaternion();
 
-		interactiveObjects.push( posXAxisHelper );
-		interactiveObjects.push( posYAxisHelper );
-		interactiveObjects.push( posZAxisHelper );
-		interactiveObjects.push( negXAxisHelper );
-		interactiveObjects.push( negYAxisHelper );
-		interactiveObjects.push( negZAxisHelper );
+    this.handleClick = function (event) {
+      if (this.animating === true) return false;
 
-		const point = new THREE.Vector3();
-		const dim = 128;
-		const turnRate = 2 * Math.PI; // turn rate in angles per second
+      const rect = domElement.getBoundingClientRect();
+      const offsetX = rect.left + (domElement.offsetWidth - dim);
+      const offsetY = rect.top + (domElement.offsetHeight - dim);
+      mouse.x = ((event.clientX - offsetX) / (rect.right - offsetX)) * 2 - 1;
+      mouse.y = -((event.clientY - offsetY) / (rect.bottom - offsetY)) * 2 + 1;
 
-		this.render = function ( renderer ) {
+      raycaster.setFromCamera(mouse, orthoCamera);
 
-			this.quaternion.copy( camera.quaternion ).invert();
-			this.updateMatrixWorld();
+      const intersects = raycaster.intersectObjects(interactiveObjects);
 
-			point.set( 0, 0, 1 );
-			point.applyQuaternion( camera.quaternion );
+      if (intersects.length > 0) {
+        const intersection = intersects[0];
+        const { object } = intersection;
 
-			if ( point.x >= 0 ) {
+        prepareAnimationData(object, this.center, this.object);
 
-				posXAxisHelper.material.opacity = 1;
-				negXAxisHelper.material.opacity = 0.5;
+        this.animating = true;
 
-			} else {
+        return true;
+      }
 
-				posXAxisHelper.material.opacity = 0.5;
-				negXAxisHelper.material.opacity = 1;
+      return false;
+    };
 
-			}
+    this.update = function (delta) {
+      const step = delta * turnRate;
 
-			if ( point.y >= 0 ) {
+      // animate position by doing a slerp and then scaling the position on the unit sphere
 
-				posYAxisHelper.material.opacity = 1;
-				negYAxisHelper.material.opacity = 0.5;
+      q1.rotateTowards(q2, step);
+      this.object.position.set(0, 0, 1).applyQuaternion(q1).multiplyScalar(radius).add(this.center);
 
-			} else {
+      // animate orientation
 
-				posYAxisHelper.material.opacity = 0.5;
-				negYAxisHelper.material.opacity = 1;
+      this.object.quaternion.rotateTowards(targetQuaternion, step);
 
-			}
+      if (q1.angleTo(q2) === 0) {
+        this.animating = false;
+      }
+    };
 
-			if ( point.z >= 0 ) {
+    this.dispose = function () {
+      geometry.dispose();
 
-				posZAxisHelper.material.opacity = 1;
-				negZAxisHelper.material.opacity = 0.5;
+      xAxis.material.dispose();
+      yAxis.material.dispose();
+      zAxis.material.dispose();
 
-			} else {
+      posXAxisHelper.material.map.dispose();
+      posYAxisHelper.material.map.dispose();
+      posZAxisHelper.material.map.dispose();
+      negXAxisHelper.material.map.dispose();
+      negYAxisHelper.material.map.dispose();
+      negZAxisHelper.material.map.dispose();
 
-				posZAxisHelper.material.opacity = 0.5;
-				negZAxisHelper.material.opacity = 1;
+      posXAxisHelper.material.dispose();
+      posYAxisHelper.material.dispose();
+      posZAxisHelper.material.dispose();
+      negXAxisHelper.material.dispose();
+      negYAxisHelper.material.dispose();
+      negZAxisHelper.material.dispose();
+    };
 
-			}
+    function prepareAnimationData(object, focusPoint, camera) {
+      switch (object.userData.type) {
+        case 'posX':
+          targetPosition.set(1, 0, 0);
+          targetQuaternion.setFromEuler(new THREE.Euler(0, Math.PI * 0.5, 0));
+          break;
 
-			//
+        case 'posY':
+          targetPosition.set(0, 1, 0);
+          targetQuaternion.setFromEuler(new THREE.Euler(-Math.PI * 0.5, 0, 0));
+          break;
 
-			const x = domElement.offsetWidth - dim;
+        case 'posZ':
+          targetPosition.set(0, 0, 1);
+          targetQuaternion.setFromEuler(new THREE.Euler());
+          break;
 
-			renderer.clearDepth();
+        case 'negX':
+          targetPosition.set(-1, 0, 0);
+          targetQuaternion.setFromEuler(new THREE.Euler(0, -Math.PI * 0.5, 0));
+          break;
 
-			renderer.getViewport( viewport );
-			renderer.setViewport( x, 0, dim, dim );
+        case 'negY':
+          targetPosition.set(0, -1, 0);
+          targetQuaternion.setFromEuler(new THREE.Euler(Math.PI * 0.5, 0, 0));
+          break;
 
-			renderer.render( this, orthoCamera );
+        case 'negZ':
+          targetPosition.set(0, 0, -1);
+          targetQuaternion.setFromEuler(new THREE.Euler(0, Math.PI, 0));
+          break;
 
-			renderer.setViewport( viewport.x, viewport.y, viewport.z, viewport.w );
+        default:
+          console.error('ViewHelper: Invalid axis.');
+      }
 
-		};
+      //
 
-		const targetPosition = new THREE.Vector3();
-		const targetQuaternion = new THREE.Quaternion();
+      radius = camera.position.distanceTo(focusPoint);
+      targetPosition.multiplyScalar(radius).add(focusPoint);
 
-		const q1 = new THREE.Quaternion();
-		const q2 = new THREE.Quaternion();
-		const viewport = new THREE.Vector4();
-		let radius = 0;
+      dummy.position.copy(focusPoint);
 
-		this.handleClick = function ( event ) {
+      dummy.lookAt(camera.position);
+      q1.copy(dummy.quaternion);
 
-			if ( this.animating === true ) return false;
+      dummy.lookAt(targetPosition);
+      q2.copy(dummy.quaternion);
+    }
 
-			const rect = domElement.getBoundingClientRect();
-			const offsetX = rect.left + ( domElement.offsetWidth - dim );
-			const offsetY = rect.top + ( domElement.offsetHeight - dim );
-			mouse.x = ( ( event.clientX - offsetX ) / ( rect.right - offsetX ) ) * 2 - 1;
-			mouse.y = - ( ( event.clientY - offsetY ) / ( rect.bottom - offsetY ) ) * 2 + 1;
+    function getAxisMaterial(color) {
+      return new THREE.MeshBasicMaterial({ color, toneMapped: false });
+    }
 
-			raycaster.setFromCamera( mouse, orthoCamera );
+    function getSpriteMaterial(color, text = null) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
 
-			const intersects = raycaster.intersectObjects( interactiveObjects );
+      const context = canvas.getContext('2d');
+      context.beginPath();
+      context.arc(32, 32, 16, 0, 2 * Math.PI);
+      context.closePath();
+      context.fillStyle = color.getStyle();
+      context.fill();
 
-			if ( intersects.length > 0 ) {
+      if (text !== null) {
+        context.font = '24px Arial';
+        context.textAlign = 'center';
+        context.fillStyle = '#000000';
+        context.fillText(text, 32, 41);
+      }
 
-				const intersection = intersects[ 0 ];
-				const object = intersection.object;
+      const texture = new THREE.CanvasTexture(canvas);
 
-				prepareAnimationData( object, this.center );
-
-				this.animating = true;
-
-				return true;
-
-			} else {
-
-				return false;
-
-			}
-
-		};
-
-		this.update = function ( delta ) {
-
-			const step = delta * turnRate;
-
-			// animate position by doing a slerp and then scaling the position on the unit sphere
-
-			q1.rotateTowards( q2, step );
-			camera.position.set( 0, 0, 1 ).applyQuaternion( q1 ).multiplyScalar( radius ).add( this.center );
-
-			// animate orientation
-
-			camera.quaternion.rotateTowards( targetQuaternion, step );
-
-			if ( q1.angleTo( q2 ) === 0 ) {
-
-				this.animating = false;
-
-			}
-
-		};
-
-		this.dispose = function () {
-
-			geometry.dispose();
-
-			xAxis.material.dispose();
-			yAxis.material.dispose();
-			zAxis.material.dispose();
-
-			posXAxisHelper.material.map.dispose();
-			posYAxisHelper.material.map.dispose();
-			posZAxisHelper.material.map.dispose();
-			negXAxisHelper.material.map.dispose();
-			negYAxisHelper.material.map.dispose();
-			negZAxisHelper.material.map.dispose();
-
-			posXAxisHelper.material.dispose();
-			posYAxisHelper.material.dispose();
-			posZAxisHelper.material.dispose();
-			negXAxisHelper.material.dispose();
-			negYAxisHelper.material.dispose();
-			negZAxisHelper.material.dispose();
-
-		};
-
-		function prepareAnimationData( object, focusPoint ) {
-
-			switch ( object.userData.type ) {
-
-				case 'posX':
-					targetPosition.set( 1, 0, 0 );
-					targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI * 0.5, 0 ) );
-					break;
-
-				case 'posY':
-					targetPosition.set( 0, 1, 0 );
-					targetQuaternion.setFromEuler( new THREE.Euler( - Math.PI * 0.5, 0, 0 ) );
-					break;
-
-				case 'posZ':
-					targetPosition.set( 0, 0, 1 );
-					targetQuaternion.setFromEuler( new THREE.Euler() );
-					break;
-
-				case 'negX':
-					targetPosition.set( - 1, 0, 0 );
-					targetQuaternion.setFromEuler( new THREE.Euler( 0, - Math.PI * 0.5, 0 ) );
-					break;
-
-				case 'negY':
-					targetPosition.set( 0, - 1, 0 );
-					targetQuaternion.setFromEuler( new THREE.Euler( Math.PI * 0.5, 0, 0 ) );
-					break;
-
-				case 'negZ':
-					targetPosition.set( 0, 0, - 1 );
-					targetQuaternion.setFromEuler( new THREE.Euler( 0, Math.PI, 0 ) );
-					break;
-
-				default:
-					console.error( 'ViewHelper: Invalid axis.' );
-
-			}
-
-			//
-
-			radius = camera.position.distanceTo( focusPoint );
-			targetPosition.multiplyScalar( radius ).add( focusPoint );
-
-			dummy.position.copy( focusPoint );
-
-			dummy.lookAt( camera.position );
-			q1.copy( dummy.quaternion );
-
-			dummy.lookAt( targetPosition );
-			q2.copy( dummy.quaternion );
-
-		}
-
-		function getAxisMaterial( color ) {
-
-			return new THREE.MeshBasicMaterial( { color: color, toneMapped: false } );
-
-		}
-
-		function getSpriteMaterial( color, text = null ) {
-
-			const canvas = document.createElement( 'canvas' );
-			canvas.width = 64;
-			canvas.height = 64;
-
-			const context = canvas.getContext( '2d' );
-			context.beginPath();
-			context.arc( 32, 32, 16, 0, 2 * Math.PI );
-			context.closePath();
-			context.fillStyle = color.getStyle();
-			context.fill();
-
-			if ( text !== null ) {
-
-				context.font = '24px Arial';
-				context.textAlign = 'center';
-				context.fillStyle = '#000000';
-				context.fillText( text, 32, 41 );
-
-			}
-
-			const texture = new THREE.CanvasTexture( canvas );
-
-			return new THREE.SpriteMaterial( { map: texture, toneMapped: false } );
-
-		}
-
-	}
-
+      return new THREE.SpriteMaterial({ map: texture, toneMapped: false });
+    }
+  }
 };
+
+/*
+ * @Date: 2023-06-29 15:12:46
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-29 16:58:32
+ * @FilePath: /threejs-demo/packages/app/CAD/src/utils/ui.js
+ */
+function createElement(type) {
+  return document.createElement(type);
+}
+
+class UIElement {
+  constructor(dom) {
+    this.domElement = dom;
+  }
+
+  add() {
+    for (let i = 0; i < arguments.length; i++) {
+      const uiElement = arguments[i];
+      if (uiElement instanceof UIElement) {
+        this.domElement.append(uiElement.domElement);
+      } else {
+        console.warn(
+          "UIElement : ",
+          uiElement,
+          " is not an instance of UIElement"
+        );
+      }
+    }
+  }
+
+  remove() {
+    for (let i = 0; i < arguments.length; i++) {
+      const uiElement = arguments[i];
+      if (uiElement instanceof UIElement) {
+        this.domElement.removeChild(uiElement.domElement);
+      } else {
+        console.warn(
+          "UIElement : ",
+          uiElement,
+          " is not an instance of UIElement"
+        );
+      }
+    }
+  }
+
+  setStyle(style) {
+    Object.assign(this.domElement.style, style);
+  }
+
+  setTextContent(text) {
+    this.domElement.textContent = text;
+  }
+
+  getTextContent() {
+    return this.domElement.textContent;
+  }
+
+  setId(id) {
+    this.domElement.id = id;
+  }
+
+  show() {
+    this.domElement.style.display = "block";
+  }
+
+  hide() {
+    this.domElement.style.display = "none";
+  }
+}
+
+class UIDiv extends UIElement {
+  constructor() {
+    super(createElement("div"));
+  }
+}
+
+class UISpan extends UIElement {
+  constructor() {
+    super(createElement("span"));
+  }
+}
+
+class UIText extends UISpan {
+  constructor() {
+    super();
+    this.domElement.className = "UIText";
+    this.domElement.style.cursor = "default";
+    this.domElement.style.display = "inline-block";
+    this.domElement.style.fontSize = "12px";
+  }
+}
+
+class UIBreak extends UIElement {
+  constructor() {
+    super(createElement("br"));
+  }
+}
 
 /*
  * @Date: 2023-06-16 00:45:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-20 17:04:47
+ * @LastEditTime: 2023-06-29 17:03:26
  * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelperExtend.js
  */
 
@@ -1251,27 +1305,24 @@ class ViewHelper extends ViewHelper$1 {
   constructor(editorCamera, container) {
     super(editorCamera, container);
 
-    const viewHelperDom = document.createElement("div");
-    viewHelperDom.setAttribute("id", "viewHelper");
+    const dom = new UIDiv();
+    dom.setId('viewHelper');
+    dom.setStyle({
+      position: 'absolute',
+      right: '0px',
+      bottom: '0px',
+      height: '128px',
+      width: '128px',
+    });
+    container.append(dom.domElement);
 
-    const style = {
-      position: "absolute",
-      right: "0px",
-      bottom: "0px",
-      height: "128px",
-      width: "128px",
-    };
-    Object.assign(viewHelperDom.style, style);
-    container.append(viewHelperDom);
-
-    viewHelperDom.addEventListener("pointerup", (event) => {
+    dom.domElement.addEventListener('pointerup', (event) => {
       event.stopPropagation();
-
 
       this.handleClick(event);
     });
 
-    viewHelperDom.addEventListener("pointerdown", function (event) {
+    dom.domElement.addEventListener('pointerdown', (event) => {
       event.stopPropagation();
     });
   }
@@ -1683,7 +1734,6 @@ class OrbitControls extends THREE.EventDispatcher {
     }
 
     function dollyIn(dollyScale) {
-      console.log(dollyScale);
       if (scope.object.isPerspectiveCamera) {
         scale *= dollyScale;
       } else if (scope.object.isOrthographicCamera) {
@@ -3850,7 +3900,7 @@ class TransformControlsPlane extends THREE.Mesh {
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Stats = function () {
+var Stats$1 = function () {
 
 	var mode = 0;
 
@@ -3888,12 +3938,12 @@ var Stats = function () {
 
 	var beginTime = ( performance || Date ).now(), prevTime = beginTime, frames = 0;
 
-	var fpsPanel = addPanel( new Stats.Panel( 'FPS', '#0ff', '#002' ) );
-	var msPanel = addPanel( new Stats.Panel( 'MS', '#0f0', '#020' ) );
+	var fpsPanel = addPanel( new Stats$1.Panel( 'FPS', '#0ff', '#002' ) );
+	var msPanel = addPanel( new Stats$1.Panel( 'MS', '#0f0', '#020' ) );
 
 	if ( self.performance && self.performance.memory ) {
 
-		var memPanel = addPanel( new Stats.Panel( 'MB', '#f08', '#201' ) );
+		var memPanel = addPanel( new Stats$1.Panel( 'MB', '#f08', '#201' ) );
 
 	}
 
@@ -3957,7 +4007,7 @@ var Stats = function () {
 
 };
 
-Stats.Panel = function ( name, fg, bg ) {
+Stats$1.Panel = function ( name, fg, bg ) {
 
 	var min = Infinity, max = 0, round = Math.round;
 	var PR = round( window.devicePixelRatio || 1 );
@@ -4018,7 +4068,7 @@ Stats.Panel = function ( name, fg, bg ) {
 
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query/
 // https://www.khronos.org/registry/webgl/extensions/EXT_disjoint_timer_query_webgl2/
-class GPUStatsPanel extends Stats.Panel {
+class GPUStatsPanel extends Stats$1.Panel {
 
 	constructor( context, name = 'GPU MS' ) {
 
@@ -4895,7 +4945,7 @@ class CAD {
     this.trasnlater = new TransformControls(this.mainCamera, this.renderer.domElement);
     this.viewHelper = new ViewHelper(this.mainCamera, this.renderer.domElement);
     this.viewHelper.position.set(0.5, 0.5, 0);
-    this.stats = new Stats();
+    this.stats = new Stats$1();
     this.stats.dom.style.position = 'absolute';
     this.gpuPanel = new GPUStatsPanel(this.renderer.getContext());
     this.stats.addPanel(this.gpuPanel);
@@ -5010,6 +5060,7 @@ class CAD {
   }
 }
 
+/* eslint-disable no-console */
 /*
  * @Date: 2023-06-21 18:27:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
@@ -5018,17 +5069,113 @@ class CAD {
  */
 
 function printInfo(key) {
-    console.count('info:'+key);
+  console.count(`info:${key}`);
 }
 
 function print(...msg) {
-    console.log(...msg);
+  console.log(...msg);
+}
+
+/*
+ * @Date: 2023-06-29 14:57:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-29 17:07:55
+ * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
+ */
+
+class Stats {
+  constructor(editor) {
+    this.enable = true;
+
+    const dom = new UISpan();
+    const objectCol = new UIText();
+    const verticesCol = new UIText();
+    const trianglesCol = new UIText();
+    const frameTimeCol = new UIText();
+
+    dom.add(objectCol);
+    dom.add(new UIBreak());
+    dom.add(verticesCol);
+    dom.add(new UIBreak());
+    dom.add(trianglesCol);
+    dom.add(new UIBreak());
+    dom.add(frameTimeCol);
+
+    dom.setStyle({
+      bottom: "10px",
+      left: "10px",
+      position: "absolute",
+    });
+    dom.setId("Stats");
+
+    const [objLabel, vecLabel, triLabel, famLabel] = [
+      "objects : ",
+      "vertices : ",
+      "triangles : ",
+      "frameTime : ",
+    ];
+
+    objectCol.setTextContent(objLabel + "0");
+    verticesCol.setTextContent(vecLabel + "0");
+    trianglesCol.setTextContent(triLabel + "0");
+    frameTimeCol.setTextContent(famLabel + "0 ms");
+
+    this.domElement = dom.domElement;
+
+    this.update = function () {
+      const scene = editor.scene;
+
+      let objects = 0,
+        vertices = 0,
+        triangles = 0;
+
+      for (let i = 0, l = scene.children.length; i < l; i++) {
+        const object = scene.children[i];
+
+        object.traverseVisible((child) => {
+          objects++;
+
+          if (child?.isMesh || child?.isPoints) {
+            const geometry = child.geometry;
+            vertices += geometry.attributes.position.count;
+
+            if (child.isMesh) {
+              if (geometry.index !== null) {
+                triangles += geometry.index.count / 3;
+              } else {
+                triangles += geometry.attributes.position.count / 3;
+              }
+            }
+          }
+        });
+      }
+
+      objectCol.setTextContent(objLabel + objects);
+      verticesCol.setTextContent(vecLabel + vertices);
+      trianglesCol.setTextContent(triLabel + triangles);
+    };
+
+    editor.signals.sceneRendered.add((frameTime) => {
+      frameTimeCol.setTextContent(famLabel + frameTime.toFixed(2) + " ms");
+    });
+
+    editor.signals.objectAdded.add(this.update);
+
+    this.showStats = function () {
+      dom.show();
+      this.update();
+    };
+
+    this.hideStats = function () {
+      dom.hide();
+    };
+  }
 }
 
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-28 18:21:14
+ * @LastEditTime: 2023-06-29 15:48:00
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -5039,7 +5186,6 @@ class ViewPort {
     const renderer = initRenderer();
     renderer.setAnimationLoop(animate);
 
-    const camera = editor.viewPortCamera;
     const scene = editor.scene;
     const sceneHelper = editor.sceneHelper;
     const target = editor.target;
@@ -5049,20 +5195,20 @@ class ViewPort {
     const gridHelper = new THREE.GridHelper(50, 50, 0x888888);
     gridHelper.isHelper = true;
 
-    const transformControls = new TransformControls(camera, target);
+    const transformControls = new TransformControls(editor.viewPortCamera, target);
     transformControls.addEventListener("change", onTransformControlsChange);
     transformControls.addEventListener("mouseDown",onTransformControlsMouseDown);
     transformControls.addEventListener("mouseUp", onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
     
-    const controls = new OrbitControls(camera, target);
+    const controls = new OrbitControls(editor.viewPortCamera, target);
     let needsUpdate = false;
     controls.addEventListener("change", () => {
       needsUpdate = true;
     });
 
-    const viewHelper = new ViewHelper(camera, target);
+    const viewHelper = new ViewHelper(editor.viewPortCamera, target);
 
     const box = new THREE.Box3();
     const selectionBox = new THREE.Box3Helper(box);
@@ -5071,26 +5217,32 @@ class ViewPort {
     selectionBox.material.depthTest = false;
     sceneHelper.add(selectionBox);
 
+    this.stats = new Stats(editor);
+
+    target.append(this.stats.domElement);
+
     // main
-
+    let startTime, endTime;
     function onRender() {
-      performance.now();
+      startTime = performance.now();
 
-      renderer.render(scene, camera);
+      renderer.render(scene, editor.viewPortCamera);
       renderer.autoClear = false;
       sceneHelper.add(gridHelper);
-      renderer.render(sceneHelper, camera);
+      renderer.render(sceneHelper, editor.viewPortCamera);
       sceneHelper.remove(gridHelper);
       viewHelper.render(renderer);
       renderer.autoClear = true;
       needsUpdate = false;
 
-      performance.now();
+      endTime = performance.now();
+
+      signals.sceneRendered.dispatch(endTime - startTime);
     }
 
     function onResize() {
       const { width, height } = target.getBoundingClientRect();
-
+      const camera = editor.viewPortCamera;
       renderer.setSize(width, height);
 
       if (camera.type === "OrthographicCamera") {
@@ -5156,7 +5308,7 @@ class ViewPort {
 
     function getIntersects(point) {
       mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      raycaster.setFromCamera(mouse, camera);
+      raycaster.setFromCamera(mouse, editor.viewPortCamera);
 
       // 筛选需要检测的对象
       const objects = [];
@@ -5266,7 +5418,7 @@ class ViewPort {
       const object = editor.getObjectByUUID(selectIds[0]);
       print('signals.objectSelected->',object);
 
-      if(object !== undefined && object !== scene && object !== camera){
+      if(object !== undefined && object !== scene && object !== editor.viewPortCamera){
         box.setFromObject(object,true);
         
         if(box.isEmpty() === false){
@@ -5282,7 +5434,13 @@ class ViewPort {
     });
 
     signals.viewPortCameraChanged.add(()=>{
+      transformControls.camera = editor.viewPortCamera;
+      controls.object = editor.viewPortCamera;
+      viewHelper.object = editor.viewPortCamera;
+
+      editor.viewPortCamera.lookAt(controls.target);
       
+      onResize();
     });
   }
 }

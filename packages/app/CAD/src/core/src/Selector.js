@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
-import { isSameValue } from "../../utils/common";
+import { isSameValue } from '../../utils/common';
 
 class Selector {
   constructor(editor) {

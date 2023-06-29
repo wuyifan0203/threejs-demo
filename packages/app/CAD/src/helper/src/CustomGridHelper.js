@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-02-27 11:55:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 01:15:55
- * @FilePath: /threejs-demo/packages/app/CAD/src/helper/CustomGridHelper.js
+ * @LastEditTime: 2023-06-29 18:14:40
+ * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/CustomGridHelper.js
  */
 
 import {
@@ -10,25 +10,25 @@ import {
   LineBasicMaterial,
   Float32BufferAttribute,
   BufferGeometry,
-  Color
+  Color,
 } from 'three';
 
 class CustomGridHelper extends LineSegments {
-  constructor(width = 10, height = 10, divsion = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divsionColor = 0xeeeeee) {
+  constructor(width = 10, height = 10, division = 1, splice = 1, centerColor = 0xaaaaaa, baseColor = 0xdfdfdf, divisionColor = 0xeeeeee) {
     const geometry = new BufferGeometry();
     const material = new LineBasicMaterial({ vertexColors: true, toneMapped: false });
     super(geometry, material);
     this.type = 'CustomGridHelper';
     this.centerColor = new Color(centerColor);
     this.baseColor = new Color(baseColor);
-    this.divsionColor = new Color(divsionColor);
+    this.divisionColor = new Color(divisionColor);
 
     this.width = width;
     this.height = height;
-    this.divsion = divsion;
+    this.division = division;
     this.splice = splice;
 
-    this.update()
+    this.update();
   }
 
   update() {
@@ -39,39 +39,38 @@ class CustomGridHelper extends LineSegments {
       delta = 1 / this.splice;
     }
 
-    const { centerColor, baseColor, divsionColor, width, height, splice, divsion } = this
-    const [timesX, timesY] = [width / divsion * splice, height / divsion * splice];
+    const {
+      centerColor, baseColor, divisionColor, width, height, splice, division,
+    } = this;
+    const [timesX, timesY] = [width / division * splice, height / division * splice];
 
     const vertices = [];
     const colors = [];
-    let color, j10, isCenter,c =0;
+    let color; let j10; let isCenter; let c = 0;
 
     function loop(half, center, times, delta, axis) {
       const o = {};
       o.x = (k, half) => vertices.push(-half, k, 0, half, k, 0);
       o.y = (k, half) => vertices.push(k, -half, 0, k, half, 0);
       for (let j = 0, k = -half; j <= times; j++, k += delta) {
-        o[axis](k, half)
+        o[axis](k, half);
         j10 = j % splice === 0;
         isCenter = j === center;
-        
-        color = divsionColor;
+
+        color = divisionColor;
         if (isCenter) {
           color = centerColor;
-        } else {
-          if (j10 && !isCenter) {
-            color = baseColor;
-          }
+        } else if (j10 && !isCenter) {
+          color = baseColor;
         }
 
         color.toArray(colors, c); c += 3;
         color.toArray(colors, c); c += 3;
       }
-
     }
 
-    loop(width/2, timesX / 2, timesX, delta, 'x');
-    loop(height/2, timesY / 2, timesY, delta, 'y');
+    loop(width / 2, timesX / 2, timesX, delta, 'x');
+    loop(height / 2, timesY / 2, timesY, delta, 'y');
 
     this.geometry.setAttribute('position', new Float32BufferAttribute(vertices, 3));
     this.geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
@@ -80,7 +79,7 @@ class CustomGridHelper extends LineSegments {
     this.geometry.attributes.color.needUpdate = true;
   }
 
-  dispose(){
+  dispose() {
     this.geometry.dispose();
     this.material.dispose();
   }
