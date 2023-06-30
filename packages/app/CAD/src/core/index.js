@@ -5,5 +5,4 @@
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/index.js
  */
 export * from './src/Editor';
-export * from './src/Collector';
 export * from './src/ViewPort';

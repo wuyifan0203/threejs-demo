@@ -1,10 +1,11 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 14:36:54
+ * @LastEditTime: 2023-06-30 18:19:37
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
+import { EventDispatcher } from '../../utils/EventDispatcher';
 import { Container } from './Container';
 import { Signal } from '../../lib/signals';
 import { Selector } from './Selector';
@@ -14,10 +15,10 @@ import {
   initOrthographicCamera,
 } from '../../utils/initialization';
 
-class Editor {
+class Editor extends EventDispatcher {
   constructor(target) {
-    this.state = {
-    };
+    super();
+    this.state = {};
     this.signals = {
       windowResize: new Signal(),
       objectSelected: new Signal(),
@@ -49,8 +50,8 @@ class Editor {
 
       this.container.addObject(child);
 
+      this.addCamera(object);
       // TODO
-      // addCamera
       // addHelper
     });
 
@@ -67,10 +68,13 @@ class Editor {
 
     this.signals.objectAdded.dispatch(object);
     this.signals.sceneGraphChanged.dispatch();
+    this.dispatchEvent('objectAdded', object);
   }
 
   addCamera(camera) {
-    this.container.addCamera(camera);
+    if (camera?.isCamera) {
+      this.container.addCamera(camera);
+    }
   }
 
   addGeometry(geometry) {
@@ -120,6 +124,14 @@ class Editor {
 
   getState(key) {
     return this.state[key];
+  }
+
+  select(object) {
+    if (Array.isArray(object)) {
+      this.selector.select(object.map((obj) => obj?.uuid));
+    } else {
+      this.selector.select([object?.uuid]);
+    }
   }
 }
 

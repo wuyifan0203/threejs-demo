@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 18:00:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:51:42
+ * @LastEditTime: 2023-06-30 17:45:12
  * @FilePath: /threejs-demo/.eslintrc.js
  */
 module.exports = {
@@ -24,9 +24,9 @@ module.exports = {
     'import/prefer-default-export': 0,
 
     // common
-    'no-console': ['warn', {
-      allow: ['warn', 'error', 'dir'], // 允许有warn，error，dir，其余的是警告
-    }],
+    'no-console': ['warn', // 允许有warn，error，dir，其余的是警告
+      { allow: ['warn', 'error', 'dir'] },
+    ],
     // 是否允许变量重复命名
     'no-shadow': 0,
     // 是否在声明前使用
@@ -60,5 +60,13 @@ module.exports = {
     'guard-for-in': 0,
     //
     'class-methods-use-this': 0,
+    'object-curly-newline': ['error', {
+      ObjectExpression: { multiline: true, minProperties: 5 },
+      ObjectPattern: { multiline: true, minProperties: 5 },
+      ImportDeclaration: { multiline: true, minProperties: 3 },
+      ExportDeclaration: { multiline: true, minProperties: 3 },
+    }],
+    // switch 后 是否有 default
+    'default-case': ['error', { commentPattern: '^skip\\sdefault' }],
   },
 };

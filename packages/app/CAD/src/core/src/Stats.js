@@ -5,7 +5,9 @@
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
  */
 
-import { UIText, UISpan, UIBreak } from '../../utils/ui';
+import {
+  UIText, UISpan, UIBreak,
+} from '../../utils/ui';
 
 class Stats {
   constructor(editor) {

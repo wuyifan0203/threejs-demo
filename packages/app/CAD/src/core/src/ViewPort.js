@@ -1,17 +1,22 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 15:48:00
+ * @LastEditTime: 2023-06-30 20:58:53
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
 import {
-  Box3Helper, Raycaster, GridHelper, Vector2, Box3, Clock,
+  Box3Helper,
+  Raycaster,
+  GridHelper,
+  Vector2,
+  Box3,
+  Clock,
 } from 'three';
 import { initRenderer } from '../../utils/initialization';
 import { ViewHelper } from '../../helper';
-import { EditorControls, TransformControls, OrbitControls } from '../../controls';
-import { print, printDebugger, printInfo } from '../../utils/log';
+import { TransformControls, OrbitControls } from '../../controls';
+import { print, printInfo } from '../../utils/log';
 import { Stats } from './Stats';
 
 class ViewPort {
@@ -28,6 +33,7 @@ class ViewPort {
     target.append(renderer.domElement);
 
     const gridHelper = new GridHelper(50, 50, 0x888888);
+    gridHelper.rotateX(Math.PI / 2);
     gridHelper.isHelper = true;
 
     const transformControls = new TransformControls(editor.viewPortCamera, target);
@@ -137,6 +143,7 @@ class ViewPort {
               // TODO command
             }
             break;
+            // skip default
         }
         controls.enabled = true;
       }
@@ -177,9 +184,7 @@ class ViewPort {
     const onDoubleClickPosition = new Vector2();
 
     function getMousePosition(x, y) {
-      const {
-        left, top, width, height,
-      } = target.getBoundingClientRect();
+      const { left, top, width, height } = target.getBoundingClientRect();
       return [(x - left) / width, (y - top) / height];
     }
 

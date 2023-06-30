@@ -1,11 +1,11 @@
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-26 16:34:19
+ * @LastEditTime: 2023-06-30 21:01:31
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
-import { isSameValue } from '../../utils/common';
+import { isSameArray } from '../../utils/common';
 
 class Selector {
   constructor(editor) {
@@ -30,14 +30,10 @@ class Selector {
   }
 
   select(selectIds) {
-    if (isSameValue(this.editor.selected, selectIds)) return;
+    if (isSameArray(this.editor.selected, selectIds)) return;
     this.editor.selected = selectIds;
 
-    if (selectIds.length === 1) {
-      this.signals.objectSelected.dispatch(selectIds);
-    } else {
-      this.signals.objectSelected.dispatch([]);
-    }
+    this.signals.objectSelected.dispatch(selectIds.length ? selectIds : []);
   }
 
   detach() {

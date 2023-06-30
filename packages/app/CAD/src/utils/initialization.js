@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 18:04:12
+ * @LastEditTime: 2023-06-30 20:28:44
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/initialization.js
  */
 
@@ -14,6 +14,7 @@ function initPerspectiveCamera(initialPosition) {
 
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5, 10);
   camera.position.copy(position);
+  camera.up.set(0, 0, 1);
 
   camera.lookAt(new Vector3());
   return camera;
@@ -23,11 +24,12 @@ function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5000, 10000);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(5000, -5000, 10000);
 
   const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
   camera.position.copy(position);
   camera.zoom = 2.5;
+  camera.up.set(0, 0, 1);
   camera.lookAt(new Vector3(0, 0, 0));
   camera.updateProjectionMatrix();
 

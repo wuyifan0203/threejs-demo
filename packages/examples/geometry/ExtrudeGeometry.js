@@ -83,11 +83,11 @@ const funcList = {
         [0, 1],
         [-1, -1],
         [1, -1],
-      ],[
-        [3,3],
-        [3,2],
-        [2,2],
-        [2,3]
+      ], [
+        [3, 3],
+        [3, 2],
+        [2, 2],
+        [2, 3],
       ]],
     };
   },
@@ -122,8 +122,8 @@ function draw(scene) {
     const pathArray = path.map((vec2) => new Vector2(...vec2));
     const shape = new Shape(pathArray);
     if (holes) {
-      holes.forEach(hole => {
-        shape.holes.push(new Path(hole.map(v=>new Vector2(...v))))
+      holes.forEach((hole) => {
+        shape.holes.push(new Path(hole.map((v) => new Vector2(...v))));
       });
     }
     return shape;

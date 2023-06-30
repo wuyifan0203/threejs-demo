@@ -1,4 +1,65 @@
-import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, GridHelper, Box3, Box3Helper, Clock } from 'three';
+import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher as EventDispatcher$1, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, GridHelper, Box3, Box3Helper, Clock } from 'three';
+
+/*
+ * @Date: 2023-06-30 16:25:00
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-30 17:55:18
+ * @FilePath: /threejs-demo/packages/app/CAD/src/utils/EventDispatcher.js
+ */
+class EventDispatcher {
+  addEventListener(type, listener) {
+    if (this._listeners === undefined) this._listeners = {};
+
+    const listeners = this._listeners;
+
+    if (listeners[type] === undefined) {
+      listeners[type] = [];
+    }
+
+    if (listeners[type].indexOf(listener) === -1) {
+      listeners[type].push(listener);
+    }
+  }
+
+  hasEventListener(type, listener) {
+    if (this._listeners === undefined) return false;
+
+    const listeners = this._listeners;
+
+    return listeners[type] !== undefined && listeners[type].indexOf(listener) !== -1;
+  }
+
+  removeEventListener(type, listener) {
+    if (this._listeners === undefined) return;
+
+    const listeners = this._listeners;
+    const listenerArray = listeners[type];
+
+    if (listenerArray !== undefined) {
+      const index = listenerArray.indexOf(listener);
+
+      if (index !== -1) {
+        listenerArray.splice(index, 1);
+      }
+    }
+  }
+
+  dispatchEvent(type, ...arg) {
+    if (this._listeners === undefined) return;
+
+    const listeners = this._listeners;
+    const listenerArray = listeners[type];
+
+    if (listenerArray !== undefined) {
+      // Make a copy, in case listeners are removed while iterating.
+      const array = listenerArray.slice(0);
+
+      for (let i = 0, l = array.length; i < l; i++) {
+        array[i].call(this, ...arg);
+      }
+    }
+  }
+}
 
 /*
  * @Date: 2023-06-13 13:06:55
@@ -585,18 +646,24 @@ class Container {
 
     };
 
-function isSameValue(v1,v2) {
-    return stringify(v1) === stringify(v2)
+/*
+ * @Date: 2023-06-25 10:49:17
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-30 18:15:08
+ * @FilePath: /threejs-demo/packages/app/CAD/src/utils/common.js
+ */
+function isSameArray(v1, v2) {
+  return stringify(v1.slice().sort()) === stringify(v2.slice().sort());
 }
 
 function stringify(v) {
-    return JSON.stringify(v)
+  return JSON.stringify(v);
 }
 
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-26 16:34:19
+ * @LastEditTime: 2023-06-30 21:01:31
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
@@ -623,14 +690,10 @@ class Selector {
   }
 
   select(selectIds) {
-    if (isSameValue(this.editor.selected, selectIds)) return;
+    if (isSameArray(this.editor.selected, selectIds)) return;
     this.editor.selected = selectIds;
 
-    if (selectIds.length === 1) {
-      this.signals.objectSelected.dispatch(selectIds);
-    } else {
-      this.signals.objectSelected.dispatch([]);
-    }
+    this.signals.objectSelected.dispatch(selectIds.length ? selectIds : []);
   }
 
   detach() {
@@ -641,7 +704,7 @@ class Selector {
 /*
  * @Date: 2023-06-14 11:09:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 18:04:12
+ * @LastEditTime: 2023-06-30 20:28:44
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/initialization.js
  */
 
@@ -650,6 +713,7 @@ function initPerspectiveCamera(initialPosition) {
 
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5, 10);
   camera.position.copy(position);
+  camera.up.set(0, 0, 1);
 
   camera.lookAt(new Vector3());
   return camera;
@@ -659,11 +723,12 @@ function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(0, 5000, 10000);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(5000, -5000, 10000);
 
   const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
   camera.position.copy(position);
   camera.zoom = 2.5;
+  camera.up.set(0, 0, 1);
   camera.lookAt(new Vector3(0, 0, 0));
   camera.updateProjectionMatrix();
 
@@ -687,14 +752,14 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 14:36:54
+ * @LastEditTime: 2023-06-30 18:19:37
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
-class Editor {
+class Editor extends EventDispatcher {
   constructor(target) {
-    this.state = {
-    };
+    super();
+    this.state = {};
     this.signals = {
       windowResize: new Signal(),
       objectSelected: new Signal(),
@@ -726,8 +791,8 @@ class Editor {
 
       this.container.addObject(child);
 
+      this.addCamera(object);
       // TODO
-      // addCamera
       // addHelper
     });
 
@@ -744,10 +809,13 @@ class Editor {
 
     this.signals.objectAdded.dispatch(object);
     this.signals.sceneGraphChanged.dispatch();
+    this.dispatchEvent('objectAdded', object);
   }
 
   addCamera(camera) {
-    this.container.addCamera(camera);
+    if (camera?.isCamera) {
+      this.container.addCamera(camera);
+    }
   }
 
   addGeometry(geometry) {
@@ -798,106 +866,14 @@ class Editor {
   getState(key) {
     return this.state[key];
   }
-}
 
-/*
- * @Date: 2023-04-03 18:22:31
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-13 13:22:53
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Collector.js
- */
-
-let currentAncestorId = null;
-let currentParentId = null;
-let selfId = null;
-
-class Tip {
-    constructor(selfId,parentId,ancestorId){
-        this.id = selfId;
-        this.parentId = parentId;
-        this.ancestorId = ancestorId;
+  select(object) {
+    if (Array.isArray(object)) {
+      this.selector.select(object.map((obj) => obj?.uuid));
+    } else {
+      this.selector.select([object?.uuid]);
     }
-}
-
-class Collector{
-    constructor(){
-        this.scene = new Scene();
-        this.textures = new Map();
-        this.materials = new Map();
-        this.geometries = new Map();
-        this._exclusion = [];
-        this.pool = [];
-    }
-
-
-    set exclusion(newValue){
-        this._exclusion = newValue;
-        this.textures.clear();
-        this.materials.clear();
-        this.geometries.clear();
-        this.pool.length = 0;
-        this.scene.children.forEach(obj=>this.track(obj,true));
-    }
-
-
-    track(object3D){
-        this.scene.add(object3D);
-        if(!this._exclusion.includes(object3D.type)){
-            this.pool.push(object3D);
-        }
-    }
-
-    collect(object){
-        selfId = object.id;
-        const isNeedCollect = object.children.length !== 0;
-        if(isNeedCollect){
-            object.children.forEach(o=>{
-                this.collect(o);
-                currentParentId = o.id;
-            });
-        }else {
-            currentParentId = object?.parent?.id;
-        }
-        if(object.geometry !== undefined){
-            this.geometries.set(new Tip(selfId,currentParentId,currentAncestorId),object.geometry);
-        }
-        if(object.material !== undefined){
-            const material = object.material;
-            if(Array.isArray(material)){
-                material.forEach(m=>{
-                    this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),m);
-                    this.collectTexture(m);
-                });
-            }else {
-                this.materials.set(new Tip(selfId,currentParentId,currentAncestorId),material);
-                this.collectTexture(material);
-            }
-        }
-    }
-
-    collectTexture(material){
-        const inTextures = (texture)=>this.materials.set(new Tip(material.id,currentParentId,currentAncestorId),texture);
-        material.alphaMap && inTextures(material.alphaMap);
-        material.aoMap && inTextures(material.aoMap);
-        material.envMap && inTextures(material.envMap);
-        material.lightMap && inTextures(material.lightMap);
-        material.map && inTextures(material.map);
-        material.specularMap && inTextures(material.specularMap);
-    }
-
-    release(object){
-        this.scene.remove(object);
-        if(object.geometry){
-            object.geometry.dispose();
-        }
-        if( object.material){
-            if(Array.isArray(object.material)){
-                object.material.forEach(m=>m.dispose());
-            }else {
-                object.material.dispose();
-            }
-        }
-    }
+  }
 }
 
 /*
@@ -1070,11 +1046,8 @@ let ViewHelper$1 = class ViewHelper extends Object3D {
     posYAxisHelper.position.y = 1;
     posZAxisHelper.position.z = 1;
     negXAxisHelper.position.x = -1;
-    negXAxisHelper.scale.setScalar(0.8);
     negYAxisHelper.position.y = -1;
-    negYAxisHelper.scale.setScalar(0.8);
     negZAxisHelper.position.z = -1;
-    negZAxisHelper.scale.setScalar(0.8);
 
     this.add(posXAxisHelper);
     this.add(posYAxisHelper);
@@ -1439,7 +1412,7 @@ const _changeEvent$1 = { type: 'change' };
 const _startEvent = { type: 'start' };
 const _endEvent = { type: 'end' };
 
-class OrbitControls extends EventDispatcher {
+class OrbitControls extends EventDispatcher$1 {
   constructor(object, domElement) {
     super();
 
@@ -4109,7 +4082,7 @@ class Stats {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 15:48:00
+ * @LastEditTime: 2023-06-30 20:58:53
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -4127,6 +4100,7 @@ class ViewPort {
     target.append(renderer.domElement);
 
     const gridHelper = new GridHelper(50, 50, 0x888888);
+    gridHelper.rotateX(Math.PI / 2);
     gridHelper.isHelper = true;
 
     const transformControls = new TransformControls(editor.viewPortCamera, target);
@@ -4230,6 +4204,7 @@ class ViewPort {
           case 'scale':
             if (!objectScaleOnDown.equals(object.scale)) ;
             break;
+            // skip default
         }
         controls.enabled = true;
       }
@@ -4270,9 +4245,7 @@ class ViewPort {
     const onDoubleClickPosition = new Vector2();
 
     function getMousePosition(x, y) {
-      const {
-        left, top, width, height,
-      } = target.getBoundingClientRect();
+      const { left, top, width, height } = target.getBoundingClientRect();
       return [(x - left) / width, (y - top) / height];
     }
 
@@ -4380,4 +4353,4 @@ class ViewPort {
   }
 }
 
-export { Collector, CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };
+export { CoordinateHelper, CustomGridHelper, Editor, ViewHelper, ViewPort };

@@ -69,11 +69,8 @@ class ViewHelper extends Object3D {
     posYAxisHelper.position.y = 1;
     posZAxisHelper.position.z = 1;
     negXAxisHelper.position.x = -1;
-    negXAxisHelper.scale.setScalar(0.8);
     negYAxisHelper.position.y = -1;
-    negYAxisHelper.scale.setScalar(0.8);
     negZAxisHelper.position.z = -1;
-    negZAxisHelper.scale.setScalar(0.8);
 
     this.add(posXAxisHelper);
     this.add(posYAxisHelper);
