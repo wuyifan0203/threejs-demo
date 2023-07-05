@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 18:19:37
+ * @LastEditTime: 2023-07-05 10:48:38
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -27,6 +27,8 @@ class Editor extends EventDispatcher {
       sceneGraphChanged: new Signal(),
       viewPortCameraChanged: new Signal(),
       sceneRendered: new Signal(),
+      transformModeChange: new Signal(),
+      objectRemoved: new Signal(),
     };
     this.target = target;
     this.container = new Container(this);
@@ -77,22 +79,57 @@ class Editor extends EventDispatcher {
     }
   }
 
+  removeCamera(camera) {
+    if (camera?.isCamera) {
+      this.container.removeCamera(camera);
+    }
+  }
+
   addGeometry(geometry) {
     this.container.addGeometry(geometry);
   }
 
-  addMaterial(geometry) {
-    this.container.addMaterial(geometry);
+  removeGeometry(geometry) {
+    this.container.removeGeometry(geometry);
+  }
+
+  addMaterial(material) {
+    this.container.addMaterial(material);
+  }
+
+  removeMaterial(material) {
+    this.container.removeMaterial(material);
   }
 
   removeObject(object) {
-    this.scene.remove(object);
+    // 排除场景和视图相机
+    if (object.parent === null) return;
+    object.traverse((child) => {
+      if (child.geometry !== undefined) this.removeGeometry(child.geometry);
+      if (child.material !== undefined) this.removeMaterial(child.material);
+
+      this.container.removeObject(child);
+      this.removeCamera(child);
+
+      // TODO
+      // scope.removeHelper(child);
+    });
+
+    object.parent.remove(object);
+
+    this.signals.objectRemoved.dispatch(object);
+    this.signals.sceneGraphChanged.dispatch();
   }
 
-  getObjectByUUID(uuid, isGlobal = false) {
+  removeObjectByUuid(uuid) {
+    const object = this.getObjectByUuid(uuid, true);
+    object && this.removeObject(object);
+  }
+
+  getObjectByUuid(uuid, isGlobal = false) {
     return isGlobal
       ? this.scene.getObjectByProperty('uuid', uuid)
-      : this.container.getObjectByUUID(uuid);
+      : this.container.getObjectByUuid(uuid);
   }
 
   getObjectsByProperty(key, value) {
@@ -127,11 +164,32 @@ class Editor extends EventDispatcher {
   }
 
   select(object) {
-    if (Array.isArray(object)) {
-      this.selector.select(object.map((obj) => obj?.uuid));
+    if (object !== undefined) {
+      if (Array.isArray(object)) {
+        this.selector.select(object.map((obj) => obj?.uuid));
+      } else {
+        this.selector.select([object?.uuid]);
+      }
     } else {
-      this.selector.select([object?.uuid]);
+      this.selector.detach();
     }
+  }
+
+  selectById(uuid) {
+    if (uuid !== undefined) {
+      if (Array.isArray(uuid)) {
+        this.selector.select(uuid);
+      } else {
+        this.selector.select([uuid]);
+      }
+    } else {
+      this.selector.detach();
+    }
+  }
+
+  setSceneBackground(background) {
+    this.scene.background = background;
+    this.signals.sceneGraphChanged.dispatch();
   }
 }
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 20:58:53
+ * @LastEditTime: 2023-07-05 10:32:22
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -42,9 +42,9 @@ class ViewPort {
     transformControls.addEventListener('mouseUp', onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    const controls = new OrbitControls(editor.viewPortCamera, target);
+    const orbitControls = new OrbitControls(editor.viewPortCamera, target);
     let needsUpdate = false;
-    controls.addEventListener('change', () => {
+    orbitControls.addEventListener('change', () => {
       needsUpdate = true;
     });
 
@@ -65,6 +65,7 @@ class ViewPort {
     let startTime; let
       endTime;
     function onRender() {
+      console.count('onRender ->');
       startTime = performance.now();
 
       renderer.render(scene, editor.viewPortCamera);
@@ -119,7 +120,7 @@ class ViewPort {
         objectRotationOnDown = object.rotation.clone();
         objectScaleOnDown = object.scale.clone();
 
-        controls.enabled = false;
+        orbitControls.enabled = false;
       }
     }
 
@@ -145,7 +146,7 @@ class ViewPort {
             break;
             // skip default
         }
-        controls.enabled = true;
+        orbitControls.enabled = true;
       }
     }
 
@@ -213,8 +214,6 @@ class ViewPort {
         const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter((id) => id !== undefined);
 
         signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
-
-        onRender();
       }
     }
 
@@ -224,7 +223,7 @@ class ViewPort {
 
       const intersects = getIntersects(onDoubleClickPosition);
       if (intersects.length > 0) {
-        const intersect = intersects[0];
+        // const intersect = intersects[0];
         // TODO 物体聚焦
         // signals.objectFocused.dispatch( intersect.object );
       }
@@ -262,7 +261,7 @@ class ViewPort {
       transformControls.detach();
       selectionBox.visible = false;
 
-      const object = editor.getObjectByUUID(selectIds[0]);
+      const object = editor.getObjectByUuid(selectIds[0]);
       print('signals.objectSelected->', object);
 
       if (object !== undefined && object !== scene && object !== editor.viewPortCamera) {
@@ -274,6 +273,14 @@ class ViewPort {
 
         transformControls.attach(object);
       }
+      needsUpdate = true;
+    });
+
+    signals.objectRemoved.add((object) => {
+      const index = editor.selected.findIndex((id) => id === object?.uuid);
+      if (index !== -1) {
+        editor.selectById(editor.selected.splice(index, 1));
+      }
     });
 
     signals.sceneGraphChanged.add(() => {
@@ -282,13 +289,23 @@ class ViewPort {
 
     signals.viewPortCameraChanged.add(() => {
       transformControls.camera = editor.viewPortCamera;
-      controls.object = editor.viewPortCamera;
+      orbitControls.object = editor.viewPortCamera;
       viewHelper.object = editor.viewPortCamera;
 
-      editor.viewPortCamera.lookAt(controls.target);
+      editor.viewPortCamera.lookAt(orbitControls.target);
 
       onResize();
     });
+
+    signals.transformModeChange.add((mode) => {
+      transformControls.setMode(mode);
+    });
+
+    this.setTransformMode = function (mode) {
+      signals.transformModeChange.dispatch(mode);
+    };
+
+    this.transformControls = transformControls;
   }
 }
 

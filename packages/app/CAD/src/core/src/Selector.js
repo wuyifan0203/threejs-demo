@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 21:01:31
+ * @LastEditTime: 2023-07-04 14:57:44
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
@@ -24,20 +24,24 @@ class Selector {
           this.select([selectIds[0]]);
         }
       } else {
-        this.select([]);
+        this.detach([]);
       }
     });
   }
 
   select(selectIds) {
     if (isSameArray(this.editor.selected, selectIds)) return;
+
     this.editor.selected = selectIds;
 
-    this.signals.objectSelected.dispatch(selectIds.length ? selectIds : []);
+    this.signals.objectSelected.dispatch(selectIds);
+    this.editor.dispatchEvent('selectionChange', selectIds);
   }
 
   detach() {
-    this.select([]);
+    this.editor.selected = [];
+    this.signals.objectSelected.dispatch([]);
+    this.editor.dispatchEvent('selectionChange', []);
   }
 }
 

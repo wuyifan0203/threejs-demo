@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 18:00:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 17:45:12
+ * @LastEditTime: 2023-07-04 13:16:09
  * @FilePath: /threejs-demo/.eslintrc.js
  */
 module.exports = {
@@ -68,5 +68,7 @@ module.exports = {
     }],
     // switch 后 是否有 default
     'default-case': ['error', { commentPattern: '^skip\\sdefault' }],
+    // 是否允许匿名函数
+    'func-names': 0,
   },
 };

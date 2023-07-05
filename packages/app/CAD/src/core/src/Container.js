@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:40:29
+ * @LastEditTime: 2023-07-05 10:31:50
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
  */
 class Container {
@@ -59,7 +59,7 @@ class Container {
     this.objects.delete(object?.uuid);
   }
 
-  getObjectByUUID(uuid) {
+  getObjectByUuid(uuid) {
     return this.objects.get(uuid);
   }
 

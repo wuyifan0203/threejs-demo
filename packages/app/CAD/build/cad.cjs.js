@@ -66,7 +66,7 @@ class EventDispatcher {
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:40:29
+ * @LastEditTime: 2023-07-05 10:31:50
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Container.js
  */
 class Container {
@@ -124,7 +124,7 @@ class Container {
     this.objects.delete(object?.uuid);
   }
 
-  getObjectByUUID(uuid) {
+  getObjectByUuid(uuid) {
     return this.objects.get(uuid);
   }
 
@@ -665,7 +665,7 @@ function stringify(v) {
 /*
  * @Date: 2023-06-25 10:27:31
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 21:01:31
+ * @LastEditTime: 2023-07-04 14:57:44
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Selector.js
  */
 
@@ -686,20 +686,24 @@ class Selector {
           this.select([selectIds[0]]);
         }
       } else {
-        this.select([]);
+        this.detach([]);
       }
     });
   }
 
   select(selectIds) {
     if (isSameArray(this.editor.selected, selectIds)) return;
+
     this.editor.selected = selectIds;
 
-    this.signals.objectSelected.dispatch(selectIds.length ? selectIds : []);
+    this.signals.objectSelected.dispatch(selectIds);
+    this.editor.dispatchEvent('selectionChange', selectIds);
   }
 
   detach() {
-    this.select([]);
+    this.editor.selected = [];
+    this.signals.objectSelected.dispatch([]);
+    this.editor.dispatchEvent('selectionChange', []);
   }
 }
 
@@ -754,7 +758,7 @@ function initScene() {
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 18:19:37
+ * @LastEditTime: 2023-07-05 10:48:38
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
  */
 
@@ -770,6 +774,8 @@ class Editor extends EventDispatcher {
       sceneGraphChanged: new Signal(),
       viewPortCameraChanged: new Signal(),
       sceneRendered: new Signal(),
+      transformModeChange: new Signal(),
+      objectRemoved: new Signal(),
     };
     this.target = target;
     this.container = new Container(this);
@@ -820,22 +826,57 @@ class Editor extends EventDispatcher {
     }
   }
 
+  removeCamera(camera) {
+    if (camera?.isCamera) {
+      this.container.removeCamera(camera);
+    }
+  }
+
   addGeometry(geometry) {
     this.container.addGeometry(geometry);
   }
 
-  addMaterial(geometry) {
-    this.container.addMaterial(geometry);
+  removeGeometry(geometry) {
+    this.container.removeGeometry(geometry);
+  }
+
+  addMaterial(material) {
+    this.container.addMaterial(material);
+  }
+
+  removeMaterial(material) {
+    this.container.removeMaterial(material);
   }
 
   removeObject(object) {
-    this.scene.remove(object);
+    // 排除场景和视图相机
+    if (object.parent === null) return;
+    object.traverse((child) => {
+      if (child.geometry !== undefined) this.removeGeometry(child.geometry);
+      if (child.material !== undefined) this.removeMaterial(child.material);
+
+      this.container.removeObject(child);
+      this.removeCamera(child);
+
+      // TODO
+      // scope.removeHelper(child);
+    });
+
+    object.parent.remove(object);
+
+    this.signals.objectRemoved.dispatch(object);
+    this.signals.sceneGraphChanged.dispatch();
   }
 
-  getObjectByUUID(uuid, isGlobal = false) {
+  removeObjectByUuid(uuid) {
+    const object = this.getObjectByUuid(uuid, true);
+    object && this.removeObject(object);
+  }
+
+  getObjectByUuid(uuid, isGlobal = false) {
     return isGlobal
       ? this.scene.getObjectByProperty('uuid', uuid)
-      : this.container.getObjectByUUID(uuid);
+      : this.container.getObjectByUuid(uuid);
   }
 
   getObjectsByProperty(key, value) {
@@ -870,11 +911,32 @@ class Editor extends EventDispatcher {
   }
 
   select(object) {
-    if (Array.isArray(object)) {
-      this.selector.select(object.map((obj) => obj?.uuid));
+    if (object !== undefined) {
+      if (Array.isArray(object)) {
+        this.selector.select(object.map((obj) => obj?.uuid));
+      } else {
+        this.selector.select([object?.uuid]);
+      }
     } else {
-      this.selector.select([object?.uuid]);
+      this.selector.detach();
     }
+  }
+
+  selectById(uuid) {
+    if (uuid !== undefined) {
+      if (Array.isArray(uuid)) {
+        this.selector.select(uuid);
+      } else {
+        this.selector.select([uuid]);
+      }
+    } else {
+      this.selector.detach();
+    }
+  }
+
+  setSceneBackground(background) {
+    this.scene.background = background;
+    this.signals.sceneGraphChanged.dispatch();
   }
 }
 
@@ -3988,7 +4050,7 @@ function print(...msg) {
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 18:31:38
+ * @LastEditTime: 2023-07-05 10:53:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
  */
 
@@ -4070,6 +4132,7 @@ class Stats {
     });
 
     editor.signals.objectAdded.add(update);
+    editor.signals.objectRemoved.add(update);
 
     this.show = function () {
       dom.show();
@@ -4084,7 +4147,7 @@ class Stats {
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-30 20:58:53
+ * @LastEditTime: 2023-07-05 10:32:22
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -4111,9 +4174,9 @@ class ViewPort {
     transformControls.addEventListener('mouseUp', onTransformControlsMouseUp);
     sceneHelper.add(transformControls);
 
-    const controls = new OrbitControls(editor.viewPortCamera, target);
+    const orbitControls = new OrbitControls(editor.viewPortCamera, target);
     let needsUpdate = false;
-    controls.addEventListener('change', () => {
+    orbitControls.addEventListener('change', () => {
       needsUpdate = true;
     });
 
@@ -4134,6 +4197,7 @@ class ViewPort {
     let startTime; let
       endTime;
     function onRender() {
+      console.count('onRender ->');
       startTime = performance.now();
 
       renderer.render(scene, editor.viewPortCamera);
@@ -4188,7 +4252,7 @@ class ViewPort {
         objectRotationOnDown = object.rotation.clone();
         objectScaleOnDown = object.scale.clone();
 
-        controls.enabled = false;
+        orbitControls.enabled = false;
       }
     }
 
@@ -4208,7 +4272,7 @@ class ViewPort {
             break;
             // skip default
         }
-        controls.enabled = true;
+        orbitControls.enabled = true;
       }
     }
 
@@ -4276,8 +4340,6 @@ class ViewPort {
         const intersectsObjectsUUId = intersects.map((item) => item?.object?.uuid).filter((id) => id !== undefined);
 
         signals.intersectionsDetected.dispatch(intersectsObjectsUUId);
-
-        onRender();
       }
     }
 
@@ -4286,11 +4348,7 @@ class ViewPort {
       onDoubleClickPosition.fromArray(mousePosition);
 
       const intersects = getIntersects(onDoubleClickPosition);
-      if (intersects.length > 0) {
-        intersects[0];
-        // TODO 物体聚焦
-        // signals.objectFocused.dispatch( intersect.object );
-      }
+      if (intersects.length > 0) ;
     }
 
     target.addEventListener('mousedown', onMouseDown);
@@ -4325,7 +4383,7 @@ class ViewPort {
       transformControls.detach();
       selectionBox.visible = false;
 
-      const object = editor.getObjectByUUID(selectIds[0]);
+      const object = editor.getObjectByUuid(selectIds[0]);
       print('signals.objectSelected->', object);
 
       if (object !== undefined && object !== scene && object !== editor.viewPortCamera) {
@@ -4337,6 +4395,14 @@ class ViewPort {
 
         transformControls.attach(object);
       }
+      needsUpdate = true;
+    });
+
+    signals.objectRemoved.add((object) => {
+      const index = editor.selected.findIndex((id) => id === object?.uuid);
+      if (index !== -1) {
+        editor.selectById(editor.selected.splice(index, 1));
+      }
     });
 
     signals.sceneGraphChanged.add(() => {
@@ -4345,13 +4411,23 @@ class ViewPort {
 
     signals.viewPortCameraChanged.add(() => {
       transformControls.camera = editor.viewPortCamera;
-      controls.object = editor.viewPortCamera;
+      orbitControls.object = editor.viewPortCamera;
       viewHelper.object = editor.viewPortCamera;
 
-      editor.viewPortCamera.lookAt(controls.target);
+      editor.viewPortCamera.lookAt(orbitControls.target);
 
       onResize();
     });
+
+    signals.transformModeChange.add((mode) => {
+      transformControls.setMode(mode);
+    });
+
+    this.setTransformMode = function (mode) {
+      signals.transformModeChange.dispatch(mode);
+    };
+
+    this.transformControls = transformControls;
   }
 }
 

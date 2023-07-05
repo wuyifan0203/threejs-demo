@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 18:31:38
+ * @LastEditTime: 2023-07-05 10:53:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
  */
 
@@ -87,6 +87,7 @@ class Stats {
     });
 
     editor.signals.objectAdded.add(update);
+    editor.signals.objectRemoved.add(update);
 
     this.show = function () {
       dom.show();
