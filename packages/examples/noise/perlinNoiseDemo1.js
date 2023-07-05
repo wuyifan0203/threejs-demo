@@ -44,9 +44,7 @@ function init() {
   const geometry = new PlaneGeometry(100, 100, 200, 200);
 
   // 生成云层纹理
-  const material = new MeshNormalMaterial({
-    side: 2,
-  });
+  const material = new MeshNormalMaterial({ side: 2 });
 
   scene.add(new AmbientLight());
 
