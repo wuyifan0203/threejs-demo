@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-06 11:18:20
+ * @LastEditTime: 2023-07-06 18:33:56
  * @FilePath: /threejs-demo/packages/examples/render/useRenderTarget.js
  */
 /* eslint-disable no-unused-vars */
@@ -147,9 +147,9 @@ function init() {
 function addWaterMark(ctx, text, col, row, ph, pw) {
   ctx.font = '20px microsoft yahei';
   ctx.fillStyle = 'rgba(0,0,0,0.5)';
-  const { height, width } = ctx.measureText(text);
+  const { width } = ctx.measureText(text);
   for (let c = 0; c < col; c++) {
-    const ch = c * (ph + height);
+    const ch = c * (ph + 20);
     for (let r = 0; r < row; r++) {
       ctx.rotate((-45 * Math.PI) / 180);
       ctx.fillText(text, ch, r * (pw + width));
