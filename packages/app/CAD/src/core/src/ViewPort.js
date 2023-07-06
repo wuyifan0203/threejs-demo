@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-05 10:32:22
+ * @LastEditTime: 2023-07-06 09:58:23
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
  */
 
@@ -304,8 +304,6 @@ class ViewPort {
     this.setTransformMode = function (mode) {
       signals.transformModeChange.dispatch(mode);
     };
-
-    this.transformControls = transformControls;
   }
 }
 

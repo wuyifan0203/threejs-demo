@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-05 17:46:32
+ * @LastEditTime: 2023-07-06 11:18:20
  * @FilePath: /threejs-demo/packages/examples/render/useRenderTarget.js
  */
 /* eslint-disable no-unused-vars */
@@ -12,13 +12,13 @@ import {
   Vector3,
   AmbientLight,
   DirectionalLight,
-  MeshNormalMaterial,
   BoxGeometry,
   MeshStandardMaterial,
   Clock,
   WebGLRenderTarget,
-  TextureLoader,
   Vector2,
+  SRGBColorSpace,
+  Color,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ImprovedNoise } from '../../lib/three/ImprovedNoise.js';
@@ -38,6 +38,8 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
   renderer.shadowMap.enabled = true;
+  // 这是默认值
+  // renderer.outputEncoding = SRGBColorSpace;
 
   const camera = initOrthographicCamera(new Vector3(-1000, 1000, 1000));
   camera.lookAt(0, 0, 0);
@@ -68,7 +70,7 @@ function init() {
   mesh.castShadow = true;
   scene.add(mesh);
 
-  const target = new WebGLRenderTarget(window.innerWidth, window.innerHeight);
+  const target = new WebGLRenderTarget(window.innerWidth, window.innerHeight, { colorSpace: SRGBColorSpace });
 
   const clock = new Clock();
   function render() {
@@ -92,11 +94,15 @@ function init() {
       renderer.getSize(size);
 
       const { x, y } = size;
+      // 长 * 宽 * RGBA（4位）
+      // Uint 因为 2^8 = 255 ,无符号整数
+      const pixels = new Uint8Array(x * y * 4);
 
       target.setSize(x, y);
-      renderer.render(scene, camera, target);
 
-      const pixels = new Uint8Array(x * y * 4);
+      renderer.setRenderTarget(target);
+      renderer.render(scene, camera);
+      renderer.setRenderTarget(null);
       renderer.readRenderTargetPixels(target, 0, 0, x, y, pixels);
 
       const canvas = document.createElement('canvas');
@@ -106,14 +112,48 @@ function init() {
       const imageData = context.createImageData(x, y);
       imageData.data.set(pixels);
       context.putImageData(imageData, 0, 0);
+
+      // 翻转图像。webgl 与 canvas 坐标系不同
+      context.translate(0, y);
+      context.scale(1, -1);
+      context.drawImage(canvas, 0, 0, x, y, 0, 0, x, y);
+
+      addWaterMark(context, 'Test', 5, 10, 10, 10);
+
+      // 生成base64
       const dataURL = canvas.toDataURL('image/png');
 
+      // 图片下载
       eleLink.download = 'test';
       eleLink.href = dataURL;
       eleLink.click();
+
+      // 调试
+      console.log(
+        '%c image',
+        `background-image: url(${dataURL});
+         background-size: contain;
+         background-repeat: no-repeat;
+         padding: 200px;
+        `,
+      );
     },
   };
 
   const gui = new GUI();
   gui.add(func, 'renderTarget');
+}
+
+function addWaterMark(ctx, text, col, row, ph, pw) {
+  ctx.font = '20px microsoft yahei';
+  ctx.fillStyle = 'rgba(0,0,0,0.5)';
+  const { height, width } = ctx.measureText(text);
+  for (let c = 0; c < col; c++) {
+    const ch = c * (ph + height);
+    for (let r = 0; r < row; r++) {
+      ctx.rotate((-45 * Math.PI) / 180);
+      ctx.fillText(text, ch, r * (pw + width));
+      ctx.rotate((45 * Math.PI) / 180); // 把水印偏转角度调整为原来的，不然他会一直转
+    }
+  }
 }
