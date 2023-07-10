@@ -1,12 +1,10 @@
 /*
  * @Date: 2022-11-29 19:36:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-19 14:32:30
+ * @LastEditTime: 2023-07-10 15:15:18
  * @FilePath: /threejs-demo/packages/examples/polygonScale/index.js
  */
-import {
-  data, data1, data2, data3, data4, data5, data6, data7, data8, data9,data10
-} from './data.js';
+import { data } from './data.js';
 import {
   Scene,
   Mesh,
@@ -27,7 +25,7 @@ import { innerPoints } from './compute.js';
 
 import { EarCut } from './Earcut.js';
 import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
-import dat from '../../lib/util/dat.gui.js'
+import dat from '../../lib/util/dat.gui.js';
 
 (function () {
   init();
@@ -61,21 +59,17 @@ function draw(scene) {
     depthWrite: false,
     transparent: true,
     color: 'skyblue',
-    wireframe: false
+    wireframe: false,
   });
 
-  const dataList = {
-    data,data1,data2,data3,data4,data5,data6,data7,data8,data9,data10
-  }
-
-  let mesh,meshNormal;
-  draw3DMesh(data10,90,0.5,0.2);
+  let mesh; let meshNormal;
+  draw3DMesh(data.data10, 90, 0.5, 0.2);
   scene.add(mesh);
   scene.add(meshNormal);
 
-  function draw3DMesh(data,angle,h) {
+  function draw3DMesh(data, angle, h) {
     const bufferG = new BufferGeometry();
-    const halfH = h/2;
+    const halfH = h / 2;
     const testData = data;
     // 一维点二维化
     const pointList = splicePoint(testData);
@@ -110,33 +104,28 @@ function draw(scene) {
     meshNormal = new FaceNormalsHelper(mesh, 1);
   }
 
-
-
-  const orbject = {
-    data:'data1',
-    angle:90,
-    height:0.5,
-  }
+  const object = {
+    data: 'data1',
+    angle: 90,
+    height: 0.5,
+  };
 
   const gui = new dat.GUI();
 
-  gui.add(orbject,'data',Object.keys(dataList)).name('Data Source').onChange(e=>update());
-  gui.add(orbject,'angle',1,179,1).name('Angle').onChange(e=>update());
-  gui.add(orbject,'height',0.1,10,0.1).name('Height').onChange(e=>update());
-  gui.add(newM,'wireframe').name('Material Wireframe');
-  gui.add(meshNormal,'visible').name('Normal helper');
-
+  gui.add(object, 'data', Object.keys(data)).name('Data Source').onChange(() => update());
+  gui.add(object, 'angle', 1, 179, 1).name('Angle').onChange(() => update());
+  gui.add(object, 'height', 0.1, 10, 0.1).name('Height').onChange(() => update());
+  gui.add(newM, 'wireframe').name('Material Wireframe');
+  gui.add(meshNormal, 'visible').name('Normal helper');
 
   function update() {
     scene.remove(mesh);
-    scene.remove(meshNormal)
-    draw3DMesh(dataList[orbject.data] ,orbject.angle,orbject.height);
+    scene.remove(meshNormal);
+    draw3DMesh(data[object.data], object.angle, object.height);
     scene.add(mesh);
-    scene.add(meshNormal)
+    scene.add(meshNormal);
   }
 }
-
-
 
 function splicePoint(data) {
   const pointList = [];

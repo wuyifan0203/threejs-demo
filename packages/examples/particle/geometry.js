@@ -15,7 +15,9 @@ import {
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { initRenderer, resize, angle2Radians } from '../../lib/tools/index.js';
+import {
+  initRenderer, resize, angle2Radians,
+} from '../../lib/tools/index.js';
 import datGui from '../../lib/util/dat.gui.js';
 
 import { Stats } from '../../lib/util/Stats.js';

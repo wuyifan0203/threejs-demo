@@ -20,7 +20,7 @@ module.exports = {
   },
   rules: {
     // import plug
-    'import/extensions': ['error', 'never', { js: 'never' }],
+    'import/extensions': 0,
     'import/prefer-default-export': 0,
 
     // common

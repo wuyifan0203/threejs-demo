@@ -1,38 +1,32 @@
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   Scene,
   Vector3,
-  TorusKnotGeometry,
   MeshPhongMaterial,
   Mesh,
   AmbientLight,
   SpotLight,
-  Plane,
-  PlaneHelper,
-  Clock,
   BoxGeometry,
   MeshBasicMaterial,
   ReplaceStencilOp,
   NotEqualStencilFunc,
-  EqualStencilFunc,
-  WebGLRenderTarget,
   AlwaysStencilFunc,
-  KeepStencilOp
-} from "../../lib/three/three.module.js";
+  KeepStencilOp,
+} from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initCustomGrid,
-} from "../../lib/tools/index.js";
+} from '../../lib/tools/index.js';
 
-import { GUI } from "../../lib/util/lil-gui.module.min.js";
+import { GUI } from '../../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
 };
 
-function init(params) {
+function init() {
   const renderer = initRenderer();
   renderer.setClearColor(0xefefef);
   renderer.shadowMap.enabled = true;
@@ -65,7 +59,7 @@ function init(params) {
 
   const geometry = new BoxGeometry(2, 2, 2);
   const normalMaterial = new MeshPhongMaterial({ color: 0xbbbbbb });
-  const faceMaterial = new MeshBasicMaterial({ color: "orange" });
+  const faceMaterial = new MeshBasicMaterial({ color: 'orange' });
 
   const normalObject = new Mesh(geometry, normalMaterial);
   const faceObject = new Mesh(geometry, faceMaterial);
@@ -84,7 +78,7 @@ function init(params) {
     renderer.state.buffers.stencil.setOp(
       ReplaceStencilOp,
       ReplaceStencilOp,
-      ReplaceStencilOp
+      ReplaceStencilOp,
     );
 
     faceObject.scale.set(1.05, 1.05, 1.05);
@@ -93,11 +87,10 @@ function init(params) {
     renderer.state.buffers.stencil.setOp(
       KeepStencilOp,
       KeepStencilOp,
-      KeepStencilOp
+      KeepStencilOp,
     );
 
     faceObject.material = faceMaterial;
-
 
     renderer.render(faceObject, camera);
 

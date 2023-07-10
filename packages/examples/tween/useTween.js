@@ -5,24 +5,25 @@
  * @LastEditTime: 2023-05-17 17:57:46
  * @FilePath: /threejs-demo/packages/examples/tween/useTween.js
  */
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   AmbientLight,
   BoxGeometry,
   Mesh,
-  MeshBasicMaterial,
   MeshLambertMaterial,
   PointLight,
   Scene,
   Vector3,
-} from "../../lib/three/three.module.js";
+} from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initCustomGrid,
-} from "../../lib/tools/index.js";
-import { Tween, update, Easing } from "../../lib/other/tween.esm.js";
+} from '../../lib/tools/index.js';
+import {
+  Tween, update, Easing,
+} from '../../lib/other/tween.esm.js';
 
 window.onload = () => {
   init();
@@ -48,8 +49,8 @@ function init() {
   const createMaterial = (color) => new MeshLambertMaterial({ color });
 
   const geometry = new BoxGeometry(1, 1, 1);
-  const mesh_test_to = new Mesh(geometry, createMaterial("green"));
-  const mesh_test_delay = new Mesh(geometry, createMaterial("red"));
+  const mesh_test_to = new Mesh(geometry, createMaterial('green'));
+  const mesh_test_delay = new Mesh(geometry, createMaterial('red'));
 
   scene.add(mesh_test_to);
   scene.add(mesh_test_delay);

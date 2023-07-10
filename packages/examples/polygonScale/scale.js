@@ -21,8 +21,7 @@ function polygonScale(path, width) {
     const p2_p = { x: p2.x - p.x, y: p1.x - p.y };
     const n_p2p = normal(p2_p);
     p2_p.x /= n_p2p;
-    p2_p.y /= n_p2p; 
-
+    p2_p.y /= n_p2p;
 
     const pq = { x: p1_p.x + p2_p.x, y: p1_p.y + p2_p.y };
 
@@ -38,7 +37,7 @@ function polygonScale(path, width) {
     };
   }
 
-  const length = path.length;
+  const { length } = path;
   const result = [];
   result.push(compute(path.at(-1), path[0], path[1]));
   for (let i = 1, l = length - 1; i < l; i++) {

@@ -46,9 +46,7 @@ function init() {
 }
 
 function initRenderer() {
-  const props = {
-    antialias: true,
-  };
+  const props = { antialias: true };
   const renderer = new WebGLRenderer(props);
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
@@ -77,9 +75,7 @@ function initGroundPlane(scene) {
 
   // create the ground plane
   const planeGeometry = new PlaneGeometry(10000, 10000);
-  const planeMaterial = new MeshPhongMaterial({
-    color: 0xffffff,
-  });
+  const planeMaterial = new MeshPhongMaterial({ color: 0xffffff });
   const plane = new Mesh(planeGeometry, planeMaterial);
   plane.receiveShadow = true;
 
@@ -201,9 +197,7 @@ function makeCurve(VectorMap, d, h = 0) {
 
 function drawLine(points, color) {
   const geometry = new BufferGeometry().setFromPoints(points);
-  const material = new LineBasicMaterial({
-    color,
-  });
+  const material = new LineBasicMaterial({ color });
   return new Line(geometry, material);
 }
 
@@ -228,11 +222,7 @@ function drawArcWaveGude(group) {
   const geometry = new BufferGeometry().setAttribute('position', new BufferAttribute(new Float32Array(totalVertices), 3));
   const mesh = new Mesh(
     geometry,
-    new MeshPhongMaterial({
-      // transparent: false,
-      // depthTest: false,
-      // color: 0x049ef4
-    }),
+    new MeshPhongMaterial({}),
   );
 
   return mesh;

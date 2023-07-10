@@ -1,14 +1,14 @@
 /*
  * @Date: 2023-06-10 16:00:40
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-12 17:38:03
- * @FilePath: /threejs-demo/packages/examples/triangle/poly2triTest.js
+ * @LastEditTime: 2023-07-10 15:18:56
+ * @FilePath: /threejs-demo/packages/examples/triangle/triangle.js
  */
-import { SweepContext, Point } from "../../lib/other/poly2tri.js";
-import { GUI } from "../../lib/util/lil-gui.module.min.js";
-import { ShapeUtils } from "../../lib/three/ShapeUtils.js";
-import { Delaunator } from "../../lib/other/delaunator.js";
-import {data} from './data.js'
+import { SweepContext, Point } from '../../lib/other/poly2tri.js';
+import { GUI } from '../../lib/util/lil-gui.module.min.js';
+import { ShapeUtils } from '../../lib/three/ShapeUtils.js';
+import { Delaunator } from '../../lib/other/delaunator.js';
+import { data } from './data.js';
 
 import {
   Mesh,
@@ -18,21 +18,21 @@ import {
   Vector3,
   BufferGeometry,
   Vector2,
-} from "../../lib/three/three.module.js";
+} from '../../lib/three/three.module.js';
 import {
   initCustomGrid,
   initOrbitControls,
   initOrthographicCamera,
   initRenderer,
-} from "../../lib/tools/common.js";
+} from '../../lib/tools/common.js';
 
 window.onload = () => {
   init();
 };
 
-var control = {
+const control = {
   dataSource: data.demo,
-  useType: "useDelaunator",
+  useType: 'useDelaunator',
   usePoly2tri,
   useEarCut,
   useDelaunator,
@@ -48,16 +48,16 @@ function init() {
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const material = new MeshBasicMaterial({
-    color: "#ff0000",
+    color: '#ff0000',
     wireframe: true,
   });
 
-  const position = control[control.useType](control.dataSource)
+  const position = control[control.useType](control.dataSource);
   console.log(position);
 
   const plane = new BufferGeometry().setAttribute(
-    "position",
-    new BufferAttribute(new Float32Array(position), 3)
+    'position',
+    new BufferAttribute(new Float32Array(position), 3),
   );
 
   const mesh = new Mesh(plane, material);
@@ -74,21 +74,21 @@ function init() {
 
   render();
 
-  const gui = new GUI();
-  gui.add(control,'dataSource',data).name('Data Source:').onChange(()=>update());
-  gui.add(control,'useType',{useDelaunator:'useDelaunator',useEarCut:'useEarCut',usePoly2tri:'usePoly2tri'}).name('Use :').onChange(()=>update());
-
-  window.scene = scene;
-
-  const update = ()=>{
+  const update = () => {
     const position = control[control.useType](control.dataSource);
     console.log(position);
     mesh.geometry.dispose();
     mesh.geometry = new BufferGeometry().setAttribute(
-      "position",
-      new BufferAttribute(new Float32Array(position), 3)
-    )
-  }
+      'position',
+      new BufferAttribute(new Float32Array(position), 3),
+    );
+  };
+
+  const gui = new GUI();
+  gui.add(control, 'dataSource', data).name('Data Source:').onChange(() => update());
+  gui.add(control, 'useType', { useDelaunator: 'useDelaunator', useEarCut: 'useEarCut', usePoly2tri: 'usePoly2tri' }).name('Use :').onChange(() => update());
+
+  window.scene = scene;
 }
 
 function usePoly2tri(data) {
@@ -178,7 +178,7 @@ function useEarCut(data) {
 function useDelaunator(data) {
   console.log('useDelaunator');
   const { path, holes } = data;
-  const total = path.concat(...(holes ?? []))
+  const total = path.concat(...(holes ?? []));
   const delaunator = new Delaunator(total);
 
   const indexes = delaunator.triangles;
@@ -190,11 +190,10 @@ function useDelaunator(data) {
 
   const result = [];
   for (let i = 0, l = indexes.length; i < l; i += 3) {
-    result.push(...totalMap[indexes[i]],0);
-    result.push(...totalMap[indexes[i+1]],0);
-    result.push(...totalMap[indexes[i+2]],0);
+    result.push(...totalMap[indexes[i]], 0);
+    result.push(...totalMap[indexes[i + 1]], 0);
+    result.push(...totalMap[indexes[i + 2]], 0);
   }
-
 
   return result;
 }

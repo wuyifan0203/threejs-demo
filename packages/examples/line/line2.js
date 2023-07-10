@@ -24,7 +24,7 @@ import {
 import { LineMaterial } from '../../lib/three/LineMaterial.js';
 import { LineSegments2 } from '../../lib/three/LineSegments2.js';
 import { LineSegmentsGeometry } from '../../lib/three/LineSegmentsGeometry.js';
-import dat from '../../lib/util/dat.gui.js'
+import dat from '../../lib/util/dat.gui.js';
 
 (function () {
   init();
@@ -63,7 +63,7 @@ function draw(scene) {
   const material = new LineMaterial({
     color: 0xff0000,
     linewidth: 3,
-    wireframe: false
+    wireframe: false,
   });
   // 4. 设置材质分辨率
   material.resolution.set(window.innerWidth, window.innerHeight);
@@ -76,6 +76,6 @@ function draw(scene) {
   console.log(scene);
 
   const gui = new dat.GUI();
-  gui.add(material,'linewidth',0.5,10,0.1);
-  gui.add(material,'wireframe');
+  gui.add(material, 'linewidth', 0.5, 10, 0.1);
+  gui.add(material, 'wireframe');
 }

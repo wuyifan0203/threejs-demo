@@ -12,7 +12,7 @@ import {
   LineBasicMaterial,
   BufferAttribute,
   Vector2,
-} from "../../lib/three/three.module.js";
+} from '../../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
@@ -20,11 +20,11 @@ import {
   resize,
   initOrthographicCamera,
   isComplexPolygon,
-} from "../../lib/tools/index.js";
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
-import { ViewHelper } from "../../lib/three/viewHelper.js";
+} from '../../lib/tools/index.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { ViewHelper } from '../../lib/three/viewHelper.js';
 
-import { GUI } from "../../lib/util/lil-gui.module.min.js";
+import { GUI } from '../../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -92,25 +92,25 @@ function init() {
   ];
 
   const test8 = [
-      new Vector3( 0.3660254037844386, 0.9162310007165113,0),
-      new Vector3( 0.3660254037844386, -0.9162310007165113,0),
-      new Vector3( 0.4068437234019832, -0.9198202128554558,0),
-      new Vector3( 0.3548990061097403, -0.9149610029779873,0),
-      new Vector3( 0.3029765403790235, -0.9098560299259333,0),
-      new Vector3( 0.25125312148107576, -0.9044619616284727,0),
-      new Vector3( 0.19985722477718126, -0.8987004349356416,0),
-      new Vector3( 0.14909142809142004, -0.8924517179356346,0),
-      new Vector3( 0.10004889478379698, -0.8855556910297906,0),
-      new Vector3( 0.15456460988750495, -0.8952830286177402,0),
-      new Vector3( 0.10784113192958364, 0,0),
-      new Vector3( 0.15456460988750495, 0.8952830286177402,0),
-      new Vector3( 0.10004889478379698, 0.8855556910297906,0),
-      new Vector3( 0.14909142809142004, 0.8924517179356346,0),
-      new Vector3( 0.19985722477718126, 0.8987004349356416,0),
-      new Vector3( 0.25125312148107576, 0.9044619616284727,0),
-      new Vector3( 0.3029765403790235, 0.9098560299259333,0),
-      new Vector3( 0.3548990061097403, 0.9149610029779873,0),
-      new Vector3( 0.4068437234019832, 0.9198202128554558,0),
+    new Vector3(0.3660254037844386, 0.9162310007165113, 0),
+    new Vector3(0.3660254037844386, -0.9162310007165113, 0),
+    new Vector3(0.4068437234019832, -0.9198202128554558, 0),
+    new Vector3(0.3548990061097403, -0.9149610029779873, 0),
+    new Vector3(0.3029765403790235, -0.9098560299259333, 0),
+    new Vector3(0.25125312148107576, -0.9044619616284727, 0),
+    new Vector3(0.19985722477718126, -0.8987004349356416, 0),
+    new Vector3(0.14909142809142004, -0.8924517179356346, 0),
+    new Vector3(0.10004889478379698, -0.8855556910297906, 0),
+    new Vector3(0.15456460988750495, -0.8952830286177402, 0),
+    new Vector3(0.10784113192958364, 0, 0),
+    new Vector3(0.15456460988750495, 0.8952830286177402, 0),
+    new Vector3(0.10004889478379698, 0.8855556910297906, 0),
+    new Vector3(0.14909142809142004, 0.8924517179356346, 0),
+    new Vector3(0.19985722477718126, 0.8987004349356416, 0),
+    new Vector3(0.25125312148107576, 0.9044619616284727, 0),
+    new Vector3(0.3029765403790235, 0.9098560299259333, 0),
+    new Vector3(0.3548990061097403, 0.9149610029779873, 0),
+    new Vector3(0.4068437234019832, 0.9198202128554558, 0),
   ];
 
   const testList = {
@@ -125,7 +125,7 @@ function init() {
   };
 
   const geometry = new BufferGeometry();
-  const material = new LineBasicMaterial({ color: "orange" });
+  const material = new LineBasicMaterial({ color: 'orange' });
   const lineLoop = new LineLoop(geometry, material);
 
   lineLoop.position.z = 2;
@@ -142,7 +142,7 @@ function init() {
   }
 
   const controlers = {
-    select: "test1",
+    select: 'test1',
     log() {
       console.log(isComplexPolygon(testList[this.select]));
     },
@@ -150,23 +150,23 @@ function init() {
 
   convertPosition(testList[controlers.select]);
   lineLoop.geometry.setAttribute(
-    "position",
-    new BufferAttribute(new Float32Array(position), 3)
+    'position',
+    new BufferAttribute(new Float32Array(position), 3),
   );
-  lineLoop.geometry.getAttribute("position").needsUpdate = true;
+  lineLoop.geometry.getAttribute('position').needsUpdate = true;
 
   const gui = new GUI();
 
-  gui.add(controlers, "select", Object.keys(testList)).onChange((e) => {
+  gui.add(controlers, 'select', Object.keys(testList)).onChange((e) => {
     convertPosition(testList[e]);
     lineLoop.geometry.setAttribute(
-      "position",
-      new BufferAttribute(new Float32Array(position), 3)
+      'position',
+      new BufferAttribute(new Float32Array(position), 3),
     );
-    lineLoop.geometry.getAttribute("position").needsUpdate = true;
+    lineLoop.geometry.getAttribute('position').needsUpdate = true;
   });
 
-  gui.add(controlers, "log").name("Log is Sample Polygon (press F12)");
+  gui.add(controlers, 'log').name('Log is Sample Polygon (press F12)');
 
   function render() {
     renderer.clear();

@@ -10,15 +10,12 @@ import {
   MeshPhongMaterial,
   DoubleSide,
   Mesh,
-  PlaneGeometry,
   DirectionalLight,
   BoxGeometry,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import { ViewHelper } from '../../lib/three/viewHelper.js';
-import {
-  initRenderer, resize,
-} from '../../lib/tools/index.js';
+import { initRenderer, resize } from '../../lib/tools/index.js';
 import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
 
 import { Stats } from '../../lib/util/Stats.js';
@@ -78,14 +75,6 @@ function init() {
   addLight(1, -1, -2);
 
   const createMaterial = (color) => new MeshPhongMaterial({ ...defaultParams, color });
-  const plane = new PlaneGeometry(2, 2);
-
-  const meshes = {
-    planeMesh1: new Mesh(plane, createMaterial('red')),
-    planeMesh2: new Mesh(plane, createMaterial('yellow')),
-    planeMesh3: new Mesh(plane, createMaterial('blue')),
-    planeMesh4: new Mesh(plane, createMaterial('green')),
-  };
 
   // scene.add(
   // meshes.planeMesh1,

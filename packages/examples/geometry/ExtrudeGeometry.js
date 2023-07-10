@@ -102,9 +102,7 @@ function draw(scene) {
     side: 2,
   });
 
-  const controls = {
-    drawFunc: list[0],
-  };
+  const controls = { drawFunc: list[0] };
 
   const extrudeSettings = {
     steps: 2,
@@ -141,14 +139,14 @@ function draw(scene) {
     mesh.geometry = new ExtrudeGeometry(getShape(funcList[controls.drawFunc]), extrudeSettings);
   }
 
-  gui.add(controls, 'drawFunc', list).onChange((e) => update());
+  gui.add(controls, 'drawFunc', list).onChange(() => update());
   gui.add(material, 'wireframe');
-  gui.add(extrudeSettings, 'steps', 1, 10, 1).onChange((e) => update());
-  gui.add(extrudeSettings, 'depth', 1, 10, 0.1).onChange((e) => update());
-  gui.add(extrudeSettings, 'bevelEnabled', 1, 10, 1).onChange((e) => update());
-  gui.add(extrudeSettings, 'bevelSize', 0, 10, 1).onChange((e) => update());
-  gui.add(extrudeSettings, 'bevelSegments', 1, 10, 1).onChange((e) => update());
-  gui.add(extrudeSettings, 'bevelOffset', 1, 10, 1).onChange((e) => update());
+  gui.add(extrudeSettings, 'steps', 1, 10, 1).onChange(() => update());
+  gui.add(extrudeSettings, 'depth', 1, 10, 0.1).onChange(() => update());
+  gui.add(extrudeSettings, 'bevelEnabled', 1, 10, 1).onChange(() => update());
+  gui.add(extrudeSettings, 'bevelSize', 0, 10, 1).onChange(() => update());
+  gui.add(extrudeSettings, 'bevelSegments', 1, 10, 1).onChange(() => update());
+  gui.add(extrudeSettings, 'bevelOffset', 1, 10, 1).onChange(() => update());
 
   scene.add(mesh);
 }

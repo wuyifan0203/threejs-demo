@@ -12,12 +12,12 @@ import {
   AmbientLight,
   DirectionalLight,
   PlaneGeometry,
-} from "../../lib/three/three.module.js";
-import { OrbitControls } from "../../lib/three/OrbitControls.js";
-import { initRenderer, resize } from "../../lib/tools/index.js";
-import { GUI } from "../../lib/util/lil-gui.module.min.js";
+} from '../../lib/three/three.module.js';
+import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { initRenderer, resize } from '../../lib/tools/index.js';
+import { GUI } from '../../lib/util/lil-gui.module.min.js';
 
-import { Stats } from "../../lib/util/Stats.js";
+import { Stats } from '../../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -27,12 +27,12 @@ function init() {
   const renderer = initRenderer();
   const stats = new Stats();
   stats.showPanel(0);
-  document.getElementById("webgl-output").append(stats.dom);
+  document.getElementById('webgl-output').append(stats.dom);
   const camera = new PerspectiveCamera(
     70,
     window.innerWidth / window.innerHeight,
     1,
-    100000
+    100000,
   );
   camera.up.set(0, 0, 1);
   camera.position.set(5, 5, 5);
@@ -58,9 +58,9 @@ function init() {
   render();
   window.camera = camera;
   window.scene = scene;
-  const redMaterial = new MeshPhongMaterial({ color: "red" });
-  const greenMaterial = new MeshPhongMaterial({ color: "blue" });
-  const blueMaterial = new MeshPhongMaterial({ color: "yellow" });
+  const redMaterial = new MeshPhongMaterial({ color: 'red' });
+  const greenMaterial = new MeshPhongMaterial({ color: 'blue' });
+  const blueMaterial = new MeshPhongMaterial({ color: 'yellow' });
 
   const mlist = [redMaterial, greenMaterial, blueMaterial];
   const plane = new PlaneGeometry(1, 1);
@@ -90,7 +90,7 @@ function init() {
     opacity: 1,
   };
 
-  gui.add(material, "polygonOffset").onChange((e) => {
+  gui.add(material, 'polygonOffset').onChange((e) => {
     mlist.forEach((m) => {
       renderer.state.setPolygonOffset(true, 1);
       m.polygonOffset = e;
@@ -98,49 +98,49 @@ function init() {
     });
   });
 
-  gui.add(material, "polygonOffsetFactor", -100, 100, 1).onChange((e) => {
+  gui.add(material, 'polygonOffsetFactor', -100, 100, 1).onChange((e) => {
     mlist.forEach((m) => {
       m.polygonOffsetFactor = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "polygonOffsetUnits", -100, 100, 0.1).onChange((e) => {
+  gui.add(material, 'polygonOffsetUnits', -100, 100, 0.1).onChange((e) => {
     mlist.forEach((m) => {
       m.polygonOffsetUnits = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "shininess", 0, 100, 0.01).onChange((e) => {
+  gui.add(material, 'shininess', 0, 100, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.shininess = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "transparent").onChange((e) => {
+  gui.add(material, 'transparent').onChange((e) => {
     mlist.forEach((m) => {
       m.transparent = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "depthTest").onChange((e) => {
+  gui.add(material, 'depthTest').onChange((e) => {
     mlist.forEach((m) => {
       m.depthTest = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "depthWrite", 0, 100, 0.01).onChange((e) => {
+  gui.add(material, 'depthWrite', 0, 100, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.depthWrite = e;
       m.needsUpdate = true;
     });
   });
 
-  gui.add(material, "opacity", 0, 1, 0.01).onChange((e) => {
+  gui.add(material, 'opacity', 0, 1, 0.01).onChange((e) => {
     mlist.forEach((m) => {
       m.opacity = e;
       m.needsUpdate = true;

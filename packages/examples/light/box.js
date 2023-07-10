@@ -1,14 +1,9 @@
-/* eslint-disable indent */
-/* eslint-disable no-multi-spaces */
-/* eslint-disable no-param-reassign */
 /*
  * @Date: 2023-01-30 14:03:05
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-10 18:27:23
- * @FilePath: /threejs-demo/src/examples/light/box.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-10 15:07:15
+ * @FilePath: /threejs-demo/packages/examples/light/box.js
  */
-/* eslint-disable no-unused-vars */
-import dat from '../../lib/util/dat.gui.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
   initRenderer,
@@ -22,19 +17,13 @@ import {
   Vector3,
   Mesh,
   MeshLambertMaterial,
-  SpotLight,
   AmbientLight,
-  SpotLightHelper,
   BoxGeometry,
-  Color,
   BufferGeometry,
-  MeshBasicMaterial,
   BufferAttribute,
   DirectionalLight,
   PlaneGeometry,
 } from '../../lib/three/three.module.js';
-
-const stop = false;
 
 const init = () => {
   const renderer = initRenderer();
@@ -74,7 +63,7 @@ const init = () => {
   window.scene = scene;
 };
 
-function draw(scene, light, helper) {
+function draw(scene) {
   const material = new MeshLambertMaterial({ color: '#516000' });
   const material1 = new MeshLambertMaterial({ color: 0x516099 });
 
@@ -105,52 +94,43 @@ function draw(scene, light, helper) {
   //  0-----3
 
   const position = [
-    -1, -1, -1,    -1,  1, -1, // v0  v1
-     1,  1, -1,     1, -1, -1, // v2  v3
-    -1, -1,  1,     1, -1,  1, // v4  v5
-     1,  1,  1,    -1,  1,  1, // v6  v7
+    -1, -1, -1, -1, 1, -1, // v0  v1
+    1, 1, -1, 1, -1, -1, // v2  v3
+    -1, -1, 1, 1, -1, 1, // v4  v5
+    1, 1, 1, -1, 1, 1, // v6  v7
   ];
 
   const index = [
-    0, 1, 2, 2, 3, 0,    4, 5, 6, 6, 7, 4,  //  down up
-    1, 0, 4, 4, 7, 1,    2, 6, 5, 5, 3, 2,  // left right
-    0, 3, 5, 5, 4, 0,    1, 7, 6, 6, 2, 1,  // front back
-  ];
-
-  const normal = [
-    0, 0, -1, 0, 0, -1, 0, 0, -1,   0, 0, -1, 0, 0, -1, 0, 0, -1, // down
-    0, 0, 1, 0, 0, 1, 0, 0, 1,    0, 0, 1, 0, 0, 1, 0, 0, 1, // up
-    -1, 0, 0, -1, 0, 0, -1, 0, 0,    -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, // left
-    1, 0, 0, 1, 0, 0, 1, 0, 0,    1, 0, 0, 1, 0, 0, 1, 0, 0, // right
-    0, -1, 0, 0, -1, 0, 0, -1, 0,    0, -1, 0, 0, -1, 0, 0, -1, 0, // front
-    0, 1, 0, 0, 1, 0, 0, 1, 0,     0, 1, 0, 0, 1, 0, 0, 1, 0, // back
+    0, 1, 2, 2, 3, 0, 4, 5, 6, 6, 7, 4, //  down up
+    1, 0, 4, 4, 7, 1, 2, 6, 5, 5, 3, 2, // left right
+    0, 3, 5, 5, 4, 0, 1, 7, 6, 6, 2, 1, // front back
   ];
 
   const position1 = [
-    1.0, 1.0, 1.0,  -1.0, 1.0, 1.0,  -1.0, -1.0, 1.0,   1.0, -1.0, 1.0,  // v0-v1-v2-v3 front
-    1.0, 1.0, 1.0,   1.0, -1.0, 1.0,   1.0, -1.0, -1.0,   1.0, 1.0, -1.0,  // v0-v3-v4-v5 right
-    1.0, 1.0, 1.0,   1.0, 1.0, -1.0,  -1.0, 1.0, -1.0,  -1.0, 1.0, 1.0,  // v0-v5-v6-v1 up
-    -1.0, 1.0, 1.0,  -1.0, 1.0, -1.0,  -1.0, -1.0, -1.0,  -1.0, -1.0, 1.0,  // v1-v6-v7-v2 left
-    -1.0, -1.0, -1.0,   1.0, -1.0, -1.0,   1.0, -1.0, 1.0,  -1.0, -1.0, 1.0,  // v7-v4-v3-v2 down
-    1.0, -1.0, -1.0,  -1.0, -1.0, -1.0,  -1.0, 1.0, -1.0,   1.0, 1.0, -1.0,   // v4-v7-v6-v5 back
+    1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, 1.0, // v0-v1-v2-v3 front
+    1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0, // v0-v3-v4-v5 right
+    1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, // v0-v5-v6-v1 up
+    -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, // v1-v6-v7-v2 left
+    -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, // v7-v4-v3-v2 down
+    1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0, // v4-v7-v6-v5 back
   ];
 
   const index1 = [
-    0, 1, 2,   0, 2, 3,    // front
-    4, 5, 6,   4, 6, 7,    // right
-    8, 9, 10,   8, 10, 11,    // up
-    12, 13, 14,  12, 14, 15,    // left
-    16, 17, 18,  16, 18, 19,    // down
-    20, 21, 22,  20, 22, 23,     // back
+    0, 1, 2, 0, 2, 3, // front
+    4, 5, 6, 4, 6, 7, // right
+    8, 9, 10, 8, 10, 11, // up
+    12, 13, 14, 12, 14, 15, // left
+    16, 17, 18, 16, 18, 19, // down
+    20, 21, 22, 20, 22, 23, // back
   ];
 
   const normal1 = [
-    0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,   0.0, 0.0, 1.0,  // v0-v1-v2-v3 front
-    1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,   1.0, 0.0, 0.0,  // v0-v3-v4-v5 right
-    0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,   0.0, 1.0, 0.0,  // v0-v5-v6-v1 up
-    -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  -1.0, 0.0, 0.0,  // v1-v6-v7-v2 left
-    0.0, -1.0, 0.0,   0.0, -1.0, 0.0,   0.0, -1.0, 0.0,   0.0, -1.0, 0.0,  // v7-v4-v3-v2 down
-    0.0, 0.0, -1.0,   0.0, 0.0, -1.0,   0.0, 0.0, -1.0,   0.0, 0.0, -1.0,   // v4-v7-v6-v5 back
+    0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, // v0-v1-v2-v3 front
+    1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, // v0-v3-v4-v5 right
+    0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, // v0-v5-v6-v1 up
+    -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, // v1-v6-v7-v2 left
+    0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, // v7-v4-v3-v2 down
+    0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, 0.0, 0.0, -1.0, // v4-v7-v6-v5 back
   ];
 
   geometry.setAttribute('position', new BufferAttribute(new Float32Array(position), 3));
@@ -161,8 +141,8 @@ function draw(scene, light, helper) {
   geometry1.setIndex(index1);
   geometry1.setAttribute('normal', new BufferAttribute(new Float32Array(normal1), 3));
 
-//   scene.add(mesh);
-//   scene.add(mesh1);
+  //   scene.add(mesh);
+  //   scene.add(mesh1);
 
   //  0----1----3
   //   \   |   /
@@ -186,24 +166,19 @@ function draw(scene, light, helper) {
   ];
 
   const normal3 = [
-   -0.866, 0.866, 0.866,
-   -0.866, 0.866, 0.866,
-   -0.866, 0.866, 0.866,
-   0.866, 0.866, 0.866,
-   0.866, 0.866, 0.866,
-   0.866, 0.866, 0.866,
+    -0.866, 0.866, 0.866,
+    -0.866, 0.866, 0.866,
+    -0.866, 0.866, 0.866,
+    0.866, 0.866, 0.866,
+    0.866, 0.866, 0.866,
+    0.866, 0.866, 0.866,
   ];
 
-  const planeMesh = new Mesh(plane, material1);
   plane.setAttribute('position', new BufferAttribute(new Float32Array(position3), 3));
   plane.setAttribute('normal', new BufferAttribute(new Float32Array(normal3), 3));
   plane.setIndex(index2);
 
-//   demoMesh.rotateZ(45);
-  demoMesh.visible  = false;
-
-//   planeMesh.rotateZ(20);
-//   scene.add(planeMesh);
+  demoMesh.visible = false;
 
   const p0 = new Vector3(0, 0, -1);
   const p1 = new Vector3(0, 0, 2);

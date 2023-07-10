@@ -4,7 +4,6 @@
  * @LastEditTime: 2023-05-06 09:51:26
  * @FilePath: /threejs-demo/packages/examples/noise/perlinNoiseDemo1.js
  */
-/* eslint-disable no-unused-vars */
 
 import {
   Scene,

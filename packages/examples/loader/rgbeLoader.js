@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-02 18:30:01
- * @FilePath: /threejs-demo/src/examples/loader/rgbeLoader.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-10 15:11:18
+ * @FilePath: /threejs-demo/packages/examples/loader/rgbeLoader.js
  */
 import {
   Scene,
@@ -109,7 +109,7 @@ function draw(scene, renderer, OrbitControls) {
     loader.setPath(`../../resources/texture/${path}/`);
     const texture = loader.load(
       `${path}.hdr`,
-      (texture) => {
+      () => {
         console.log('Load finished !');
       },
       (ProgressEvent) => {

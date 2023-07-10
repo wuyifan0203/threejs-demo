@@ -1,13 +1,7 @@
 /*
- * @Date: 2023-06-06 17:59:11
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 13:53:44
- * @FilePath: /threejs-demo/packages/examples/material/clipping.js
- */
-/*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-07 09:44:40
+ * @LastEditTime: 2023-07-10 15:13:07
  * @FilePath: /threejs-demo/packages/examples/material/clipping.js
  */
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
@@ -108,9 +102,7 @@ function init() {
 
   resize(renderer, camera);
 
-  const control = {
-    useGlobalClipping: true,
-  };
+  const control = { useGlobalClipping: true };
 
   const gui = new GUI();
 

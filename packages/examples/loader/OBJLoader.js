@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-30 14:03:05
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-02 18:30:05
- * @FilePath: /threejs-demo/src/examples/loader/OBJLoader.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-10 15:10:16
+ * @FilePath: /threejs-demo/packages/examples/loader/OBJLoader.js
  */
 /* eslint-disable no-unused-vars */
 import dat from '../../lib/util/dat.gui.js';
@@ -26,12 +26,6 @@ import {
   Color,
   Matrix4,
 } from '../../lib/three/three.module.js';
-
-window.onload = () => {
-  init();
-};
-
-const stop = false;
 
 const init = () => {
   const renderer = initRenderer();
@@ -83,12 +77,18 @@ const init = () => {
   window.scene = scene;
 };
 
+window.onload = () => {
+  init();
+};
+
+const stop = false;
+
 function draw(scene, light, helper) {
   const modelPath = '../../resources/models/Mountain lion.OBJ';
   const loader = new OBJLoader();
   const newMin = new Vector3();
   const newMax = new Vector3();
-  new Promise((resolve, reject) => {
+  const load = new Promise((resolve, reject) => {
     loader.load(
       modelPath,
       (obj) => {

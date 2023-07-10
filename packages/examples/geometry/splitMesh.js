@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-13 13:42:58
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-07 10:17:24
+ * @LastEditTime: 2023-07-10 15:05:27
  * @FilePath: /threejs-demo/packages/examples/geometry/splitMesh.js
  */
 import {
@@ -400,6 +400,7 @@ function draw(scene) {
     };
   }
 
+  // eslint-disable-next-line consistent-return
   function convertLoopDirection(loop, direction = 'AC') {
     const last = loop.at(-1);
     const first = loop[0];
@@ -493,29 +494,29 @@ function draw(scene) {
   const gui = new GUI();
 
   const planeNormalFolder = gui.addFolder('Plane Normal');
-  planeNormalFolder.add(control.planeNormal, 'x', -1, 1, 0.1).onChange((e) => {
+  planeNormalFolder.add(control.planeNormal, 'x', -1, 1, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
-  planeNormalFolder.add(control.planeNormal, 'y', -1, 1, 0.1).onChange((e) => {
+  planeNormalFolder.add(control.planeNormal, 'y', -1, 1, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
-  planeNormalFolder.add(control.planeNormal, 'z', -1, 1, 0.1).onChange((e) => {
+  planeNormalFolder.add(control.planeNormal, 'z', -1, 1, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
 
   const planePointFolder = gui.addFolder('Plane Point');
-  planePointFolder.add(control.planePoint, 'x', -3, 3, 0.1).onChange((e) => {
+  planePointFolder.add(control.planePoint, 'x', -3, 3, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
-  planePointFolder.add(control.planePoint, 'y', -3, 3, 0.1).onChange((e) => {
+  planePointFolder.add(control.planePoint, 'y', -3, 3, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
-  planePointFolder.add(control.planePoint, 'z', -3, 3, 0.1).onChange((e) => {
+  planePointFolder.add(control.planePoint, 'z', -3, 3, 0.1).onChange(() => {
     updateSplitMeshLine();
   });
 
   const MeshFolder = gui.addFolder('Mesh Folder');
-  MeshFolder.add(control, 'geometry', ['sphereGeometry', 'torusGeometry']).onChange((e) => {
+  MeshFolder.add(control, 'geometry', ['sphereGeometry', 'torusGeometry']).onChange(() => {
     updateSplitMeshLine();
   });
   MeshFolder.add(mesh, 'visible').name('Target Mesh visible');

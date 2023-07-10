@@ -95,11 +95,11 @@ function init() {
   const gui = new dat.GUI();
   gui.width = 330;
 
-  gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange((e) => {
+  gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange(() => {
     switchCamera();
   });
 
-  gui.add(controler, 'type', { PerspectiveCamera: 'p', OrthographicCamera: 'o' }).name('Camera Type:').onChange((e) => {
+  gui.add(controler, 'type', { PerspectiveCamera: 'p', OrthographicCamera: 'o' }).name('Camera Type:').onChange(() => {
     switchCamera();
   });
 

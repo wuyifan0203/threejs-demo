@@ -8,9 +8,7 @@ import {
   MeshLambertMaterial,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import {
-  initRenderer, resize,
-} from '../../lib/tools/index.js';
+import { initRenderer, resize } from '../../lib/tools/index.js';
 import { GUI } from '../../lib/util/lil-gui.module.min.js';
 
 import { Stats } from '../../lib/util/Stats.js';

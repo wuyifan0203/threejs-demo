@@ -15,7 +15,9 @@ import {
   PlaneGeometry,
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { initRenderer, initOrthographicCamera, initDefaultLighting } from '../../lib/tools/index.js';
+import {
+  initRenderer, initOrthographicCamera, initDefaultLighting,
+} from '../../lib/tools/index.js';
 import {
   World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase,
 } from '../../lib/other/physijs/cannon.js';

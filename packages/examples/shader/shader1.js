@@ -1,8 +1,7 @@
-/* eslint-disable operator-linebreak */
 /*
  * @Date: 2023-05-10 18:26:20
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-11 17:53:30
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-10 15:17:00
  * @FilePath: /threejs-demo/packages/examples/shader/shader1.js
  * @ShaderExample:https://www.shadertoy.com/view/4dl3zn
  */
@@ -86,12 +85,8 @@ function init() {
 
   const material = new ShaderMaterial({
     uniforms: {
-      iTime: {
-        value: 1.0,
-      },
-      iResolution: {
-        value: new Vector2(1, 1),
-      },
+      iTime: { value: 1.0 },
+      iResolution: { value: new Vector2(1, 1) },
     },
     vertexShader,
     fragmentShader,

@@ -1,16 +1,9 @@
-/* eslint-disable no-unused-vars */
-
 import {
   Scene,
   Mesh,
   BufferGeometry,
   Vector3,
-  DoubleSide,
-  LineBasicMaterial,
-  EdgesGeometry,
   BufferAttribute,
-  LineSegments,
-  MeshBasicMaterial,
   BoxBufferGeometry,
   MeshLambertMaterial,
   Matrix4,
@@ -29,7 +22,6 @@ import {
   initDefaultLighting,
   rotationFormula,
   createMirrorMatrix,
-  normal2Euler,
 } from '../../lib/tools/index.js';
 
 (function () {
@@ -95,8 +87,6 @@ function draw(scene) {
   const modelMatrix = new Matrix4().compose(position, quaternion, scale);
 
   const translateMatrix = new Matrix4().makeTranslation(-5, -1, 0);
-
-  const rotateMatrix = new Matrix4().makeRotationFromEuler(new Euler(45, 0, 0));
 
   const mirrorMatrix = createMirrorMatrix(normal, origin);
 

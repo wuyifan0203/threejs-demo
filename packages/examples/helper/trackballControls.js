@@ -13,7 +13,6 @@ import {
 } from '../../lib/three/three.module.js';
 import {
   initRenderer,
-  initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
@@ -28,7 +27,7 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const camera = initOrthographicCamera(new Vector3(1000,1000, 1000));
+  const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
   const scene = new Scene();
   renderer.setClearColor(0xffffff);
   renderer.autoClear = false;
@@ -41,9 +40,9 @@ function init() {
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   controls.rotateSpeed = 3.0;
-	controls.zoomSpeed = 3;
-	controls.panSpeed = 0.8;
-  controls.staticMoving= true
+  controls.zoomSpeed = 3;
+  controls.panSpeed = 0.8;
+  controls.staticMoving = true;
 
   draw(scene);
 

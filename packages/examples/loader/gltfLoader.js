@@ -8,15 +8,7 @@ import {
   Scene,
   PointLight,
   PerspectiveCamera,
-  BufferGeometry,
-  PointsMaterial,
-  AdditiveBlending,
-  Points,
-  MeshLambertMaterial,
-  Float32BufferAttribute,
   AmbientLight,
-  MeshBasicMaterial,
-  Mesh,
   DirectionalLight,
   MeshPhongMaterial,
 } from '../../lib/three/three.module.js';
@@ -70,7 +62,7 @@ function init() {
   window.scene = scene;
 }
 
-function draw(scene, camera) {
+function draw(scene) {
   // model
   const modelPath = '../../resources/models/ar15_rifle/scene.gltf';
   const loader = new GLTFLoader();
@@ -82,7 +74,7 @@ function draw(scene, camera) {
       color: '#ffe8a3',
       depthTest: true,
     });
-    modelMesh.scale.set(20,20,20)
+    modelMesh.scale.set(20, 20, 20);
     scene.add(modelMesh);
   };
   const onError = (e) => {

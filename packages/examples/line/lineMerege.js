@@ -1,15 +1,10 @@
-/* eslint-disable no-unused-vars */
-
 import {
   Scene,
-  // Mesh,
   BufferGeometry,
-  // BoxBufferGeometry,
   LineBasicMaterial,
   EdgesGeometry,
   BufferAttribute,
   LineSegments,
-  // MeshBasicMaterial
 } from '../../lib/three/three.module.js';
 import { OrbitControls } from '../../lib/three/OrbitControls.js';
 import {
@@ -42,9 +37,7 @@ function init() {
 }
 
 function draw(scene) {
-  const lineMaterial = new LineBasicMaterial({
-    color: 0xffffff,
-  });
+  const lineMaterial = new LineBasicMaterial({ color: 0xffffff });
 
   // const basicMaterial = new MeshBasicMaterial({ color: 0xff98ff });
 
