@@ -72,8 +72,8 @@ function initOrthographicCamera(initialPosition) {
  * @param {Scene} scene
  * @return {Mesh}
  */
-function initGroundPlane(scene) {
-  const planeGeometry = new PlaneGeometry(200, 200);
+function initGroundPlane(scene,size = {x:200,y:200}) {
+  const planeGeometry = new PlaneGeometry(size.x, size.y);
   const planeMaterial = new MeshPhongMaterial({
     color: 0xd3d3d3
   });
