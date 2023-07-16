@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-05 10:53:08
+ * @LastEditTime: 2023-07-17 01:30:09
  * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
  */
 
@@ -9,10 +9,19 @@ import {
   UIText, UISpan, UIBreak,
 } from '../../utils/ui';
 
+const _objLabel = 'objects';
+const _vecLabel = 'vertices';
+const _triLabel = 'triangles';
+const _famLabel = 'frameTime';
+
+const _style = {
+    bottom: '10px',
+    left: '10px',
+    position: 'absolute',
+}
+
 class Stats {
   constructor(editor) {
-    this.enable = true;
-
     const dom = new UISpan();
     const objectCol = new UIText();
     const verticesCol = new UIText();
@@ -27,26 +36,30 @@ class Stats {
     dom.add(new UIBreak());
     dom.add(frameTimeCol);
 
-    dom.setStyle({
-      bottom: '10px',
-      left: '10px',
-      position: 'absolute',
-    });
+    dom.setStyle(_style);
     dom.setId('Stats');
 
-    const [objLabel, vecLabel, triLabel, famLabel] = [
-      'objects : ',
-      'vertices : ',
-      'triangles : ',
-      'frameTime : ',
-    ];
-
-    objectCol.setTextContent(`${objLabel}0`);
-    verticesCol.setTextContent(`${vecLabel}0`);
-    trianglesCol.setTextContent(`${triLabel}0`);
-    frameTimeCol.setTextContent(`${famLabel}0 ms`);
+    objectCol.setTextContent(`${_objLabel}0`);
+    verticesCol.setTextContent(`${_vecLabel}0`);
+    trianglesCol.setTextContent(`${_triLabel}0`);
+    frameTimeCol.setTextContent(`${_famLabel}0 ms`);
 
     this.domElement = dom.domElement;
+
+    editor.signals.sceneRendered.add((frameTime) => {
+      frameTimeCol.setTextContent(`${_famLabel + frameTime.toFixed(2)} ms`);
+    });
+
+    editor.signals.objectAdded.add(update);
+    editor.signals.objectRemoved.add(update);
+
+    this.show = function () {
+      dom.show();
+    };
+
+    this.hide = function () {
+      dom.hide();
+    };
 
     function update() {
       const { scene } = editor;
@@ -57,8 +70,7 @@ class Stats {
 
       for (let i = 0, l = scene.children.length; i < l; i++) {
         const object = scene.children[i];
-
-        // eslint-disable-next-line no-loop-func
+        
         object.traverseVisible((child) => {
           objects++;
 
@@ -77,25 +89,10 @@ class Stats {
         });
       }
 
-      objectCol.setTextContent(objLabel + objects);
-      verticesCol.setTextContent(vecLabel + vertices);
-      trianglesCol.setTextContent(triLabel + triangles);
+      objectCol.setTextContent(_objLabel + objects);
+      verticesCol.setTextContent(_vecLabel + vertices);
+      trianglesCol.setTextContent(_triLabel + triangles);
     }
-
-    editor.signals.sceneRendered.add((frameTime) => {
-      frameTimeCol.setTextContent(`${famLabel + frameTime.toFixed(2)} ms`);
-    });
-
-    editor.signals.objectAdded.add(update);
-    editor.signals.objectRemoved.add(update);
-
-    this.show = function () {
-      dom.show();
-    };
-
-    this.hide = function () {
-      dom.hide();
-    };
   }
 }
 
