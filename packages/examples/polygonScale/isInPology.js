@@ -5,9 +5,7 @@
  * @FilePath: /threejs-demo/src/examples/pology/isInPology.js
  */
 
-export {
-  pointInPolygon,
-};
+export { pointInPolygon };
 
 function pointInPolygon(point, vs) {
   const x = point[0]; const y = point[1];

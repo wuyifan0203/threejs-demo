@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-19 14:33:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-19 15:00:37
+ * @LastEditTime: 2023-07-17 11:21:52
  * @FilePath: /threejs-demo/packages/lib/tools/dataFormat.js
  */
 
@@ -18,6 +18,16 @@ function vec2ToVec3Vertex(pointList, h = 0) {
 
 function arrayToVec2(data) {
   return data.map((d) => new Vector2(d[0], d[1]));
+}
+
+function array2DToVertex(data,h = 0) {
+  const vertices = [];
+  const { length } = data;
+  for (let index = 0; index < length; index++) {
+    const [x,y] = data[index];
+    vertices.push(x, y, h);
+  }
+  return vertices;
 }
 
 /**
@@ -40,5 +50,6 @@ function dataToVec2(data){
 export { 
     vec2ToVec3Vertex, 
     arrayToVec2,
-    dataToVec2
+    dataToVec2,
+    array2DToVertex
  };

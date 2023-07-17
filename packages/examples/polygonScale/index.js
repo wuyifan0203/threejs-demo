@@ -1,4 +1,10 @@
 /*
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-17 10:55:24
+ * @FilePath: /threejs-demo/packages/examples/polygonScale/index.js
+ */
+/*
  * @Date: 2022-11-29 19:36:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
  * @LastEditTime: 2023-07-10 15:15:18
