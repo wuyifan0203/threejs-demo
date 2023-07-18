@@ -1,14 +1,15 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 import {
-  BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector3,
+  BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector2, Vector3,
 } from '../../lib/three/three.module.js';
 import {
   initCustomGrid,
-  initOrbitControls, initOrthographicCamera, initRenderer, array2DToVertex,
+  initOrbitControls, initOrthographicCamera, initRenderer, array2DToVertex, vec2ToVec3Vertex,
 } from '../../lib/tools/index.js';
 
 import { innerPoints } from './compute.js';
+import { polygonScale } from './computed2.js';
 
 window.onload = function () {
   init();
@@ -28,8 +29,8 @@ function init() {
     orbitControl.update();
   }
 
-  function displayData(data, color = 0x000000, color1 = 0xff0000) {
-    const lineBuffer = array2DToVertex(data);
+  function displayData(data, h, color = 0x000000, color1 = 0xff0000) {
+    const lineBuffer = array2DToVertex(data, h);
     const geometry = new BufferGeometry().setAttribute('position', new Float32BufferAttribute(lineBuffer, 3));
     const lineM = new LineBasicMaterial({ color });
     const pointM = new PointsMaterial({ color: color1, size: 5 });
@@ -40,17 +41,24 @@ function init() {
     scene.add(point);
   }
 
-  displayData(data);
+  function display(data, color = 0x000000, color1 = 0xff0000) {
+    const lineBuffer = vec2ToVec3Vertex(data);
+    const geometry = new BufferGeometry().setAttribute('position', new Float32BufferAttribute(lineBuffer, 3));
+    const lineM = new LineBasicMaterial({ color });
+    const pointM = new PointsMaterial({ color: color1, size: 5 });
 
-  // expend
+    const line = new LineLoop(geometry, lineM);
+    const point = new Points(geometry, pointM);
+    scene.add(line);
+    scene.add(point);
+  }
 
-  // displayData(expendWidth(data, -0.17632698070846498), 'orange', 'blue');
-  // displayData(expendWidth(data, 0.17632698070846498), 'orange', 'blue');
-  // displayData(expendWidth(data, 0.3), 'orange', 'blue');
-  // displayData(expendWidth(data, 0.8), 'orange', 'blue');
+  display(expend(data, -0.3), 'skyblue', 'blue');
 
-  displayData(top, 'orange', 'blue');
-  displayData(down, 'green', 'yellow');
+  display(expend(data, -0.5), 'orange', 'yellow');
+  display(expend(data, 0));
+  // display(expend(data, 0.3), 'pink', 'gray');
+  // display(expend(data, 0.5), 'green', 'aqua');
 }
 
 var data = [
@@ -4871,4 +4879,9 @@ function expendWidth(pointList, width) {
   }
 
   return result;
+}
+
+function expend(data, width) {
+  data = data.map((i) => new Vector2(i[0], i[1]));
+  return polygonScale(data, width);
 }
