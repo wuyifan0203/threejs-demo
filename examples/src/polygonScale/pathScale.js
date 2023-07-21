@@ -2,11 +2,11 @@
 /* eslint-disable no-var */
 import {
   BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector2, Vector3, Mesh, MeshBasicMaterial, Color,
-} from '../../packages/lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initCustomGrid,
   initOrbitControls, initOrthographicCamera, initRenderer, array2DToVertex, vec2ToVec3Vertex,
-} from '../../packages/lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 import { innerPoints } from './compute.js';
 import { polygonScale } from './computed2.js';

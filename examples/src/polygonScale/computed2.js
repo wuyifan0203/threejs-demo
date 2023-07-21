@@ -9,12 +9,12 @@
 
 import {
   BufferGeometry, Float16BufferAttribute, LineBasicMaterial, LineLoop, LineSegments, MeshBasicMaterial, Vector2,
-} from '../../packages/lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   isComplexPolygon, vec2ToData, vec2ToVec3, vec2ToVec3Vertex,
-} from '../../packages/lib/tools/index.js';
+} from '../lib/tools/index.js';
 import { EarCut } from './Earcut.js';
-import { SweepContext, Point } from '../../packages/lib/other/poly2tri.js';
+import { SweepContext, Point } from '../lib/other/poly2tri.js';
 //
 // R       P        T
 // .-------.--------.
