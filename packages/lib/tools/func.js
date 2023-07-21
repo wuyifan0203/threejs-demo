@@ -179,11 +179,7 @@ function CC2SSC(canvasX, canvasY, canvasWidth, canvasHeight) {
   }
 }
 
-/**
- * @description: 判断是否为简单多边型(既图形是否打结)
- * @param {Array<Vector2>} points 围成多边形的所有点，按先后顺序组成的数组
- * @return {boolean}
- */
+
 
 /**
  * 叉乘
@@ -221,8 +217,9 @@ const extractArray = (array, startIndex, length) => {
 };
 
 /**
- * 是否是复杂多边形
- * @param points 多边形的顶点
+ * @description: 判断是否为简单多边型(既图形是否打结)
+ * @param {Array<Vector2>} points 围成多边形的所有点，按先后顺序组成的数组
+ * @return {boolean}
  */
 const isComplexPolygon = (points) => {
   const length = points.length;

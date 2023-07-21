@@ -1,7 +1,7 @@
 /* eslint-disable vars-on-top */
 /* eslint-disable no-var */
 import {
-  BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector2, Vector3,
+  BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector2, Vector3, Mesh, MeshBasicMaterial, Color,
 } from '../../lib/three/three.module.js';
 import {
   initCustomGrid,
@@ -38,7 +38,7 @@ function init() {
     const line = new LineLoop(geometry, lineM);
     const point = new Points(geometry, pointM);
     scene.add(line);
-    scene.add(point);
+    // scene.add(point);
   }
 
   function display(data, color = 0x000000, color1 = 0xff0000) {
@@ -53,10 +53,20 @@ function init() {
     scene.add(point);
   }
 
-  display(expend(data, -0.3), 'skyblue', 'blue');
+  function displayMesh(position) {
+    position.forEach((p) => {
+      const geometry = new BufferGeometry().setAttribute('position', new Float32BufferAttribute(p, 3));
+      const m = new MeshBasicMaterial({ color: new Color(random(), random(), random()), wireframe: true });
+      scene.add(new Mesh(geometry, m));
+    });
+  }
 
-  display(expend(data, -0.5), 'orange', 'yellow');
-  display(expend(data, 0));
+  // display(expend(data, 0.3, scene), 'skyblue', 'blue');
+
+  displayMesh(expend(data, 1.4, scene), 'yellow', 'green');
+
+  // display(expend(data, -0.5), 'orange', 'yellow');
+  displayData(data, 0);
   // display(expend(data, 0.3), 'pink', 'gray');
   // display(expend(data, 0.5), 'green', 'aqua');
 }
@@ -4881,7 +4891,11 @@ function expendWidth(pointList, width) {
   return result;
 }
 
-function expend(data, width) {
+function expend(data, width, scene) {
   data = data.map((i) => new Vector2(i[0], i[1]));
-  return polygonScale(data, width);
+  return polygonScale(data, width, scene);
+}
+
+function random() {
+  return Math.random();
 }

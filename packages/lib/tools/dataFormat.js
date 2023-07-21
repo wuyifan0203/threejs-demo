@@ -1,11 +1,11 @@
 /*
  * @Date: 2023-06-19 14:33:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-17 11:21:52
+ * @LastEditTime: 2023-07-19 13:18:31
  * @FilePath: /threejs-demo/packages/lib/tools/dataFormat.js
  */
 
-import { Vector2 } from "../three/three.module.js";
+import { Vector2, Vector3 } from "../three/three.module.js";
 function vec2ToVec3Vertex(pointList, h = 0) {
   const vertices = [];
   const { length } = pointList;
@@ -47,9 +47,29 @@ function dataToVec2(data){
     return res
 }
 
+function vec2ToData(data) {
+  const array = [];
+  data.forEach(v => {
+    array.push(v.x,v.y)
+  });
+
+  return array
+}
+
+function vec2ToVec3(data,h) {
+  const array = [];
+  data.forEach(v => {
+    array.push(new Vector3(v.x,v.y,h))
+  });
+
+  return array
+}
+
 export { 
     vec2ToVec3Vertex, 
     arrayToVec2,
     dataToVec2,
-    array2DToVertex
+    array2DToVertex,
+    vec2ToData,
+    vec2ToVec3
  };
