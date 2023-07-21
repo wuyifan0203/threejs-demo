@@ -12,17 +12,17 @@ import {
   Group,
   LineLoop,
   LineBasicMaterial,
-} from '../../lib/three/three.module.js';
+} from '../../packages/lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
+} from '../../packages/lib/tools/index.js';
+import { OrbitControls } from '../../packages/lib/three/OrbitControls.js';
+import { ViewHelper } from '../../packages/lib/three/viewHelper.js';
+import dat from '../../packages/lib/util/dat.gui.js';
 import { data } from './previewData.js';
 
 window.onload = () => {
