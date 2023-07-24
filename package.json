@@ -4,6 +4,7 @@
   "description": "this is a demo which was written when I learn threejs",
   "main": "no",
   "author": "Yifan Wu",
+  "private": true,
   "license": "MIT",
   "dependencies": {
     "@tweenjs/tween.js": "^20.0.3",
@@ -16,5 +17,9 @@
     "vite": "^4.4.6",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0"
+  },
+  "engines": {
+    "node": ">=16",
+    "pnpm": ">=7"
   }
 }
