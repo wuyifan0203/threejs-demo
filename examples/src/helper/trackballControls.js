@@ -10,16 +10,16 @@ import {
   Mesh,
   MeshNormalMaterial,
   BoxGeometry,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
   initCustomGrid,
   resize,
   initOrthographicCamera,
-} from '../../lib/tools/index.js';
-import { TrackballControls } from '../../lib/three/TrackballControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
+} from '../lib/tools/index.js';
+import { TrackballControls } from '../lib/three/TrackballControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
 
 window.onload = () => {
   init();

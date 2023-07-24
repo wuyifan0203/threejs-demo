@@ -12,13 +12,13 @@ import {
   Mesh,
   DirectionalLight,
   BoxGeometry,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { initRenderer, resize } from '../../lib/tools/index.js';
-import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { initRenderer, resize } from '../lib/tools/index.js';
+import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
 
-import { Stats } from '../../lib/util/Stats.js';
+import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();

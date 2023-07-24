@@ -5,11 +5,11 @@ import {
   EdgesGeometry,
   BufferAttribute,
   LineSegments,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer, initDefaultLighting, initAxesHelper, initPerspectiveCamera,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 (function () {
   init();

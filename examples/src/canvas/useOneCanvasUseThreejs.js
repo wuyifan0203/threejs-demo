@@ -1,16 +1,17 @@
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { CustomGrid } from '../../lib/three/customGrid.js';
-import {
-  Scene, Vector3, WebGLRenderer,
-} from '../../lib/three/three.module.js';
-import { initOrthographicCamera } from '../../lib/tools/common.js';
-
 /*
  * @Date: 2023-05-04 13:54:25
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-06 09:51:00
- * @FilePath: /threejs-demo/packages/examples/canvas/useOneCanvasUseThreejs.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 00:50:42
+ * @FilePath: /threejs-demo/examples/src/canvas/useOneCanvasUseThreejs.js
  */
+import {
+  Scene, Vector3, WebGLRenderer,
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { CustomGrid } from '../lib/three/customGrid.js';
+import { initOrthographicCamera } from '../lib/tools/common.js';
+
+
 window.onload = () => {
   init();
 };

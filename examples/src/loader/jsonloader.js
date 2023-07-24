@@ -12,10 +12,10 @@ import {
   Mesh,
   MeshBasicMaterial,
   ObjectLoader, Scene, SphereGeometry, Vector3, WebGLRenderer,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initOrbitControls, initOrthographicCamera, resize,
-} from '../../lib/tools/common.js';
+} from '../lib/tools/common.js';
 
 window.onload = () => {
   init();

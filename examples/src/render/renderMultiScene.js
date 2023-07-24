@@ -15,15 +15,15 @@ import {
   Clock,
   GridHelper,
   Vector2,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initGroundPlane,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();

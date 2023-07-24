@@ -4,14 +4,14 @@
  * @LastEditTime: 2023-07-10 15:07:15
  * @FilePath: /threejs-demo/packages/examples/light/box.js
  */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initGroundPlane,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Scene,
   Vector3,
@@ -23,7 +23,7 @@ import {
   BufferAttribute,
   DirectionalLight,
   PlaneGeometry,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 
 const init = () => {
   const renderer = initRenderer();

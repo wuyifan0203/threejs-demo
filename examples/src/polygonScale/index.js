@@ -18,20 +18,20 @@ import {
   Vector3,
   BufferAttribute,
   MeshBasicMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
   angle2Radians,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import { innerPoints } from './compute.js';
 
 import { EarCut } from './Earcut.js';
-import { FaceNormalsHelper } from '../../lib/three/FaceNormalsHelper.js';
-import dat from '../../lib/util/dat.gui.js';
+import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 (function () {
   init();
@@ -116,7 +116,7 @@ function draw(scene) {
     height: 0.5,
   };
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   gui.add(object, 'data', Object.keys(data)).name('Data Source').onChange(() => update());
   gui.add(object, 'angle', 1, 179, 1).name('Angle').onChange(() => update());

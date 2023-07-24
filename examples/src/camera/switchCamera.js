@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 16:41:42
- * @FilePath: /threejs-demo/packages/examples/camera/switchCamera.js
+ * @LastEditTime: 2023-07-25 00:48:55
+ * @FilePath: /threejs-demo/examples/src/camera/switchCamera.js
  */
 import {
   Vector3,
@@ -11,7 +11,7 @@ import {
   MeshNormalMaterial,
   SphereGeometry,
   BoxGeometry,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
@@ -19,12 +19,12 @@ import {
   initCustomGrid,
   resize,
   initOrthographicCamera,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
-import { EffectComposer } from '../../lib/three/EffectComposer.js';
-import { RenderPass } from '../../lib/three/RenderPass.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { EffectComposer } from '../lib/three/EffectComposer.js';
+import { RenderPass } from '../lib/three/RenderPass.js';
 
 window.onload = () => {
   init();
@@ -92,7 +92,7 @@ function init() {
     current: '3D',
   };
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.width = 330;
 
   gui.add(controler, 'current', ['3D', 'XY', 'XZ', 'YZ']).name('Select View:').onChange(() => {

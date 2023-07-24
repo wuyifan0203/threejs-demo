@@ -13,14 +13,14 @@ import {
   LineLoop,
   Points,
   PointsMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
   initCustomGrid,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 (function () {
   init();

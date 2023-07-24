@@ -12,7 +12,7 @@ import {
   LineBasicMaterial,
   BufferAttribute,
   Vector2,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
@@ -20,11 +20,11 @@ import {
   resize,
   initOrthographicCamera,
   isComplexPolygon,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
 
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();

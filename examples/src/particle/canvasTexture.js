@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:44:38
- * @FilePath: /threejs-demo/src/examples/particle/canvasTexture.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:11:59
+ * @FilePath: /threejs-demo/examples/src/particle/canvasTexture.js
  */
 import {
   Scene,
@@ -13,13 +13,13 @@ import {
   Float32BufferAttribute,
   Points,
   CanvasTexture,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { initRenderer, resize } from '../../lib/tools/index.js';
-import datGui from '../../lib/util/dat.gui.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { initRenderer, resize } from '../lib/tools/index.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
-import { Stats } from '../../lib/util/Stats.js';
+import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -121,14 +121,14 @@ function draw(scene, renderer) {
   }
 
   function createImageTexture() {
-    const url = '../../resources/texture/others/heart.png';
+    const url = '../../public/images/others/heart.png';
     const loader = new TextureLoader();
     return loader.load(url);
   }
 
   // GUI
 
-  const gui = new datGui.GUI();
+  const gui = new GUI();
   gui.add(controls, 'range', 1, 1000, 1).onChange(() => { createParticlesByPoints(); });
   gui.add(controls, 'size', 1, 30, 0.1).onChange((e) => {
     material.size = e;

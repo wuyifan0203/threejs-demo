@@ -19,15 +19,15 @@ import {
   sRGBEncoding,
   TorusKnotGeometry,
   EquirectangularReflectionMapping,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   resize,
   initPerspectiveCamera,
-} from '../../lib/tools/index.js';
-import dat from '../../lib/util/dat.gui.js';
-import { RGBELoader } from '../../lib/three/RGBELoader.js';
+} from '../lib/tools/index.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { RGBELoader } from '../lib/three/RGBELoader.js';
 
 window.onload = () => {
   init();
@@ -129,7 +129,7 @@ function draw(scene, renderer, OrbitControls) {
   };
   loadBackground(controls.background);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   gui.add(renderer, 'toneMappingExposure', 0, 2, 0.01).name('exposure');
   gui.add(material, 'roughness', 0, 1, 0.01);

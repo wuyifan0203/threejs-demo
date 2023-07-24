@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/packages/examples/shader/shader1.js
  * @ShaderExample:https://www.shadertoy.com/view/4dl3zn
  */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   Vector3,
   Scene,
@@ -13,12 +13,12 @@ import {
   PlaneGeometry,
   Mesh,
   Vector2,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();

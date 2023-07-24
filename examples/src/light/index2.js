@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
@@ -7,7 +7,7 @@ import {
   // initGroundPlane,
   // initCamera,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Scene,
   Vector3,
@@ -29,7 +29,7 @@ import {
   SpotLightHelper,
   OrthographicCamera,
   BufferAttribute,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 
 let scene;
 const params = {

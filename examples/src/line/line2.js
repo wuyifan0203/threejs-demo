@@ -12,19 +12,19 @@ import {
   EdgesGeometry,
   LineSegments,
   BoxGeometry,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
-import { LineMaterial } from '../../lib/three/LineMaterial.js';
-import { LineSegments2 } from '../../lib/three/LineSegments2.js';
-import { LineSegmentsGeometry } from '../../lib/three/LineSegmentsGeometry.js';
-import dat from '../../lib/util/dat.gui.js';
+import { LineMaterial } from '../lib/three/LineMaterial.js';
+import { LineSegments2 } from '../lib/three/LineSegments2.js';
+import { LineSegmentsGeometry } from '../lib/three/LineSegmentsGeometry.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 (function () {
   init();
@@ -75,7 +75,7 @@ function draw(scene) {
   scene.add(line, l);
   console.log(scene);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.add(material, 'linewidth', 0.5, 10, 0.1);
   gui.add(material, 'wireframe');
 }

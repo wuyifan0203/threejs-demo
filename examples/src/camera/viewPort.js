@@ -6,15 +6,15 @@ import {
   Vector3,
   WebGLRenderer,
   MeshNormalMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { GridHelper } from '../../lib/three/GridHelper2.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { GridHelper } from '../lib/three/GridHelper2.js';
 import {
   initRenderer, resize,
   initOrthographicCamera,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
-import { Stats } from '../../lib/util/Stats.js';
+import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();

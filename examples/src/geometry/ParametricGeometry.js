@@ -9,18 +9,18 @@ import {
   Scene,
   Mesh,
   MeshNormalMaterial,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { ParametricGeometry } from '../../lib/three/ParametricGeometry.js';
-import dat from '../../lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { ParametricGeometry } from '../lib/three/ParametricGeometry.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 window.onload = () => {
   init();
@@ -176,7 +176,7 @@ function draw(scene) {
 
   const mesh = new Mesh(parametric, material);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   gui.add(controls, 'drawFunc', list).onChange((e) => {
     parametric.dispose();

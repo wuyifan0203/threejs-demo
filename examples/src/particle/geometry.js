@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:45:59
- * @FilePath: /threejs-demo/src/examples/particle/geometry.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:14:35
+ * @FilePath: /threejs-demo/examples/src/particle/geometry.js
  */
 import {
   Scene,
@@ -12,15 +12,15 @@ import {
   AdditiveBlending,
   Points,
   Texture,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
   initRenderer, resize, angle2Radians,
-} from '../../lib/tools/index.js';
-import datGui from '../../lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
-import { Stats } from '../../lib/util/Stats.js';
+import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -120,7 +120,7 @@ function draw(scene, renderer) {
 
   // GUI
 
-  const gui = new datGui.GUI();
+  const gui = new GUI();
   const geometryFolder = gui.addFolder('Geometry');
   geometryFolder.open();
   geometryFolder.add(controls, 'radius', 1, 64, 0.1).onChange(() => {

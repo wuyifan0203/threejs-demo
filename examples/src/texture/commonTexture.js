@@ -2,8 +2,8 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 09:25:33
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 16:44:04
- * @FilePath: /threejs-demo/packages/examples/texture/commonTexture.js
+ * @LastEditTime: 2023-07-25 01:18:00
+ * @FilePath: /threejs-demo/examples/src/texture/commonTexture.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
@@ -14,11 +14,11 @@ import {
   SpotLight,
   WebGLRenderer,
   Color,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { FBXLoader } from '../../lib/three/FBXLoader.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { FBXLoader } from '../lib/three/FBXLoader.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = function () {
   init();
@@ -50,7 +50,7 @@ async function init() {
 
   const modelLoader = new FBXLoader();
   const textureLoader = new TextureLoader();
-  const basePath = '../../resources/';
+  const basePath = '../../public/';
 
   const modelGroup = await modelLoader.loadAsync(`${basePath}models/th5jddwva_LOD0.fbx`, (ProgressEvent) => {
     console.log(
@@ -61,7 +61,7 @@ async function init() {
   light.target = modelGroup;
   // eslint-disable-next-line no-return-await
   const loadTexture = async (name) => await textureLoader.loadAsync(
-    `${basePath}texture/fruit/2K_${name}.jpg`,
+    `${basePath}images/fruit/2K_${name}.jpg`,
     (ProgressEvent) => {
       console.log(
         `loading texture ${name} progress: ${(ProgressEvent.loaded / ProgressEvent.total) * 100} %`,

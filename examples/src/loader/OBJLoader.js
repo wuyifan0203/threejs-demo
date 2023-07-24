@@ -1,18 +1,18 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:10:16
- * @FilePath: /threejs-demo/packages/examples/loader/OBJLoader.js
+ * @LastEditTime: 2023-07-25 01:06:41
+ * @FilePath: /threejs-demo/examples/src/loader/OBJLoader.js
  */
 /* eslint-disable no-unused-vars */
-import dat from '../../lib/util/dat.gui.js';
-import { OBJLoader } from '../../lib/three/OBJLoader.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { OBJLoader } from '../lib/three/OBJLoader.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Scene,
   Vector3,
@@ -25,7 +25,7 @@ import {
   MeshPhongMaterial,
   Color,
   Matrix4,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 
 const init = () => {
   const renderer = initRenderer();
@@ -84,7 +84,7 @@ window.onload = () => {
 const stop = false;
 
 function draw(scene, light, helper) {
-  const modelPath = '../../resources/models/Mountain lion.OBJ';
+  const modelPath = '../../public/models/mountain_lion.obj';
   const loader = new OBJLoader();
   const newMin = new Vector3();
   const newMax = new Vector3();
@@ -98,6 +98,8 @@ function draw(scene, light, helper) {
         scene.add(obj);
         const modelMatrix = new Matrix4().compose(obj.position, obj.quaternion, obj.scale);
 
+
+        console.log(obj);
         //   obj.children[0].material.color.set(new Color("gray"));
         // 重新计算模型最新位置，并放在中心点
         obj.children[0].geometry.computeBoundingBox();
@@ -116,18 +118,18 @@ function draw(scene, light, helper) {
         resolve(obj);
       },
       (ProgressEvent) => {
-        // console.log(
-        //   "progress: " + (ProgressEvent.loaded / ProgressEvent.total) * 100 + " %"
-        // );
+        console.log(
+          "progress: " + (ProgressEvent.loaded / ProgressEvent.total) * 100 + " %"
+        );
       },
       (error) => {
-        console.log(`Opp ! have an Error in${error}`);
+        console.log(`Opp ! have an Error in ${error}`);
         reject(error);
       },
     );
   });
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   const controls = {
     color: light.color,

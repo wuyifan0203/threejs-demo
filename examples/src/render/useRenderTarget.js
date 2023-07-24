@@ -19,16 +19,16 @@ import {
   Vector2,
   SRGBColorSpace,
   Color,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initGroundPlane,
-} from '../../lib/tools/index.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+} from '../lib/tools/index.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();

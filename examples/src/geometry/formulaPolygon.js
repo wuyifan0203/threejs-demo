@@ -6,17 +6,17 @@ import {
   ExtrudeGeometry,
   Shape,
   Vector2,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
   initCustomGrid,
   resize,
   initPerspectiveCamera,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 // eslint-disable-next-line no-undef
 const { compile, isComplex } = math;
@@ -174,7 +174,7 @@ function draw(scene) {
     return options;
   };
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   gui.width = 320;
   const rangeSettingFolder = gui.addFolder('Range Setting');
   rangeSettingFolder.add(geometryParams, 'xMin', -25, 10, 0.01).onChange(() => update());

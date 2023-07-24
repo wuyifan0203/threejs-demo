@@ -4,13 +4,7 @@
  * @LastEditTime: 2023-07-06 18:31:13
  * @FilePath: /threejs-demo/packages/examples/canvas/addWaterMark.js
  */
-/*
- * @Date: 2023-05-17 10:09:04
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-06 17:51:12
- * @FilePath: /threejs-demo/packages/examples/canvas/canvasGradient.js
- */
-import dat from '../../lib/util/dat.gui.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 function init() {
   const width = window.innerWidth;
@@ -61,7 +55,7 @@ function init() {
 
   updateCtx();
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 }
 
 window.onload = () => {

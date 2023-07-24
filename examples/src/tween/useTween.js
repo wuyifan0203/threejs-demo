@@ -5,7 +5,7 @@
  * @LastEditTime: 2023-05-17 17:57:46
  * @FilePath: /threejs-demo/packages/examples/tween/useTween.js
  */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   AmbientLight,
   BoxGeometry,
@@ -14,16 +14,16 @@ import {
   PointLight,
   Scene,
   Vector3,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initCustomGrid,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Tween, update, Easing,
-} from '../../lib/other/tween.esm.js';
+} from '../lib/other/tween.esm.js';
 
 window.onload = () => {
   init();

@@ -10,7 +10,7 @@
  * @LastEditTime: 2023-06-06 17:51:12
  * @FilePath: /threejs-demo/packages/examples/canvas/canvasGradient.js
  */
-import dat from '../../lib/util/dat.gui.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 function init() {
   const width = window.innerWidth / 3;
@@ -66,7 +66,7 @@ function init() {
   updateLinear();
   updateRadial();
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   const linearFolder = gui.addFolder('Linear');
   const radialFolder = gui.addFolder('Radial');

@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-05-25 10:56:19
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-16 10:17:49
- * @FilePath: /threejs-demo/packages/examples/booleanOperation/2d.js
+ * @LastEditTime: 2023-07-25 00:40:43
+ * @FilePath: /threejs-demo/examples/src/booleanOperation/2d.js
  */
-import { PolyBool } from '../../lib/other/PolyBool.js';;
+import { PolyBool } from '../lib/other/PolyBool.js';
 
 function name(params) {
   const res = PolyBool.intersect({

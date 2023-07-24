@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-24 12:38:57
- * @FilePath: /threejs-demo/src/examples/loader/gltfLoader.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:02:48
+ * @FilePath: /threejs-demo/examples/src/loader/gltfLoader.js
  */
 import {
   Scene,
@@ -11,10 +11,10 @@ import {
   AmbientLight,
   DirectionalLight,
   MeshPhongMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { GLTFLoader } from '../../lib/three/GLTFLoader.js';
-import { initRenderer, resize } from '../../lib/tools/index.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { initRenderer, resize } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -64,7 +64,7 @@ function init() {
 
 function draw(scene) {
   // model
-  const modelPath = '../../resources/models/ar15_rifle/scene.gltf';
+  const modelPath = '../../public/models/ar15_rifle/scene.gltf';
   const loader = new GLTFLoader();
   let modelMesh = null;
 

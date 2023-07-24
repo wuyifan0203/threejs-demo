@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-21 17:20:11
- * @FilePath: /threejs-demo/packages/examples/zFighting/pologyOffsetTest.js
+ * @LastEditTime: 2023-07-25 01:24:41
+ * @FilePath: /threejs-demo/examples/src/zFighting/pologyOffsetTest.js
  */
 import {
   Scene,
@@ -12,12 +12,12 @@ import {
   AmbientLight,
   DirectionalLight,
   PlaneGeometry,
-} from '../../packages/lib/three/three.module.js';
-import { OrbitControls } from '../../packages/lib/three/OrbitControls.js';
-import { initRenderer, resize } from '../../packages/lib/tools/index.js';
-import { GUI } from '../../packages/lib/util/lil-gui.module.min.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { initRenderer, resize } from '../lib/tools/index.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
-import { Stats } from '../../packages/lib/util/Stats.js';
+import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();

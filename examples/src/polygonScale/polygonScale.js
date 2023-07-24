@@ -13,7 +13,7 @@ import {
   LineBasicMaterial,
   LineLoop,
   Points,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
@@ -23,12 +23,12 @@ import {
   isClockWise,
   dataToVec2,
   vec2ToVec3Vertex,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
 import { data } from './data.js';
 import { polygonScale } from './scale.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();

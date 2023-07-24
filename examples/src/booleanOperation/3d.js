@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:28:31
- * @FilePath: /threejs-demo/src/examples/booleanOperation/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 00:46:03
+ * @FilePath: /threejs-demo/examples/src/booleanOperation/3d.js
  */
 import {
   Vector3,
@@ -12,18 +12,18 @@ import {
   SphereGeometry,
   BoxGeometry,
   Matrix4,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { CSG } from '../lib/other/CSGMesh.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
-import { CSG } from '../../lib/other/CSGMesh.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -164,7 +164,7 @@ function draw(scene) {
     },
   };
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   console.log('有时候选none会栈溢出。是正常现象，因为我没有修');
   const sphere1Folder = gui.addFolder('sphere1');
   sphere1Folder.open();

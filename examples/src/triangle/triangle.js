@@ -4,10 +4,10 @@
  * @LastEditTime: 2023-07-10 15:18:56
  * @FilePath: /threejs-demo/packages/examples/triangle/triangle.js
  */
-import { SweepContext, Point } from '../../lib/other/poly2tri.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
-import { ShapeUtils } from '../../lib/three/ShapeUtils.js';
-import { Delaunator } from '../../lib/other/delaunator.js';
+import { SweepContext, Point } from '../lib/other/poly2tri.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { ShapeUtils } from '../lib/three/ShapeUtils.js';
+import { Delaunator } from '../lib/other/delaunator.js';
 import { data } from './data.js';
 
 import {
@@ -18,13 +18,13 @@ import {
   Vector3,
   BufferGeometry,
   Vector2,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initCustomGrid,
   initOrbitControls,
   initOrthographicCamera,
   initRenderer,
-} from '../../lib/tools/common.js';
+} from '../lib/tools/common.js';
 
 window.onload = () => {
   init();

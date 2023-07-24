@@ -12,13 +12,13 @@ import {
   BoxGeometry,
   ArrayCamera,
   Vector3,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initAxesHelper,
   initCustomGrid,
   initPerspectiveCamera,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();

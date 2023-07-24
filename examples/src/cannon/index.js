@@ -13,16 +13,16 @@ import {
   Vector3,
   MeshPhongMaterial,
   PlaneGeometry,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer, initOrthographicCamera, initDefaultLighting,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase,
-} from '../../lib/other/physijs/cannon.js';
+} from '../lib/other/physijs/cannon.js';
 
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();

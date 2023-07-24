@@ -17,8 +17,8 @@ import {
   Line,
   CubicBezierCurve3,
   BufferAttribute,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 (function () {
   init();

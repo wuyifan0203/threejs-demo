@@ -15,14 +15,14 @@ import {
   LineBasicMaterial,
   LineLoop,
   RingGeometry,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 Mesh.prototype.setMultiplyScale = function (unit) {
   this.scale.set(unit, unit, unit);
@@ -58,7 +58,7 @@ function init() {
   // Direction of rotation        :    C    :  AC   :   C   :   C  :    C    :    C   :    AC  :    AC
 
   // set background
-  const basePath = '../../resources/texture/plants/2k_';
+  const basePath = '../../public/images/plants/2k_';
   const loader = new TextureLoader();
   const getTexture = (path) => loader.load(basePath + path);
   scene.background = getTexture('stars_milky_way.jpg');

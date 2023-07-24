@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:56:36
- * @FilePath: /threejs-demo/src/examples/particle/GRAVITY.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:16:16
+ * @FilePath: /threejs-demo/examples/src/particle/GRAVITY.js
  */
 import {
   Scene,
@@ -15,10 +15,10 @@ import {
   MeshLambertMaterial,
   Float32BufferAttribute,
   AmbientLight,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { GLTFLoader } from '../../lib/three/GLTFLoader.js';
-import { initRenderer, resize } from '../../lib/tools/index.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { initRenderer, resize } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -102,7 +102,7 @@ function draw(scene, camera) {
   scene.add(particleSystem);
 
   // model
-  const modelPath = '../../resources/models/astronaut.glb';
+  const modelPath = '../../public/models/astronaut.glb';
   const loader = new GLTFLoader();
   let modelMesh = null;
 

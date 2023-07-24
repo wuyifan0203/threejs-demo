@@ -4,9 +4,9 @@
  * @LastEditTime: 2023-02-24 13:29:52
  * @FilePath: /threejs-demo/src/examples/viewHelperTest/index2.js
  */
-import * as THREE from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
+import * as THREE from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
 
 let mesh; let renderer; let scene; let camera; let controls; let
   helper;

@@ -1,4 +1,4 @@
-import dat from '../../lib/util/dat.gui.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 function init() {
   const dom1 = document.querySelector('#ruler1');
@@ -72,7 +72,7 @@ function init() {
   let rulerInstance = createRuler2(1000, 50);
   dom2.append(rulerInstance);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
   const ruler2Folder = gui.addFolder('Ruler2');
 
   ruler2Folder.add(controls.ruler2, 'zero', -900, 1800, 10).name('zero position').onChange(() => update());

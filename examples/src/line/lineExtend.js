@@ -2,9 +2,9 @@
 /* eslint-disable no-unused-vars */
 /*
  * @Date: 2022-11-16 15:00:21
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 17:14:44
- * @FilePath: /threejs-demo/src/examples/edge/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:00:07
+ * @FilePath: /threejs-demo/examples/src/line/lineExtend.js
  */
 
 import {
@@ -17,16 +17,16 @@ import {
   BufferAttribute,
   LineSegments,
   MeshBasicMaterial,
-  BoxBufferGeometry,
+  BoxGeometry,
   Matrix4,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 (function () {
   init();
@@ -54,7 +54,7 @@ function init() {
 
 function draw(scene) {
   const [x, y, z] = [6, 10, 4];
-  const g = new BoxBufferGeometry(x, y, z);
+  const g = new BoxGeometry(x, y, z);
   const lm = new LineBasicMaterial({ color: 'red' });
   const e = new EdgesGeometry(g);
   const l = new LineSegments(e, lm);

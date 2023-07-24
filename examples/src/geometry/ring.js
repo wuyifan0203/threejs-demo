@@ -9,8 +9,8 @@ import {
   BufferAttribute,
   LineSegments,
   MeshBasicMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
@@ -18,9 +18,9 @@ import {
   initCustomGrid,
   initAxesHelper,
   angle2Radians,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
-import dat from '../../lib/util/dat.gui.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 function circle(x, r2) {
   return Math.sqrt(r2 - x * x);
@@ -295,7 +295,7 @@ function draw(scene) {
 
   draw3DMesh(object.r, object.angle, object.height, object.width);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   gui.add(object, 'angle', 0, 360, 1).onChange(() => {
     scene.remove(lineMesh, mesh);

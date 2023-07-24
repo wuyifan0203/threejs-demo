@@ -7,17 +7,17 @@ import {
   Shape,
   Vector2,
   Path,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -132,7 +132,7 @@ function draw(scene) {
 
   const mesh = new Mesh(parametric, material);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   function update() {
     parametric.dispose();

@@ -12,17 +12,17 @@ import {
   Group,
   LineLoop,
   LineBasicMaterial,
-} from '../../packages/lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../packages/lib/tools/index.js';
-import { OrbitControls } from '../../packages/lib/three/OrbitControls.js';
-import { ViewHelper } from '../../packages/lib/three/viewHelper.js';
-import dat from '../../packages/lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { data } from './previewData.js';
 
 window.onload = () => {
@@ -62,7 +62,7 @@ function init() {
 
   const group = new Group();
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   const getOPtions = () => {
     const o = {};

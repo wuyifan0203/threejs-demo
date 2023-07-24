@@ -16,16 +16,16 @@ import {
   LineBasicMaterial,
   TorusGeometry,
   SphereGeometry,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import { GUI } from '../../lib/util/lil-gui.module.min.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 const { EPSILON } = Number;
 

@@ -1,16 +1,16 @@
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
   initGroundPlane,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Scene,
   Vector3,
   Mesh,
-  BoxBufferGeometry,
+  BoxGeometry,
   MeshBasicMaterial,
   MeshLambertMaterial,
   MeshMatcapMaterial,
@@ -25,7 +25,7 @@ import {
   PointLightHelper,
   SpotLightHelper,
 
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 
 let scene;
 const params = {
@@ -145,7 +145,7 @@ lightSelect.addEventListener('change', () => {
 });
 
 function draw(scene) {
-  const box = new BoxBufferGeometry(3, 5, 2);
+  const box = new BoxGeometry(3, 5, 2);
   mesh = new Mesh(box, materialList[materialValue]);
   mesh.position.set(0, 0, 1);
   mesh.name = 'box';

@@ -4,16 +4,16 @@
  * @LastEditTime: 2023-05-10 18:17:52
  * @FilePath: /threejs-demo/packages/examples/material/transparentTest2.js
  */
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   BoxGeometry, Mesh, MeshBasicMaterial, Scene, Vector3,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   getColor,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();

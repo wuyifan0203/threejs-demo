@@ -4,15 +4,15 @@ import {
   BufferGeometry,
   Vector3,
   BufferAttribute,
-  BoxBufferGeometry,
+  BoxGeometry,
   MeshLambertMaterial,
   Matrix4,
   Euler,
   Quaternion,
   Points,
   PointsMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
@@ -22,7 +22,7 @@ import {
   initDefaultLighting,
   rotationFormula,
   createMirrorMatrix,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 (function () {
   init();
@@ -61,7 +61,7 @@ function draw(scene) {
     wireframe: true,
   });
 
-  const box = new BoxBufferGeometry(4, 4, 4);
+  const box = new BoxGeometry(4, 4, 4);
   const boxMesh = new Mesh(box, basicMaterial);
   const centerBuffer = new BufferGeometry().setAttribute('position', new BufferAttribute(new Float32Array([0, 0, 0]), 3));
   const pointMaterial = new PointsMaterial({ color: 0xff0000, size: 5 });

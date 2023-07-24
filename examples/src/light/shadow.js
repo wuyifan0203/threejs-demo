@@ -6,15 +6,15 @@
  * @FilePath: /threejs-demo/packages/examples/light/shadow.js
  */
 /* eslint-disable no-unused-vars */
-import dat from '../../lib/util/dat.gui.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initGroundPlane,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import {
   Scene,
   Vector3,
@@ -25,7 +25,7 @@ import {
   SpotLightHelper,
   BoxGeometry,
   Color,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 
 let stop = false;
 
@@ -97,7 +97,7 @@ function draw(scene, light, helper) {
   mesh2.renderOrder = 2;
   scene.add(mesh2);
 
-  const gui = new dat.GUI();
+  const gui = new GUI();
 
   light.target = mesh;
 

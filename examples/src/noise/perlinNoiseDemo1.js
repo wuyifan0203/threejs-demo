@@ -12,15 +12,15 @@ import {
   AmbientLight,
   PlaneGeometry,
   MeshNormalMaterial,
-} from '../../lib/three/three.module.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ImprovedNoise } from '../../lib/three/ImprovedNoise.js';
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ImprovedNoise } from '../lib/three/ImprovedNoise.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
-} from '../../lib/tools/index.js';
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();

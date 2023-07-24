@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-31 18:10:09
- * @FilePath: /threejs-demo/src/examples/use dat.GUI/index.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-07-25 01:22:51
+ * @FilePath: /threejs-demo/examples/src/use dat.GUI/index.js
  */
 import {
   Vector3,
@@ -11,19 +11,19 @@ import {
   MeshBasicMaterial,
   SphereGeometry,
   Color,
-} from '../../lib/three/three.module.js';
+} from '../lib/three/three.module.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
-} from '../../lib/tools/index.js';
-import { OrbitControls } from '../../lib/three/OrbitControls.js';
-import { ViewHelper } from '../../lib/three/viewHelper.js';
-import dat from '../../lib/util/dat.gui.js';
+} from '../lib/tools/index.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { ViewHelper } from '../lib/three/viewHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
-import { addMaterialGUI } from '../../lib/tools/datGUIutils.js';
+import { addMaterialGUI } from '../lib/tools/datGUIutils.js';
 
 window.onload = function () {
   init();
@@ -60,7 +60,6 @@ function draw(scene) {
   const sphereGeometry = new SphereGeometry(5, 32, 32);
   const mesh = new Mesh(sphereGeometry, material);
 
-  console.log(sphereGeometry.getFace());
 
   scene.add(mesh);
 
@@ -84,13 +83,12 @@ function draw(scene) {
   };
 
   // 创建 gui 对象
-  const gui = new dat.GUI();
+  const gui = new GUI();
   console.log(gui);
   // gui 有 domElement属性 ， saveToLocalStorageIfPossible函数,width，等属性
   // 比如 修改宽度
   gui.width = 300;
   // 保存本地
-  gui.saveToLocalStorageIfPossible(); // 好像没生效
   // 设置gui 位置
   gui.domElement.style.position = 'absolute';
 
