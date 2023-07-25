@@ -84,7 +84,7 @@ window.onload = () => {
 const stop = false;
 
 function draw(scene, light, helper) {
-  const modelPath = '../../public/models/mountain_lion.obj';
+  const modelPath = '../../public/models/mountain_lions.obj';
   const loader = new OBJLoader();
   const newMin = new Vector3();
   const newMax = new Vector3();
@@ -97,7 +97,6 @@ function draw(scene, light, helper) {
         obj.rotateX(Math.PI / 2);
         scene.add(obj);
         const modelMatrix = new Matrix4().compose(obj.position, obj.quaternion, obj.scale);
-
 
         console.log(obj);
         //   obj.children[0].material.color.set(new Color("gray"));
@@ -119,7 +118,7 @@ function draw(scene, light, helper) {
       },
       (ProgressEvent) => {
         console.log(
-          "progress: " + (ProgressEvent.loaded / ProgressEvent.total) * 100 + " %"
+          `progress: ${(ProgressEvent.loaded / ProgressEvent.total) * 100} %`,
         );
       },
       (error) => {
