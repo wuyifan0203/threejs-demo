@@ -11,7 +11,7 @@ import {
   Mesh,
   ArrowHelper,
   Group,
-  OrthographicCamera
+  OrthographicCamera,
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
@@ -22,7 +22,7 @@ import { OrbitControls } from '../three/OrbitControls.js';
  * @return {WebGLRenderer}
  */
 function initRenderer(props = {}) {
-  const renderer = new WebGLRenderer(Object.assign({antialias: true},props));
+  const renderer = new WebGLRenderer({ antialias: true, ...props });
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
@@ -72,11 +72,9 @@ function initOrthographicCamera(initialPosition) {
  * @param {Scene} scene
  * @return {Mesh}
  */
-function initGroundPlane(scene,size = {x:200,y:200}) {
+function initGroundPlane(scene, size = { x: 200, y: 200 }) {
   const planeGeometry = new PlaneGeometry(size.x, size.y);
-  const planeMaterial = new MeshPhongMaterial({
-    color: 0xd3d3d3
-  });
+  const planeMaterial = new MeshPhongMaterial({ color: 0xd3d3d3 });
   const plane = new Mesh(planeGeometry, planeMaterial);
   plane.name = 'LargeGroundPlane';
   plane.receiveShadow = true;
@@ -93,9 +91,9 @@ function initGroundPlane(scene,size = {x:200,y:200}) {
  * @return {SpotLight}
  */
 function initDefaultLighting(scene, initialPosition) {
-  var position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
+  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
 
-  var spotLight = new SpotLight(0xffffff);
+  const spotLight = new SpotLight(0xffffff);
   spotLight.position.copy(position);
   spotLight.shadow.mapSize.width = 2048;
   spotLight.shadow.mapSize.height = 2048;
@@ -123,7 +121,7 @@ function initAxesHelper(scene) {
   const arrowHelper = new Group();
   arrowHelper.name = 'arrowHelper';
 
-  ['X', 'Y', 'Z'].forEach(e => {
+  ['X', 'Y', 'Z'].forEach((e) => {
     const pos = { X: [1, 0, 0], Y: [0, 1, 0], Z: [0, 0, 1] }[e];
     const size = { X: 1000 * 0.5, Y: 1000 * 0.5, Z: 1000 * 0.5 }[e];
     const color = { X: 'red', Y: 'green', Z: 'blue' }[e];
@@ -148,7 +146,7 @@ function resize(render, camera) {
     render.setSize(window.innerWidth, window.innerHeight);
     if (camera.type === 'OrthographicCamera') {
       camera.top = 15 * (h / w);
-      camera.bottom =  - 15 * (h / w);
+      camera.bottom = -15 * (h / w);
     } else if (camera.type === 'PerspectiveCamera') {
       camera.aspect = window.innerWidth / window.innerHeight;
     }
@@ -172,8 +170,8 @@ function initCustomGrid(scene, width = 50, height = 50) {
   return grid;
 }
 
-function initOrbitControls(camera,container) {
-  return new OrbitControls(camera,container);
+function initOrbitControls(camera, container) {
+  return new OrbitControls(camera, container);
 }
 
 export {
@@ -185,5 +183,5 @@ export {
   initOrthographicCamera,
   initCustomGrid,
   initOrbitControls,
-  resize
+  resize,
 };
