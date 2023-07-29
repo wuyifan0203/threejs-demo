@@ -1,6 +1,6 @@
 {
-  "name": "yes",
-  "version": "yes",
+  "name": "threejsdemo",
+  "version": "0.0.3",
   "description": "this is a demo which was written when I learn threejs",
   "main": "no",
   "author": "Yifan Wu",
@@ -11,15 +11,16 @@
     "delaunator": "^5.0.0",
     "poly2tri": "^1.5.0",
     "polybooljs": "^1.2.0",
-    "three": "^0.154.0"
+    "three": "^0.155.0"
   },
   "devDependencies": {
-    "vite": "^4.4.6",
+    "@types/three": "^0.154.0",
     "eslint": "^8.43.0",
-    "eslint-config-airbnb-base": "^15.0.0"
+    "eslint-config-airbnb-base": "^15.0.0",
+    "vite": "^4.4.6"
   },
   "engines": {
-    "node": ">=16",
-    "pnpm": ">=7"
+    "node": ">=16.14.0",
+    "pnpm": ">=8.6.9"
   }
 }

@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
-const THREE = require("three");
+import { PerspectiveCamera, Vector3, OrthographicCamera, WebGLRenderer, PCFSoftShadowMap, Scene, Group, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial, EventDispatcher as EventDispatcher$1, MOUSE, TOUCH, Spherical, Matrix4, CylinderGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, GridHelper, Box3, Box3Helper, Clock } from "three";
 class EventDispatcher {
   addEventListener(type, listener) {
     if (this._listeners === void 0)
@@ -512,36 +510,36 @@ class Selector {
   }
 }
 function initPerspectiveCamera(initialPosition) {
-  const camera = new THREE.PerspectiveCamera(50, 1, 0.01, 1e3);
-  const position = initialPosition !== void 0 ? initialPosition : new THREE.Vector3(0, 5, 10);
+  const camera = new PerspectiveCamera(50, 1, 0.01, 1e3);
+  const position = initialPosition !== void 0 ? initialPosition : new Vector3(0, 5, 10);
   camera.position.copy(position);
   camera.up.set(0, 0, 1);
-  camera.lookAt(new THREE.Vector3());
+  camera.lookAt(new Vector3());
   return camera;
 }
 function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  const position = initialPosition !== void 0 ? initialPosition : new THREE.Vector3(5e3, -5e3, 1e4);
-  const camera = new THREE.OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 1e7);
+  const position = initialPosition !== void 0 ? initialPosition : new Vector3(5e3, -5e3, 1e4);
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 1e7);
   camera.position.copy(position);
   camera.zoom = 2.5;
   camera.up.set(0, 0, 1);
-  camera.lookAt(new THREE.Vector3(0, 0, 0));
+  camera.lookAt(new Vector3(0, 0, 0));
   camera.updateProjectionMatrix();
   return camera;
 }
 function initRenderer(options = {}) {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, ...options });
+  const renderer = new WebGLRenderer({ antialias: true, ...options });
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFSoftShadowMap;
   renderer.setClearColor(11184810);
   return renderer;
 }
 function initScene() {
-  return new THREE.Scene();
+  return new Scene();
 }
 class Editor extends EventDispatcher {
   constructor(target) {
@@ -688,7 +686,7 @@ class Editor extends EventDispatcher {
     this.signals.sceneGraphChanged.dispatch();
   }
 }
-class CoordinateHelper extends THREE.Group {
+class CoordinateHelper extends Group {
   constructor(colors = { x: "red", y: "green", z: "blue" }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
     super();
     this.colors = colors;
@@ -697,9 +695,9 @@ class CoordinateHelper extends THREE.Group {
     this.arrowsWidth = arrowsWidth;
     this.type = "CoordinateHelper";
     const pos = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
-    const origin = new THREE.Vector3();
+    const origin = new Vector3();
     ["x", "y", "z"].forEach((key) => {
-      const arrow = new THREE.ArrowHelper(new THREE.Vector3(...pos[key]), origin, axesLength, colors[key], arrowsLength, arrowsWidth);
+      const arrow = new ArrowHelper(new Vector3(...pos[key]), origin, axesLength, colors[key], arrowsLength, arrowsWidth);
       arrow.renderOrder = Infinity;
       this.add(arrow);
     });
@@ -716,15 +714,15 @@ class CoordinateHelper extends THREE.Group {
     });
   }
 }
-class CustomGridHelper extends THREE.LineSegments {
+class CustomGridHelper extends LineSegments {
   constructor(width = 10, height = 10, division = 1, splice = 1, centerColor = 11184810, baseColor = 14671839, divisionColor = 15658734) {
-    const geometry = new THREE.BufferGeometry();
-    const material = new THREE.LineBasicMaterial({ vertexColors: true, toneMapped: false });
+    const geometry = new BufferGeometry();
+    const material = new LineBasicMaterial({ vertexColors: true, toneMapped: false });
     super(geometry, material);
     this.type = "CustomGridHelper";
-    this.centerColor = new THREE.Color(centerColor);
-    this.baseColor = new THREE.Color(baseColor);
-    this.divisionColor = new THREE.Color(divisionColor);
+    this.centerColor = new Color(centerColor);
+    this.baseColor = new Color(baseColor);
+    this.divisionColor = new Color(divisionColor);
     this.width = width;
     this.height = height;
     this.division = division;
@@ -776,8 +774,8 @@ class CustomGridHelper extends THREE.LineSegments {
     }
     loop(width / 2, timesX / 2, timesX, delta, "x");
     loop(height / 2, timesY / 2, timesY, delta, "y");
-    this.geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
-    this.geometry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+    this.geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
+    this.geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
     this.geometry.attributes.position.needUpdate = true;
     this.geometry.attributes.color.needUpdate = true;
   }
@@ -786,42 +784,42 @@ class CustomGridHelper extends THREE.LineSegments {
     this.material.dispose();
   }
 }
-let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
+let ViewHelper$1 = class ViewHelper extends Object3D {
   constructor(camera, domElement) {
     super();
     this.object = camera;
     this.isViewHelper = true;
     this.animating = false;
-    this.center = new THREE.Vector3();
-    const color1 = new THREE.Color("#ff3653");
-    const color2 = new THREE.Color("#8adb00");
-    const color3 = new THREE.Color("#2c8fff");
+    this.center = new Vector3();
+    const color1 = new Color("#ff3653");
+    const color2 = new Color("#8adb00");
+    const color3 = new Color("#2c8fff");
     const interactiveObjects = [];
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const dummy = new THREE.Object3D();
-    const orthoCamera = new THREE.OrthographicCamera(-2, 2, 2, -2, 0, 4);
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
+    const dummy = new Object3D();
+    const orthoCamera = new OrthographicCamera(-2, 2, 2, -2, 0, 4);
     orthoCamera.position.set(0, 0, 2);
-    const geometry = new THREE.BoxGeometry(0.8, 0.05, 0.05).translate(0.4, 0, 0);
-    const xAxis = new THREE.Mesh(geometry, getAxisMaterial(color1));
-    const yAxis = new THREE.Mesh(geometry, getAxisMaterial(color2));
-    const zAxis = new THREE.Mesh(geometry, getAxisMaterial(color3));
+    const geometry = new BoxGeometry(0.8, 0.05, 0.05).translate(0.4, 0, 0);
+    const xAxis = new Mesh(geometry, getAxisMaterial(color1));
+    const yAxis = new Mesh(geometry, getAxisMaterial(color2));
+    const zAxis = new Mesh(geometry, getAxisMaterial(color3));
     yAxis.rotation.z = Math.PI / 2;
     zAxis.rotation.y = -Math.PI / 2;
     this.add(xAxis);
     this.add(zAxis);
     this.add(yAxis);
-    const posXAxisHelper = new THREE.Sprite(getSpriteMaterial(color1, "X"));
+    const posXAxisHelper = new Sprite(getSpriteMaterial(color1, "X"));
     posXAxisHelper.userData.type = "posX";
-    const posYAxisHelper = new THREE.Sprite(getSpriteMaterial(color2, "Y"));
+    const posYAxisHelper = new Sprite(getSpriteMaterial(color2, "Y"));
     posYAxisHelper.userData.type = "posY";
-    const posZAxisHelper = new THREE.Sprite(getSpriteMaterial(color3, "Z"));
+    const posZAxisHelper = new Sprite(getSpriteMaterial(color3, "Z"));
     posZAxisHelper.userData.type = "posZ";
-    const negXAxisHelper = new THREE.Sprite(getSpriteMaterial(color1));
+    const negXAxisHelper = new Sprite(getSpriteMaterial(color1));
     negXAxisHelper.userData.type = "negX";
-    const negYAxisHelper = new THREE.Sprite(getSpriteMaterial(color2));
+    const negYAxisHelper = new Sprite(getSpriteMaterial(color2));
     negYAxisHelper.userData.type = "negY";
-    const negZAxisHelper = new THREE.Sprite(getSpriteMaterial(color3));
+    const negZAxisHelper = new Sprite(getSpriteMaterial(color3));
     negZAxisHelper.userData.type = "negZ";
     posXAxisHelper.position.x = 1;
     posYAxisHelper.position.y = 1;
@@ -841,12 +839,12 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
     interactiveObjects.push(negXAxisHelper);
     interactiveObjects.push(negYAxisHelper);
     interactiveObjects.push(negZAxisHelper);
-    const point = new THREE.Vector3();
+    const point = new Vector3();
     const dim = 128;
     const turnRate = 2 * Math.PI;
-    const q1 = new THREE.Quaternion();
-    const q2 = new THREE.Quaternion();
-    const viewport = new THREE.Vector4();
+    const q1 = new Quaternion();
+    const q2 = new Quaternion();
+    const viewport = new Vector4();
     let radius = 0;
     this.render = function(renderer) {
       this.quaternion.copy(this.object.quaternion).invert();
@@ -881,8 +879,8 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
       renderer.render(this, orthoCamera);
       renderer.setViewport(viewport.x, viewport.y, viewport.z, viewport.w);
     };
-    const targetPosition = new THREE.Vector3();
-    const targetQuaternion = new THREE.Quaternion();
+    const targetPosition = new Vector3();
+    const targetQuaternion = new Quaternion();
     this.handleClick = function(event) {
       if (this.animating === true)
         return false;
@@ -933,27 +931,27 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
       switch (object.userData.type) {
         case "posX":
           targetPosition.set(1, 0, 0);
-          targetQuaternion.setFromEuler(new THREE.Euler(0, Math.PI * 0.5, 0));
+          targetQuaternion.setFromEuler(new Euler(0, Math.PI * 0.5, 0));
           break;
         case "posY":
           targetPosition.set(0, 1, 0);
-          targetQuaternion.setFromEuler(new THREE.Euler(-Math.PI * 0.5, 0, 0));
+          targetQuaternion.setFromEuler(new Euler(-Math.PI * 0.5, 0, 0));
           break;
         case "posZ":
           targetPosition.set(0, 0, 1);
-          targetQuaternion.setFromEuler(new THREE.Euler());
+          targetQuaternion.setFromEuler(new Euler());
           break;
         case "negX":
           targetPosition.set(-1, 0, 0);
-          targetQuaternion.setFromEuler(new THREE.Euler(0, -Math.PI * 0.5, 0));
+          targetQuaternion.setFromEuler(new Euler(0, -Math.PI * 0.5, 0));
           break;
         case "negY":
           targetPosition.set(0, -1, 0);
-          targetQuaternion.setFromEuler(new THREE.Euler(Math.PI * 0.5, 0, 0));
+          targetQuaternion.setFromEuler(new Euler(Math.PI * 0.5, 0, 0));
           break;
         case "negZ":
           targetPosition.set(0, 0, -1);
-          targetQuaternion.setFromEuler(new THREE.Euler(0, Math.PI, 0));
+          targetQuaternion.setFromEuler(new Euler(0, Math.PI, 0));
           break;
         default:
           console.error("ViewHelper: Invalid axis.");
@@ -967,7 +965,7 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
       q2.copy(dummy.quaternion);
     }
     function getAxisMaterial(color) {
-      return new THREE.MeshBasicMaterial({ color, toneMapped: false });
+      return new MeshBasicMaterial({ color, toneMapped: false });
     }
     function getSpriteMaterial(color, text = null) {
       const canvas = document.createElement("canvas");
@@ -985,8 +983,8 @@ let ViewHelper$1 = class ViewHelper extends THREE.Object3D {
         context.fillStyle = "#000000";
         context.fillText(text, 32, 41);
       }
-      const texture = new THREE.CanvasTexture(canvas);
-      return new THREE.SpriteMaterial({ map: texture, toneMapped: false });
+      const texture = new CanvasTexture(canvas);
+      return new SpriteMaterial({ map: texture, toneMapped: false });
     }
   }
 };
@@ -1093,7 +1091,7 @@ class ViewHelper2 extends ViewHelper$1 {
 const _changeEvent$1 = { type: "change" };
 const _startEvent = { type: "start" };
 const _endEvent = { type: "end" };
-class OrbitControls extends THREE.EventDispatcher {
+class OrbitControls extends EventDispatcher$1 {
   constructor(object, domElement) {
     super();
     if (domElement === void 0)
@@ -1104,7 +1102,7 @@ class OrbitControls extends THREE.EventDispatcher {
     this.domElement = domElement;
     this.domElement.style.touchAction = "none";
     this.enabled = true;
-    this.target = new THREE.Vector3();
+    this.target = new Vector3();
     this.minDistance = 0;
     this.maxDistance = Infinity;
     this.minZoom = 0;
@@ -1127,8 +1125,8 @@ class OrbitControls extends THREE.EventDispatcher {
     this.autoRotate = false;
     this.autoRotateSpeed = 2;
     this.keys = { LEFT: "ArrowLeft", UP: "ArrowUp", RIGHT: "ArrowRight", BOTTOM: "ArrowDown" };
-    this.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.PAN };
-    this.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+    this.mouseButtons = { LEFT: MOUSE.ROTATE, MIDDLE: MOUSE.DOLLY, RIGHT: MOUSE.PAN };
+    this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
     this.target0 = this.target.clone();
     this.position0 = this.object.position.clone();
     this.zoom0 = this.object.zoom;
@@ -1161,11 +1159,11 @@ class OrbitControls extends THREE.EventDispatcher {
       state = STATE.NONE;
     };
     this.update = function() {
-      const offset = new THREE.Vector3();
-      const quat = new THREE.Quaternion().setFromUnitVectors(object.up, new THREE.Vector3(0, 1, 0));
+      const offset = new Vector3();
+      const quat = new Quaternion().setFromUnitVectors(object.up, new Vector3(0, 1, 0));
       const quatInverse = quat.clone().invert();
-      const lastPosition = new THREE.Vector3();
-      const lastQuaternion = new THREE.Quaternion();
+      const lastPosition = new Vector3();
+      const lastQuaternion = new Quaternion();
       const twoPI = 2 * Math.PI;
       return function update() {
         const position = scope.object.position;
@@ -1261,20 +1259,20 @@ class OrbitControls extends THREE.EventDispatcher {
     };
     let state = STATE.NONE;
     const EPS = 1e-6;
-    const spherical = new THREE.Spherical();
-    const sphericalDelta = new THREE.Spherical();
+    const spherical = new Spherical();
+    const sphericalDelta = new Spherical();
     let scale = 1;
-    const panOffset = new THREE.Vector3();
+    const panOffset = new Vector3();
     let zoomChanged = false;
-    const rotateStart = new THREE.Vector2();
-    const rotateEnd = new THREE.Vector2();
-    const rotateDelta = new THREE.Vector2();
-    const panStart = new THREE.Vector2();
-    const panEnd = new THREE.Vector2();
-    const panDelta = new THREE.Vector2();
-    const dollyStart = new THREE.Vector2();
-    const dollyEnd = new THREE.Vector2();
-    const dollyDelta = new THREE.Vector2();
+    const rotateStart = new Vector2();
+    const rotateEnd = new Vector2();
+    const rotateDelta = new Vector2();
+    const panStart = new Vector2();
+    const panEnd = new Vector2();
+    const panDelta = new Vector2();
+    const dollyStart = new Vector2();
+    const dollyEnd = new Vector2();
+    const dollyDelta = new Vector2();
     const pointers = [];
     const pointerPositions = {};
     let zoomToCursorFlag = false;
@@ -1291,7 +1289,7 @@ class OrbitControls extends THREE.EventDispatcher {
       sphericalDelta.phi -= angle;
     }
     const panLeft = function() {
-      const v = new THREE.Vector3();
+      const v = new Vector3();
       return function panLeft2(distance, objectMatrix) {
         v.setFromMatrixColumn(objectMatrix, 0);
         v.multiplyScalar(-distance);
@@ -1299,7 +1297,7 @@ class OrbitControls extends THREE.EventDispatcher {
       };
     }();
     const panUp = function() {
-      const v = new THREE.Vector3();
+      const v = new Vector3();
       return function panUp2(distance, objectMatrix) {
         if (scope.screenSpacePanning === true) {
           v.setFromMatrixColumn(objectMatrix, 1);
@@ -1312,7 +1310,7 @@ class OrbitControls extends THREE.EventDispatcher {
       };
     }();
     const pan = function() {
-      const offset = new THREE.Vector3();
+      const offset = new Vector3();
       return function pan2(deltaX, deltaY) {
         const element = scope.domElement;
         if (scope.object.isPerspectiveCamera) {
@@ -1394,7 +1392,7 @@ class OrbitControls extends THREE.EventDispatcher {
     function zoomToCursor(event) {
       const x = event.offsetX / scope.domElement.clientWidth * 2 - 1;
       const y = -(event.offsetY / scope.domElement.clientHeight) * 2 + 1;
-      const v = new THREE.Vector3(x, y, 0);
+      const v = new Vector3(x, y, 0);
       v.unproject(scope.object);
       v.sub(scope.object.position).setLength(scope.zoomSpeed * 10);
       if (scope.object.isPerspectiveCamera) {
@@ -1601,13 +1599,13 @@ class OrbitControls extends THREE.EventDispatcher {
           mouseAction = -1;
       }
       switch (mouseAction) {
-        case THREE.MOUSE.DOLLY:
+        case MOUSE.DOLLY:
           if (scope.enableZoom === false)
             return;
           handleMouseDownDolly(event);
           state = STATE.DOLLY;
           break;
-        case THREE.MOUSE.ROTATE:
+        case MOUSE.ROTATE:
           if (event.ctrlKey || event.metaKey || event.shiftKey) {
             if (scope.enablePan === false)
               return;
@@ -1620,7 +1618,7 @@ class OrbitControls extends THREE.EventDispatcher {
             state = STATE.ROTATE;
           }
           break;
-        case THREE.MOUSE.PAN:
+        case MOUSE.PAN:
           if (event.ctrlKey || event.metaKey || event.shiftKey) {
             if (scope.enableRotate === false)
               return;
@@ -1679,13 +1677,13 @@ class OrbitControls extends THREE.EventDispatcher {
       switch (pointers.length) {
         case 1:
           switch (scope.touches.ONE) {
-            case THREE.TOUCH.ROTATE:
+            case TOUCH.ROTATE:
               if (scope.enableRotate === false)
                 return;
               handleTouchStartRotate();
               state = STATE.TOUCH_ROTATE;
               break;
-            case THREE.TOUCH.PAN:
+            case TOUCH.PAN:
               if (scope.enablePan === false)
                 return;
               handleTouchStartPan();
@@ -1697,13 +1695,13 @@ class OrbitControls extends THREE.EventDispatcher {
           break;
         case 2:
           switch (scope.touches.TWO) {
-            case THREE.TOUCH.DOLLY_PAN:
+            case TOUCH.DOLLY_PAN:
               if (scope.enableZoom === false && scope.enablePan === false)
                 return;
               handleTouchStartDollyPan();
               state = STATE.TOUCH_DOLLY_PAN;
               break;
-            case THREE.TOUCH.DOLLY_ROTATE:
+            case TOUCH.DOLLY_ROTATE:
               if (scope.enableZoom === false && scope.enableRotate === false)
                 return;
               handleTouchStartDollyRotate();
@@ -1771,7 +1769,7 @@ class OrbitControls extends THREE.EventDispatcher {
     function trackPointer(event) {
       let position = pointerPositions[event.pointerId];
       if (position === void 0) {
-        position = new THREE.Vector2();
+        position = new Vector2();
         pointerPositions[event.pointerId] = position;
       }
       position.set(event.pageX, event.pageY);
@@ -1787,20 +1785,20 @@ class OrbitControls extends THREE.EventDispatcher {
     this.update();
   }
 }
-const _raycaster = new THREE.Raycaster();
-const _tempVector = new THREE.Vector3();
-const _tempVector2 = new THREE.Vector3();
-const _tempQuaternion = new THREE.Quaternion();
+const _raycaster = new Raycaster();
+const _tempVector = new Vector3();
+const _tempVector2 = new Vector3();
+const _tempQuaternion = new Quaternion();
 const _unit = {
-  X: new THREE.Vector3(1, 0, 0),
-  Y: new THREE.Vector3(0, 1, 0),
-  Z: new THREE.Vector3(0, 0, 1)
+  X: new Vector3(1, 0, 0),
+  Y: new Vector3(0, 1, 0),
+  Z: new Vector3(0, 0, 1)
 };
 const _changeEvent = { type: "change" };
 const _mouseDownEvent = { type: "mouseDown" };
 const _mouseUpEvent = { type: "mouseUp", mode: null };
 const _objectChangeEvent = { type: "objectChange" };
-class TransformControls extends THREE.Object3D {
+class TransformControls extends Object3D {
   constructor(camera, domElement) {
     super();
     if (domElement === void 0) {
@@ -1852,17 +1850,17 @@ class TransformControls extends THREE.Object3D {
     defineProperty("showX", true);
     defineProperty("showY", true);
     defineProperty("showZ", true);
-    const worldPosition = new THREE.Vector3();
-    const worldPositionStart = new THREE.Vector3();
-    const worldQuaternion = new THREE.Quaternion();
-    const worldQuaternionStart = new THREE.Quaternion();
-    const cameraPosition = new THREE.Vector3();
-    const cameraQuaternion = new THREE.Quaternion();
-    const pointStart = new THREE.Vector3();
-    const pointEnd = new THREE.Vector3();
-    const rotationAxis = new THREE.Vector3();
+    const worldPosition = new Vector3();
+    const worldPositionStart = new Vector3();
+    const worldQuaternion = new Quaternion();
+    const worldQuaternionStart = new Quaternion();
+    const cameraPosition = new Vector3();
+    const cameraQuaternion = new Quaternion();
+    const pointStart = new Vector3();
+    const pointEnd = new Vector3();
+    const rotationAxis = new Vector3();
     const rotationAngle = 0;
-    const eye = new THREE.Vector3();
+    const eye = new Vector3();
     defineProperty("worldPosition", worldPosition);
     defineProperty("worldPositionStart", worldPositionStart);
     defineProperty("worldQuaternion", worldQuaternion);
@@ -1874,20 +1872,20 @@ class TransformControls extends THREE.Object3D {
     defineProperty("rotationAxis", rotationAxis);
     defineProperty("rotationAngle", rotationAngle);
     defineProperty("eye", eye);
-    this._offset = new THREE.Vector3();
-    this._startNorm = new THREE.Vector3();
-    this._endNorm = new THREE.Vector3();
-    this._cameraScale = new THREE.Vector3();
-    this._parentPosition = new THREE.Vector3();
-    this._parentQuaternion = new THREE.Quaternion();
-    this._parentQuaternionInv = new THREE.Quaternion();
-    this._parentScale = new THREE.Vector3();
-    this._worldScaleStart = new THREE.Vector3();
-    this._worldQuaternionInv = new THREE.Quaternion();
-    this._worldScale = new THREE.Vector3();
-    this._positionStart = new THREE.Vector3();
-    this._quaternionStart = new THREE.Quaternion();
-    this._scaleStart = new THREE.Vector3();
+    this._offset = new Vector3();
+    this._startNorm = new Vector3();
+    this._endNorm = new Vector3();
+    this._cameraScale = new Vector3();
+    this._parentPosition = new Vector3();
+    this._parentQuaternion = new Quaternion();
+    this._parentQuaternionInv = new Quaternion();
+    this._parentScale = new Vector3();
+    this._worldScaleStart = new Vector3();
+    this._worldQuaternionInv = new Quaternion();
+    this._worldScale = new Vector3();
+    this._positionStart = new Vector3();
+    this._quaternionStart = new Quaternion();
+    this._scaleStart = new Vector3();
     this._getPointer = getPointer.bind(this);
     this._onPointerDown = onPointerDown.bind(this);
     this._onPointerHover = onPointerHover.bind(this);
@@ -2214,33 +2212,33 @@ function intersectObjectWithRay(object, raycaster, includeInvisible) {
   }
   return false;
 }
-const _tempEuler = new THREE.Euler();
-const _alignVector = new THREE.Vector3(0, 1, 0);
-const _zeroVector = new THREE.Vector3(0, 0, 0);
-const _lookAtMatrix = new THREE.Matrix4();
-const _tempQuaternion2 = new THREE.Quaternion();
-const _identityQuaternion = new THREE.Quaternion();
-const _dirVector = new THREE.Vector3();
-const _tempMatrix = new THREE.Matrix4();
-const _unitX = new THREE.Vector3(1, 0, 0);
-const _unitY = new THREE.Vector3(0, 1, 0);
-const _unitZ = new THREE.Vector3(0, 0, 1);
-const _v1 = new THREE.Vector3();
-const _v2 = new THREE.Vector3();
-const _v3 = new THREE.Vector3();
-class TransformControlsGizmo extends THREE.Object3D {
+const _tempEuler = new Euler();
+const _alignVector = new Vector3(0, 1, 0);
+const _zeroVector = new Vector3(0, 0, 0);
+const _lookAtMatrix = new Matrix4();
+const _tempQuaternion2 = new Quaternion();
+const _identityQuaternion = new Quaternion();
+const _dirVector = new Vector3();
+const _tempMatrix = new Matrix4();
+const _unitX = new Vector3(1, 0, 0);
+const _unitY = new Vector3(0, 1, 0);
+const _unitZ = new Vector3(0, 0, 1);
+const _v1 = new Vector3();
+const _v2 = new Vector3();
+const _v3 = new Vector3();
+class TransformControlsGizmo extends Object3D {
   constructor() {
     super();
     this.isTransformControlsGizmo = true;
     this.type = "TransformControlsGizmo";
-    const gizmoMaterial = new THREE.MeshBasicMaterial({
+    const gizmoMaterial = new MeshBasicMaterial({
       depthTest: false,
       depthWrite: false,
       fog: false,
       toneMapped: false,
       transparent: true
     });
-    const gizmoLineMaterial = new THREE.LineBasicMaterial({
+    const gizmoLineMaterial = new LineBasicMaterial({
       depthTest: false,
       depthWrite: false,
       fog: false,
@@ -2275,207 +2273,207 @@ class TransformControlsGizmo extends THREE.Object3D {
     matYellow.color.setHex(16776960);
     const matGray = gizmoMaterial.clone();
     matGray.color.setHex(7895160);
-    const arrowGeometry = new THREE.CylinderGeometry(0, 0.04, 0.1, 12);
+    const arrowGeometry = new CylinderGeometry(0, 0.04, 0.1, 12);
     arrowGeometry.translate(0, 0.05, 0);
-    const scaleHandleGeometry = new THREE.BoxGeometry(0.08, 0.08, 0.08);
+    const scaleHandleGeometry = new BoxGeometry(0.08, 0.08, 0.08);
     scaleHandleGeometry.translate(0, 0.04, 0);
-    const lineGeometry = new THREE.BufferGeometry();
-    lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3));
-    const lineGeometry2 = new THREE.CylinderGeometry(75e-4, 75e-4, 0.5, 3);
+    const lineGeometry = new BufferGeometry();
+    lineGeometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 0, 0], 3));
+    const lineGeometry2 = new CylinderGeometry(75e-4, 75e-4, 0.5, 3);
     lineGeometry2.translate(0, 0.25, 0);
     function CircleGeometry(radius, arc) {
-      const geometry = new THREE.TorusGeometry(radius, 75e-4, 3, 64, arc * Math.PI * 2);
+      const geometry = new TorusGeometry(radius, 75e-4, 3, 64, arc * Math.PI * 2);
       geometry.rotateY(Math.PI / 2);
       geometry.rotateX(Math.PI / 2);
       return geometry;
     }
     function TranslateHelperGeometry() {
-      const geometry = new THREE.BufferGeometry();
-      geometry.setAttribute("position", new THREE.Float32BufferAttribute([0, 0, 0, 1, 1, 1], 3));
+      const geometry = new BufferGeometry();
+      geometry.setAttribute("position", new Float32BufferAttribute([0, 0, 0, 1, 1, 1], 3));
       return geometry;
     }
     const gizmoTranslate = {
       X: [
-        [new THREE.Mesh(arrowGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
-        [new THREE.Mesh(arrowGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]],
-        [new THREE.Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]]
+        [new Mesh(arrowGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
+        [new Mesh(arrowGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]],
+        [new Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]]
       ],
       Y: [
-        [new THREE.Mesh(arrowGeometry, matGreen), [0, 0.5, 0]],
-        [new THREE.Mesh(arrowGeometry, matGreen), [0, -0.5, 0], [Math.PI, 0, 0]],
-        [new THREE.Mesh(lineGeometry2, matGreen)]
+        [new Mesh(arrowGeometry, matGreen), [0, 0.5, 0]],
+        [new Mesh(arrowGeometry, matGreen), [0, -0.5, 0], [Math.PI, 0, 0]],
+        [new Mesh(lineGeometry2, matGreen)]
       ],
       Z: [
-        [new THREE.Mesh(arrowGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(arrowGeometry, matBlue), [0, 0, -0.5], [-Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(lineGeometry2, matBlue), null, [Math.PI / 2, 0, 0]]
+        [new Mesh(arrowGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
+        [new Mesh(arrowGeometry, matBlue), [0, 0, -0.5], [-Math.PI / 2, 0, 0]],
+        [new Mesh(lineGeometry2, matBlue), null, [Math.PI / 2, 0, 0]]
       ],
       XYZ: [
-        [new THREE.Mesh(new THREE.OctahedronGeometry(0.1, 0), matWhiteTransparent.clone()), [0, 0, 0]]
+        [new Mesh(new OctahedronGeometry(0.1, 0), matWhiteTransparent.clone()), [0, 0, 0]]
       ],
       XY: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matBlueTransparent.clone()), [0.15, 0.15, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matBlueTransparent.clone()), [0.15, 0.15, 0]]
       ],
       YZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matRedTransparent.clone()), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matRedTransparent.clone()), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
       ],
       XZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matGreenTransparent.clone()), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matGreenTransparent.clone()), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
       ]
     };
     const pickerTranslate = {
       X: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0.3, 0, 0], [0, 0, -Math.PI / 2]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [-0.3, 0, 0], [0, 0, Math.PI / 2]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0.3, 0, 0], [0, 0, -Math.PI / 2]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [-0.3, 0, 0], [0, 0, Math.PI / 2]]
       ],
       Y: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, -0.3, 0], [0, 0, Math.PI]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, -0.3, 0], [0, 0, Math.PI]]
       ],
       Z: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, 0.3], [Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, -0.3], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, 0.3], [Math.PI / 2, 0, 0]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, -0.3], [-Math.PI / 2, 0, 0]]
       ],
       XYZ: [
-        [new THREE.Mesh(new THREE.OctahedronGeometry(0.2, 0), matInvisible)]
+        [new Mesh(new OctahedronGeometry(0.2, 0), matInvisible)]
       ],
       XY: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]
       ],
       YZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
       ],
       XZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
       ]
     };
     const helperTranslate = {
       START: [
-        [new THREE.Mesh(new THREE.OctahedronGeometry(0.01, 2), matHelper), null, null, null, "helper"]
+        [new Mesh(new OctahedronGeometry(0.01, 2), matHelper), null, null, null, "helper"]
       ],
       END: [
-        [new THREE.Mesh(new THREE.OctahedronGeometry(0.01, 2), matHelper), null, null, null, "helper"]
+        [new Mesh(new OctahedronGeometry(0.01, 2), matHelper), null, null, null, "helper"]
       ],
       DELTA: [
-        [new THREE.Line(TranslateHelperGeometry(), matHelper), null, null, null, "helper"]
+        [new Line(TranslateHelperGeometry(), matHelper), null, null, null, "helper"]
       ],
       X: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
       ],
       Y: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [0, -1e3, 0], [0, 0, Math.PI / 2], [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [0, -1e3, 0], [0, 0, Math.PI / 2], [1e6, 1, 1], "helper"]
       ],
       Z: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [0, 0, -1e3], [0, -Math.PI / 2, 0], [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [0, 0, -1e3], [0, -Math.PI / 2, 0], [1e6, 1, 1], "helper"]
       ]
     };
     const gizmoRotate = {
       XYZE: [
-        [new THREE.Mesh(CircleGeometry(0.5, 1), matGray), null, [0, Math.PI / 2, 0]]
+        [new Mesh(CircleGeometry(0.5, 1), matGray), null, [0, Math.PI / 2, 0]]
       ],
       X: [
-        [new THREE.Mesh(CircleGeometry(0.5, 0.5), matRed)]
+        [new Mesh(CircleGeometry(0.5, 0.5), matRed)]
       ],
       Y: [
-        [new THREE.Mesh(CircleGeometry(0.5, 0.5), matGreen), null, [0, 0, -Math.PI / 2]]
+        [new Mesh(CircleGeometry(0.5, 0.5), matGreen), null, [0, 0, -Math.PI / 2]]
       ],
       Z: [
-        [new THREE.Mesh(CircleGeometry(0.5, 0.5), matBlue), null, [0, Math.PI / 2, 0]]
+        [new Mesh(CircleGeometry(0.5, 0.5), matBlue), null, [0, Math.PI / 2, 0]]
       ],
       E: [
-        [new THREE.Mesh(CircleGeometry(0.75, 1), matYellowTransparent), null, [0, Math.PI / 2, 0]]
+        [new Mesh(CircleGeometry(0.75, 1), matYellowTransparent), null, [0, Math.PI / 2, 0]]
       ]
     };
     const helperRotate = {
       AXIS: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
       ]
     };
     const pickerRotate = {
       XYZE: [
-        [new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 8), matInvisible)]
+        [new Mesh(new SphereGeometry(0.25, 10, 8), matInvisible)]
       ],
       X: [
-        [new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [0, -Math.PI / 2, -Math.PI / 2]]
+        [new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [0, -Math.PI / 2, -Math.PI / 2]]
       ],
       Y: [
-        [new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [Math.PI / 2, 0, 0]]
+        [new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [Math.PI / 2, 0, 0]]
       ],
       Z: [
-        [new THREE.Mesh(new THREE.TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [0, 0, -Math.PI / 2]]
+        [new Mesh(new TorusGeometry(0.5, 0.1, 4, 24), matInvisible), [0, 0, 0], [0, 0, -Math.PI / 2]]
       ],
       E: [
-        [new THREE.Mesh(new THREE.TorusGeometry(0.75, 0.1, 2, 24), matInvisible)]
+        [new Mesh(new TorusGeometry(0.75, 0.1, 2, 24), matInvisible)]
       ]
     };
     const gizmoScale = {
       X: [
-        [new THREE.Mesh(scaleHandleGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
-        [new THREE.Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
-        [new THREE.Mesh(scaleHandleGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]]
+        [new Mesh(scaleHandleGeometry, matRed), [0.5, 0, 0], [0, 0, -Math.PI / 2]],
+        [new Mesh(lineGeometry2, matRed), [0, 0, 0], [0, 0, -Math.PI / 2]],
+        [new Mesh(scaleHandleGeometry, matRed), [-0.5, 0, 0], [0, 0, Math.PI / 2]]
       ],
       Y: [
-        [new THREE.Mesh(scaleHandleGeometry, matGreen), [0, 0.5, 0]],
-        [new THREE.Mesh(lineGeometry2, matGreen)],
-        [new THREE.Mesh(scaleHandleGeometry, matGreen), [0, -0.5, 0], [0, 0, Math.PI]]
+        [new Mesh(scaleHandleGeometry, matGreen), [0, 0.5, 0]],
+        [new Mesh(lineGeometry2, matGreen)],
+        [new Mesh(scaleHandleGeometry, matGreen), [0, -0.5, 0], [0, 0, Math.PI]]
       ],
       Z: [
-        [new THREE.Mesh(scaleHandleGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(lineGeometry2, matBlue), [0, 0, 0], [Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(scaleHandleGeometry, matBlue), [0, 0, -0.5], [-Math.PI / 2, 0, 0]]
+        [new Mesh(scaleHandleGeometry, matBlue), [0, 0, 0.5], [Math.PI / 2, 0, 0]],
+        [new Mesh(lineGeometry2, matBlue), [0, 0, 0], [Math.PI / 2, 0, 0]],
+        [new Mesh(scaleHandleGeometry, matBlue), [0, 0, -0.5], [-Math.PI / 2, 0, 0]]
       ],
       XY: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matBlueTransparent), [0.15, 0.15, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matBlueTransparent), [0.15, 0.15, 0]]
       ],
       YZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matRedTransparent), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matRedTransparent), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
       ],
       XZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.01), matGreenTransparent), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new BoxGeometry(0.15, 0.15, 0.01), matGreenTransparent), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
       ],
       XYZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.1, 0.1), matWhiteTransparent.clone())]
+        [new Mesh(new BoxGeometry(0.1, 0.1, 0.1), matWhiteTransparent.clone())]
       ]
     };
     const pickerScale = {
       X: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0.3, 0, 0], [0, 0, -Math.PI / 2]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [-0.3, 0, 0], [0, 0, Math.PI / 2]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0.3, 0, 0], [0, 0, -Math.PI / 2]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [-0.3, 0, 0], [0, 0, Math.PI / 2]]
       ],
       Y: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, -0.3, 0], [0, 0, Math.PI]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0.3, 0]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, -0.3, 0], [0, 0, Math.PI]]
       ],
       Z: [
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, 0.3], [Math.PI / 2, 0, 0]],
-        [new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, -0.3], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, 0.3], [Math.PI / 2, 0, 0]],
+        [new Mesh(new CylinderGeometry(0.2, 0, 0.6, 4), matInvisible), [0, 0, -0.3], [-Math.PI / 2, 0, 0]]
       ],
       XY: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0.15, 0]]
       ],
       YZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0, 0.15, 0.15], [0, Math.PI / 2, 0]]
       ],
       XZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.01), matInvisible), [0.15, 0, 0.15], [-Math.PI / 2, 0, 0]]
       ],
       XYZ: [
-        [new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.2, 0.2), matInvisible), [0, 0, 0]]
+        [new Mesh(new BoxGeometry(0.2, 0.2, 0.2), matInvisible), [0, 0, 0]]
       ]
     };
     const helperScale = {
       X: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [-1e3, 0, 0], null, [1e6, 1, 1], "helper"]
       ],
       Y: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [0, -1e3, 0], [0, 0, Math.PI / 2], [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [0, -1e3, 0], [0, 0, Math.PI / 2], [1e6, 1, 1], "helper"]
       ],
       Z: [
-        [new THREE.Line(lineGeometry, matHelper.clone()), [0, 0, -1e3], [0, -Math.PI / 2, 0], [1e6, 1, 1], "helper"]
+        [new Line(lineGeometry, matHelper.clone()), [0, 0, -1e3], [0, -Math.PI / 2, 0], [1e6, 1, 1], "helper"]
       ]
     };
     function setupGizmo(gizmoMap) {
-      const gizmo = new THREE.Object3D();
+      const gizmo = new Object3D();
       for (const name in gizmoMap) {
         for (let i = gizmoMap[name].length; i--; ) {
           const object = gizmoMap[name][i][0].clone();
@@ -2695,11 +2693,11 @@ class TransformControlsGizmo extends THREE.Object3D {
     super.updateMatrixWorld(force);
   }
 }
-class TransformControlsPlane extends THREE.Mesh {
+class TransformControlsPlane extends Mesh {
   constructor() {
     super(
-      new THREE.PlaneGeometry(1e5, 1e5, 2, 2),
-      new THREE.MeshBasicMaterial({ visible: false, wireframe: true, side: THREE.DoubleSide, transparent: true, opacity: 0.1, toneMapped: false })
+      new PlaneGeometry(1e5, 1e5, 2, 2),
+      new MeshBasicMaterial({ visible: false, wireframe: true, side: DoubleSide, transparent: true, opacity: 0.1, toneMapped: false })
     );
     this.isTransformControlsPlane = true;
     this.type = "TransformControlsPlane";
@@ -2842,7 +2840,7 @@ class ViewPort {
     const { sceneHelper } = editor;
     const { target } = editor;
     target.append(renderer.domElement);
-    const gridHelper = new THREE.GridHelper(50, 50, 8947848);
+    const gridHelper = new GridHelper(50, 50, 8947848);
     gridHelper.rotateX(Math.PI / 2);
     gridHelper.isHelper = true;
     const transformControls = new TransformControls(editor.viewPortCamera, target);
@@ -2856,8 +2854,8 @@ class ViewPort {
       needsUpdate = true;
     });
     const viewHelper = new ViewHelper2(editor.viewPortCamera, target);
-    const box = new THREE.Box3();
-    const selectionBox = new THREE.Box3Helper(box);
+    const box = new Box3();
+    const selectionBox = new Box3Helper(box);
     selectionBox.visible = false;
     selectionBox.material.transparent = true;
     selectionBox.material.depthTest = false;
@@ -2931,8 +2929,8 @@ class ViewPort {
         orbitControls.enabled = true;
       }
     }
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    const raycaster = new Raycaster();
+    const mouse = new Vector2();
     function getIntersects(point) {
       mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
       raycaster.setFromCamera(mouse, editor.viewPortCamera);
@@ -2949,9 +2947,9 @@ class ViewPort {
       }
       return raycaster.intersectObjects(objects, false);
     }
-    const onDownPosition = new THREE.Vector2();
-    const onUpPosition = new THREE.Vector2();
-    const onDoubleClickPosition = new THREE.Vector2();
+    const onDownPosition = new Vector2();
+    const onUpPosition = new Vector2();
+    const onDoubleClickPosition = new Vector2();
     function getMousePosition(x, y) {
       const { left, top, width, height } = target.getBoundingClientRect();
       return [(x - left) / width, (y - top) / height];
@@ -2987,7 +2985,7 @@ class ViewPort {
     }
     target.addEventListener("mousedown", onMouseDown);
     target.addEventListener("dblclick", onDoubleClick);
-    const clock = new THREE.Clock();
+    const clock = new Clock();
     function animate() {
       const delta = clock.getDelta();
       if (viewHelper.animating === true) {
@@ -3041,8 +3039,10 @@ class ViewPort {
     };
   }
 }
-exports.CoordinateHelper = CoordinateHelper;
-exports.CustomGridHelper = CustomGridHelper;
-exports.Editor = Editor;
-exports.ViewHelper = ViewHelper2;
-exports.ViewPort = ViewPort;
+export {
+  CoordinateHelper,
+  CustomGridHelper,
+  Editor,
+  ViewHelper2 as ViewHelper,
+  ViewPort
+};
