@@ -1,13 +1,13 @@
 {
-  "name": "src",
+  "name": "f-utils",
   "version": "1.0.0",
-  "description": "",
-  "main": "",
+  "description": "utils",
+  "main": "./build/f-utils.cjs.js",
   "type": "module",
   "types": "./types/src/index.d.ts",
   "module": "./build/f-utils.es.js",
   "scripts": {
-    "build": "vite build --emptyOutDir && echo '666'"
+    "build": "vite build --emptyOutDir"
   },
   "keywords": [],
   "author": "",

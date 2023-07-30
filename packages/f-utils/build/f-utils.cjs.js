@@ -48,4 +48,43 @@ function rotateMatrix(rotateAngle, rotationAxis, target = new three.Matrix4()) {
     1
   );
 }
+class EventDispatcher {
+  constructor() {
+    this._listeners = {};
+  }
+  addEventListener(type, listener) {
+    const listeners = this._listeners;
+    if (listeners[type] === void 0) {
+      listeners[type] = [];
+    }
+    if (listeners[type].indexOf(listener) === -1) {
+      listeners[type].push(listener);
+    }
+  }
+  hasEventListener(type, listener) {
+    if (this._listeners === void 0)
+      return false;
+    const listeners = this._listeners;
+    return listeners[type] !== void 0 && listeners[type].indexOf(listener) !== -1;
+  }
+  removeEventListener(type, listener) {
+    const listenerArray = this._listeners[type];
+    if (listenerArray !== void 0) {
+      const index = listenerArray.indexOf(listener);
+      if (index !== -1) {
+        listenerArray.splice(index, 1);
+      }
+    }
+  }
+  dispatchEvent(type, ...arg) {
+    const listenerArray = this._listeners[type];
+    if (listenerArray !== void 0) {
+      const array = listenerArray.slice(0);
+      for (let i = 0, l = array.length; i < l; i++) {
+        array[i].call(this, ...arg);
+      }
+    }
+  }
+}
+exports.EventDispatcher = EventDispatcher;
 exports.rotationFormula = rotationFormula;

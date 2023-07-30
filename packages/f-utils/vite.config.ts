@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-07-06 14:18:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-30 02:59:32
+ * @LastEditTime: 2023-07-31 01:50:33
  * @FilePath: /threejs-demo/packages/f-utils/vite.config.ts
  */
 import { defineConfig } from 'vite';
@@ -27,7 +27,7 @@ export default defineConfig({
     },
   },
   plugins:[dts({
-    entryRoot:'./src/index.ts',
+    entryRoot:'./src',
     outDir:"./types"
   })]
 });
