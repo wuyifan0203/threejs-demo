@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-06 09:58:23
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/ViewPort.js
+ * @LastEditTime: 2023-08-02 23:53:36
+ * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.js
  */
 
 import {
@@ -12,18 +12,22 @@ import {
   Vector2,
   Box3,
   Clock,
+  PCFSoftShadowMap,
+  WebGLRenderer,
 } from 'three';
-import { initRenderer } from '../../utils/initialization';
-import { ViewHelper } from '../../helper';
-import { TransformControls, OrbitControls } from '../../controls';
-import { print, printInfo } from '../../utils/log';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 import { Stats } from './Stats';
 
 class ViewPort {
   constructor(editor) {
     const { signals } = editor;
 
-    const renderer = initRenderer();
+    const renderer = new WebGLRenderer({ antialias: true });
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = PCFSoftShadowMap;
+    renderer.setClearColor(0xaaaaaa);
     renderer.setAnimationLoop(animate);
 
     const { scene } = editor;

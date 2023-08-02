@@ -4,7 +4,7 @@
   "description": "utils",
   "main": "./build/f-utils.cjs.js",
   "type": "module",
-  "types": "./types/src/index.d.ts",
+  "types": "./types/index.d.ts",
   "module": "./build/f-utils.es.js",
   "scripts": {
     "build": "vite build --emptyOutDir"

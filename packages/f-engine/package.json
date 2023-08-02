@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build":"vite build --emptyOutDir"
+    "build": "vite build --emptyOutDir"
   },
   "keywords": [
     "cad",
@@ -14,9 +14,11 @@
   "author": "Yifan Wu",
   "license": "ISC",
   "devDependencies": {
-    "vite": "^4.4.6"
+    "vite": "^4.4.6",
+    "vite-plugin-dts": "^3.3.1"
   },
   "dependencies": {
-    "three": "^0.153.0"
+    "f-utils": "link:../f-utils",
+    "three": "^0.155.0"
   }
 }

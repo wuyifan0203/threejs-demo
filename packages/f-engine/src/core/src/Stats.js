@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-17 01:30:09
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Stats.js
+ * @LastEditTime: 2023-08-02 23:51:25
+ * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Stats.js
  */
 
 import {
@@ -15,10 +15,10 @@ const _triLabel = 'triangles';
 const _famLabel = 'frameTime';
 
 const _style = {
-    bottom: '10px',
-    left: '10px',
-    position: 'absolute',
-}
+  bottom: '10px',
+  left: '10px',
+  position: 'absolute',
+};
 
 class Stats {
   constructor(editor) {
@@ -70,7 +70,7 @@ class Stats {
 
       for (let i = 0, l = scene.children.length; i < l; i++) {
         const object = scene.children[i];
-        
+
         object.traverseVisible((child) => {
           objects++;
 

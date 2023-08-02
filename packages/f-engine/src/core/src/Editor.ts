@@ -1,48 +1,42 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-05 10:48:38
- * @FilePath: /threejs-demo/packages/app/CAD/src/core/src/Editor.js
+ * @LastEditTime: 2023-08-03 00:40:45
+ * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
-import { EventDispatcher } from '../../utils/EventDispatcher';
-import { Container } from './Container';
+import { EventDispatcher } from 'f-utils';
 import { Signal } from '../../lib/signals';
 import { Selector } from './Selector';
-import {
-  initPerspectiveCamera,
-  initScene,
-  initOrthographicCamera,
-} from '../../utils/initialization';
+import { SignalTypes,SignalsMap } from '../../types/SignalTypes';
+import { Scene } from 'three';
 
 class Editor extends EventDispatcher {
-  constructor(target) {
+  
+  private state:{[key:string]:any};
+  private selector:Selector
+  public signals:SignalTypes<SignalsMap>;
+  public domElement:HTMLElement;
+  public scene:Scene;
+  public sceneHelper:Scene
+
+  constructor(domElement:HTMLElement) {
     super();
     this.state = {};
     this.signals = {
-      windowResize: new Signal(),
       objectSelected: new Signal(),
       intersectionsDetected: new Signal(),
       objectAdded: new Signal(),
       sceneGraphChanged: new Signal(),
-      viewPortCameraChanged: new Signal(),
       sceneRendered: new Signal(),
       transformModeChange: new Signal(),
       objectRemoved: new Signal(),
     };
-    this.target = target;
-    this.container = new Container(this);
-    this.scene = initScene();
-    this.sceneHelper = initScene();
-
-    this.cameras = {
-      orthographic: initOrthographicCamera(),
-      perspective: initPerspectiveCamera(),
-    };
-    this.viewPortCamera = this.cameras.orthographic;
+    this.domElement = domElement;
+    this.scene = new Scene()
+    this.sceneHelper = new Scene();
 
     this.selector = new Selector(this);
-    this.selected = [];
   }
 
   addObject(object, parent, index) {
@@ -50,7 +44,6 @@ class Editor extends EventDispatcher {
       if (child.geometry !== undefined) this.addGeometry(child.geometry);
       if (child.material !== undefined) this.addMaterial(child.material);
 
-      this.container.addObject(child);
 
       this.addCamera(object);
       // TODO
@@ -75,30 +68,24 @@ class Editor extends EventDispatcher {
 
   addCamera(camera) {
     if (camera?.isCamera) {
-      this.container.addCamera(camera);
     }
   }
 
   removeCamera(camera) {
     if (camera?.isCamera) {
-      this.container.removeCamera(camera);
     }
   }
 
   addGeometry(geometry) {
-    this.container.addGeometry(geometry);
   }
 
   removeGeometry(geometry) {
-    this.container.removeGeometry(geometry);
   }
 
   addMaterial(material) {
-    this.container.addMaterial(material);
   }
 
   removeMaterial(material) {
-    this.container.removeMaterial(material);
   }
 
   removeObject(object) {
@@ -108,7 +95,6 @@ class Editor extends EventDispatcher {
       if (child.geometry !== undefined) this.removeGeometry(child.geometry);
       if (child.material !== undefined) this.removeMaterial(child.material);
 
-      this.container.removeObject(child);
       this.removeCamera(child);
 
       // TODO
@@ -127,9 +113,7 @@ class Editor extends EventDispatcher {
   }
 
   getObjectByUuid(uuid, isGlobal = false) {
-    return isGlobal
-      ? this.scene.getObjectByProperty('uuid', uuid)
-      : this.container.getObjectByUuid(uuid);
+    return this.scene.getObjectByProperty('uuid', uuid)
   }
 
   getObjectsByProperty(key, value) {
@@ -142,18 +126,7 @@ class Editor extends EventDispatcher {
     return result;
   }
 
-  toggleViewportCamera() {
-    const { orthographic, perspective } = this.cameras;
 
-    if (orthographic === this.viewPortCamera) {
-      this.viewPortCamera = perspective;
-    } else {
-      this.viewPortCamera = orthographic;
-    }
-    this.signals.viewPortCameraChanged.dispatch();
-
-    this.signals.sceneGraphChanged.dispatch();
-  }
 
   setState(key, value) {
     this.state[key] = value;
