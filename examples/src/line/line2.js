@@ -1,8 +1,8 @@
 /*
  * @Date: 2022-11-16 15:00:21
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-24 15:34:15
- * @FilePath: /threejs-demo/src/examples/edge/index2.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-02 13:56:38
+ * @FilePath: /threejs-demo/examples/src/line/line2.js
  */
 
 import {
@@ -24,11 +24,11 @@ import {
 import { LineMaterial } from '../lib/three/LineMaterial.js';
 import { LineSegments2 } from '../lib/three/LineSegments2.js';
 import { LineSegmentsGeometry } from '../lib/three/LineSegmentsGeometry.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
-(function () {
+window.onload = () => {
   init();
-}());
+};
 
 function init() {
   const renderer = initRenderer();

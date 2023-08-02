@@ -11,9 +11,9 @@ import {
   initRenderer, initDefaultLighting, initAxesHelper, initPerspectiveCamera,
 } from '../lib/tools/index.js';
 
-(function () {
+window.onload = () => {
   init();
-}());
+};
 
 function init() {
   const renderer = initRenderer();
