@@ -20,7 +20,7 @@ import {
   angle2Radians,
 } from '../lib/tools/index.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 function circle(x, r2) {
   return Math.sqrt(r2 - x * x);

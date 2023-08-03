@@ -40,10 +40,16 @@ import { Vector3, Matrix4 } from '../three/three.module.js';
  * @param {vec3} vec3After
  * @return {mat4} rotate matrix
  */
+const zero = new Vector3();
 function rotationFormula(vec3Before, vec3After, target) {
+  if (vec3Before.equals(zero) || vec3After.equals(zero)) {
+    console.error('the value of vec3Before or vec3After is zero');
+    return target ? target: new Matrix4();
+  }
+  if (vec3Before.equals(vec3After)) {
+    return target ? target.identity() : new Matrix4().identity();
+  }
   const rotationAxis = new Vector3().crossVectors(vec3Before, vec3After);
-
-  const rotateAngle = Math.acos(dotProduct(vec3Before, vec3After) / normalizeVec3(vec3Before) * normalizeVec3(vec3After));
 
   return rotateMatrix(rotateAngle, rotationAxis, target);
 }
