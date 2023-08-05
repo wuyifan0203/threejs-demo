@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-02 13:56:38
+ * @LastEditTime: 2023-08-05 15:38:10
  * @FilePath: /threejs-demo/examples/src/line/line2.js
  */
 
@@ -57,6 +57,8 @@ function draw(scene) {
   const g = new BoxGeometry(5, 6, 4);
   const edge = new EdgesGeometry(g);
   const l = new LineSegments(edge, new LineBasicMaterial({ color: 'green' }));
+  // 注意
+  // LineSegmentsGeometry 不支持带index的geometry ，测试半天，才发现
   const geometry = new LineSegmentsGeometry();
   geometry.fromEdgesGeometry(edge);
   // 3. 创建 LineMaterial，设置颜色和线宽
@@ -72,8 +74,8 @@ function draw(scene) {
   // 6. 计算下线条长度
   //   line.computeLineDistances();
   // 7. 添加到场景
-  scene.add(line, l);
-  console.log(scene);
+  scene.add(line);
+  scene.add(l);
 
   const gui = new GUI();
   gui.add(material, 'linewidth', 0.5, 10, 0.1);

@@ -6,7 +6,7 @@
  * @FilePath: /threejs-demo/packages/examples/light/shadow.js
  */
 /* eslint-disable no-unused-vars */
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,

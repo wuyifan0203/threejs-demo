@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:07:15
- * @FilePath: /threejs-demo/packages/examples/light/box.js
+ * @LastEditTime: 2023-08-05 09:36:12
+ * @FilePath: /threejs-demo/examples/src/light/box.js
  */
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
