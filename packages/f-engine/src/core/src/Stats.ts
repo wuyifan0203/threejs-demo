@@ -1,13 +1,13 @@
 /*
  * @Date: 2023-06-29 14:57:42
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-02 23:51:25
- * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Stats.js
+ * @LastEditTime: 2023-08-07 01:11:21
+ * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Stats.ts
  */
 
-import {
-  UIText, UISpan, UIBreak,
-} from '../../utils/ui';
+import { UIText, UISpan, UIBreak } from '@/utils/ui';
+import { Editor } from './Editor';
+import { Mesh, Points } from 'three'
 
 const _objLabel = 'objects';
 const _vecLabel = 'vertices';
@@ -21,8 +21,10 @@ const _style = {
 };
 
 class Stats {
-  constructor(editor) {
-    const dom = new UISpan();
+  public domElement: HTMLElement
+  private dom: UISpan
+  constructor(editor: Editor) {
+    const dom = this.dom = new UISpan();
     const objectCol = new UIText();
     const verticesCol = new UIText();
     const trianglesCol = new UIText();
@@ -46,20 +48,12 @@ class Stats {
 
     this.domElement = dom.domElement;
 
-    editor.signals.sceneRendered.add((frameTime) => {
+    editor.signals.sceneRendered.add((frameTime: number) => {
       frameTimeCol.setTextContent(`${_famLabel + frameTime.toFixed(2)} ms`);
     });
 
     editor.signals.objectAdded.add(update);
     editor.signals.objectRemoved.add(update);
-
-    this.show = function () {
-      dom.show();
-    };
-
-    this.hide = function () {
-      dom.hide();
-    };
 
     function update() {
       const { scene } = editor;
@@ -74,11 +68,14 @@ class Stats {
         object.traverseVisible((child) => {
           objects++;
 
-          if (child?.isMesh || child?.isPoints) {
+
+          const isMesh = child instanceof Mesh;
+          const isPoints = child instanceof Points;
+          if ( isMesh || isPoints) {
             const { geometry } = child;
             vertices += geometry.attributes.position.count;
 
-            if (child.isMesh) {
+            if (isMesh) {
               if (geometry.index !== null) {
                 triangles += geometry.index.count / 3;
               } else {
@@ -93,6 +90,14 @@ class Stats {
       verticesCol.setTextContent(_vecLabel + vertices);
       trianglesCol.setTextContent(_triLabel + triangles);
     }
+  }
+
+  show() {
+    this.dom.show();
+  }
+
+  hide() {
+    this.dom.hide();
   }
 }
 

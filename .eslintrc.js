@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 18:00:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-04 13:16:09
+ * @LastEditTime: 2023-08-07 01:21:08
  * @FilePath: /threejs-demo/.eslintrc.js
  */
 module.exports = {
@@ -9,9 +9,6 @@ module.exports = {
     browser: true,
     es2021: true,
   },
-  extends: [
-    'airbnb-base',
-  ],
   overrides: [
   ],
   parserOptions: {
