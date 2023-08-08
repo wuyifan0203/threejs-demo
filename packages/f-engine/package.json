@@ -1,5 +1,5 @@
 {
-  "name": "cad",
+  "name": "@f/engine",
   "version": "0.0.1",
   "description": "cad code",
   "main": "index.js",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@types/three": "^0.154.0",
-    "f-utils": "link:../f-utils",
+    "@f/utils": "workspace:*",
     "three": "^0.155.0"
   }
 }

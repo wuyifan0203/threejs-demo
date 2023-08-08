@@ -1,5 +1,5 @@
 {
-  "name": "f-utils",
+  "name": "@f/utils",
   "version": "1.0.0",
   "description": "utils",
   "main": "./build/f-utils.cjs.js",

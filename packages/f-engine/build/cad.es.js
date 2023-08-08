@@ -1,4 +1,4 @@
-import { Scene, Group, Vector3, ArrowHelper, LineSegments, BufferGeometry, LineBasicMaterial, Color, Float32BufferAttribute, Object3D, Raycaster, Vector2, OrthographicCamera, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial } from "three";
+import { Scene, Object3D, Vector3, Color, Raycaster, Vector2, OrthographicCamera, BoxGeometry, Mesh, Sprite, Quaternion, Vector4, Euler, MeshBasicMaterial, CanvasTexture, SpriteMaterial } from "three";
 class EventDispatcher {
   constructor() {
     this._listeners = {};
@@ -476,104 +476,6 @@ class Editor extends EventDispatcher {
     this.signals.sceneGraphChanged.dispatch();
   }
 }
-class CoordinateHelper extends Group {
-  constructor(colors = { x: "red", y: "green", z: "blue" }, axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
-    super();
-    this.colors = colors;
-    this.axesLength = axesLength;
-    this.arrowsLength = arrowsLength;
-    this.arrowsWidth = arrowsWidth;
-    this.type = "CoordinateHelper";
-    const pos = { x: [1, 0, 0], y: [0, 1, 0], z: [0, 0, 1] };
-    const origin = new Vector3();
-    ["x", "y", "z"].forEach((key) => {
-      const arrow = new ArrowHelper(new Vector3(...pos[key]), origin, axesLength, colors[key], arrowsLength, arrowsWidth);
-      arrow.renderOrder = Infinity;
-      this.add(arrow);
-    });
-    this.isHelper = true;
-  }
-  setLength(axesLength = 10, arrowsLength = 1, arrowsWidth = arrowsLength * 0.5) {
-    this.traverse((child) => {
-      child.setLength(axesLength, arrowsLength, arrowsWidth);
-    });
-  }
-  dispose() {
-    this.traverse((child) => {
-      child.dispose();
-    });
-  }
-}
-class CustomGridHelper extends LineSegments {
-  constructor(width = 10, height = 10, division = 1, splice = 1, centerColor = 11184810, baseColor = 14671839, divisionColor = 15658734) {
-    const geometry = new BufferGeometry();
-    const material = new LineBasicMaterial({ vertexColors: true, toneMapped: false });
-    super(geometry, material);
-    this.type = "CustomGridHelper";
-    this.centerColor = new Color(centerColor);
-    this.baseColor = new Color(baseColor);
-    this.divisionColor = new Color(divisionColor);
-    this.width = width;
-    this.height = height;
-    this.division = division;
-    this.splice = splice;
-    this.update();
-  }
-  update() {
-    let delta;
-    if (this.splice === 1) {
-      delta = 1;
-    } else {
-      delta = 1 / this.splice;
-    }
-    const {
-      centerColor,
-      baseColor,
-      divisionColor,
-      width,
-      height,
-      splice,
-      division
-    } = this;
-    const [timesX, timesY] = [width / division * splice, height / division * splice];
-    const vertices = [];
-    const colors = [];
-    let color;
-    let j10;
-    let isCenter;
-    let c = 0;
-    function loop(half, center, times, delta2, axis) {
-      const o = {};
-      o.x = (k, half2) => vertices.push(-half2, k, 0, half2, k, 0);
-      o.y = (k, half2) => vertices.push(k, -half2, 0, k, half2, 0);
-      for (let j = 0, k = -half; j <= times; j++, k += delta2) {
-        o[axis](k, half);
-        j10 = j % splice === 0;
-        isCenter = j === center;
-        color = divisionColor;
-        if (isCenter) {
-          color = centerColor;
-        } else if (j10 && !isCenter) {
-          color = baseColor;
-        }
-        color.toArray(colors, c);
-        c += 3;
-        color.toArray(colors, c);
-        c += 3;
-      }
-    }
-    loop(width / 2, timesX / 2, timesX, delta, "x");
-    loop(height / 2, timesY / 2, timesY, delta, "y");
-    this.geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
-    this.geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-    this.geometry.attributes.position.needUpdate = true;
-    this.geometry.attributes.color.needUpdate = true;
-  }
-  dispose() {
-    this.geometry.dispose();
-    this.material.dispose();
-  }
-}
 let ViewHelper$1 = class ViewHelper extends Object3D {
   constructor(camera, domElement) {
     super();
@@ -856,8 +758,6 @@ class ViewHelper2 extends ViewHelper$1 {
   }
 }
 export {
-  CoordinateHelper,
-  CustomGridHelper,
   Editor,
   ViewHelper2 as ViewHelper
 };

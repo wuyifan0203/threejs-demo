@@ -74,12 +74,12 @@ importers:
 
   packages/f-engine:
     dependencies:
+      '@f/utils':
+        specifier: workspace:*
+        version: link:../f-utils
       '@types/three':
         specifier: ^0.154.0
         version: registry.npmmirror.com/@types/three@0.154.0
-      f-utils:
-        specifier: link:../f-utils
-        version: link:../f-utils
       three:
         specifier: ^0.155.0
         version: registry.npmmirror.com/three@0.155.0

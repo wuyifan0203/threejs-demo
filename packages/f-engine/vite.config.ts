@@ -1,12 +1,12 @@
 /*
  * @Date: 2023-07-06 14:18:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-07 00:45:28
+ * @LastEditTime: 2023-08-08 20:55:24
  * @FilePath: /threejs-demo/packages/f-engine/vite.config.ts
  */
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
-const path = require('path');
+import path from 'path';
 
 
 export default defineConfig({

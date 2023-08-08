@@ -1,15 +1,15 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-03 00:40:45
+ * @LastEditTime: 2023-08-08 20:58:21
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
-import { EventDispatcher } from 'f-utils';
+import { EventDispatcher } from '@f/utils';
 import { Signal } from '../../lib/signals';
 import { Selector } from './Selector';
 import { SignalTypes,SignalsMap } from '../../types/SignalTypes';
-import { Scene } from 'three';
+import { Camera, Mesh, Scene } from 'three';
 
 class Editor extends EventDispatcher {
   
@@ -39,7 +39,7 @@ class Editor extends EventDispatcher {
     this.selector = new Selector(this);
   }
 
-  addObject(object, parent, index) {
+  addObject(object:Mesh, parent, index) {
     object.traverse((child) => {
       if (child.geometry !== undefined) this.addGeometry(child.geometry);
       if (child.material !== undefined) this.addMaterial(child.material);
@@ -66,7 +66,7 @@ class Editor extends EventDispatcher {
     this.dispatchEvent('objectAdded', object);
   }
 
-  addCamera(camera) {
+  addCamera(camera:Camera) {
     if (camera?.isCamera) {
     }
   }
