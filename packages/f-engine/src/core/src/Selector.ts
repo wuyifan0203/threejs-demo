@@ -11,7 +11,6 @@ import { Editor } from './Editor';
 class Selector {
   private editor:Editor
   constructor(editor:Editor) {
-    // 是否为多选模式
     this.editor = editor;
 
     this.editor.signals.intersectionsDetected.add((selectIds:string[]) => {

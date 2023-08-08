@@ -1,25 +1,24 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-08 20:53:52
+ * @LastEditTime: 2023-08-09 01:21:29
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
-
-import { Camera, OrthographicCamera, PerspectiveCamera, WebGLRenderer } from 'three';
+import { WebGLRenderer,OrthographicCamera, PerspectiveCamera } from 'three'
 import { generateUUID } from 'three/src/math/MathUtils';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';
-import { Editor } from './Editor';
+import type { Editor } from './Editor';
 
 class ViewPort extends EventDispatcher {
-  readonly type: string;
   readonly uuid: string;
+  protected type: string;
   protected editor: Editor;
-  private camera: OrthographicCamera | PerspectiveCamera;
   protected domElement: HTMLElement;
+  protected renderer: WebGLRenderer;
+  private camera: OrthographicCamera | PerspectiveCamera;
   private width: number;
   private height: number;
-  private renderer: WebGLRenderer;
   private orbitControls: OrbitControls;
   public name: string;
   public onAfterRenderScene: Function;
@@ -46,21 +45,17 @@ class ViewPort extends EventDispatcher {
 
 
     this.orbitControls = new OrbitControls(camera, this.renderer.domElement);
-    this.orbitControls.addEventListener('change', () => {
-      this.render();
-    });
+    this.orbitControls.addEventListener('change',this.render);
 
     this.domElement.append(this.renderer.domElement);
 
     // signals
-    this.editor.signals.sceneGraphChanged.add(() => {
-      this.render();
-    });
+    this.editor.signals.sceneGraphChanged.add(this.render);
   }
 
   private render() {
     this.onBeforeRender(this.editor, this.camera);
-    
+
     this.renderer.clear();
     this.renderer.render(this.editor.scene, this.camera);
 
