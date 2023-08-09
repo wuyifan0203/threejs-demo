@@ -18,7 +18,7 @@
     "vite-plugin-dts": "^3.3.1"
   },
   "dependencies": {
-    "@types/three": "^0.154.0",
+    "@types/three": "^0.155.0",
     "@f/utils": "workspace:*",
     "three": "^0.155.0"
   }

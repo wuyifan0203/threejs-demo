@@ -11,11 +11,11 @@ type SignalTypes<T> = { [k in keyof T]: Signal }
 interface SignalsMap {
     'objectSelected': Signal
     'intersectionsDetected': Signal
-    'objectAdded': Signal
+    'objectsAdded': Signal
     'sceneGraphChanged': Signal
     'sceneRendered': Signal
     "transformModeChange": Signal
-    "objectRemoved":Signal
+    "objectsRemoved":Signal
 }
 
 

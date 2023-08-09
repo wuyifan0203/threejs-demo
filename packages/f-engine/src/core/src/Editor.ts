@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-09 00:16:44
+ * @LastEditTime: 2023-08-10 00:57:36
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
@@ -13,7 +13,10 @@ import { Camera, Color, Mesh, Scene, Texture } from 'three';
 
 class Editor extends EventDispatcher {
   
-  private state:{[key:string]:any};
+  private state:{
+    selections:Set<string>
+    [key:string]:any
+  };
   private selector:Selector
   public signals:SignalTypes<SignalsMap>;
   public domElement:HTMLElement;
@@ -22,15 +25,17 @@ class Editor extends EventDispatcher {
 
   constructor(domElement:HTMLElement) {
     super();
-    this.state = {};
+    this.state = {
+      selections:new Set()
+    };
     this.signals = {
       objectSelected: new Signal(),
       intersectionsDetected: new Signal(),
-      objectAdded: new Signal(),
+      objectsAdded: new Signal(),
       sceneGraphChanged: new Signal(),
       sceneRendered: new Signal(),
       transformModeChange: new Signal(),
-      objectRemoved: new Signal(),
+      objectsRemoved: new Signal(),
     };
     this.domElement = domElement;
     this.scene = new Scene()
@@ -126,6 +131,10 @@ class Editor extends EventDispatcher {
     return result;
   }
 
+  addHelper(helper){
+    this.sceneHelper.add(helper)
+  }
+
 
 
   setState(key, value) {
@@ -148,13 +157,9 @@ class Editor extends EventDispatcher {
     }
   }
 
-  selectById(uuid) {
-    if (uuid !== undefined) {
-      if (Array.isArray(uuid)) {
-        this.selector.select(uuid);
-      } else {
-        this.selector.select([uuid]);
-      }
+  selectByIds(uuids:Array<string> | undefined) {
+    if (uuids !== undefined) {
+        this.selector.select(uuids);
     } else {
       this.selector.detach();
     }
