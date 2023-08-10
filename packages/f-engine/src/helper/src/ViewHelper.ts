@@ -1,5 +1,6 @@
 import {
   BoxGeometry,
+  Camera,
   CanvasTexture,
   Color,
   Euler,
@@ -17,7 +18,15 @@ import {
 } from 'three';
 
 class ViewHelper extends Object3D {
-  constructor(camera, domElement) {
+  object: any;
+  isViewHelper: boolean;
+  animating: boolean;
+  center: Vector3;
+  render: (renderer: any) => void;
+  handleClick: (event: any) => boolean;
+  update: (delta: any) => void;
+  dispose: () => void;
+  constructor(camera:Camera, domElement:HTMLElement) {
     super();
 
     this.object = camera;
@@ -31,7 +40,7 @@ class ViewHelper extends Object3D {
     const color2 = new Color('#8adb00');
     const color3 = new Color('#2c8fff');
 
-    const interactiveObjects = [];
+    const interactiveObjects :Array<Object3D>= [];
     const raycaster = new Raycaster();
     const mouse = new Vector2();
     const dummy = new Object3D();
@@ -194,12 +203,12 @@ class ViewHelper extends Object3D {
       yAxis.material.dispose();
       zAxis.material.dispose();
 
-      posXAxisHelper.material.map.dispose();
-      posYAxisHelper.material.map.dispose();
-      posZAxisHelper.material.map.dispose();
-      negXAxisHelper.material.map.dispose();
-      negYAxisHelper.material.map.dispose();
-      negZAxisHelper.material.map.dispose();
+      posXAxisHelper.material.map?.dispose();
+      posYAxisHelper.material.map?.dispose();
+      posZAxisHelper.material.map?.dispose();
+      negXAxisHelper.material.map?.dispose();
+      negYAxisHelper.material.map?.dispose();
+      negZAxisHelper.material.map?.dispose();
 
       posXAxisHelper.material.dispose();
       posYAxisHelper.material.dispose();
@@ -209,7 +218,7 @@ class ViewHelper extends Object3D {
       negZAxisHelper.material.dispose();
     };
 
-    function prepareAnimationData(object, focusPoint, camera) {
+    function prepareAnimationData(object:Object3D, focusPoint:Vector3, camera:Camera) {
       switch (object.userData.type) {
         case 'posX':
           targetPosition.set(1, 0, 0);
@@ -259,27 +268,27 @@ class ViewHelper extends Object3D {
       q2.copy(dummy.quaternion);
     }
 
-    function getAxisMaterial(color) {
+    function getAxisMaterial(color:Color) {
       return new MeshBasicMaterial({ color, toneMapped: false });
     }
 
-    function getSpriteMaterial(color, text = null) {
+    function getSpriteMaterial(color:Color, text = '') {
       const canvas = document.createElement('canvas');
       canvas.width = 64;
       canvas.height = 64;
 
       const context = canvas.getContext('2d');
-      context.beginPath();
-      context.arc(32, 32, 16, 0, 2 * Math.PI);
-      context.closePath();
-      context.fillStyle = color.getStyle();
-      context.fill();
+      context!.beginPath();
+      context!.arc(32, 32, 16, 0, 2 * Math.PI);
+      context!.closePath();
+      context!.fillStyle = color.getStyle();
+      context!.fill();
 
-      if (text !== null) {
-        context.font = '24px Arial';
-        context.textAlign = 'center';
-        context.fillStyle = '#000000';
-        context.fillText(text, 32, 41);
+      if (text !== '') {
+        context!.font = '24px Arial';
+        context!.textAlign = 'center';
+        context!.fillStyle = '#000000';
+        context!.fillText(text, 32, 41);
       }
 
       const texture = new CanvasTexture(canvas);

@@ -52,7 +52,7 @@ class ViewPort extends EventDispatcher {
     this.editor.signals.sceneGraphChanged.add(this.render);
   }
 
-  private render() {
+  protected render() {
     this.onBeforeRender(this.editor, this.camera);
 
     this.renderer.clear();

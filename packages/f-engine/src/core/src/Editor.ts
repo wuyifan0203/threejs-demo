@@ -1,15 +1,15 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-10 00:57:36
+ * @LastEditTime: 2023-08-10 20:08:01
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
 import { EventDispatcher } from '@f/utils';
-import { Signal } from '../../lib/signals';
+import { Signal } from 'signals';
 import { Selector } from './Selector';
 import { SignalTypes,SignalsMap } from '../../types/SignalTypes';
-import { Camera, Color, Mesh, Scene, Texture } from 'three';
+import { Camera, Color, Mesh, Object3D, Scene, Texture } from 'three';
 
 class Editor extends EventDispatcher {
   
@@ -29,7 +29,7 @@ class Editor extends EventDispatcher {
       selections:new Set()
     };
     this.signals = {
-      objectSelected: new Signal(),
+      objectsSelected: new Signal(),
       intersectionsDetected: new Signal(),
       objectsAdded: new Signal(),
       sceneGraphChanged: new Signal(),
@@ -44,7 +44,7 @@ class Editor extends EventDispatcher {
     this.selector = new Selector(this);
   }
 
-  addObject(object:Mesh, parent, index) {
+  addObject(object:Object3D, parent:Object3D, index:number |undefined) {
     object.traverse((child) => {
       if (child.geometry !== undefined) this.addGeometry(child.geometry);
       if (child.material !== undefined) this.addMaterial(child.material);
@@ -66,7 +66,7 @@ class Editor extends EventDispatcher {
       object.parent = parent;
     }
 
-    this.signals.objectAdded.dispatch(object);
+    this.signals.objectsAdded.dispatch(object);
     this.signals.sceneGraphChanged.dispatch();
     this.dispatchEvent('objectAdded', object);
   }
@@ -76,7 +76,7 @@ class Editor extends EventDispatcher {
     }
   }
 
-  removeCamera(camera) {
+  removeCamera(camera:) {
     if (camera?.isCamera) {
     }
   }
@@ -113,11 +113,11 @@ class Editor extends EventDispatcher {
   }
 
   removeObjectByUuid(uuid) {
-    const object = this.getObjectByUuid(uuid, true);
+    const object = this.getObjectByUuid(uuid);
     object && this.removeObject(object);
   }
 
-  getObjectByUuid(uuid, isGlobal = false) {
+  getObjectByUuid(uuid:string) {
     return this.scene.getObjectByProperty('uuid', uuid)
   }
 

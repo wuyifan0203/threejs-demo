@@ -1,15 +1,16 @@
 /*
  * @Date: 2023-06-16 00:45:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-29 17:03:26
- * @FilePath: /threejs-demo/packages/app/CAD/src/helper/src/ViewHelperExtend.js
+ * @LastEditTime: 2023-08-10 20:52:18
+ * @FilePath: /threejs-demo/packages/f-engine/src/helper/src/ViewHelperExtend.ts
  */
 import { ViewHelper as ViewHelperBase } from './ViewHelper';
 import { UIDiv } from '../../utils/ui';
+import type { Camera } from 'three';
 
 class ViewHelper extends ViewHelperBase {
-  constructor(editorCamera, container) {
-    super(editorCamera, container);
+  constructor(camera:Camera, domElement:HTMLElement) {
+    super(camera, domElement);
 
     const dom = new UIDiv();
     dom.setId('viewHelper');
@@ -20,7 +21,7 @@ class ViewHelper extends ViewHelperBase {
       height: '128px',
       width: '128px',
     });
-    container.append(dom.domElement);
+    domElement.append(dom.domElement);
 
     dom.domElement.addEventListener('pointerup', (event) => {
       event.stopPropagation();
