@@ -27,13 +27,13 @@ class Selector {
 
     this.editor.setState('selection',selectIds);
 
-    this.editor.signals.objectSelected.dispatch(selectIds);
+    this.editor.signals.objectsSelected.dispatch(selectIds);
     this.editor.dispatchEvent('selectionChange', selectIds);
   }
 
   detach() {
     this.editor.setState('selection',[])
-    this.editor.signals.objectSelected.dispatch([]);
+    this.editor.signals.objectsSelected.dispatch([]);
     this.editor.dispatchEvent('selectionChange', []);
   }
 }

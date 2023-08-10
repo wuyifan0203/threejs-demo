@@ -1,14 +1,14 @@
-import type { Signal } from "../../types/Signal";
+import type { Signal } from "signals";
 type SignalTypes<T> = {
     [k in keyof T]: Signal;
 };
 interface SignalsMap {
-    'objectSelected': Signal;
+    'objectsSelected': Signal;
     'intersectionsDetected': Signal;
-    'objectAdded': Signal;
+    'objectsAdded': Signal;
     'sceneGraphChanged': Signal;
     'sceneRendered': Signal;
     "transformModeChange": Signal;
-    "objectRemoved": Signal;
+    "objectsRemoved": Signal;
 }
 export { SignalTypes, SignalsMap };

@@ -19,7 +19,7 @@ class ViewPort extends EventDispatcher {
   protected camera: OrthographicCamera | PerspectiveCamera;
   private width: number;
   private height: number;
-  protected orbitControls: OrbitControls;
+  public orbitControls: OrbitControls;
   public name: string;
   public onAfterRenderScene: Function;
   public onBeforeRender: Function;

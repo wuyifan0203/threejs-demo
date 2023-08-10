@@ -1,22 +1,23 @@
-import { OrthographicCamera, PerspectiveCamera } from 'three';
+import { WebGLRenderer, OrthographicCamera, PerspectiveCamera } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';
-import { Editor } from './Editor';
+import type { Editor } from './Editor';
 declare class ViewPort extends EventDispatcher {
-    readonly type: string;
     readonly uuid: string;
+    protected type: string;
     protected editor: Editor;
-    private camera;
     protected domElement: HTMLElement;
+    protected renderer: WebGLRenderer;
+    protected camera: OrthographicCamera | PerspectiveCamera;
     private width;
     private height;
-    private renderer;
-    private orbitControls;
+    orbitControls: OrbitControls;
     name: string;
     onAfterRenderScene: Function;
     onBeforeRender: Function;
     onBeforeRenderSceneHelper: Function;
     constructor(editor: Editor, camera: OrthographicCamera | PerspectiveCamera, domElement: HTMLElement);
-    private render;
+    protected render(): void;
     setSize(width: number, height: number): void;
     getSize(): {
         width: number;

@@ -4,15 +4,15 @@
  * @LastEditTime: 2023-06-30 18:15:08
  * @FilePath: /threejs-demo/packages/app/CAD/src/utils/common.js
  */
-function isSameArray(v1, v2) {
+function isSameArray(v1:Array<string>, v2:Array<string>) {
   return stringify(v1.slice().sort()) === stringify(v2.slice().sort());
 }
 
-function parse(v) {
+function parse(v:string) {
   return JSON.parse(v);
 }
 
-function stringify(v) {
+function stringify(v:object) {
   return JSON.stringify(v);
 }
 

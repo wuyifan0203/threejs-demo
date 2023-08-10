@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-10 20:56:37
+ * @LastEditTime: 2023-08-11 01:25:13
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { Vector3, type Object3D, type OrthographicCamera, type PerspectiveCamera, Euler, Clock } from "three";
@@ -10,6 +10,7 @@ import StatsPanel from 'three/examples/jsm/libs/stats.module';
 import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
+import { TransformControlHandler } from "./TransformControlHandler";
 
 type uuids = Array<string>;
 type transformMode = 'translate' | 'scale' | 'rotate'
@@ -44,57 +45,13 @@ class MainViewPort extends ViewPort {
         this.transformControl = new TransformControls(camera, this.renderer.domElement);
         this.editor.addHelper(this.transformControl);
 
-        this.transformControl.addEventListener('change', () => {
-            const { object } = this.transformControl;
+        const handler = new TransformControlHandler(this.transformControl);
 
-            if (object !== undefined) {
-                this.editor.signals.sceneGraphChanged.dispatch();
-            }
-        })
+        this.transformControl.addEventListener('change', () => handler.handleChange(editor))
+        this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this))
+        this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this))
 
-        const _objectPositionOnDown = new Vector3();
-        const _objectRotationOnDown = new Euler();
-        const _objectScaleOnDown = new Vector3();
-
-        this.transformControl.addEventListener('mouseDown', () => {
-            const { object } = this.transformControl;
-
-            if (object !== undefined) {
-                _objectPositionOnDown.copy(object.position);
-                _objectRotationOnDown.copy(object.rotation);
-                _objectScaleOnDown.copy(object.scale);
-
-                this.orbitControls.enabled = false;
-            }
-        })
-
-        this.transformControl.addEventListener('mouseUp', () => {
-            const { object } = this.transformControl;
-
-            if (object !== undefined) {
-                switch (this.transformControl.getMode()) {
-                    case 'translate':
-                        if (!_objectPositionOnDown.equals(object.position)) {
-                            // TODO command
-                        }
-                        break;
-                    case 'rotate':
-                        if (!_objectRotationOnDown.equals(object.rotation)) {
-                            // TODO command
-                        }
-                        break;
-                    case 'scale':
-                        if (!_objectScaleOnDown.equals(object.scale)) {
-                            // TODO command
-                        }
-                        break;
-                    // skip default
-                }
-                this.orbitControls.enabled = true;
-            }
-        })
-
-        const selectId: Array<string> = [];
+        const selectId: uuids = [];
 
         this.editor.signals.objectsRemoved.add((uuids: uuids) => {
             const selections: Set<string> = this.editor.getState('selections');
@@ -131,9 +88,23 @@ class MainViewPort extends ViewPort {
             }
             this.editor.signals.sceneGraphChanged.dispatch()
         })
+    }
 
+    protected render(): void {
+        this.onBeforeRender(this.editor, this.camera);
 
-
+        this.renderer.clear();
+  
+        this.renderer.render(this.editor.scene, this.camera);
+  
+        this.renderer.render(this.editor.sceneHelper, this.camera);
+  
+        this.viewHelper.render(this.renderer);
+  
+        this.onAfterRenderScene(this.editor, this.camera);
+  
+        this.needsUpdate = false;
+        
     }
 
     public setTransformMode(mode: transformMode) {

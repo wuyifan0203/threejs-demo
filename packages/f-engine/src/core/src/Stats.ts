@@ -52,8 +52,8 @@ class Stats {
       frameTimeCol.setTextContent(`${_famLabel + frameTime.toFixed(2)} ms`);
     });
 
-    editor.signals.objectAdded.add(update);
-    editor.signals.objectRemoved.add(update);
+    editor.signals.objectsAdded.add(update);
+    editor.signals.objectsRemoved.add(update);
 
     function update() {
       const { scene } = editor;

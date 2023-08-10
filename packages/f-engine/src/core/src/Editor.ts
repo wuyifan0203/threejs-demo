@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-10 20:08:01
+ * @LastEditTime: 2023-08-11 01:33:28
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
@@ -9,7 +9,7 @@ import { EventDispatcher } from '@f/utils';
 import { Signal } from 'signals';
 import { Selector } from './Selector';
 import { SignalTypes,SignalsMap } from '../../types/SignalTypes';
-import { Camera, Color, Mesh, Object3D, Scene, Texture } from 'three';
+import { Color, Object3D, Scene, Texture } from 'three';
 
 class Editor extends EventDispatcher {
   
@@ -45,15 +45,6 @@ class Editor extends EventDispatcher {
   }
 
   addObject(object:Object3D, parent:Object3D, index:number |undefined) {
-    object.traverse((child) => {
-      if (child.geometry !== undefined) this.addGeometry(child.geometry);
-      if (child.material !== undefined) this.addMaterial(child.material);
-
-
-      this.addCamera(object);
-      // TODO
-      // addHelper
-    });
 
     if (parent === undefined) {
       this.scene.add(object);
@@ -61,7 +52,7 @@ class Editor extends EventDispatcher {
       if (index === undefined) {
         parent.add(object);
       } else {
-        parent.children.slice(index, 0, object);
+        parent.children.splice(index, 0, object);
       }
       object.parent = parent;
     }
@@ -71,48 +62,17 @@ class Editor extends EventDispatcher {
     this.dispatchEvent('objectAdded', object);
   }
 
-  addCamera(camera:Camera) {
-    if (camera?.isCamera) {
-    }
-  }
-
-  removeCamera(camera:) {
-    if (camera?.isCamera) {
-    }
-  }
-
-  addGeometry(geometry) {
-  }
-
-  removeGeometry(geometry) {
-  }
-
-  addMaterial(material) {
-  }
-
-  removeMaterial(material) {
-  }
-
-  removeObject(object) {
+  removeObject(object:Object3D) {
     // 排除场景和视图相机
     if (object.parent === null) return;
-    object.traverse((child) => {
-      if (child.geometry !== undefined) this.removeGeometry(child.geometry);
-      if (child.material !== undefined) this.removeMaterial(child.material);
-
-      this.removeCamera(child);
-
-      // TODO
-      // scope.removeHelper(child);
-    });
 
     object.parent.remove(object);
 
-    this.signals.objectRemoved.dispatch(object);
+    this.signals.objectsRemoved.dispatch(object);
     this.signals.sceneGraphChanged.dispatch();
   }
 
-  removeObjectByUuid(uuid) {
+  removeObjectByUuid(uuid:string) {
     const object = this.getObjectByUuid(uuid);
     object && this.removeObject(object);
   }
@@ -121,7 +81,7 @@ class Editor extends EventDispatcher {
     return this.scene.getObjectByProperty('uuid', uuid)
   }
 
-  getObjectsByProperty(key, value) {
+  getObjectsByProperty(key:string, value:any) {
     let result = this.scene.getObjectsByProperty(key, value);
     const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key, value);
     if (sceneHelperResult.length > 0) {
@@ -131,27 +91,23 @@ class Editor extends EventDispatcher {
     return result;
   }
 
-  addHelper(helper){
+  addHelper(helper:Object3D){
     this.sceneHelper.add(helper)
   }
 
 
 
-  setState(key, value) {
+  setState(key:string, value:any) {
     this.state[key] = value;
   }
 
-  getState(key) {
+  getState(key:string) {
     return this.state[key];
   }
 
-  select(object) {
-    if (object !== undefined) {
-      if (Array.isArray(object)) {
-        this.selector.select(object.map((obj) => obj?.uuid));
-      } else {
-        this.selector.select([object?.uuid]);
-      }
+  select(object:Object3D[]) {
+    if (object.length) {
+        this.selector.select(object.map((obj) => obj.uuid));
     } else {
       this.selector.detach();
     }
