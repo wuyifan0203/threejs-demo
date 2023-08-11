@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-17 16:11:09
- * @FilePath: /threejs-demo/packages/examples/geometry/ParametricGeometry.js
+ * @LastEditTime: 2023-08-11 20:21:06
+ * @FilePath: /threejs-demo/examples/src/geometry/ParametricGeometry.js
  */
 import {
   Vector3,
@@ -64,8 +64,33 @@ const funcList = {
     const Sigma = 6;
     const k = 5;
 
-    const x = u * size - size / 2;
-    const y = v * size - size / 2;
+    let x = u * size - size / 2;
+    let y = v * size - size / 2;
+
+    const ux = x - mux;
+    const uy = y - muy;
+    const z = k * Math.exp((ux * ux) / -Sigma) * Math.exp((uy * uy) / -Sigma);
+    target.set(x, y, z);
+  },
+
+  Gaussian2(u,v,target){
+    const mux = 0;
+    const muy = 0;
+    const size = 10;
+    const Sigma = 6;
+    const k = 5;
+
+    let x = u * size - size / 2;
+    let y = v * size - size / 2;
+
+    const radius = size / 2;
+    const distanceSquared = x * x + y * y;
+
+    if (distanceSquared > radius * radius) {
+      const scaleFactor = radius / Math.sqrt(distanceSquared);
+      x *= scaleFactor;
+      y *= scaleFactor;
+    }
     const ux = x - mux;
     const uy = y - muy;
     const z = k * Math.exp((ux * ux) / -Sigma) * Math.exp((uy * uy) / -Sigma);

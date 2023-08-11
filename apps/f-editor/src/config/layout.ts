@@ -1,51 +1,51 @@
 /*
  * @Date: 2023-06-09 09:22:25
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-06-09 11:23:37
- * @FilePath: /dragable/src/config/layout.ts
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-11 20:59:58
+ * @FilePath: /threejs-demo/apps/f-editor/src/config/layout.ts
  */
 import content1 from '../component/content/content1.vue'
 import {markRaw,defineAsyncComponent} from 'vue'
 export const layoutConfig = {
     root: {
-      type: 'column',
+      type: 'row',
       content: [
         {
-          type: 'row',
+          type: 'column',
           content: [
-            {
-              type: 'stack',
-              content: [
-                {
-                  type: 'component',
-                  content: [],
-                  size: 1,
-                  sizeUnit: 'fr',
-                  minSizeUnit: 'px',
-                  id: '',
-                  maximised: false,
-                  isClosable: true, // 控制是否允许关闭
-                  reorderEnabled: true,
-                  title: 'Objects Tree',
-                  header: {
-                    show: 'top',
-                    popout: false,
-                    maximise: false,
-                  },
-                  componentType: 'objectTree',
-                  componentState: {
-                    refId: 3,
-                  },
-                },
-              ],
-              size: 18.181818181818183,
-              sizeUnit: '%',
-              minSizeUnit: 'px',
-              id: '',
-              isClosable: true,
-              maximised: false,
-              activeItemIndex: 0,
-            },
+            // {
+            //   type: 'stack',
+            //   content: [
+            //     {
+            //       type: 'component',
+            //       content: [],
+            //       size: 1,
+            //       sizeUnit: 'fr',
+            //       minSizeUnit: 'px',
+            //       id: '',
+            //       maximised: false,
+            //       isClosable: true, // 控制是否允许关闭
+            //       reorderEnabled: true,
+            //       title: 'Objects Tree',
+            //       header: {
+            //         show: 'top',
+            //         popout: false,
+            //         maximise: false,
+            //       },
+            //       componentType: 'objectTree',
+            //       componentState: {
+            //         refId: 3,
+            //       },
+            //     },
+            //   ],
+            //   size: 18.181818181818183,
+            //   sizeUnit: '%',
+            //   minSizeUnit: 'px',
+            //   id: '',
+            //   isClosable: true,
+            //   maximised: false,
+            //   activeItemIndex: 0,
+            // },
             {
               type: 'stack',
               content: [
@@ -72,7 +72,7 @@ export const layoutConfig = {
                   },
                 },
               ],
-              size: 63.63636363636363,
+              size: 75,
               sizeUnit: '%',
               minSizeUnit: 'px',
               header: {
@@ -84,7 +84,7 @@ export const layoutConfig = {
               maximised: false,
             },
             {
-              type: 'column',
+              type: 'row',
               content: [
                 {
                   type: 'stack',
@@ -92,7 +92,7 @@ export const layoutConfig = {
                     {
                       type: 'component',
                       content: [],
-                      size: 10,
+                      size: 20,
                       sizeUnit: '%',
                       minSizeUnit: 'px',
                       id: '',
@@ -112,7 +112,7 @@ export const layoutConfig = {
                       },
                     },
                   ],
-                  size: 20.722378817471586,
+                  size: 50,
                   sizeUnit: '%',
                   minSizeUnit: 'px',
                   id: '',
@@ -145,7 +145,7 @@ export const layoutConfig = {
                       },
                     },
                   ],
-                  size: 79.27762118252839,
+                  size: 50,
                   sizeUnit: '%',
                   minSizeUnit: 'px',
                   id: '',
@@ -187,7 +187,7 @@ export const layoutConfig = {
                 //   activeItemIndex: 0,
                 // },
               ],
-              size: 18.181818181818183,
+              size: 25,
               sizeUnit: '%',
               minSizeUnit: 'px',
               id: '',
@@ -196,7 +196,7 @@ export const layoutConfig = {
             },
             
           ],
-          size: 71.71717171717171,
+          size: 80,
           sizeUnit: '%',
           minSizeUnit: 'px',
           isClosable: true,
@@ -204,7 +204,7 @@ export const layoutConfig = {
           id: '',
         },
         {
-          type: 'row',
+          type: 'column',
           content: [
             {
               type: 'component',
@@ -251,9 +251,10 @@ export const layoutConfig = {
               },
             },
           ],
-          size: 28.28282828282828,
+          size: 20,
           sizeUnit: '%',
           minSizeUnit: 'px',
+          minWidth:200,
           id: '',
           isClosable: true,
           maximised: false,
