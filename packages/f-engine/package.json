@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "vite build --emptyOutDir"
+    "build": "vite build --emptyOutDir",
+    "dev":"vite"
   },
   "keywords": [
     "cad",

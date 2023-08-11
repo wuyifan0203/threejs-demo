@@ -342,12 +342,18 @@ var signals = { exports: {} };
   })(commonjsGlobal);
 })(signals);
 var signalsExports = signals.exports;
-function isSameArray(v1, v2) {
-  return stringify(v1.slice().sort()) === stringify(v2.slice().sort());
+function isSameSet(set1, set2) {
+  if (set1.size !== set2.size) {
+    return false;
+  }
+  for (let element of set1) {
+    if (!set2.has(element)) {
+      return false;
+    }
+  }
+  return true;
 }
-function stringify(v) {
-  return JSON.stringify(v);
-}
+const selectSet = /* @__PURE__ */ new Set();
 class Selector {
   constructor(editor) {
     this.editor = editor;
@@ -360,7 +366,9 @@ class Selector {
     });
   }
   select(selectIds) {
-    if (isSameArray(this.editor.getState("selections"), selectIds))
+    selectSet.clear();
+    selectIds.forEach((id) => selectSet.add(id));
+    if (isSameSet(this.editor.getState("selections"), selectSet))
       return;
     this.editor.setState("selection", selectIds);
     this.editor.signals.objectsSelected.dispatch(selectIds);
@@ -1216,9 +1224,9 @@ class ViewPort extends EventDispatcher {
     this.renderer.setClearColor(15724527);
     this.renderer.autoClear = false;
     this.orbitControls = new OrbitControls(camera, this.renderer.domElement);
-    this.orbitControls.addEventListener("change", this.render);
+    this.orbitControls.addEventListener("change", () => this.render());
     this.domElement.append(this.renderer.domElement);
-    this.editor.signals.sceneGraphChanged.add(this.render);
+    this.editor.signals.sceneGraphChanged.add(() => this.render());
   }
   render() {
     this.onBeforeRender(this.editor, this.camera);
@@ -2644,7 +2652,7 @@ class MainViewPort extends ViewPort {
     this.type = "MainViewPort";
     this.clock = new Clock();
     this.needsUpdate = false;
-    this.renderer.setAnimationLoop(this.animate);
+    this.renderer.setAnimationLoop(() => this.animate());
     this.excludeObjects = [];
     this.excludeTypes = [];
     this.statePanel = new StatsPanel();

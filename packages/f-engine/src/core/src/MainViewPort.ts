@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 01:25:13
+ * @LastEditTime: 2023-08-11 09:55:16
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
-import { Vector3, type Object3D, type OrthographicCamera, type PerspectiveCamera, Euler, Clock } from "three";
+import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock } from "three";
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import StatsPanel from 'three/examples/jsm/libs/stats.module';
 import { ViewPort } from "./ViewPort";
@@ -30,7 +30,7 @@ class MainViewPort extends ViewPort {
         this.clock = new Clock();
         this.needsUpdate = false;
 
-        this.renderer.setAnimationLoop(this.animate)
+        this.renderer.setAnimationLoop(()=>this.animate())
 
         this.excludeObjects = [];
         this.excludeTypes = [];

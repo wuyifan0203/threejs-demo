@@ -1,14 +1,16 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 01:39:54
+ * @LastEditTime: 2023-08-11 09:50:47
  * @FilePath: /threejs-demo/packages/f-engine/example/index.js
  */
 import {
  Mesh, BoxGeometry, MeshNormalMaterial, Vector3 ,Color
 } from 'three';
-import { MainViewPort, Editor } from '../build/cad.es.js';
+// import { MainViewPort, Editor } from '../build/cad.es.js';
+import { MainViewPort, Editor } from '../src';
 import { GUI } from './lil-gui.module.min.js';
+import { initOrthographicCamera } from './initialization.js';
 
 window.onload = () => {
   init();
@@ -17,32 +19,23 @@ window.onload = () => {
 function init() {
   const dom = document.getElementById('cad');
   const editor = new Editor(dom);
-  const viewPort = new MainViewPort(editor);
 
-  console.log(viewPort);
+  const camera = initOrthographicCamera(new Vector3(1000,1000,1000));
+  camera.up.set(0,0,1)
+
+  const viewPort = new MainViewPort(editor,camera,dom);
+
+  const {width,height} = dom.getBoundingClientRect()
+
+  viewPort.setSize(width,height)
 
   dom.addEventListener('resize', () => {
     editor.signals.windowResize.dispatch();
   });
 
- 
-
-  editor.addEventListener('objectAdded',(object)=>{
-    console.log('EventDispatcher.objectAdded->',object);
-  })
-
-  editor.addEventListener('selectionChange',(object)=>{
-    console.log('EventDispatcher.selectionChange->',object);
-  })
-
-
-
 
 
   const control = {
-    toggleViewportCamera(){
-      editor.toggleViewportCamera();
-    },
     transformMode:'translate',
     panelMode:'select',
     sceneBackgroundType:'None',
@@ -61,7 +54,7 @@ function init() {
       const boxMesh = new Mesh(boxGeometry, boxMaterial);
       boxMesh.position.copy(position)
       editor.addObject(boxMesh);
-      editor.selectById(boxMesh.uuid)
+      editor.selectByIds([boxMesh.uuid])
       objList.push(boxMesh)
     },
 
@@ -93,7 +86,6 @@ function init() {
   const gui = new GUI();
   gui.open();
   const CFolder = gui.addFolder('Camera')
-  CFolder.add(control,'toggleViewportCamera').name('Toggle Viewport Camera');
   CFolder.add(control,'transformMode',{translate:'translate',rotate:'rotate',scale:'scale'}).name('Set Transform Mode').onChange((e)=>{
     viewPort.setTransformMode(e)
   })

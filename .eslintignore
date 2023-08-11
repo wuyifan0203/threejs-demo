@@ -1,4 +1,4 @@
-/build/*
+/build/*.js
 
 /examples/src/lib/*
 /lib/*.js
