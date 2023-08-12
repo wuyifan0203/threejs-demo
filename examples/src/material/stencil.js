@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 18:33:07
+ * @LastEditTime: 2023-08-12 18:21:19
  * @FilePath: /threejs-demo/examples/src/material/stencil.js
  */
 import { OrbitControls } from '../lib/three/OrbitControls.js';
@@ -11,7 +11,6 @@ import {
   MeshPhongMaterial,
   Mesh,
   AmbientLight,
-  SpotLight,
   BoxGeometry,
   MeshBasicMaterial,
   ReplaceStencilOp,
@@ -33,8 +32,6 @@ function init() {
   const renderer = initRenderer();
   renderer.setClearColor(0xefefef);
   renderer.setAnimationLoop(render);
-
-  console.log(renderer);
 
   const camera = initOrthographicCamera(new Vector3(100, 100, 100));
   camera.lookAt(0, 0, 0);

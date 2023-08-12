@@ -8,7 +8,7 @@ import {
   MeshNormalMaterial,
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { GridHelper } from '../lib/three/GridHelper2.js';
+import { DynamicGrid } from '../lib/three/GridHelper2.js';
 import {
   initRenderer, resize,
   initOrthographicCamera,
@@ -35,7 +35,7 @@ function init() {
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
-  let customGrid = new GridHelper(50, 1);
+  let customGrid = new DynamicGrid(50, 1);
   customGrid.rotateX(Math.PI / 2);
   scene.add(customGrid);
 
@@ -107,6 +107,7 @@ function init() {
     ctx.strokeRect(20 + unit, 21, unit, 8);
     ctx.strokeStyle = '#808080';
     ctx.closePath();
+    gridUnit = parseFloat(gridUnit > 1 ? gridUnit.toFixed(1) : gridUnit.toFixed(10));
     ctx.fillText(`${gridUnit} um`, 20, 10);
   }
 
@@ -124,10 +125,11 @@ function init() {
 
   orbitControls.addEventListener('change', () => {
     const { x: unitX } = getInterval(camera);
+
     const { x, y } = getY(unitX);
 
     // console.log('unitX', unitX, 'Y', x * y, 'x', x, 'y', y);
-    scene.remove(customGrid);
+
     let gridUnit = 5;
     if (y === 1) {
       gridUnit = 1 * x;
@@ -140,13 +142,12 @@ function init() {
     gridUnit = Number(gridUnit.toFixed(14));
 
     // console.log('gridUnit', gridUnit);
-    customGrid = new GridHelper(50, gridUnit);
+    customGrid.updateInterval(gridUnit);
     // 保证一直为虚线
-    customGrid.material.gapSize = x;
-    customGrid.material.dashSize = x;
+    customGrid.material.gapSize = gridUnit / 20;
+    customGrid.material.dashSize = gridUnit / 20;
     customGrid.computeLineDistances();
-    customGrid.rotateX(Math.PI / 2);
-    scene.add(customGrid);
+
 
     const { x: cx, y: cy } = orbitControls.target;
     const dx = cx % gridUnit;

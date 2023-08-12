@@ -1,57 +1,50 @@
 /*
  * @Date: 2023-04-26 17:41:37
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-06 10:02:34
- * @FilePath: /threejs-demo/packages/lib/three/GridHelper2.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-12 15:32:27
+ * @FilePath: /threejs-demo/examples/src/lib/three/GridHelper2.js
  */
 import {
   LineSegments,
   Float32BufferAttribute,
-  Color,
   BufferGeometry,
   LineDashedMaterial
 } from "./three.module.js";
 
-class GridHelper extends LineSegments {
-  constructor(size = 10, interval = 1, color = '#808080') {
-    color = new Color(color);
-
-    const halfSize = size / 2;
-
-    const vertices = [],
-      colors = [];
-
-    for (let i = 0, j = 0, k = -halfSize; k <= halfSize; i++, k += 1) {
-      const x = halfSize * interval;
-      const y = k * interval;
-      vertices.push(-x, 0, y, x, 0, y);
-      vertices.push(y, 0, -x, y, 0, x);
-
-      color.toArray(colors, j);
-      j += 3;
-      color.toArray(colors, j);
-      j += 3;
-      color.toArray(colors, j);
-      j += 3;
-      color.toArray(colors, j);
-      j += 3;
-    }
-
+class DynamicGrid extends LineSegments {
+  constructor(size, interval, color = '#919191') {
+    const positions = new Float32BufferAttribute((size + 1) * 12, 3); // 3个值为一个点，2个点一条线，2条线一个格子 3 * 2 * 2
+    // + 1 因为10个格子11条线
     const geometry = new BufferGeometry();
-    geometry.setAttribute("position", new Float32BufferAttribute(vertices, 3));
-    geometry.setAttribute("color", new Float32BufferAttribute(colors, 3));
-
+    geometry.setAttribute('position', positions);
     const material = new LineDashedMaterial({
-      vertexColors: true,
+      color,
       toneMapped: false,
-      dashSize: 0.1,
-	    gapSize:0.1,
-      scale: 10,
     });
 
     super(geometry, material);
+    this.type = 'DynamicGrid';
+    this.size = size;
+    this.frustumCulled = false;
+    this.updateInterval(interval);
+  }
 
-    this.type = "GridHelper";
+  updateInterval(interval) {
+    this.interval = interval;
+    const position = this.geometry.getAttribute('position');
+    for (let j = 0, halfSize = this.size / 2, k = -halfSize; k <= halfSize; k += 1) {
+      const x = halfSize * interval;
+      const y = k * interval;
+      position.setXYZ(j, -x, 0, y);
+      j++;
+      position.setXYZ(j, x, 0, y);
+      j++;
+      position.setXYZ(j, y, 0, -x);
+      j++;
+      position.setXYZ(j, y, 0, x);
+      j++;
+    }
+    position.needsUpdate = true;
   }
 
   dispose() {
@@ -60,4 +53,4 @@ class GridHelper extends LineSegments {
   }
 }
 
-export { GridHelper };
+export { DynamicGrid };
