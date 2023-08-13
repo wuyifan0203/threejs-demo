@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 09:55:16
+ * @LastEditTime: 2023-08-13 16:48:10
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
-import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock } from "three";
+import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster } from "three";
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import StatsPanel from 'three/examples/jsm/libs/stats.module';
 import { ViewPort } from "./ViewPort";
@@ -15,6 +15,12 @@ import { TransformControlHandler } from "./TransformControlHandler";
 type uuids = Array<string>;
 type transformMode = 'translate' | 'scale' | 'rotate'
 
+
+const _raycaster = new Raycaster();
+const _mouse = new Vector2();
+
+const _onDownPosition = new Vector2();
+const _onUpPosition = new Vector2();
 
 class MainViewPort extends ViewPort {
     public excludeObjects: Array<Object3D>;
@@ -30,7 +36,8 @@ class MainViewPort extends ViewPort {
         this.clock = new Clock();
         this.needsUpdate = false;
 
-        this.renderer.setAnimationLoop(()=>this.animate())
+        this.renderer.setAnimationLoop(() => this.animate())
+
 
         this.excludeObjects = [];
         this.excludeTypes = [];
@@ -88,23 +95,96 @@ class MainViewPort extends ViewPort {
             }
             this.editor.signals.sceneGraphChanged.dispatch()
         })
+
+        const getIntersects = (point:Vector2) => {
+            _mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
+            _raycaster.setFromCamera(_mouse, camera);
+      
+            // 筛选需要检测的对象
+            const objects:Object3D[] = [];
+      
+            // 排除的物体的id数组
+            // 排除掉transformControl 和 selectionBox 和 extrudeObjects 和 不可见的
+            const excludeUuids = [
+              this.transformControl.uuid,
+              ...this.excludeObjects.map((o) => o.uuid),
+            ];
+      
+            for (let i = 0, l = editor.scene.children.length; i < l; i++) {
+              traverseObject(editor.scene.children[i], excludeUuids, this.excludeTypes, objects);
+            }
+      
+            for (let i = 0, l = editor.sceneHelper.children.length; i < l; i++) {
+              traverseObject(editor.sceneHelper.children[i], excludeUuids, this.excludeTypes, objects);
+            }
+      
+      
+            return _raycaster.intersectObjects(objects, false);
+          }
+      
+
+        const mutiSelectId:Array<string> = [];
+
+        const handelClick = (event:PointerEvent)=> {
+          if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
+            const intersects = getIntersects(_onUpPosition);
+    
+            const intersectsObjectsUUId = intersects
+              .map((item: { object: { uuid: any; }; }) => item?.object?.uuid)
+              .filter((id: undefined) => id !== undefined);
+    
+            if (intersectsObjectsUUId.length === 0) {
+              mutiSelectId.length = 0;
+            } else {
+              mutiSelectId.push(intersectsObjectsUUId[0]);
+            }
+    
+            // 这里必须要进行拷贝，不然执行下一行后会有bug
+            this.editor.signals.intersectionsDetected.dispatch(mutiSelectId);
+    
+            // 非多选模式需要清空，为下次单选做准备
+            if (!event.ctrlKey) {
+              mutiSelectId.length = 0;
+            }
+          }
+        }
+
+        const onMouseUp = (event:PointerEvent) => {
+            const mousePosition = getMousePosition(event.clientX, event.clientY,this.renderer.domElement);
+            _onUpPosition.fromArray(mousePosition);
+      
+            handelClick(event);
+      
+            this.renderer.domElement.removeEventListener('pointerup', onMouseUp);
+          }
+
+        const onMouseDown = (event:PointerEvent) => {
+            // 鼠标左键点击则执行
+            if (event.button !== 0) return;
+            const mousePosition = getMousePosition(event.clientX, event.clientY,this.renderer.domElement);
+            _onDownPosition.fromArray(mousePosition);
+
+            this.renderer.domElement.addEventListener('pointerup', onMouseUp);
+        }
+
+        this.renderer.domElement.addEventListener('pointerdown', onMouseDown);
     }
 
     protected render(): void {
         this.onBeforeRender(this.editor, this.camera);
 
         this.renderer.clear();
-  
+
         this.renderer.render(this.editor.scene, this.camera);
-  
+
         this.renderer.render(this.editor.sceneHelper, this.camera);
-  
+
         this.viewHelper.render(this.renderer);
-  
+
         this.onAfterRenderScene(this.editor, this.camera);
-  
+
         this.needsUpdate = false;
-        
+
     }
 
     public setTransformMode(mode: transformMode) {
@@ -125,7 +205,19 @@ class MainViewPort extends ViewPort {
     }
 }
 
+function getMousePosition(x:number, y:number,dom:HTMLElement):[number,number] {
+    const { left, top, width, height } = dom.getBoundingClientRect();
+    return [(x - left) / width, (y - top) / height];
+  }
 
+  function traverseObject(object:Object3D, extrudeIds:uuids, type:Array<string>, target:Object3D[]) {
+    if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
+      target.push(object);
+    //   for (let i = 0, l = object.children.length; i < l; i++) {
+    //     traverseObject(object.children[i], extrudeIds, type,target);
+    //   }
+    }
+  }
 
 
 export { MainViewPort }

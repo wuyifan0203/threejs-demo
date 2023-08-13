@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-09 09:22:25
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 20:59:58
+ * @LastEditTime: 2023-08-14 00:52:54
  * @FilePath: /threejs-demo/apps/f-editor/src/config/layout.ts
  */
 import content1 from '../component/content/content1.vue'
@@ -13,39 +13,6 @@ export const layoutConfig = {
         {
           type: 'column',
           content: [
-            // {
-            //   type: 'stack',
-            //   content: [
-            //     {
-            //       type: 'component',
-            //       content: [],
-            //       size: 1,
-            //       sizeUnit: 'fr',
-            //       minSizeUnit: 'px',
-            //       id: '',
-            //       maximised: false,
-            //       isClosable: true, // 控制是否允许关闭
-            //       reorderEnabled: true,
-            //       title: 'Objects Tree',
-            //       header: {
-            //         show: 'top',
-            //         popout: false,
-            //         maximise: false,
-            //       },
-            //       componentType: 'objectTree',
-            //       componentState: {
-            //         refId: 3,
-            //       },
-            //     },
-            //   ],
-            //   size: 18.181818181818183,
-            //   sizeUnit: '%',
-            //   minSizeUnit: 'px',
-            //   id: '',
-            //   isClosable: true,
-            //   maximised: false,
-            //   activeItemIndex: 0,
-            // },
             {
               type: 'stack',
               content: [
@@ -153,39 +120,6 @@ export const layoutConfig = {
                   maximised: false,
                   activeItemIndex: 0,
                 },
-                // {
-                //   type: 'stack',
-                //   content: [
-                //     {
-                //       type: 'component',
-                //       content: [],
-                //       size: 10,
-                //       sizeUnit: '%',
-                //       minSizeUnit: 'px',
-                //       id: '',
-                //       maximised: false,
-                //       isClosable: true,
-                //       reorderEnabled: true,
-                //       title: 'Result View',
-                //       header: {
-                //         show: 'top',
-                //         popout: false,
-                //         maximise: false,
-                //       },
-                //       componentType: 'resultTree',
-                //       componentState: {
-                //         refId: 7,
-                //       },
-                //     },
-                //   ],
-                //   size: 40.13341213094269,
-                //   sizeUnit: '%',
-                //   minSizeUnit: 'px',
-                //   id: '',
-                //   isClosable: true,
-                //   maximised: false,
-                //   activeItemIndex: 0,
-                // },
               ],
               size: 25,
               sizeUnit: '%',
