@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-09 09:22:25
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-14 00:52:54
+ * @LastEditTime: 2023-08-14 02:07:10
  * @FilePath: /threejs-demo/apps/f-editor/src/config/layout.ts
  */
 import content1 from '../component/content/content1.vue'
@@ -19,7 +19,7 @@ export const layoutConfig = {
                 {
                   type: 'component',
                   content: [],
-                  size: 1,
+                  size: '1',
                   sizeUnit: 'fr',
                   minSizeUnit: 'px',
                   id: '',
@@ -59,7 +59,7 @@ export const layoutConfig = {
                     {
                       type: 'component',
                       content: [],
-                      size: 20,
+                      size: '20',
                       sizeUnit: '%',
                       minSizeUnit: 'px',
                       id: '',
@@ -79,7 +79,7 @@ export const layoutConfig = {
                       },
                     },
                   ],
-                  size: 50,
+                  size: '50',
                   sizeUnit: '%',
                   minSizeUnit: 'px',
                   id: '',
@@ -93,7 +93,7 @@ export const layoutConfig = {
                     {
                       type: 'component',
                       content: [],
-                      size: 10,
+                      size: '10',
                       sizeUnit: '%',
                       minSizeUnit: 'px',
                       id: '',
@@ -112,7 +112,7 @@ export const layoutConfig = {
                       },
                     },
                   ],
-                  size: 50,
+                  size: '50',
                   sizeUnit: '%',
                   minSizeUnit: 'px',
                   id: '',
@@ -121,7 +121,7 @@ export const layoutConfig = {
                   activeItemIndex: 0,
                 },
               ],
-              size: 25,
+              size: '25',
               sizeUnit: '%',
               minSizeUnit: 'px',
               id: '',
@@ -130,7 +130,7 @@ export const layoutConfig = {
             },
             
           ],
-          size: 80,
+          size: '80',
           sizeUnit: '%',
           minSizeUnit: 'px',
           isClosable: true,
@@ -165,7 +165,7 @@ export const layoutConfig = {
             {
               type: 'component',
               content: [],
-              size: 47.5,
+              size: '47.5',
               sizeUnit: '%',
               minSizeUnit: 'px',
               id: '',
@@ -185,17 +185,17 @@ export const layoutConfig = {
               },
             },
           ],
-          size: 20,
+          size: '20',
           sizeUnit: '%',
           minSizeUnit: 'px',
-          minWidth:200,
+          minWidth:'200',
           id: '',
           isClosable: true,
           maximised: false,
           activeItemIndex: 0,
         },
       ],
-      size: 1,
+      size: '1',
       sizeUnit: 'fr',
       minSizeUnit: 'px',
       id: '',
@@ -223,9 +223,9 @@ export const layoutConfig = {
     dimensions: {
       borderWidth: 3,
       borderGrabWidth: 3,
-      defaultMinItemHeight: 0,
+      defaultMinItemHeight: '0',
       defaultMinItemHeightUnit: 'px',
-      defaultMinItemWidth: 10,
+      defaultMinItemWidth: '10',
       defaultMinItemWidthUnit: 'px',
       headerHeight: 26,
       dragProxyWidth: 300,
@@ -243,7 +243,7 @@ export const layoutConfig = {
     resolved: true,
 };
 
-export const getSetting = (componentType)=>{
+export const getSetting = (componentType:any)=>{
 
     return markRaw(defineAsyncComponent(
         () => import('../component/content/content1.vue'),
