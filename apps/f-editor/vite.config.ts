@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-19 19:45:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-02 00:57:57
+ * @LastEditTime: 2023-08-15 01:02:02
  * @FilePath: /threejs-demo/apps/f-editor/vite.config.ts
  */
 import { defineConfig } from "vite";
@@ -15,7 +15,14 @@ export default defineConfig({
     vueJsx()
   ],
   server: {
-    host: '0.0.0.0',
-    port:3000
+    port:3000,
+    open:true
+  },
+  css:{
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "./src/assets/scss/global.scss";`
+      }
+    }
   }
 })

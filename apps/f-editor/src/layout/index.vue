@@ -1,15 +1,15 @@
 <!--
  * @Date: 2023-08-14 01:54:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-14 01:54:59
+ * @LastEditTime: 2023-08-15 01:22:08
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/index.vue
 -->
 <template>
-  <header>888</header>
+  <MenuBar></MenuBar>
   <main class="main">
     <aside class="aside">22</aside>
     <div class="layout">
-      <glayout ref="glayoutRoot" class=""    style="width: 100%; height: 100%"></glayout>
+      <glayout ref="glayoutRoot" class="glayout"></glayout>
     </div>
   </main>
   <footer>444</footer>
@@ -19,10 +19,12 @@
 import {layoutConfig} from '../config/layout'
 import glayout from '../component/Glout/glayout.vue'
 import { defineComponent,ref,onMounted } from 'vue';
+import MenuBar from './menubar/index.vue'
 export default defineComponent({
     name: 'Layout',
     components: {
-        glayout
+        glayout,
+        MenuBar
     },
     setup(props, {expose}) {
     const glayoutRoot = ref(null);
@@ -60,6 +62,10 @@ export default defineComponent({
 
 .layout{
   flex-grow: 1;
+}
+.glayout{
+  width: 100%; 
+  height: 100%;
 }
 footer{
   height: 30px;
