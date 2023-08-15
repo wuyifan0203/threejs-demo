@@ -1,30 +1,53 @@
 <!--
  * @Date: 2023-08-15 00:44:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-15 01:52:12
+ * @LastEditTime: 2023-08-16 02:13:26
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/menubar/index.vue
 -->
 <template>
     <div class="menubar">
-        <Menu v-model:selectedKeys="current" mode="horizontal" :items="menoConfig" size="small" />
+        <n-dropdown trigger="hover" :options="options" @select="handleSelect">
+            <n-button>找个地方休息</n-button>
+        </n-dropdown>
     </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { Menu } from 'ant-design-vue'
-import { config } from "../../config/menu";
+import { NDropdown, NButton,useMessage } from 'naive-ui'
+import { config } from "@/config/menu";
 export default defineComponent({
     name: "Menubar",
     components: {
-        Menu
+        NDropdown,
+        NButton
     },
     setup() {
-        const menoConfig = ref(config);
-        const current = ref([menoConfig.value[0].key]);
+        // const menoConfig = ref(config);
+        const message = useMessage()
         return {
-            menoConfig,
-            current
+            options: [
+                {
+                    label: '滨海湾金沙，新加坡',
+                    key: 'marina bay sands',
+                    disabled: true
+                },
+                {
+                    label: '布朗酒店，伦敦',
+                    key: "brown's hotel, london"
+                },
+                {
+                    label: '亚特兰蒂斯巴哈马，拿骚',
+                    key: 'atlantis nahamas, nassau'
+                },
+                {
+                    label: '比佛利山庄酒店，洛杉矶',
+                    key: 'the beverly hills hotel, los angeles'
+                }
+            ],
+            handleSelect(key: string | number) {
+                message.info(String(key))
+            }
         };
     },
 });
@@ -41,6 +64,7 @@ export default defineComponent({
     .ant-menu-horizontal>.ant-menu-item-selected::after {
         content: none;
     }
+
     .ant-menu-horizontal>.ant-menu-item-active::after {
         content: none;
     }
