@@ -1,12 +1,19 @@
 /*
  * @Date: 2023-06-09 09:22:25
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-14 02:07:10
+ * @LastEditTime: 2023-08-16 11:01:46
  * @FilePath: /threejs-demo/apps/f-editor/src/config/layout.ts
  */
-import content1 from '../component/content/content1.vue'
-import {markRaw,defineAsyncComponent} from 'vue'
-export const layoutConfig = {
+
+const componentMap = {
+  mainView:()=> import('@/layout/mainView/index.vue'),
+  objectTree:()=>import('@/layout/objectTree/index.vue'),
+  editor:()=>import('@/layout/editor/index.vue'),
+  terminal:()=>import('@/layout/terminal/index.vue'),
+  file:()=>import('@/layout/file/index.vue'),
+}
+
+ const layoutConfig = {
     root: {
       type: 'row',
       content: [
@@ -32,7 +39,7 @@ export const layoutConfig = {
                     popout: false,
                     maximise: false,
                   },
-                  componentType: 'cad',
+                  componentType: 'mainView',
                   componentState: {
                     abc: 123,
                     refId: 4,
@@ -66,14 +73,14 @@ export const layoutConfig = {
                       maximised: false,
                       isClosable: true,
                       reorderEnabled: true,
-                      title: 'Task Tree',
+                      title: 'File',
                       header: {
                         show: 'top',
                         popout: false,
                         maximise: false,
                       },
   
-                      componentType: 'taskProgress',
+                      componentType: 'file',
                       componentState: {
                         refId: 5,
                       },
@@ -100,13 +107,13 @@ export const layoutConfig = {
                       maximised: false,
                       isClosable: true,
                       reorderEnabled: true,
-                      title: 'Historical Task',
+                      title: 'Terminal',
                       header: {
                         show: 'top',
                         popout: false,
                         maximise: false,
                       },
-                      componentType: 'taskList',
+                      componentType: 'terminal',
                       componentState: {
                         refId: 6,
                       },
@@ -150,13 +157,13 @@ export const layoutConfig = {
               maximised: false,
               isClosable: true,
               reorderEnabled: true,
-              title: 'Global Parameters',
+              title: 'Object Tree',
               header: {
                 show: 'top',
                 popout: false,
                 maximise: false,
               },
-              componentType: 'globalParameters',
+              componentType: 'objectTree',
               componentState: {
                 abc: 123,
                 refId: 1,
@@ -172,13 +179,13 @@ export const layoutConfig = {
               maximised: false,
               isClosable: true,
               reorderEnabled: true,
-              title: 'Message',
+              title: 'Editor',
               header: {
                 show: 'top',
                 popout: false,
                 maximise: false,
               },
-              componentType: 'systemLog',
+              componentType: 'editor',
               componentState: {
                 abc: 123,
                 refId: 0,
@@ -243,13 +250,11 @@ export const layoutConfig = {
     resolved: true,
 };
 
-export const getSetting = (componentType:any)=>{
-
-    return markRaw(defineAsyncComponent(
-        () => import('../component/content/content1.vue'),
-      )
-    );
 
 
+
+export {
+  layoutConfig,
+  componentMap
 }
   

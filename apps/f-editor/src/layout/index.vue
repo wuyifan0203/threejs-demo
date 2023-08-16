@@ -1,46 +1,50 @@
 <!--
  * @Date: 2023-08-14 01:54:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-15 01:22:08
+ * @LastEditTime: 2023-08-16 10:52:17
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/index.vue
 -->
 <template>
-  <MenuBar></MenuBar>
+  <Menu>222</Menu>
   <main class="main">
-    <aside class="aside">22</aside>
+    <SideMenu class="aside"></SideMenu>
     <div class="layout">
-      <glayout ref="glayoutRoot" class="glayout"></glayout>
+      <GLayout ref="GLayoutRoot" class="GLayout"></GLayout>
     </div>
   </main>
-  <footer>444</footer>
+  <State></State>
 </template>
 
 <script lang="ts">
-import {layoutConfig} from '../config/layout'
-import glayout from '../component/Glout/glayout.vue'
 import { defineComponent,ref,onMounted } from 'vue';
-import MenuBar from './menubar/index.vue'
+import {layoutConfig,componentMap} from '../config/layout';
+import Menu from './headMenu/index.vue';
+import GLayout from '../component/GLayout/index.vue';
+import State from './state/index.vue';
+import SideMenu from './asideMenu/index.vue';
 export default defineComponent({
     name: 'Layout',
     components: {
-        glayout,
-        MenuBar
+      GLayout,
+      Menu,
+      State,
+      SideMenu
     },
     setup(props, {expose}) {
-    const glayoutRoot = ref(null);
+    const GLayoutRoot = ref(null);
 
     onMounted(()=>{
-      if( glayoutRoot.value){
-        (glayoutRoot.value as any).loadGLLayout(layoutConfig)
+      if( GLayoutRoot.value){
+        (GLayoutRoot.value as any).loadGLLayout(layoutConfig,componentMap)
       }
     })
 
     expose({
-      glayoutRoot:glayoutRoot.value
+      GLayoutRoot:GLayoutRoot.value
     })
 
     return {
-      glayoutRoot
+      GLayoutRoot
     }
     
   }
@@ -63,7 +67,7 @@ export default defineComponent({
 .layout{
   flex-grow: 1;
 }
-.glayout{
+.GLayout{
   width: 100%; 
   height: 100%;
 }

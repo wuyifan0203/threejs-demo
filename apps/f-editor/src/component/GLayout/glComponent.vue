@@ -1,8 +1,8 @@
 <!--
  * @Date: 2023-06-08 17:53:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-06-09 09:32:43
- * @FilePath: /dragable/src/component/Glout/glComponent.vue
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-16 10:18:26
+  * @FilePath: /threejs-demo/apps/f-editor/src/layout/asideMenu/index.vue
 -->
 <template>
   <div ref="GLComponent" style="position: absolute; overflow: hidden">

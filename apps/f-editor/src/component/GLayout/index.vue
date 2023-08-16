@@ -4,11 +4,7 @@
       <!-- Root dom for Golden-Layout manager -->
     </div>
     <div style="position: absolute; width: 100%; height: 100%">
-      <glComponent
-        v-for="pair in AllComponents"
-        :key="pair[0]"
-        :ref="GlcKeyPrefix + pair[0]"
-      >
+      <glComponent v-for="pair in AllComponents" :key="pair[0]" :ref="GlcKeyPrefix + pair[0]">
         <component :is="pair[1]"></component>
       </glComponent>
     </div>
@@ -41,7 +37,6 @@ import {
   GoldenLayout,
 } from "golden-layout";
 import glComponent from "./glComponent.vue";
-import { getSetting } from "../../config/layout";
 export default defineComponent({
   name: "GLayout",
   components: {
@@ -53,7 +48,7 @@ export default defineComponent({
       default: "",
     },
   },
-  setup(props,{expose}) {
+  setup(props, { expose }) {
     const GLRoot: Ref<null | HTMLElement> = ref(null);
     let GLayout: any;
     const GlcKeyPrefix = readonly(ref("glc_"));
@@ -67,8 +62,20 @@ export default defineComponent({
 
     const instance = getCurrentInstance();
 
-    const addComponent = (componentType: string, title: string) => {
-     const glc = getSetting(componentType)
+    const getSetting = (componentType: string, componentMap: { [key: string]: any }) => {
+      // 从映射对象中获取动态导入函数
+      const importFn = componentMap[componentType];
+      if (!importFn) {
+        // 如果没有找到对应的动态导入函数，返回 null 或抛出错误
+        return null;
+      }
+      // 使用动态导入函数来异步加载组件
+      const glc = markRaw(defineAsyncComponent(importFn));
+      return glc;
+    };
+
+    const addComponent = (componentType: string, title: string, componentMap: { [key: string]: any }) => {
+      const glc = getSetting(componentType, componentMap)
 
       let index = CurIndex;
 
@@ -80,38 +87,44 @@ export default defineComponent({
       return index;
     };
 
-    const addGLComponent = async (componentType: string, title: string) => {
+    const addGLComponent = async (componentType: string, title: string, componentMap) => {
       if (componentType.length == 0)
         throw new Error("addGLComponent: Component's type is empty");
 
-      const index = addComponent(componentType, title);
+      const index = addComponent(componentType, title, componentMap);
 
       await nextTick(); // wait 1 tick for vue to add the dom
 
       GLayout.addComponent(componentType, { refId: index }, title);
     };
 
-    const loadGLLayout = async (layoutConfig: object) => {
+    type contentType =  RowOrColumnItemConfig[]| StackItemConfig[] | ComponentItemConfig[];
+
+    const loadGLLayout = async (layoutConfig: (LayoutConfig | ResolvedLayoutConfig) & { resolved?: boolean }, componentMap) => {
       GLayout.clear();
       AllComponents.value.clear();
 
-      const config = layoutConfig.resolved
-        ? LayoutConfig.fromResolved(layoutConfig)
-        : layoutConfig;
+      const config = layoutConfig.resolved ? LayoutConfig.fromResolved(layoutConfig as ResolvedLayoutConfig) : layoutConfig;
 
-      let contents = [config.root.content];
+      if (!config.root) {
+        return;
+      }
+
+      let contents:(contentType)[] = [config.root.content] as any;
 
       let index = 0;
       while (contents.length > 0) {
-        const content = contents.shift();
+        const content = contents.shift() as contentType;
         for (let itemConfig of content) {
           if (itemConfig.type == "component") {
-            index = addComponent(itemConfig.componentType, itemConfig.title);
+            index = addComponent(itemConfig.componentType as string, itemConfig.title as string, componentMap);
             if (typeof itemConfig.componentState == "object")
+            if(itemConfig.componentState){
               itemConfig.componentState["refId"] = index;
+            }
             else itemConfig.componentState = { refId: index };
           } else if (itemConfig.content.length > 0) {
-            contents.push(itemConfig.content);
+            contents.push(itemConfig.content as contentType);
           }
         }
       }
@@ -162,7 +175,7 @@ export default defineComponent({
         component.glc.setPosAndSize(left, top, width, height);
       };
 
-      const handleContainerVirtualVisibilityChangeRequiredEvent = (container,visible) => {
+      const handleContainerVirtualVisibilityChangeRequiredEvent = (container, visible) => {
         const component = MapComponents.get(container);
         if (!component || !component?.glc) {
           throw new Error("handleContainerVirtualVisibilityChangeRequiredEvent: Component not found");
@@ -171,7 +184,7 @@ export default defineComponent({
         component.glc.setVisibility(visible);
       };
 
-      const handleContainerVirtualZIndexChangeRequiredEvent = (container,logicalZIndex,defaultZIndex) => {
+      const handleContainerVirtualZIndexChangeRequiredEvent = (container, logicalZIndex, defaultZIndex) => {
         const component = MapComponents.get(container);
         if (!component || !component?.glc) {
           throw new Error("handleContainerVirtualZIndexChangeRequiredEvent: Component not found");
@@ -189,10 +202,10 @@ export default defineComponent({
           throw new Error("bindComponentEventListener: component's ref id is required");
         }
 
-        console.log(instance);
+        // console.log(instance);
 
         const ref = GlcKeyPrefix.value + refId;
-        const component = instance.refs[ref][0];
+        const component = (instance?.refs as any)[ref][0] as unknown as typeof glComponent;
         console.log(component);
 
         MapComponents.set(container, { refId: refId, glc: component });
@@ -201,10 +214,10 @@ export default defineComponent({
           handleContainerVirtualRectingRequiredEvent(container, width, height);
 
         container.virtualVisibilityChangeRequiredEvent = (container, visible) =>
-          handleContainerVirtualVisibilityChangeRequiredEvent(container,visible);
+          handleContainerVirtualVisibilityChangeRequiredEvent(container, visible);
 
-        container.virtualZIndexChangeRequiredEvent = (container,logicalZIndex,defaultZIndex) =>
-          handleContainerVirtualZIndexChangeRequiredEvent(container,logicalZIndex,defaultZIndex);
+        container.virtualZIndexChangeRequiredEvent = (container, logicalZIndex, defaultZIndex) =>
+          handleContainerVirtualZIndexChangeRequiredEvent(container, logicalZIndex, defaultZIndex);
 
         return {
           component,
