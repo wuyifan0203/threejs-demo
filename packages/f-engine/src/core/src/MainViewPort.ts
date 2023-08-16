@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 21:03:16
+ * @LastEditTime: 2023-08-17 01:31:51
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color } from "three";
@@ -46,9 +46,10 @@ class MainViewPort extends ViewPort {
         this.needsUpdate = false;
 
         this.renderer.setAnimationLoop(() => this.animate());
+
         this.composer = new EffectComposer( this.renderer );
 
-        const renderPass = new RenderPass( this.editor.scene, camera );
+        const renderPass = new RenderPass( this.editor.scene, this.camera );
 				this.composer.addPass( renderPass );
 
         this.outlinePass = new OutlinePass( new Vector2(this.width, this.height), this.editor.scene, camera );
@@ -209,9 +210,8 @@ class MainViewPort extends ViewPort {
         this.renderer.clear();
 
         this.composer.render()
-        this.renderer.render(this.editor.scene, this.camera);
+        // this.renderer.render(this.editor.scene, this.camera);
        
-
         this.renderer.render(this.editor.sceneHelper, this.camera);
      
 

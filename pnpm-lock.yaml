@@ -31,8 +31,8 @@ importers:
         specifier: ^8.43.0
         version: registry.npmmirror.com/eslint@8.43.0
       vite:
-        specifier: ^4.4.6
-        version: registry.npmmirror.com/vite@4.4.6
+        specifier: ^4.4.8
+        version: registry.npmmirror.com/vite@4.4.8
 
   apps/f-editor:
     dependencies:
@@ -97,11 +97,11 @@ importers:
         specifier: ^0.155.0
         version: registry.npmmirror.com/@types/three@0.155.0
       vite:
-        specifier: ^4.4.6
-        version: registry.npmmirror.com/vite@4.4.6
+        specifier: ^4.4.8
+        version: registry.npmmirror.com/vite@4.4.8
       vite-plugin-dts:
         specifier: ^3.3.1
-        version: registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.6)
+        version: registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.8)
 
   packages/f-utils:
     dependencies:
@@ -113,11 +113,11 @@ importers:
         specifier: ^0.155.0
         version: registry.npmmirror.com/@types/three@0.155.0
       vite:
-        specifier: ^4.4.6
-        version: registry.npmmirror.com/vite@4.4.6
+        specifier: ^4.4.8
+        version: registry.npmmirror.com/vite@4.4.8
       vite-plugin-dts:
         specifier: ^3.3.1
-        version: registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.6)
+        version: registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.8)
 
 packages:
 
@@ -4653,7 +4653,7 @@ packages:
       vue: registry.npmmirror.com/vue@3.3.4
     dev: false
 
-  registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.6):
+  registry.npmmirror.com/vite-plugin-dts@3.3.1(typescript@4.9.5)(vite@4.4.8):
     resolution: {integrity: sha512-RFebFGg6GWKkZqRQ5n6ls8giSiygKMBriJTFp8N+CRbYgI4lMXBxXEx0z2bthfeQv/xB53Wmhn/LNOOqb9OQHQ==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vite-plugin-dts/-/vite-plugin-dts-3.3.1.tgz}
     id: registry.npmmirror.com/vite-plugin-dts/3.3.1
     name: vite-plugin-dts
@@ -4672,7 +4672,7 @@ packages:
       debug: registry.npmmirror.com/debug@4.3.4
       kolorist: registry.npmmirror.com/kolorist@1.8.0
       typescript: registry.npmmirror.com/typescript@4.9.5
-      vite: registry.npmmirror.com/vite@4.4.6
+      vite: registry.npmmirror.com/vite@4.4.8
       vue-tsc: registry.npmmirror.com/vue-tsc@1.8.8(typescript@4.9.5)
     transitivePeerDependencies:
       - '@types/node'
@@ -4702,43 +4702,6 @@ packages:
       postcss: registry.npmmirror.com/postcss@8.4.26
       resolve: registry.npmmirror.com/resolve@1.22.2
       rollup: registry.npmmirror.com/rollup@2.77.3
-    optionalDependencies:
-      fsevents: registry.npmmirror.com/fsevents@2.3.2
-    dev: true
-
-  registry.npmmirror.com/vite@4.4.6:
-    resolution: {integrity: sha512-EY6Mm8vJ++S3D4tNAckaZfw3JwG3wa794Vt70M6cNJ6NxT87yhq7EC8Rcap3ahyHdo8AhCmV9PTk+vG1HiYn1A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/vite/-/vite-4.4.6.tgz}
-    name: vite
-    version: 4.4.6
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      lightningcss: ^1.21.0
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      lightningcss:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: registry.npmmirror.com/esbuild@0.18.15
-      postcss: registry.npmmirror.com/postcss@8.4.26
-      rollup: registry.npmmirror.com/rollup@3.26.3
     optionalDependencies:
       fsevents: registry.npmmirror.com/fsevents@2.3.2
     dev: true
