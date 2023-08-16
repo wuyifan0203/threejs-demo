@@ -17,8 +17,8 @@ class ViewPort extends EventDispatcher {
   protected domElement: HTMLElement;
   protected renderer: WebGLRenderer;
   protected camera: OrthographicCamera | PerspectiveCamera;
-  private width: number;
-  private height: number;
+  protected width: number;
+  protected height: number;
   public orbitControls: OrbitControls;
   public name: string;
   public onAfterRenderScene: Function;

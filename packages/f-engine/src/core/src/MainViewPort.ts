@@ -1,16 +1,22 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-13 16:48:10
+ * @LastEditTime: 2023-08-16 21:03:16
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
-import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster } from "three";
+import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color } from "three";
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import StatsPanel from 'three/examples/jsm/libs/stats.module';
 import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
 import { TransformControlHandler } from "./TransformControlHandler";
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
 type uuids = Array<string>;
 type transformMode = 'translate' | 'scale' | 'rotate'
@@ -30,13 +36,33 @@ class MainViewPort extends ViewPort {
     private statePanel: StatsPanel;
     private clock: Clock;
     private needsUpdate: boolean
+    public composer: EffectComposer;
+    public outlinePass: OutlinePass;
+  effectFXAA: ShaderPass;
     constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
         super(editor, camera, domElement);
         this.type = 'MainViewPort';
         this.clock = new Clock();
         this.needsUpdate = false;
 
-        this.renderer.setAnimationLoop(() => this.animate())
+        this.renderer.setAnimationLoop(() => this.animate());
+        this.composer = new EffectComposer( this.renderer );
+
+        const renderPass = new RenderPass( this.editor.scene, camera );
+				this.composer.addPass( renderPass );
+
+        this.outlinePass = new OutlinePass( new Vector2(this.width, this.height), this.editor.scene, camera );
+        this.outlinePass.hiddenEdgeColor = new Color( 1, 0, 0 );
+				this.composer.addPass( this.outlinePass );
+
+        const outputPass = new OutputPass();
+				this.composer.addPass( outputPass );
+
+        this.effectFXAA = new ShaderPass( FXAAShader );
+				this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
+				this.composer.addPass( this.effectFXAA );
+
+        
 
 
         this.excludeObjects = [];
@@ -81,6 +107,9 @@ class MainViewPort extends ViewPort {
             this.transformControl.detach();
             selectObjects.length = 0;
 
+            console.log(uuids);
+            
+
             uuids.forEach(uuid => {
                 const obj = this.editor.getObjectByUuid(uuid)
                 obj && selectObjects.push(obj)
@@ -90,6 +119,10 @@ class MainViewPort extends ViewPort {
                 if (selectObjects.length === 1) {
                     this.transformControl.attach(selectObjects[0])
                 }
+
+                console.log(selectObjects);
+                
+                this.outlinePass.selectedObjects = selectObjects
 
                 // 选择物体高亮
             }
@@ -175,13 +208,17 @@ class MainViewPort extends ViewPort {
 
         this.renderer.clear();
 
+        this.composer.render()
         this.renderer.render(this.editor.scene, this.camera);
+       
 
         this.renderer.render(this.editor.sceneHelper, this.camera);
+     
 
         this.viewHelper.render(this.renderer);
 
         this.onAfterRenderScene(this.editor, this.camera);
+     
 
         this.needsUpdate = false;
 
@@ -202,6 +239,13 @@ class MainViewPort extends ViewPort {
         if (this.needsUpdate) {
             this.render()
         }
+    }
+
+    public setSize(width: number, height: number): void {
+      super.setSize(width, height);
+      this.composer.setSize( width, height );
+
+			this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
     }
 }
 
