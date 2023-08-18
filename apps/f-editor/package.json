@@ -14,6 +14,7 @@
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "golden-layout": "^2.6.0",
     "naive-ui": "^2.34.4",
+    "pinia": "^2.1.6",
     "vue": "^3.2.37"
   },
   "devDependencies": {

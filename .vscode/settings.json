@@ -12,6 +12,7 @@
       "importmap",
       "Phong",
       "physijs",
+      "pinia",
       "plusplus",
       "raycaster",
       "slerp",
