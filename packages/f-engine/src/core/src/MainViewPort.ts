@@ -36,9 +36,9 @@ class MainViewPort extends ViewPort {
     private statePanel: StatsPanel;
     private clock: Clock;
     private needsUpdate: boolean
-    public composer: EffectComposer;
-    public outlinePass: OutlinePass;
-  effectFXAA: ShaderPass;
+  //   public composer: EffectComposer;
+  //   public outlinePass: OutlinePass;
+  // effectFXAA: ShaderPass;
     constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
         super(editor, camera, domElement);
         this.type = 'MainViewPort';
@@ -47,21 +47,21 @@ class MainViewPort extends ViewPort {
 
         this.renderer.setAnimationLoop(() => this.animate());
 
-        this.composer = new EffectComposer( this.renderer );
+        // this.composer = new EffectComposer( this.renderer );
 
-        const renderPass = new RenderPass( this.editor.scene, this.camera );
-				this.composer.addPass( renderPass );
+        // const renderPass = new RenderPass( this.editor.scene, this.camera );
+				// this.composer.addPass( renderPass );
 
-        this.outlinePass = new OutlinePass( new Vector2(this.width, this.height), this.editor.scene, camera );
-        this.outlinePass.hiddenEdgeColor = new Color( 1, 0, 0 );
-				this.composer.addPass( this.outlinePass );
+        // this.outlinePass = new OutlinePass( new Vector2(this.width, this.height), this.editor.scene, camera );
+        // this.outlinePass.hiddenEdgeColor = new Color( 1, 0, 0 );
+				// this.composer.addPass( this.outlinePass );
 
-        const outputPass = new OutputPass();
-				this.composer.addPass( outputPass );
+        // const outputPass = new OutputPass();
+				// this.composer.addPass( outputPass );
 
-        this.effectFXAA = new ShaderPass( FXAAShader );
-				this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
-				this.composer.addPass( this.effectFXAA );
+        // this.effectFXAA = new ShaderPass( FXAAShader );
+				// this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
+				// this.composer.addPass( this.effectFXAA );
 
         
 
@@ -123,7 +123,7 @@ class MainViewPort extends ViewPort {
 
                 console.log(selectObjects);
                 
-                this.outlinePass.selectedObjects = selectObjects
+                // this.outlinePass.selectedObjects = selectObjects
 
                 // 选择物体高亮
             }
@@ -209,8 +209,8 @@ class MainViewPort extends ViewPort {
 
         this.renderer.clear();
 
-        this.composer.render()
-        // this.renderer.render(this.editor.scene, this.camera);
+        // this.composer.render()
+        this.renderer.render(this.editor.scene, this.camera);
        
         this.renderer.render(this.editor.sceneHelper, this.camera);
      
@@ -243,9 +243,9 @@ class MainViewPort extends ViewPort {
 
     public setSize(width: number, height: number): void {
       super.setSize(width, height);
-      this.composer.setSize( width, height );
+      // this.composer.setSize( width, height );
 
-			this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
+			// this.effectFXAA.uniforms[ 'resolution' ].value.set( 1 / this.width, 1 / this.height );
     }
 }
 

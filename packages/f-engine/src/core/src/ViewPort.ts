@@ -1,11 +1,12 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 09:47:29
+ * @LastEditTime: 2023-08-19 10:03:12
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
-import { WebGLRenderer,OrthographicCamera, PerspectiveCamera } from 'three'
+import { WebGLRenderer, OrthographicCamera, PerspectiveCamera } from 'three'
 import { generateUUID } from 'three/src/math/MathUtils';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';
 import type { Editor } from './Editor';
@@ -44,12 +45,12 @@ class ViewPort extends EventDispatcher {
     this.renderer.autoClear = false;
 
     this.orbitControls = new OrbitControls(camera, this.renderer.domElement);
-    this.orbitControls.addEventListener('change',()=>this.render());
+    this.orbitControls.addEventListener('change', () => this.render());
 
     this.domElement.append(this.renderer.domElement);
 
     // signals
-    this.editor.signals.sceneGraphChanged.add(()=>this.render());
+    this.editor.signals.sceneGraphChanged.add(() => this.render());
   }
 
   protected render() {
