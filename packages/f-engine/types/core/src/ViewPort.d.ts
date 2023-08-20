@@ -9,8 +9,8 @@ declare class ViewPort extends EventDispatcher {
     protected domElement: HTMLElement;
     protected renderer: WebGLRenderer;
     protected camera: OrthographicCamera | PerspectiveCamera;
-    private width;
-    private height;
+    protected width: number;
+    protected height: number;
     orbitControls: OrbitControls;
     name: string;
     onAfterRenderScene: Function;

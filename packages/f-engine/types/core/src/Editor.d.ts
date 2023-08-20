@@ -5,10 +5,12 @@ declare class Editor extends EventDispatcher {
     private state;
     private selector;
     signals: SignalTypes<SignalsMap>;
-    domElement: HTMLElement;
     scene: Scene;
     sceneHelper: Scene;
-    constructor(domElement: HTMLElement);
+    private _needsUpdate;
+    constructor();
+    get needsUpdate(): boolean;
+    set needsUpdate(value: boolean);
     addObject(object: Object3D, parent: Object3D, index: number | undefined): void;
     removeObject(object: Object3D): void;
     removeObjectByUuid(uuid: string): void;

@@ -1,0 +1,16 @@
+$themes: (
+    light: (bgColor1: #ffffff,
+        bgColor2: #333333,
+        fontColor1: rgba(0, 0, 0, 0.5),
+        fontColor2: #333333,
+        border1: 1px solid #e5e5e5,
+        border2: 1px solid #ffffff,
+        opacity1: 0.7),
+    dark: (bgColor1: #1a1a1a,
+        bgColor2: #000000,
+        fontColor1: rgba(255, 255, 255, 0.8),
+        fontColor2: #999999,
+        border1: none,
+        border2: 1px solid #000000,
+        opacity1: 1)
+);

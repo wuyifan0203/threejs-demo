@@ -36,6 +36,9 @@ importers:
 
   apps/f-editor:
     dependencies:
+      '@f/engine':
+        specifier: workspace:*
+        version: link:../../packages/f-engine
       '@vitejs/plugin-vue-jsx':
         specifier: ^3.0.1
         version: registry.npmmirror.com/@vitejs/plugin-vue-jsx@3.0.1(vite@4.4.8)(vue@3.3.4)

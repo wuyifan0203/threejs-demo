@@ -196,7 +196,7 @@ export default defineComponent({
       const bindComponentEventListener = (container, itemConfig) => {
         let refId = -1;
         if (itemConfig && itemConfig.componentState) {
-          console.log("itemConfig : ", itemConfig);
+          // console.log("itemConfig : ", itemConfig);
           refId = itemConfig.componentState.refId;
         } else {
           throw new Error("bindComponentEventListener: component's ref id is required");
@@ -206,7 +206,7 @@ export default defineComponent({
 
         const ref = GlcKeyPrefix.value + refId;
         const component = (instance?.refs as any)[ref][0] as unknown as typeof glComponent;
-        console.log(component);
+        // console.log(component);
 
         MapComponents.set(container, { refId: refId, glc: component });
 

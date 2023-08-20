@@ -4,6 +4,8 @@
   "description": "cad code",
   "main": "index.js",
   "type": "module",
+  "module": "./build/cad.es.js",
+  "types":"./types/index.d.ts",
   "scripts": {
     "build": "vite build --emptyOutDir",
     "dev":"vite"

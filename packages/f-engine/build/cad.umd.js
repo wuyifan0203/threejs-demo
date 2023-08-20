@@ -362,7 +362,7 @@
       this.editor = editor;
       this.editor.signals.intersectionsDetected.add((selectIds) => {
         if (selectIds.length > 0) {
-          this.select([selectIds[0]]);
+          this.select(selectIds);
         } else {
           this.detach();
         }
@@ -371,9 +371,11 @@
     select(selectIds) {
       selectSet.clear();
       selectIds.forEach((id) => selectSet.add(id));
-      if (isSameSet(this.editor.getState("selections"), selectSet))
+      const editorSelectionSet = this.editor.getState("selections");
+      if (isSameSet(editorSelectionSet, selectSet))
         return;
-      this.editor.setState("selection", selectIds);
+      editorSelectionSet.clear();
+      editorSelectionSet.add(...selectSet);
       this.editor.signals.objectsSelected.dispatch(selectIds);
       this.editor.dispatchEvent("selectionChange", selectIds);
     }
@@ -384,7 +386,7 @@
     }
   }
   class Editor extends EventDispatcher {
-    constructor(domElement) {
+    constructor() {
       super();
       this.state = {
         selections: /* @__PURE__ */ new Set()
@@ -398,10 +400,19 @@
         transformModeChange: new signalsExports.Signal(),
         objectsRemoved: new signalsExports.Signal()
       };
-      this.domElement = domElement;
       this.scene = new three.Scene();
       this.sceneHelper = new three.Scene();
       this.selector = new Selector(this);
+      this._needsUpdate = false;
+    }
+    get needsUpdate() {
+      return this._needsUpdate;
+    }
+    set needsUpdate(value) {
+      this._needsUpdate = value;
+      if (!!value) {
+        this.signals.sceneGraphChanged.dispatch();
+      }
     }
     addObject(object, parent, index) {
       if (parent === void 0) {
@@ -1259,7 +1270,7 @@
       };
     }
   }
-  const _raycaster = new three.Raycaster();
+  const _raycaster$1 = new three.Raycaster();
   const _tempVector = new three.Vector3();
   const _tempVector2 = new three.Vector3();
   const _tempQuaternion = new three.Quaternion();
@@ -1394,8 +1405,8 @@
     pointerHover(pointer) {
       if (this.object === void 0 || this.dragging === true)
         return;
-      _raycaster.setFromCamera(pointer, this.camera);
-      const intersect = intersectObjectWithRay(this._gizmo.picker[this.mode], _raycaster);
+      _raycaster$1.setFromCamera(pointer, this.camera);
+      const intersect = intersectObjectWithRay(this._gizmo.picker[this.mode], _raycaster$1);
       if (intersect) {
         this.axis = intersect.object.name;
       } else {
@@ -1406,8 +1417,8 @@
       if (this.object === void 0 || this.dragging === true || pointer.button !== 0)
         return;
       if (this.axis !== null) {
-        _raycaster.setFromCamera(pointer, this.camera);
-        const planeIntersect = intersectObjectWithRay(this._plane, _raycaster, true);
+        _raycaster$1.setFromCamera(pointer, this.camera);
+        const planeIntersect = intersectObjectWithRay(this._plane, _raycaster$1, true);
         if (planeIntersect) {
           this.object.updateMatrixWorld();
           this.object.parent.updateMatrixWorld();
@@ -1434,8 +1445,8 @@
       }
       if (object === void 0 || axis === null || this.dragging === false || pointer.button !== -1)
         return;
-      _raycaster.setFromCamera(pointer, this.camera);
-      const planeIntersect = intersectObjectWithRay(this._plane, _raycaster, true);
+      _raycaster$1.setFromCamera(pointer, this.camera);
+      const planeIntersect = intersectObjectWithRay(this._plane, _raycaster$1, true);
       if (!planeIntersect)
         return;
       this.pointEnd.copy(planeIntersect.point).sub(this.worldPositionStart);
@@ -1604,7 +1615,7 @@
       }
     }
     getRaycaster() {
-      return _raycaster;
+      return _raycaster$1;
     }
     // TODO: deprecate
     getMode() {
@@ -2649,7 +2660,14 @@
       }
     }
   }
+  const _raycaster = new three.Raycaster();
+  const _mouse = new three.Vector2();
+  const _onDownPosition = new three.Vector2();
+  const _onUpPosition = new three.Vector2();
   class MainViewPort extends ViewPort {
+    //   public composer: EffectComposer;
+    //   public outlinePass: OutlinePass;
+    // effectFXAA: ShaderPass;
     constructor(editor, camera, domElement) {
       super(editor, camera, domElement);
       this.type = "MainViewPort";
@@ -2661,6 +2679,8 @@
       this.statePanel = new StatsPanel();
       this.statePanel.showPanel(0);
       this.statePanel.dom.style.position = "absolute";
+      this.statePanel.dom.style.zIndex = "1";
+      console.log(this.statePanel.dom);
       domElement.append(this.statePanel.dom);
       this.viewHelper = new ViewHelper(camera, domElement);
       this.transformControl = new TransformControls(camera, this.renderer.domElement);
@@ -2686,6 +2706,7 @@
       this.editor.signals.objectsSelected.add((uuids) => {
         this.transformControl.detach();
         selectObjects.length = 0;
+        console.log(uuids);
         uuids.forEach((uuid) => {
           const obj = this.editor.getObjectByUuid(uuid);
           obj && selectObjects.push(obj);
@@ -2694,9 +2715,59 @@
           if (selectObjects.length === 1) {
             this.transformControl.attach(selectObjects[0]);
           }
+          console.log(selectObjects);
         }
         this.editor.signals.sceneGraphChanged.dispatch();
       });
+      const getIntersects = (point) => {
+        _mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
+        _raycaster.setFromCamera(_mouse, camera);
+        const objects = [];
+        const excludeUuids = [
+          this.transformControl.uuid,
+          ...this.excludeObjects.map((o) => o.uuid)
+        ];
+        for (let i = 0, l = editor.scene.children.length; i < l; i++) {
+          traverseObject(editor.scene.children[i], excludeUuids, this.excludeTypes, objects);
+        }
+        for (let i = 0, l = editor.sceneHelper.children.length; i < l; i++) {
+          traverseObject(editor.sceneHelper.children[i], excludeUuids, this.excludeTypes, objects);
+        }
+        return _raycaster.intersectObjects(objects, false);
+      };
+      const mutiSelectId = [];
+      const handelClick = (event) => {
+        if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
+          const intersects = getIntersects(_onUpPosition);
+          const intersectsObjectsUUId = intersects.map((item) => {
+            var _a;
+            return (_a = item == null ? void 0 : item.object) == null ? void 0 : _a.uuid;
+          }).filter((id) => id !== void 0);
+          if (intersectsObjectsUUId.length === 0) {
+            mutiSelectId.length = 0;
+          } else {
+            mutiSelectId.push(intersectsObjectsUUId[0]);
+          }
+          this.editor.signals.intersectionsDetected.dispatch(mutiSelectId);
+          if (!event.ctrlKey) {
+            mutiSelectId.length = 0;
+          }
+        }
+      };
+      const onMouseUp = (event) => {
+        const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
+        _onUpPosition.fromArray(mousePosition);
+        handelClick(event);
+        this.renderer.domElement.removeEventListener("pointerup", onMouseUp);
+      };
+      const onMouseDown = (event) => {
+        if (event.button !== 0)
+          return;
+        const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
+        _onDownPosition.fromArray(mousePosition);
+        this.renderer.domElement.addEventListener("pointerup", onMouseUp);
+      };
+      this.renderer.domElement.addEventListener("pointerdown", onMouseDown);
     }
     render() {
       this.onBeforeRender(this.editor, this.camera);
@@ -2720,6 +2791,18 @@
       if (this.needsUpdate) {
         this.render();
       }
+    }
+    setSize(width, height) {
+      super.setSize(width, height);
+    }
+  }
+  function getMousePosition(x, y, dom) {
+    const { left, top, width, height } = dom.getBoundingClientRect();
+    return [(x - left) / width, (y - top) / height];
+  }
+  function traverseObject(object, extrudeIds, type, target) {
+    if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
+      target.push(object);
     }
   }
   exports2.Editor = Editor;

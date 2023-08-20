@@ -14,5 +14,6 @@ declare class MainViewPort extends ViewPort {
     protected render(): void;
     setTransformMode(mode: transformMode): void;
     private animate;
+    setSize(width: number, height: number): void;
 }
 export { MainViewPort };

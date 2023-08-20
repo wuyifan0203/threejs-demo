@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 01:33:28
+ * @LastEditTime: 2023-08-21 00:14:50
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
@@ -19,11 +19,11 @@ class Editor extends EventDispatcher {
   };
   private selector:Selector
   public signals:SignalTypes<SignalsMap>;
-  public domElement:HTMLElement;
   public scene:Scene;
   public sceneHelper:Scene
+  private _needsUpdate: boolean;
 
-  constructor(domElement:HTMLElement) {
+  constructor() {
     super();
     this.state = {
       selections:new Set()
@@ -37,11 +37,23 @@ class Editor extends EventDispatcher {
       transformModeChange: new Signal(),
       objectsRemoved: new Signal(),
     };
-    this.domElement = domElement;
     this.scene = new Scene()
     this.sceneHelper = new Scene();
 
     this.selector = new Selector(this);
+
+    this._needsUpdate = false;
+  }
+
+  get needsUpdate() {
+    return this._needsUpdate;
+  }
+
+  set needsUpdate(value:boolean) {
+    this._needsUpdate = value;
+    if(!!value){
+      this.signals.sceneGraphChanged.dispatch()
+    }
   }
 
   addObject(object:Object3D, parent:Object3D, index:number |undefined) {
