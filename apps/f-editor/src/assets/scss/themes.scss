@@ -1,16 +1,41 @@
+//_themes.scss
+//当HTML的data-theme为dark时，样式引用dark
+//data-theme为其他值时，就采用组件库的默认样式
+//这里我只定义了两套主题方案，想要再多只需在`$themes`里加就行了
+//注意一点是，每套配色方案里的key可以自定义但必须一致，不然就会混乱
+
 $themes: (
-    light: (bgColor1: #ffffff,
-        bgColor2: #333333,
-        fontColor1: rgba(0, 0, 0, 0.5),
-        fontColor2: #333333,
-        border1: 1px solid #e5e5e5,
-        border2: 1px solid #ffffff,
-        opacity1: 0.7),
-    dark: (bgColor1: #1a1a1a,
-        bgColor2: #000000,
-        fontColor1: rgba(255, 255, 255, 0.8),
-        fontColor2: #999999,
-        border1: none,
-        border2: 1px solid #000000,
-        opacity1: 1)
+
+    light: (
+        //字体
+        font_color1: #414141,
+        font_color2: white,
+        
+        //背景
+        background_color1: #fff,
+        background_color2: #f0f2f5,
+        background_color3: red,
+        background_color4: #2674e7,
+        
+        //边框
+        border_color1: #3d414a,
+    
+    ),
+    
+    dark: (
+        //字体
+        font_color1: #a7a7a7,
+        font_color2: white,
+        
+        //背景
+        background_color1: #1b2531,
+        background_color2: #283142,
+        background_color3: #1e6ceb,
+        background_color4: #323e4e,
+    
+        //边框
+        border_color1: #3d414a,
+    
+    )
 );
+
