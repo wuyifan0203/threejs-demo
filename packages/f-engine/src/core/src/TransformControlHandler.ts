@@ -1,14 +1,15 @@
+/*
+ * @Date: 2023-08-11 00:42:23
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-24 01:09:32
+ * @FilePath: /threejs-demo/packages/f-engine/src/core/src/TransformControlHandler.ts
+ */
 import { Euler, Vector3 } from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls";
 import { Editor } from "./Editor";
 import { MainViewPort } from "./MainViewPort";
 
-/*
- * @Date: 2023-08-11 00:42:23
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 01:36:27
- * @FilePath: /threejs-demo/packages/f-engine/src/core/src/TransformControlHandler.ts
- */
+
 class TransformControlHandler {
     private transformControl: TransformControls;
     private objectPositionOnDown: Vector3;

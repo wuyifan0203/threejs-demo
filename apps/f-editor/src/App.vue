@@ -1,33 +1,40 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-22 01:03:44
+ * @LastEditTime: 2023-08-24 01:46:06
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
   <NThemeEditor class="editor">
-    <n-message-provider>
+    <n-config-provider  :theme-overrides="dark">
+      <n-message-provider>
       <Layout />
     </n-message-provider>
+    </n-config-provider>
   </NThemeEditor>
 </template>
 
 <script lang="ts">
+import { defineComponent, onMounted, ref } from 'vue';
+import { NMessageProvider,NConfigProvider ,NThemeEditor} from 'naive-ui';
 import Layout from "./layout/index.vue";
-import { NMessageProvider } from 'naive-ui'
-import { defineComponent, onMounted } from 'vue';
-import { NThemeEditor } from 'naive-ui'
+import {dark} from './config/theme'
+import {store} from '@/store'
 export default defineComponent({
   name: 'App',
   components: {
     Layout,
     NMessageProvider,
-    NThemeEditor
+    NThemeEditor,
+    NConfigProvider
   },
   setup() {
     onMounted(() => {
-      window.document.documentElement.setAttribute("data-theme", 'dark');
+      store.appStore.changeTheme('dark');
     })
+    return {
+      dark,
+     }
   }
 })
 </script>
