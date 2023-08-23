@@ -26,7 +26,7 @@ export default defineComponent({
   },
   setup() {
     onMounted(() => {
-      window.document.documentElement.setAttribute("data-theme", 'drak');
+      window.document.documentElement.setAttribute("data-theme", 'dark');
     })
   }
 })

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 09:23:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 10:45:56
+ * @LastEditTime: 2023-08-23 10:07:33
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/headMenu/index.vue
 -->
 <!--
@@ -21,6 +21,7 @@
         size="small">
            {{item.label}}
         </n-dropdown>
+        <n-button type="primary" @click="click"></n-button>
     </div>
 </template>
 
@@ -37,26 +38,12 @@ export default defineComponent({
     setup() {
         // const menuConfig = ref(config);
         const message = useMessage()
+        const click = () =>{
+            const theme =window.document.documentElement.getAttribute("data-theme")
+            window.document.documentElement.setAttribute("data-theme", theme === 'dark' ? 'light' : 'dark');
+        }
         return {
-            // options: [
-            //     {
-            //         label: '滨海湾金沙，新加坡',
-            //         key: 'marina bay sands',
-            //         disabled: true
-            //     },
-            //     {
-            //         label: '布朗酒店，伦敦',
-            //         key: "brown's hotel, london"
-            //     },
-            //     {
-            //         label: '亚特兰蒂斯巴哈马，拿骚',
-            //         key: 'atlantis nahamas, nassau'
-            //     },
-            //     {
-            //         label: '比佛利山庄酒店，洛杉矶',
-            //         key: 'the beverly hills hotel, los angeles'
-            //     }
-            // ],
+            click,
             config,
             handleSelect(key: string | number) {
                 message.info(String(key))
