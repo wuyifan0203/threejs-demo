@@ -45,6 +45,9 @@ importers:
       golden-layout:
         specifier: ^2.6.0
         version: registry.npmmirror.com/golden-layout@2.6.0
+      mitt:
+        specifier: ^3.0.1
+        version: registry.npmmirror.com/mitt@3.0.1
       naive-ui:
         specifier: ^2.34.4
         version: registry.npmmirror.com/naive-ui@2.34.4(vue@3.3.4)
@@ -3821,6 +3824,12 @@ packages:
     dependencies:
       brace-expansion: registry.npmmirror.com/brace-expansion@2.0.1
     dev: true
+
+  registry.npmmirror.com/mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/mitt/-/mitt-3.0.1.tgz}
+    name: mitt
+    version: 3.0.1
+    dev: false
 
   registry.npmmirror.com/ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/ms/-/ms-2.1.2.tgz}

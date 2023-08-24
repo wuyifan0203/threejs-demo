@@ -26,9 +26,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent } from "vue";
 import { NDropdown, NButton, useMessage } from 'naive-ui'
 import { config } from "@/config/menu";
+import { store } from "@/store";
 export default defineComponent({
     name: "Menu",
     components: {
@@ -39,8 +40,7 @@ export default defineComponent({
         // const menuConfig = ref(config);
         const message = useMessage()
         const click = () =>{
-            const theme =window.document.documentElement.getAttribute("data-theme")
-            window.document.documentElement.setAttribute("data-theme", theme === 'dark' ? 'light' : 'dark');
+            store.app.theme === 'dark' ? store.app.changeTheme('light') : store.app.changeTheme('dark')
         }
         return {
             click,

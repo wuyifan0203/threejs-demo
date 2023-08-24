@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-21 01:10:29
+ * @LastEditTime: 2023-08-24 19:51:20
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color } from "three";
@@ -73,8 +73,6 @@ class MainViewPort extends ViewPort {
         this.statePanel.showPanel(0);
         this.statePanel.dom.style.position = 'absolute';
         this.statePanel.dom.style.zIndex = '1';
-
-        console.log(this.statePanel.dom);
         
         domElement.append(this.statePanel.dom);
 

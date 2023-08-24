@@ -1,0 +1,9 @@
+@import './themes.scss';
+
+.lm_goldenlayout{
+    @include background_color("background_color1");
+}
+
+.lm_header .lm_tab{
+    @include background_color("background_color2");
+}

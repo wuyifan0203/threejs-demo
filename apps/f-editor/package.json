@@ -11,12 +11,13 @@
     "docs:build": "vuepress build docs"
   },
   "dependencies": {
+    "@f/engine": "workspace:*",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "golden-layout": "^2.6.0",
+    "mitt": "^3.0.1",
     "naive-ui": "^2.34.4",
     "pinia": "^2.1.6",
-    "vue": "^3.2.37",
-    "@f/engine": "workspace:*"
+    "vue": "^3.2.37"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

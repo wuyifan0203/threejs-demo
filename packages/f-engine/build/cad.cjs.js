@@ -2679,7 +2679,6 @@ class MainViewPort extends ViewPort {
     this.statePanel.showPanel(0);
     this.statePanel.dom.style.position = "absolute";
     this.statePanel.dom.style.zIndex = "1";
-    console.log(this.statePanel.dom);
     domElement.append(this.statePanel.dom);
     this.viewHelper = new ViewHelper2(camera, domElement);
     this.transformControl = new TransformControls(camera, this.renderer.domElement);

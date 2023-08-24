@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2023-08-23 09:39:47
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-24 19:49:33
+ * @FilePath: /threejs-demo/apps/f-editor/src/layout/mainView/index.vue
+-->
 <template>
   <div class="wraper">
     <div class="tab"> this is Main Vue</div>
@@ -17,9 +23,7 @@ export default defineComponent({
   props: [],
   setup() {
     onMounted(() => {
-      console.log("mounted");
-      store.cadStore.setupCAD();
-
+      store.cad.setupCAD();
     })
     return {
 

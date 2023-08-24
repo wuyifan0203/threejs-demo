@@ -1,25 +1,26 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-24 01:46:06
+ * @LastEditTime: 2023-08-24 20:54:59
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
   <NThemeEditor class="editor">
-    <n-config-provider  :theme-overrides="dark">
+    <n-config-provider :theme-overrides="themeConfig">
       <n-message-provider>
-      <Layout />
-    </n-message-provider>
+        <Layout />
+      </n-message-provider>
     </n-config-provider>
   </NThemeEditor>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
-import { NMessageProvider,NConfigProvider ,NThemeEditor} from 'naive-ui';
+import { defineComponent, onMounted, ref, watch } from 'vue';
+import { NMessageProvider, NConfigProvider, NThemeEditor } from 'naive-ui';
 import Layout from "./layout/index.vue";
-import {dark} from './config/theme'
-import {store} from '@/store'
+import { dark, light } from './config/theme'
+import { store } from '@/store'
+import { emitter } from '@/utils'
 export default defineComponent({
   name: 'App',
   components: {
@@ -29,12 +30,23 @@ export default defineComponent({
     NConfigProvider
   },
   setup() {
+    const themeConfig = ref(dark);
+
     onMounted(() => {
-      store.appStore.changeTheme('dark');
+      store.app.changeTheme('dark');
+    })
+
+
+    emitter.on('changeTheme', (theme: string) => {      
+      if (theme === 'dark') {
+        themeConfig.value = dark;
+      } else {
+        themeConfig.value = light;
+      }
     })
     return {
-      dark,
-     }
+      themeConfig,
+    }
   }
 })
 </script>
@@ -65,4 +77,5 @@ body {
   @include background_color("background_color1");
   @include border_color("border_color1");
 }
+
 </style>
