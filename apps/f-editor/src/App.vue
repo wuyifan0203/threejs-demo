@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-24 20:54:59
+ * @LastEditTime: 2023-08-25 18:31:06
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
@@ -52,9 +52,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" >
-@import "./assets/scss/mixin.scss";
 @import "golden-layout/dist/css/goldenlayout-base.css";
-@import "golden-layout/dist/css/themes/goldenlayout-dark-theme.css";
+@import "./assets/scss/mixin.scss";
+@import "golden-layout/dist/css/themes/goldenlayout-borderless-dark-theme.css";
+@import "./assets/scss/overWriteGLayout.scss";
+
 
 body {
   height: 100%;
@@ -76,6 +78,14 @@ body {
   @include font_color("font_color1");
   @include background_color("background_color1");
   @include border_color("border_color1");
+}
+
+[data-theme=light]{
+  @import "golden-layout/dist/css/themes/goldenlayout-borderless-light-theme.css";
+}
+
+[data-theme=dark]{
+  @import "golden-layout/dist/css/themes/goldenlayout-borderless-dark-theme.css";
 }
 
 </style>

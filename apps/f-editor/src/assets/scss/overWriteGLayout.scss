@@ -1,9 +1,27 @@
-@import './themes.scss';
+@import './mixin.scss';
+@import './global.scss';
 
 .lm_goldenlayout{
-    @include background_color("background_color1");
+    @include background_color("baseBgdColor");
 }
 
-.lm_header .lm_tab{
-    @include background_color("background_color2");
+.lm_content {
+    @include background_color("paneContentBgdColor");
+}
+
+.lm_dropTargetIndicator {
+    box-shadow: inset 0 0 30px themed('baseBgdColor');
+    outline: 1px dashed $drop-target-fore-color;
+    .lm_inner {
+        @include background_color("baseBgdColor");
+    }
+}
+
+.lm_splitter {
+    @include background_color("baseBgdColor");
+
+    &:hover,
+    &.lm_dragging {
+        @include background_color("baseBgdColor");
+    }
 }
