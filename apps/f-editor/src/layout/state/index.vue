@@ -1,11 +1,11 @@
 <!--
  * @Date: 2023-08-16 10:20:41
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 10:21:07
- * @FilePath: /threejs-demo/apps/f-editor/src/layout/stateBar/index.vue
+ * @LastEditTime: 2023-08-28 10:04:12
+ * @FilePath: /threejs-demo/apps/f-editor/src/layout/state/index.vue
 -->
 <template>
-<div>this is bottom bar</div>
+<div class="bottom-bar">this is bottom bar</div>
 </template>
 
 <script>
@@ -21,6 +21,10 @@ export default defineComponent({
     }
 })
 </script>
-<style scoped>
-
+<style scoped lang="scss">
+@import '../../assets/scss/mixin.scss';
+.bottom-bar{
+  @include background_color("baseBgdColor");
+  height: 100%;
+}
 </style>

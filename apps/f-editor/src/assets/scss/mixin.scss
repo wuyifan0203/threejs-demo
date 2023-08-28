@@ -17,6 +17,10 @@
     @return map-get($theme-map, $key); // map-get($map,$key) 函数的作用是根据 $key，返回 $key 在 $map 中对应的值。比如themed(bgColor1)返回 #ffffff 或 #1a1a1a。
 }
 
+@function getValue($map-name,$key) {
+  @return map-get(map-get($themes,$map-name), $key);
+}
+
 // 获取背景颜色
 @mixin background_color($color) {
     @include themeify {

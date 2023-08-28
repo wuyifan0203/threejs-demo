@@ -1,18 +1,23 @@
 <!--
  * @Date: 2023-08-14 01:54:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-21 01:35:49
+ * @LastEditTime: 2023-08-28 10:18:33
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/index.vue
 -->
 <template>
-  <Menu>222</Menu>
+  <header class="header">
+    <Menu>222</Menu>
+  </header>
   <main class="main">
     <SideMenu class="aside"></SideMenu>
     <div class="layout">
       <GLayout ref="GLayoutRoot" class="GLayout"></GLayout>
     </div>
   </main>
-  <State></State>
+  <footer class="footer">
+    <State></State>
+  </footer>
+
 </template>
 
 <script lang="ts">
@@ -54,11 +59,13 @@ export default defineComponent({
 
 <style lang="scss">
 
-
+.header{
+  height: 25px;
+}
 .main {
   display: flex;
   flex-direction: row;
-  height: calc(100% - 60px);
+  height: calc(100% - 45px);
 }
 
 .aside {
@@ -74,8 +81,8 @@ export default defineComponent({
   height: 100%;
 }
 
-footer {
-  height: 30px;
+.footer {
+  height: 20px;
   width: 100%;
 }
 

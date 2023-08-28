@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 09:23:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-23 10:07:33
+ * @LastEditTime: 2023-08-28 10:15:40
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/headMenu/index.vue
 -->
 <!--
@@ -21,7 +21,7 @@
         size="small">
            {{item.label}}
         </n-dropdown>
-        <n-button type="primary" @click="click"></n-button>
+        <n-button type="primary" @click="click" class="btn">change theme</n-button>
     </div>
 </template>
 
@@ -55,22 +55,12 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scope>
+@import '../../assets/scss/mixin.scss';
 .menubar {
-    .ant-menu-horizontal {
-        font-size: 12px;
-        line-height: 27px;
-    }
-
-    .ant-menu-horizontal>.ant-menu-item-selected::after {
-        content: none;
-    }
-
-    .ant-menu-horizontal>.ant-menu-item-active::after {
-        content: none;
-    }
-
-    .ant-menu-horizontal>.ant-menu-item {
-        padding-inline: 6px;
-    }
+    height: 100%;
+    @include background_color("baseBgdColor");
+   .btn{
+    height: 15px;
+   }
 }
 </style>

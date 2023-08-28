@@ -1,11 +1,11 @@
 <!--
  * @Date: 2023-08-16 10:14:41
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 10:30:03
+ * @LastEditTime: 2023-08-28 10:01:03
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/asideMenu/index.vue
 -->
 <template>
-<div>
+<div class="aside">
     <aside>this is aside</aside>
 </div>
 </template>
@@ -23,6 +23,9 @@ export default defineComponent({
     }
 })
 </script>
-<style scoped>
-
+<style scoped lang="scss">
+@import '../../assets/scss/mixin.scss';
+.aside{
+  @include background_color("baseBgdColor");
+}
 </style>
