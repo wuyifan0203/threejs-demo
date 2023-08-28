@@ -1,32 +1,40 @@
-import { BufferGeometry, Mesh, MeshBasicMaterial, NotEqualStencilFunc } from "three"
-import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils'
-
 /*
  * @Date: 2023-08-12 17:43:07
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-14 00:54:07
+ * @LastEditTime: 2023-08-28 14:04:53
  * @FilePath: /threejs-demo/packages/f-engine/src/helper/src/SelectionHelper.ts
  */
-class SelectionHelper {
-    private selectedMaterial: MeshBasicMaterial;
-    private selectMesh: Mesh;
-    constructor(color = '#ffa500') {
-        this.selectedMaterial = new MeshBasicMaterial({
-            color, stencilWrite: true,
-            stencilRef: 1,
-            stencilFunc: NotEqualStencilFunc
-        });
 
-        this.selectMesh = new Mesh(new BufferGeometry(), this.selectedMaterial);
-        this.selectMesh.visible = false;
-        this.selectMesh.scale.set(1, 1, 1);
-        this.selectMesh.frustumCulled = false;
+import { BufferGeometry, Mesh, MeshBasicMaterial ,Matrix4} from "three"
+import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils'
+
+const modalMatrix = new Matrix4();
+class SelectionHelper extends Mesh {
+    constructor(color = '#ffa500') {
+       const material = new MeshBasicMaterial({
+            color,
+            wireframe:true,
+            depthTest: false,
+        });
+        super(new BufferGeometry(), material);
+
+        this.visible = false;
     }
 
     public setFromObjects(objects: Array<Mesh>) {
-        this.selectMesh.geometry.dispose();
-        const geometry = mergeGeometries(objects.map(({ geometry }) => geometry));
-        this.selectMesh.geometry = geometry;
+        this.geometry.dispose();
+        this.visible = false;
+        if(objects.length){
+            const geometries = objects.map(({ geometry,position,quaternion,scale }) => {  
+                geometry.clone().applyMatrix4(modalMatrix.compose(position,quaternion,scale))
+                return geometry
+            });
+            const geometry = mergeGeometries(geometries);
+            console.log(geometry);
+            
+            this.geometry = geometry;
+            this.visible = true;
+        }
     }
 }
 

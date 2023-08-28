@@ -1,0 +1,40 @@
+<!--
+ * @Date: 2023-04-03 17:25:42
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-06-30 17:14:14
+ * @FilePath: /threejs-demo/packages/app/CAD/example/index.html
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        #cad{
+            width: 921px;
+            height: 693px;
+            position: relative;
+            top:100px;
+            left:100px
+        }
+    </style>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "./lib/three.module.js"
+            }
+        }
+    </script>
+
+</head>
+<body>
+    <div id="cad" ></div>
+</body>
+<script type="module" src="./base.js"></script>
+</html>
