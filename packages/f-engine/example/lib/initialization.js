@@ -1,8 +1,8 @@
 /*
  * @Date         : 2023-07-14 10:24:21
- * @LastEditors  : wuyifan wuyifan@max-optics.com
- * @LastEditTime : 2023-08-03 18:02:28
- * @FilePath     : /web-gui/packages/mo-cad/examples/lib/initialization.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-08-29 20:34:25
+ * @FilePath: /threejs-demo/packages/f-engine/example/lib/initialization.js
  * @Copyright    : Shanghai Max-Optics information Technology Co,.Ltd.
  * @Author       : wuyifan@max-optics.com
  * @Description  :
@@ -44,7 +44,7 @@ function initOrthographicCamera(initialPosition) {
   const position =
     initialPosition !== undefined ? initialPosition : new Vector3(5000, -5000, 10000);
 
-  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000);
   camera.position.copy(position);
   camera.zoom = 2.5;
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-21 00:14:50
+ * @LastEditTime: 2023-08-29 20:44:24
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
@@ -19,6 +19,7 @@ class Editor extends EventDispatcher {
   };
   private selector:Selector
   public signals:SignalTypes<SignalsMap>;
+  public sceneBackground: Scene;
   public scene:Scene;
   public sceneHelper:Scene
   private _needsUpdate: boolean;
@@ -37,8 +38,13 @@ class Editor extends EventDispatcher {
       transformModeChange: new Signal(),
       objectsRemoved: new Signal(),
     };
-    this.scene = new Scene()
+    this.scene = new Scene();
+    this.scene.name = 'main-scene'
     this.sceneHelper = new Scene();
+    this.sceneHelper.name = 'scene-helper'
+    this.sceneBackground = new Scene();
+    this.sceneBackground.name = 'scene-background'
+    this.sceneBackground.background = new Color(0x000000);
 
     this.selector = new Selector(this);
 
@@ -134,7 +140,7 @@ class Editor extends EventDispatcher {
   }
 
   setSceneBackground(background:Color|Texture|null) {
-    this.scene.background = background;
+    this.sceneBackground.background = background;
     this.signals.sceneGraphChanged.dispatch();
   }
 }
