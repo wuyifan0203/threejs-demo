@@ -1,14 +1,15 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-28 11:07:04
+ * @LastEditTime: 2023-08-30 20:07:36
  * @FilePath: /threejs-demo/packages/f-engine/example/base/base.js
  */
 import {
  Mesh, BoxGeometry, MeshNormalMaterial, Vector3 ,Color
 } from 'three';
-// import { MainViewPort, Editor } from '../build/cad.es.js';
-import { MainViewPort, Editor } from '../../src';
+import {
+ MainViewPort, Editor ,ViewPort
+} from '../../src';
 import { GUI } from '../lib/lil-gui.module.min.js';
 import { initOrthographicCamera } from '../lib/initialization.js';
 
@@ -17,21 +18,27 @@ window.onload = () => {
 };
 
 function init() {
-  const dom = document.getElementById('cad');
-  const editor = new Editor(dom);
+  const dom = document.getElementById('main-viewport');
+  const dom2 = document.getElementById('viewport');
+  const editor = new Editor();
 
   const camera = initOrthographicCamera(new Vector3(1000,1000,1000));
   camera.up.set(0,0,1)
 
-  const viewPort = new MainViewPort(editor,camera,dom);
+  const camera2 = initOrthographicCamera(new Vector3(1000,0,0));
+  camera2.up.set(0,0,1)
 
-  const {width,height} = dom.getBoundingClientRect()
+  const mainViewPort = new MainViewPort(editor,camera,dom);
+  const viewPort = new ViewPort(editor,camera2,dom2);
 
-  viewPort.setSize(width,height)
 
-  dom.addEventListener('resize', () => {
-    editor.signals.windowResize.dispatch();
-  });
+  function resize(params) {
+    mainViewPort.setSize(dom.clientWidth,dom.clientHeight);
+    viewPort.setSize(dom2.clientWidth,dom2.clientHeight)
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
 
 
 

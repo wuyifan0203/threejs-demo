@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-29 20:46:14
+ * @LastEditTime: 2023-08-30 21:01:03
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -11,13 +11,8 @@ import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
 import { TransformControlHandler } from "./TransformControlHandler";
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
-import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
-import { SelectionHelper } from "@/helper/src/SelectionHelper";
+
 
 type uuids = Array<string>;
 type transformMode = 'translate' | 'scale' | 'rotate'
@@ -37,7 +32,6 @@ class MainViewPort extends ViewPort {
   private statePanel: StatsPanel;
   private clock: Clock;
   private needsUpdate: boolean
-  public selectionHelper: SelectionHelper;
 
   constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super(editor, camera, domElement);
@@ -55,9 +49,10 @@ class MainViewPort extends ViewPort {
     this.statePanel.dom.style.position = 'absolute';
     this.statePanel.dom.style.zIndex = '1';
 
-    domElement.append(this.statePanel.dom);
+    this.domElement.setAttribute('id', 'F-MainViewPort');
+    this.domElement.append(this.statePanel.dom);
 
-    this.viewHelper = new ViewHelper(camera, domElement);
+    this.viewHelper = new ViewHelper(camera, this.domElement);
 
     this.transformControl = new TransformControls(camera, this.renderer.domElement);
     this.editor.addHelper(this.transformControl);
@@ -68,11 +63,13 @@ class MainViewPort extends ViewPort {
     this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this))
     this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this))
 
-    this.selectionHelper = new SelectionHelper();
-    this.editor.addHelper(this.selectionHelper);
+    const outlinePass = new OutlinePass(this.size,this.editor.scene,this.camera);
+    outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
+    outlinePass.edgeStrength = 4;
+    this.composer.insertPass(outlinePass,3)
 
-    const outlinePass = new OutlinePass(new Vector2(this.width,this.height),this.editor.scene,this.camera);
-    this.composer.insertPass(outlinePass,8)
+    console.log(this.composer);
+    
     
     const selectId: uuids = [];
 
@@ -94,9 +91,7 @@ class MainViewPort extends ViewPort {
     const selectObjects: Array<Object3D> = []
 
     this.editor.signals.objectsSelected.add((uuids: uuids) => {
-      this.transformControl.detach();
       selectObjects.length = 0;
-
 
       uuids.forEach(uuid => {
         const obj = this.editor.getObjectByUuid(uuid)
@@ -104,16 +99,8 @@ class MainViewPort extends ViewPort {
       })
 
       if (selectObjects.length !== 0) {
-        if (selectObjects.length === 1) {
-          this.transformControl.attach(selectObjects[0])
-        }
-
-        console.log(selectObjects);
-
         // 选择物体高亮
-
-        // this.selectionHelper.setFromObjects(selectObjects as Mesh[])
-        this.composer.passes[8].selectedObjects = selectObjects as Mesh[]
+        (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
         
       }
       this.editor.signals.sceneGraphChanged.dispatch()
