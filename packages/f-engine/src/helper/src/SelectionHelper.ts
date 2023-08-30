@@ -30,7 +30,6 @@ class SelectionHelper extends Mesh {
                 return geometry
             });
             const geometry = mergeGeometries(geometries);
-            console.log(geometry);
             
             this.geometry = geometry;
             this.visible = true;

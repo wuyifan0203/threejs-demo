@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-30 21:01:03
+ * @LastEditTime: 2023-08-31 01:22:32
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -15,7 +15,7 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 
 
 type uuids = Array<string>;
-type transformMode = 'translate' | 'scale' | 'rotate'
+type Mode = 'select'| 'translate'| 'rotate'|  'scale'
 
 
 const _raycaster = new Raycaster();
@@ -32,6 +32,7 @@ class MainViewPort extends ViewPort {
   private statePanel: StatsPanel;
   private clock: Clock;
   private needsUpdate: boolean
+  private _currentMode: string;
 
   constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super(editor, camera, domElement);
@@ -66,10 +67,11 @@ class MainViewPort extends ViewPort {
     const outlinePass = new OutlinePass(this.size,this.editor.scene,this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
     outlinePass.edgeStrength = 4;
-    this.composer.insertPass(outlinePass,3)
+    this.composer.insertPass(outlinePass,3);
 
-    console.log(this.composer);
-    
+    this._currentMode = 'select';
+
+
     
     const selectId: uuids = [];
 
@@ -99,10 +101,12 @@ class MainViewPort extends ViewPort {
       })
 
       if (selectObjects.length !== 0) {
-        // 选择物体高亮
-        (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
+       
+      
         
       }
+       // 选择物体高亮
+      (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
       this.editor.signals.sceneGraphChanged.dispatch()
     })
 
@@ -149,7 +153,6 @@ class MainViewPort extends ViewPort {
           mutiSelectId.push(intersectsObjectsUUId[0]);
         }
 
-        // 这里必须要进行拷贝，不然执行下一行后会有bug
         this.editor.signals.intersectionsDetected.dispatch(mutiSelectId);
 
         // 非多选模式需要清空，为下次单选做准备
@@ -180,18 +183,16 @@ class MainViewPort extends ViewPort {
     this.renderer.domElement.addEventListener('pointerdown', onMouseDown);
   }
 
+  get currentMode(){
+    return this._currentMode;
+  }
+
   protected render(): void {
     super.render();
 
     this.viewHelper.render(this.renderer);
 
-
     this.needsUpdate = false;
-
-  }
-
-  public setTransformMode(mode: transformMode) {
-    this.transformControl.setMode(mode)
   }
 
   private animate() {
@@ -207,8 +208,11 @@ class MainViewPort extends ViewPort {
     }
   }
 
-  public setSize(width: number, height: number): void {
-    super.setSize(width, height);
+  public changeMode(mode:Mode) {
+    this._currentMode = mode;
+    if(mode!=='select'){
+      this.transformControl.setMode(mode);
+    }
   }
 }
 
