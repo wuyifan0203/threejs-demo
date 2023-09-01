@@ -15,7 +15,7 @@
     "threejs"
   ],
   "author": "Yifan Wu",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/signals": "^1.0.1",
     "@types/three": "^0.155.0",
@@ -25,6 +25,6 @@
   "dependencies": {
     "@f/utils": "workspace:*",
     "signals": "^1.0.0",
-    "three": "^0.155.0"
+    "three": "^0.156.0"
   }
 }

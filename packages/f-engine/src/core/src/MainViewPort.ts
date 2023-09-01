@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-31 01:22:32
+ * @LastEditTime: 2023-08-31 19:50:41
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -96,15 +96,16 @@ class MainViewPort extends ViewPort {
       selectObjects.length = 0;
 
       uuids.forEach(uuid => {
-        const obj = this.editor.getObjectByUuid(uuid)
-        obj && selectObjects.push(obj)
-      })
+        const obj = this.editor.getObjectByUuid(uuid);
+        obj && selectObjects.push(obj);
+      });
 
-      if (selectObjects.length !== 0) {
-       
-      
-        
+      if(selectObjects.length === 1 && this._currentMode !== 'select'){
+        this.transformControl.attach(selectObjects[0]);
+      }else{
+        this.transformControl.detach();
       }
+  
        // 选择物体高亮
       (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
       this.editor.signals.sceneGraphChanged.dispatch()
@@ -135,7 +136,6 @@ class MainViewPort extends ViewPort {
 
       return _raycaster.intersectObjects(objects, false);
     }
-
 
     const mutiSelectId: Array<string> = [];
 
@@ -210,9 +210,19 @@ class MainViewPort extends ViewPort {
 
   public changeMode(mode:Mode) {
     this._currentMode = mode;
+
     if(mode!=='select'){
       this.transformControl.setMode(mode);
+      
+      const selections:Set<string> = this.editor.getState('selections');
+      if(selections.size === 1){
+        const obj = this.editor.getObjectByUuid(selections.values().next().value);
+        obj && this.transformControl.attach(obj);
+      }
+    }else{
+      this.transformControl.detach();
     }
+    this.editor.needsUpdate = true;
   }
 }
 

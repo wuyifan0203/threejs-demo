@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-30 20:07:36
+ * @LastEditTime: 2023-08-31 19:38:31
  * @FilePath: /threejs-demo/packages/f-engine/example/base/base.js
  */
 import {
@@ -41,10 +41,10 @@ function init() {
   resize();
 
 
+  const modeArray = ['select','translate','rotate','scale'];
 
   const control = {
-    transformMode:'translate',
-    panelMode:'select',
+    panelMode:0,
     sceneBackgroundType:'None',
     sceneColor1:'#ffffff',
     sceneColor2:'#0000ff'
@@ -93,8 +93,8 @@ function init() {
   const gui = new GUI();
   gui.open();
   const CFolder = gui.addFolder('Camera')
-  CFolder.add(control,'transformMode',{translate:'translate',rotate:'rotate',scale:'scale'}).name('Set Transform Mode').onChange((e)=>{
-    viewPort.setTransformMode(e)
+  CFolder.add(control,'panelMode',{select:0,translate:1,rotate:2,scale:3}).name('Set Mode').onChange((e)=>{
+    mainViewPort.changeMode(modeArray[control.panelMode])
   })
   CFolder.add(control,'sceneBackgroundType',{None:'None',Color:"Color",Texture:'Texture'}).name('Scene Background Type').onChange(setBackGround)
   CFolder.addColor(control,'sceneColor1').onChange(()=>{

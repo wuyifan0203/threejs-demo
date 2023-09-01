@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "dependencies": {
-    "three": "^0.155.0"
+    "three": "^0.156.0"
   },
   "license": "MIT",
   "devDependencies": {
