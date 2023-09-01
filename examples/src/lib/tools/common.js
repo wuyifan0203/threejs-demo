@@ -90,7 +90,7 @@ function initGroundPlane(scene, size = { x: 200, y: 200 }) {
  * @param {Vector3} initialPosition
  * @return {SpotLight}
  */
-function initDefaultLighting(scene, initialPosition) {
+function initDefaultLighting(scene, initialPosition,color = 0x343434 ) {
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
 
   const spotLight = new SpotLight(0xffffff);
@@ -105,7 +105,7 @@ function initDefaultLighting(scene, initialPosition) {
 
   scene.add(spotLight);
 
-  const ambientLight = new AmbientLight(0x343434);
+  const ambientLight = new AmbientLight(color);
   ambientLight.name = 'ambientLight';
   scene.add(ambientLight);
 
