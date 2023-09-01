@@ -8,7 +8,7 @@
 <div class="bottom-bar">this is bottom bar</div>
 </template>
 
-<script>
+<script lang="ts">
 import { defineComponent } from 'vue';
 export default defineComponent({
     name: 'StateBar' ,

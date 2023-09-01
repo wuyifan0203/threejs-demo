@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-19 19:45:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 01:25:23
+ * @LastEditTime: 2023-09-01 13:12:25
  * @FilePath: /threejs-demo/apps/f-editor/vite.config.ts
  */
 import { defineConfig } from "vite";
@@ -24,6 +24,13 @@ export default defineConfig({
   server: {
     port:3000,
     open:true
+  },
+  base:'./',
+  build:{
+    outDir:'./dist',
+    emptyOutDir:true,
+    sourcemap:false,
+    minify:false,
   },
   css:{
     preprocessorOptions: {
