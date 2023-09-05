@@ -1,9 +1,10 @@
 /*
- * @Date: 2023-09-01 13:44:22
+ * @Date: 2023-09-05 20:45:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-05 20:45:26
- * @FilePath: /threejs-demo/examples/src/animate/useAnimation.js
+ * @LastEditTime: 2023-09-05 20:45:12
+ * @FilePath: /threejs-demo/examples/src/animate/useSkinning.js
  */
+
 import {
     BoxGeometry,
     Scene,
