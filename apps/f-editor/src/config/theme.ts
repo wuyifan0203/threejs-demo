@@ -1,14 +1,14 @@
 /*
  * @Date: 2023-08-24 01:23:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-24 19:22:33
+ * @LastEditTime: 2023-09-06 16:20:18
  * @FilePath: /threejs-demo/apps/f-editor/src/config/theme.ts
  */
 const dark = {
     "Tree": {
       "fontSize": "12px",
       "nodeBorderRadius": "0px",
-      "nodeColorHover": "#ff0000FF",
+      "nodeColorHover": "#444444FF",
       "nodeColorPressed": "rgba(137, 137, 137, 1)",
       "nodeColorActive": "#5F668EFF",
       "arrowColor": "rgba(220, 220, 220, 1)",

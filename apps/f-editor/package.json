@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@f/engine": "workspace:*",
+    "@f/utils": "workspace:^",
     "@vitejs/plugin-vue-jsx": "^3.0.1",
     "golden-layout": "^2.6.0",
     "mitt": "^3.0.1",

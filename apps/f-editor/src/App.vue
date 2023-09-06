@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-28 10:30:03
+ * @LastEditTime: 2023-09-06 16:23:00
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
@@ -34,6 +34,7 @@ export default defineComponent({
 
     onMounted(() => {
       store.app.changeTheme('dark');
+      store.tree.resetTree();
     })
 
 

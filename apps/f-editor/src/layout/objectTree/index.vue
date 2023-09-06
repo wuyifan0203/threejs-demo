@@ -1,17 +1,18 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-22 00:51:16
+ * @LastEditTime: 2023-09-06 16:22:12
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
   <div>this is Object Tree</div>
-  <n-tree block-line :data="data" :selectable="false" />
+  <n-tree block-line :data="treeData" :selectable="false" />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { NTree } from 'naive-ui'
+import { computed, defineComponent,ref } from 'vue';
+import { NTree } from 'naive-ui';
+import { store } from '@/store'
 export default defineComponent({
   name: 'ObjectTree',
   components: {
@@ -19,50 +20,15 @@ export default defineComponent({
   },
   props: [],
   setup() {
-
-    const data = [
-      {
-        label: 'Scene',
-        key: 'id',
-        visable: true,
-        children: [
-          {
-            label: 'Camera',
-            key: 'q',
-          },
-          {
-            label: 'MEsh',
-            key: 'w',
-          },
-          {
-            label: 'Object',
-            key: 'e',
-          },
-          {
-            label: 'Circle',
-            key: 'r',
-          },
-          {
-            label: 'Camera',
-            key: 't',
-          },
-          {
-            label: 'Camera',
-            key: 'id1',
-          }
-        ]
-      }
-    ]
+    const treeData = computed(()=>[store.tree.currentTree])
     return {
-      data
-
+      treeData
     }
   }
 })
 </script>
 <style scoped>
-.n-tree{
+.n-tree {
   --n-arrow-color: #000;
 }
-
 </style>

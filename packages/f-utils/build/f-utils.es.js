@@ -1,4 +1,4 @@
-import { Vector3, Matrix4 } from "three";
+import { Vector3, Matrix4, MathUtils } from "three";
 function rotationFormula(vec3Before, vec3After, target) {
   const rotationAxis = new Vector3().crossVectors(vec3Before, vec3After);
   const rotateAngle = Math.acos(dotProduct(vec3Before, vec3After) / normalizeVec3(vec3Before) * normalizeVec3(vec3After));
@@ -84,7 +84,90 @@ class EventDispatcher {
     }
   }
 }
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+const { generateUUID } = MathUtils;
+const removedEvent = "removed";
+const addedEvent = "added";
+const changeEvent = "change";
+class TreeNode extends EventDispatcher {
+  constructor(type, attribute = {}) {
+    super();
+    this.name = "";
+    this.id = generateUUID();
+    this.children = [];
+    this.parent = null;
+    this.attribute = attribute;
+    this._type = type;
+  }
+  get type() {
+    return this._type;
+  }
+  // 增
+  add(node) {
+    node.parent = this;
+    this.children.push(node);
+    node.dispatchEvent(addedEvent, node);
+  }
+  // 改
+  getAttribute() {
+    return deepClone(this.attribute);
+  }
+  setAttribute(attribute) {
+    this.dispatchEvent(changeEvent, deepClone(this.attribute), attribute);
+    Object.assign(this.attribute, attribute);
+  }
+  // 删
+  remove(node) {
+    const index = this.children.indexOf(node);
+    if (index !== -1) {
+      this.children.splice(index, 1);
+      node.parent = null;
+      node.dispatchEvent(removedEvent, node);
+    }
+    return this;
+  }
+  removeFromParent() {
+    if (this.parent) {
+      this.parent.remove(this);
+    }
+    return this;
+  }
+  clear() {
+    this.children.forEach((n) => {
+      this.remove(n);
+    });
+  }
+  // 查
+  getNotesByProperty(key, value) {
+    let result = [];
+    if (this[key] === value)
+      result.push(this);
+    for (let i = 0, l = this.children.length; i < l; i++) {
+      const childResult = this.children[i].getNotesByProperty(key, value);
+      if (childResult.length > 0) {
+        result = result.concat(childResult);
+      }
+    }
+    return result;
+  }
+  getNodeByProperty(key, value) {
+    if (this[key] === value)
+      return this;
+    for (let i = 0, l = this.children.length; i < l; i++) {
+      const child = this.children[i];
+      const object = child.getNodeByProperty(key, value);
+      if (object !== void 0) {
+        return object;
+      }
+    }
+    return void 0;
+  }
+}
 export {
   EventDispatcher,
+  TreeNode,
+  deepClone,
   rotationFormula
 };
