@@ -15,7 +15,7 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 
 
 type uuids = Array<string>;
-type Mode = 'select'| 'translate'| 'rotate'|  'scale'
+type Mode = 'select' | 'translate' | 'rotate' | 'scale'
 
 
 const _raycaster = new Raycaster();
@@ -64,15 +64,15 @@ class MainViewPort extends ViewPort {
     this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this))
     this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this))
 
-    const outlinePass = new OutlinePass(this.size,this.editor.scene,this.camera);
+    const outlinePass = new OutlinePass(this.size, this.editor.scene, this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
     outlinePass.edgeStrength = 4;
-    this.composer.insertPass(outlinePass,3);
+    this.composer.insertPass(outlinePass, 3);
 
     this._currentMode = 'select';
 
 
-    
+
     const selectId: uuids = [];
 
     this.editor.signals.objectsRemoved.add((uuids: uuids) => {
@@ -100,13 +100,13 @@ class MainViewPort extends ViewPort {
         obj && selectObjects.push(obj);
       });
 
-      if(selectObjects.length === 1 && this._currentMode !== 'select'){
+      if (selectObjects.length === 1 && this._currentMode !== 'select') {
         this.transformControl.attach(selectObjects[0]);
-      }else{
+      } else {
         this.transformControl.detach();
       }
-  
-       // 选择物体高亮
+
+      // 选择物体高亮
       (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
       this.editor.signals.sceneGraphChanged.dispatch()
     })
@@ -183,7 +183,7 @@ class MainViewPort extends ViewPort {
     this.renderer.domElement.addEventListener('pointerdown', onMouseDown);
   }
 
-  get currentMode(){
+  get currentMode() {
     return this._currentMode;
   }
 
@@ -208,18 +208,18 @@ class MainViewPort extends ViewPort {
     }
   }
 
-  public changeMode(mode:Mode) {
+  public changeMode(mode: Mode) {
     this._currentMode = mode;
 
-    if(mode!=='select'){
+    if (mode !== 'select') {
       this.transformControl.setMode(mode);
-      
-      const selections:Set<string> = this.editor.getState('selections');
-      if(selections.size === 1){
+
+      const selections: Set<string> = this.editor.getState('selections');
+      if (selections.size === 1) {
         const obj = this.editor.getObjectByUuid(selections.values().next().value);
         obj && this.transformControl.attach(obj);
       }
-    }else{
+    } else {
       this.transformControl.detach();
     }
     this.editor.needsUpdate = true;
