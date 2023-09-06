@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 13:53:17
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-06 16:04:07
+ * @LastEditTime: 2023-09-06 16:33:11
  * @FilePath: /threejs-demo/packages/f-utils/src/others/TreeNode.ts
  */
 import { MathUtils } from 'three';
@@ -15,10 +15,10 @@ const changeEvent = 'change';
 
 class TreeNode extends EventDispatcher {
     readonly id: string;
+    public name: string;
     public children: TreeNode[];
     public parent: null | TreeNode;
     private attribute: { [key: string | symbol]: any };
-    public name: string;
     private _type: string
 
     constructor(type: string, attribute: { [key: string | symbol]: any } = {}) {

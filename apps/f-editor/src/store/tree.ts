@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-21 00:15:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-06 16:20:52
+ * @LastEditTime: 2023-09-06 16:31:41
  * @FilePath: /threejs-demo/apps/f-editor/src/store/tree.ts
  */
 
@@ -18,7 +18,7 @@ const useTreeStore = defineStore({
     },
     actions: {
         resetTree() {
-            this.root.label = 'Scene'
+            this.root.name = 'Scene'
             this.root.clear();
         },
 
