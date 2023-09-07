@@ -1,4 +1,5 @@
-import { WebGLRenderer, OrthographicCamera, PerspectiveCamera } from 'three';
+import { WebGLRenderer, OrthographicCamera, PerspectiveCamera, Vector2 } from 'three';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';
 import type { Editor } from './Editor';
@@ -9,19 +10,14 @@ declare class ViewPort extends EventDispatcher {
     protected domElement: HTMLElement;
     protected renderer: WebGLRenderer;
     protected camera: OrthographicCamera | PerspectiveCamera;
-    protected width: number;
-    protected height: number;
+    protected size: Vector2;
     orbitControls: OrbitControls;
     name: string;
-    onAfterRenderScene: Function;
+    onAfterRender: Function;
     onBeforeRender: Function;
-    onBeforeRenderSceneHelper: Function;
+    protected composer: EffectComposer;
     constructor(editor: Editor, camera: OrthographicCamera | PerspectiveCamera, domElement: HTMLElement);
     protected render(): void;
     setSize(width: number, height: number): void;
-    getSize(): {
-        width: number;
-        height: number;
-    };
 }
 export { ViewPort };

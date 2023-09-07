@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-29 20:44:24
+ * @LastEditTime: 2023-09-07 20:10:58
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
@@ -62,12 +62,12 @@ class Editor extends EventDispatcher {
     }
   }
 
-  addObject(object:Object3D, parent:Object3D, index:number |undefined) {
+  addObject(object:Object3D, parent:Object3D| null, index:number |null) {
 
-    if (parent === undefined) {
+    if (parent === null) {
       this.scene.add(object);
     } else {
-      if (index === undefined) {
+      if (index === null) {
         parent.add(object);
       } else {
         parent.children.splice(index, 0, object);

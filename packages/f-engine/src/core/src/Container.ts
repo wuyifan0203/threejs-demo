@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 13:06:55
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-02 01:29:32
+ * @LastEditTime: 2023-09-07 21:01:20
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Container.ts
  */
 import type { BufferGeometry, Camera, Light, Material, Object3D, Texture } from "three";
@@ -34,11 +34,7 @@ class Container {
 
   // camera
   addCamera(key: string, camera: Camera) {
-    if (camera?.isCamera) {
-      this.cameras.set(key, camera);
-    } else {
-      console.error('Container.addCamera: object not an instance of THREE.Camera.', camera);
-    }
+    this.cameras.set(key, camera);
   }
 
   removeCamera(camera: Camera) {
@@ -47,11 +43,7 @@ class Container {
 
   // light
   addLight(key: string, light: Light) {
-    if (light?.isLight) {
-      this.lights.set(key, light);
-    } else {
-      console.error('Container.addLight: object not an instance of THREE.Light.', light);
-    }
+    this.lights.set(key, light);
   }
 
   removeLight(light: Light) {
@@ -60,9 +52,12 @@ class Container {
 
   // object
 
-  addObject(object: Object3D) {
+  addObject(object: Object3D|any) {
     if (object?.isObject3D) {
       this.objects.set(object.uuid, object);
+      if (object?.isCamera) {
+        // this.addCamera()
+      }
     } else {
       console.error('Container.addObject: object not an instance of THREE.Object3D.', object);
     }
@@ -96,7 +91,7 @@ class Container {
 
   // material
 
-  addMaterial(material:Material|Material[]) {
+  addMaterial(material: Material | Material[]) {
     if (Array.isArray(material)) {
       for (let i = 0, l = material.length; i < l; i++) {
         if (material[i]?.isMaterial) {
@@ -113,7 +108,7 @@ class Container {
     }
   }
 
-  removeMaterial(material:Material|Material[]) {
+  removeMaterial(material: Material | Material[]) {
     if (Array.isArray(material)) {
       for (let i = 0, l = material.length; i < l; i++) {
         this.removeObjectToRefCounter(material[i], this.materialsRefCounter, this.materials);
@@ -123,13 +118,13 @@ class Container {
     }
   }
 
-  getMaterialByUUID(uuid:string) {
+  getMaterialByUUID(uuid: string) {
     return this.materials.get(uuid);
   }
 
   // texture
 
-  addTexture(texture:Texture) {
+  addTexture(texture: Texture) {
     if (texture?.isTexture) {
       this.addObjectToRefCounter(texture, this.texturesRefCounter, this.textures);
     } else {
@@ -137,35 +132,35 @@ class Container {
     }
   }
 
-  removeTexture(texture:Texture) {
+  removeTexture(texture: Texture) {
     this.removeObjectToRefCounter(texture, this.texturesRefCounter, this.textures);
   }
 
-  getTextureByUUID(uuid:string) {
+  getTextureByUUID(uuid: string) {
     return this.textures.get(uuid);
   }
 
   // helper
 
-  addHelper(key:string,helper:Object3D) {
+  private addHelper(key: string, helper: Object3D) {
     this.helpers.set(key, helper);
   }
 
-  removeHelper(helper:Object3D) {
+  private removeHelper(helper: Object3D) {
     if (this.helpers.has(helper?.uuid)) {
       this.helpers.delete(helper.uuid);
     }
   }
 
-  getHelperByKey(key:string) {
+  getHelperByKey(key: string) {
     return this.helpers.get(key);
   }
 
   // counter
 
-  addObjectToRefCounter(object:Texture|BufferGeometry|Material, counter:Map<string,number>, map:Map<string,Material|Texture|BufferGeometry>) {
+  private addObjectToRefCounter(object: Texture | BufferGeometry | Material, counter: Map<string, number>, map: Map<string, Material | Texture | BufferGeometry>) {
     let count = counter.get(object.uuid);
-    
+
     if (count === undefined) {
       map.set(object.uuid, object);
       counter.set(object.uuid, 1);
@@ -174,10 +169,10 @@ class Container {
     }
   }
 
-  removeObjectToRefCounter(object:Texture|BufferGeometry|Material, counter:Map<string,number>, map:Map<string,Material|Texture|BufferGeometry>) {
+  private removeObjectToRefCounter(object: Texture | BufferGeometry | Material, counter: Map<string, number>, map: Map<string, Material | Texture | BufferGeometry>) {
     let count = counter.get(object.uuid);
 
-    if(count){
+    if (count) {
       count--;
       if (count === 0) {
         counter.delete(object.uuid);
