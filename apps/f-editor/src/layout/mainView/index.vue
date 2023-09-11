@@ -1,15 +1,15 @@
 <!--
  * @Date: 2023-08-23 09:39:47
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-24 19:49:33
+ * @LastEditTime: 2023-09-11 19:21:31
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/mainView/index.vue
 -->
 <template>
-  <div class="wraper">
+  <div class="wrapper">
     <div class="tab"> this is Main Vue</div>
     <main id="CAD">
       <div id="main-view"></div>
-      <div id="depuly-view"></div>
+      <div id="deputy-view"></div>
     </main>
   </div>
 </template>
@@ -32,7 +32,7 @@ export default defineComponent({
 })
 </script>
 <style scoped lang="scss">
-.wraper {
+.wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
