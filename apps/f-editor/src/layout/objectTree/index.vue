@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-11 20:59:05
+ * @LastEditTime: 2023-09-12 17:51:21
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
@@ -13,10 +13,19 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, getCurrentInstance, h, ref } from 'vue';
+import { computed, defineComponent, h, ref, onMounted } from 'vue';
 import { NTree, TreeSelectRenderPrefix, NInput, TreeSelectRenderSuffix } from 'naive-ui';
-import  Icon from '@/components/Icon/index.vue'
-import { store } from '@/store'
+import { store } from '@/store';
+import type { Node } from '@/engine/Node';
+
+const iconMap = {
+  Root: 'f-_collection',
+  Group: 'f-_collection',
+  Camera:'f-camera',
+  Light:'f-light',
+  Modal:'f-moxing2'
+}
+
 export default defineComponent({
   name: 'ObjectTree',
   components: {
@@ -28,32 +37,20 @@ export default defineComponent({
     const treeData = computed(() => [store.tree.currentTree]);
     const pattern = ref('');
 
-    const scoped = getCurrentInstance();
-    console.log(scoped);
-
-    const Icon = scoped!.appContext.components.Icon
-
-    const renderPrefix: TreeSelectRenderPrefix = ({ option, checked, selected }) => {
-      console.log(option, checked, selected);
-
-      return h(
-        Icon,
-        { 
-          // class: ['f-iconfont','f-_collection'] 
-          props:{
-            iconName:'f-_collection'
-          }
-        },
-      )
+    const renderPrefix: TreeSelectRenderPrefix = ({ option }) => {
+      const iconName = iconMap[(option as unknown as Node).type];
+      return h('i', { class: [iconName,'f-iconfont']})
     }
 
-    const renderSuffix: TreeSelectRenderSuffix = ({ option, checked, selected }) => {
-      return h(
-        'i',
-        { class: '' },
-        { default: () => 'Suffix' }
-      )
+    const renderSuffix: TreeSelectRenderSuffix = ({ option }) => {
+      const iconName = !(option as unknown as Node).visible ? 'f-yanjing_xianshi' : 'f-yanjing_yincang';
+      return h('i', { class: [iconName,'f-iconfont']})
     }
+
+    onMounted(()=>{
+      store.tree.resetTree();
+    })
+
     return {
       treeData,
       pattern,

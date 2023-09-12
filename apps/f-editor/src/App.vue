@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-06 16:23:00
+ * @LastEditTime: 2023-09-12 17:56:32
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
@@ -56,6 +56,7 @@ export default defineComponent({
 @import "golden-layout/dist/css/goldenlayout-base.css";
 @import "./assets/scss/mixin.scss";
 @import "./assets/scss/overWriteGLayout.scss";
+@import 'https://at.alicdn.com/t/c/font_4242393_09qprqmd8arh.css';
 
 
 body {

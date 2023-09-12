@@ -1,59 +1,52 @@
 <!--
- * @Date: 2023-08-16 09:23:16
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-01 13:07:25
- * @FilePath: /threejs-demo/apps/f-editor/src/layout/headMenu/index.vue
--->
-<!--
- * @Date: 2023-08-16 09:23:16
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-28 10:15:40
- * @FilePath: /threejs-demo/apps/f-editor/src/layout/headMenu/index.vue
--->
-<!--
  * @Date: 2023-08-15 00:44:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-16 09:37:21
- * @FilePath: /threejs-demo/apps/f-editor/src/layout/menubar/index.vue
+ * @LastEditTime: 2023-09-12 17:54:01
+ * @FilePath: /threejs-demo/apps/f-editor/src/layout/headMenu/index.vue
 -->
 <template>
     <div class="menubar">
-        <n-dropdown
-        v-for="item in config"
-        :key="item.key"
-        trigger="hover" 
-        :options="item.children" 
-        @select="handleSelect" 
-        size="small">
-           {{item.label}}
-        </n-dropdown>
-        <n-button type="primary" @click="click" class="btn">change theme</n-button>
+        <n-space>
+            <n-dropdown v-for="item in config" :key="item.key" trigger="hover" :options="item.children"
+                @select="handleSelect" size="small" :render-icon="renderIcon"
+                >
+                {{ item.label }}
+            </n-dropdown>
+            <n-button type="primary" @click="click" class="btn">change theme</n-button>
+        </n-space>
     </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { NDropdown, NButton, useMessage } from 'naive-ui'
+import { defineComponent, h } from "vue";
+import { NDropdown, NButton, useMessage, NSpace } from 'naive-ui'
 import { config } from "@/config/menu";
 import { store } from "@/store";
 export default defineComponent({
     name: "Menu",
     components: {
         NDropdown,
-        NButton
+        NButton,
+        NSpace
     },
     setup() {
         // const menuConfig = ref(config);
         const message = useMessage()
-        const click = () =>{
+        const click = () => {
             store.app.theme === 'dark' ? store.app.changeTheme('light') : store.app.changeTheme('dark')
+        }
+
+
+        const renderIcon = ()=>{
+            return h('i',{class:['f-iconfont','f-xuanzegongju']})
         }
         return {
             click,
             config,
             handleSelect(key: string | number) {
                 message.info(String(key))
-            }
+            },
+            renderIcon
         };
     },
 });
@@ -62,11 +55,19 @@ export default defineComponent({
 
 <style lang="scss" scope>
 @import '../../assets/scss/mixin.scss';
+
 .menubar {
     height: 100%;
+    line-height: 25px;
+    padding-left:20px; 
     @include background_color("baseBgdColor");
-   .btn{
-    height: 15px;
-   }
+
+    .btn {
+        height: 15px;
+    }
+
+    .headMenu {
+        margin: 15px;
+    }
 }
 </style>
