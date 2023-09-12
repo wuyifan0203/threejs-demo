@@ -1,14 +1,14 @@
 <!--
  * @Date: 2023-08-16 10:14:41
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-12 17:59:09
+ * @LastEditTime: 2023-09-13 02:16:11
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/asideMenu/index.vue
 -->
 <template>
   <div class="aside">
     <aside>this is aside
       <n-space vertical>
-        <n-button v-for="items in config" :key="items.key" size="small" text>
+        <n-button v-for="items in config" :key="items.key" size="small">
           <template #icon>
             <i :class="items.icon" class="aside-icon f-iconfont"></i>
           </template>
@@ -41,6 +41,12 @@ export default defineComponent({
 
 .aside {
   @include background_color("baseBgdColor");
+
+  :deep(.n-button) {
+    width: 100%;
+    height: 20px;
+    padding: 0 5px;
+  }
  
   .aside-icon{
     font-size: 20px;

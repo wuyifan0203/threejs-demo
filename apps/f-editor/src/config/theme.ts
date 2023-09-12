@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-24 01:23:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-06 16:20:18
+ * @LastEditTime: 2023-09-13 01:30:09
  * @FilePath: /threejs-demo/apps/f-editor/src/config/theme.ts
  */
 const dark = {
@@ -25,9 +25,9 @@ const dark = {
       "nodeColorHover": "#eeeeeeFF",
       "loadingColor": "#848484FF",
       "dropMarkColor": "#787878FF",
-      "arrowColor": "rgba(220, 220, 220, 1)",
+      "arrowColor": "#353535FF",
       "nodeColorActive": "rgba(199, 205, 202, 0.81)",
-      "nodeTextColor": "#DCDCDCFF",
+      "nodeTextColor": "#353535FF",
       "nodeColorPressed": "rgba(199, 205, 202, 0.81)"
     }
   }

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-12 17:56:32
+ * @LastEditTime: 2023-09-13 01:40:30
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
@@ -75,10 +75,12 @@ body {
   font-size: 12px !important;
   height: 100vh;
   width: 100vw;
-  font-size: 18px;
   @include font_color("fontColor");
   @include background_color("baseBgdColor");
   @include border_color("border_color1");
+}
+.f-iconfont{
+  font-size: 12px;
 }
 
 

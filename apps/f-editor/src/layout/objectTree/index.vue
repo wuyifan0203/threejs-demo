@@ -1,12 +1,17 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-12 17:51:21
+ * @LastEditTime: 2023-09-13 02:02:52
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
-  <div>this is Object Tree
-    <n-input v-model:value="pattern" placeholder="搜索" />
+  <div class="tree-head">
+    <div class="tree-filter">this is Object Tree</div>
+    <n-input v-model:value="pattern" placeholder="" class="tree-search" autosize style="min-width: 40%">
+      <template #prefix>
+        <i class="f-iconfont f-sousuo"></i>
+      </template>
+    </n-input>
   </div>
   <n-tree block-line :data="treeData" key-field="id" label-field="name" :selectable="false" :render-prefix="renderPrefix"
     :render-suffix="renderSuffix" />
@@ -60,8 +65,18 @@ export default defineComponent({
   }
 })
 </script>
-<style scoped>
+<style scoped lang="scss">
+.tree-head{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+.tree-filter,.tree-search{
+height:20px;
+}
 .n-tree {
-  --n-arrow-color: #000;
+ :deep(.n-tree-node-wrapper){
+  padding:0;
+ }
 }
 </style>
