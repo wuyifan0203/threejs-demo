@@ -137,7 +137,7 @@ class MainViewPort extends ViewPort {
       return _raycaster.intersectObjects(objects, false);
     }
 
-    const mutiSelectId: Array<string> = [];
+    const multiSelectId: Array<string> = [];
 
     const handelClick = (event: PointerEvent) => {
       if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
@@ -148,16 +148,16 @@ class MainViewPort extends ViewPort {
           .filter((id: undefined) => id !== undefined);
 
         if (intersectsObjectsUUId.length === 0) {
-          mutiSelectId.length = 0;
+          multiSelectId.length = 0;
         } else {
-          mutiSelectId.push(intersectsObjectsUUId[0]);
+          multiSelectId.push(intersectsObjectsUUId[0]);
         }
 
-        this.editor.signals.intersectionsDetected.dispatch(mutiSelectId);
+        this.editor.signals.intersectionsDetected.dispatch(multiSelectId);
 
         // 非多选模式需要清空，为下次单选做准备
         if (!event.ctrlKey) {
-          mutiSelectId.length = 0;
+          multiSelectId.length = 0;
         }
       }
     }

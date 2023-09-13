@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-30 20:55:18
+ * @LastEditTime: 2023-09-13 20:31:58
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
-import { WebGLRenderer, OrthographicCamera, PerspectiveCamera, Vector2 } from 'three'
+import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three'
 import { generateUUID } from 'three/src/math/MathUtils';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -12,9 +12,7 @@ import { EventDispatcher } from '@f/utils';
 import type { Editor } from './Editor';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
-import { ClearMaskPass, MaskPass } from 'three/examples/jsm/postprocessing/MaskPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
-import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 
 class ViewPort extends EventDispatcher {
@@ -42,7 +40,7 @@ class ViewPort extends EventDispatcher {
     this.onAfterRender = () => { };
     this.onBeforeRender = () => { };
 
-    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: true ,logarithmicDepthBuffer:true});
     this.renderer.setClearColor(0xefefef);
     this.renderer.autoClear = false;
 
@@ -63,28 +61,16 @@ class ViewPort extends EventDispatcher {
     const helperRenderPass = new RenderPass(sceneHelper, this.camera);
     helperRenderPass.clear = false;
 
-    const bgMask = new MaskPass(sceneBackground, this.camera);
-    const mainMask = new MaskPass(scene, this.camera);
-    const helperMask = new MaskPass(sceneHelper, this.camera);
-
-    const clearMaskPass = new ClearMaskPass();
     const copyPass = new ShaderPass(CopyShader);
-    const gammaPass = new ShaderPass(GammaCorrectionShader);
 
     const fxaaPass = new ShaderPass(FXAAShader);
 
     this.composer = new EffectComposer(this.renderer);
+    
     this.composer.addPass(bgRenderPass);
     this.composer.addPass(mainRenderPass);
     this.composer.addPass(helperRenderPass);
 
-    // this.composer.addPass(bgMask);
-    // this.composer.addPass(clearMaskPass)
-    // this.composer.addPass(mainMask);
-    // this.composer.addPass(clearMaskPass)
-    // this.composer.addPass(helperMask);
-    // this.composer.addPass(clearMaskPass)
-    // this.composer.addPass(gammaPass);
     this.composer.addPass(fxaaPass);
     this.composer.addPass(copyPass);
 
@@ -110,13 +96,13 @@ class ViewPort extends EventDispatcher {
     this.size.set(width,height)
     this.renderer.setSize(width,height)
     this.composer.setSize(width, height);
-    // this.composer.passes.at(-2).uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+    (this.composer.passes.at(-2) as ShaderPass).uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
 
-    if (this.camera instanceof OrthographicCamera) {
-      this.camera.top = 15 * (height / width);
-      this.camera.bottom = -15 * (height / width);
-    } else if (this.camera instanceof PerspectiveCamera) {
-      this.camera.aspect = width / height;
+    if ((this.camera as OrthographicCamera)?.isOrthographicCamera) {
+      (this.camera as OrthographicCamera).top = 15 * (height / width);
+      (this.camera as OrthographicCamera).bottom = -15 * (height / width);
+    } else if ((this.camera as PerspectiveCamera)?.isPerspectiveCamera) {
+      (this.camera as PerspectiveCamera).aspect = width / height;
     }
 
     this.camera.updateProjectionMatrix();
