@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-24 01:23:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 01:30:09
+ * @LastEditTime: 2023-09-14 01:08:23
  * @FilePath: /threejs-demo/apps/f-editor/src/config/theme.ts
  */
 const dark = {
@@ -15,6 +15,13 @@ const dark = {
       "nodeTextColor": "#DCDCDCFF",
       "loadingColor": "#919191FF",
       "dropMarkColor": "#939393FF"
+    },
+    "Menu": {
+      "borderRadius": "0px",
+      "color": "#0000",
+      "itemTextColor": "rgba(255, 255, 255, 1)",
+      "itemHeight": "25px",
+      "fontSize": "12px"
     }
   }
 
@@ -29,6 +36,13 @@ const dark = {
       "nodeColorActive": "rgba(199, 205, 202, 0.81)",
       "nodeTextColor": "#353535FF",
       "nodeColorPressed": "rgba(199, 205, 202, 0.81)"
+    },
+    "Menu": {
+      "borderRadius": "0px",
+      "color": "#0000",
+      "itemTextColor": "rgba(255, 255, 255, 1)",
+      "itemHeight": "25px",
+      "fontSize": "12px"
     }
   }
 
