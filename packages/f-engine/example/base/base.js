@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-31 19:38:31
+ * @LastEditTime: 2023-09-13 20:22:08
  * @FilePath: /threejs-demo/packages/f-engine/example/base/base.js
  */
 import {
@@ -32,7 +32,7 @@ function init() {
   const viewPort = new ViewPort(editor,camera2,dom2);
 
 
-  function resize(params) {
+  function resize() {
     mainViewPort.setSize(dom.clientWidth,dom.clientHeight);
     viewPort.setSize(dom2.clientWidth,dom2.clientHeight)
   }
