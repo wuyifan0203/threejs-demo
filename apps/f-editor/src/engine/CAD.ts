@@ -1,14 +1,14 @@
 /*
  * @Date: 2023-08-20 23:51:53
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-07 20:52:13
+ * @LastEditTime: 2023-09-14 20:55:43
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/CAD.ts
  */
 import { Editor, MainViewPort, Container } from '@f/engine';
-import { GridHelper, Object3D, OrthographicCamera } from 'three';
+import { GridHelper, type Object3D, OrthographicCamera } from 'three';
 
 const aspect = window.innerWidth / window.innerHeight;
-const camera = new OrthographicCamera(-15, 15, 15 * aspect, - 15 * aspect, 0, 10000);
+const camera = new OrthographicCamera(-15, 15, 15 * aspect, - 15 * aspect, 1, 10000);
 camera.position.set(0, 200, 500);
 camera.up.set(0, 0, 1);
 camera.lookAt(0, 0, 0);

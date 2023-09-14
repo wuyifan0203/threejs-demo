@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-06-09 11:26:39
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 01:40:30
+ * @LastEditTime: 2023-09-14 20:44:29
  * @FilePath: /threejs-demo/apps/f-editor/src/App.vue
 -->
 <template>
@@ -53,6 +53,7 @@ export default defineComponent({
 </script>
 
 <style lang="scss" >
+@import "./assets/scss/global.scss";
 @import "golden-layout/dist/css/goldenlayout-base.css";
 @import "./assets/scss/mixin.scss";
 @import "./assets/scss/overWriteGLayout.scss";
@@ -72,16 +73,16 @@ body {
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-  font-size: 12px !important;
+  font-size: 12px;
   height: 100vh;
   width: 100vw;
   @include font_color("fontColor");
   @include background_color("baseBgdColor");
   @include border_color("border_color1");
 }
+
 .f-iconfont{
   font-size: 12px;
 }
-
 
 </style>

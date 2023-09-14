@@ -1,12 +1,14 @@
 /*
  * @Date: 2023-08-15 01:10:19
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-12 17:10:25
+ * @LastEditTime: 2023-09-14 19:49:11
  * @FilePath: /threejs-demo/apps/f-editor/src/config/menu.ts
  */
 
+import { MenuOption } from "@/types/config";
 
-export const config = [
+
+export const config: MenuOption[] = [
     {
         key: 'file',
         label: 'File',
@@ -27,7 +29,7 @@ export const config = [
                 key: 'saveAs',
                 label: 'Save As',
             },
-            {   
+            {
                 key: 'export',
                 label: 'Export',
             }
@@ -57,7 +59,7 @@ export const config = [
             },
             {
                 key: 'zoomOut',
-                label: 'Zoom Out',          
+                label: 'Zoom Out',
             },
             {
                 key: 'resetZoom',
@@ -65,9 +67,9 @@ export const config = [
             },
             {
                 key: 'toggleGrid',
-                label: 'Toggle Grid',   
+                label: 'Toggle Grid',
             },
-        ]   
+        ]
     },
     {
         key: 'about',

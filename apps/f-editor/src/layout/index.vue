@@ -1,12 +1,12 @@
 <!--
  * @Date: 2023-08-14 01:54:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-11 20:11:03
+ * @LastEditTime: 2023-09-14 20:25:51
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/index.vue
 -->
 <template>
   <header class="header">
-    <Menu>222</Menu>
+    <HeadMenu>222</HeadMenu>
   </header>
   <main class="main">
     <SideMenu class="aside"></SideMenu>
@@ -23,7 +23,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { layoutConfig, componentMap } from '../config/layout';
-import Menu from './headMenu/index.vue';
+import HeadMenu from './headMenu/index.vue';
 import GLayout from '@/components/GLayout/index.vue';
 import State from './state/index.vue';
 import SideMenu from './asideMenu/index.vue';
@@ -31,7 +31,7 @@ export default defineComponent({
   name: 'Layout',
   components: {
     GLayout,
-    Menu,
+    HeadMenu,
     State,
     SideMenu
   },
