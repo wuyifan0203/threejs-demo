@@ -1,6 +1,6 @@
 import { EventDispatcher } from '@f/utils';
 import { SignalTypes, SignalsMap } from '../../types/SignalTypes';
-import { Color, Object3D, Scene, Texture } from 'three';
+import { Color, type Object3D, Scene, Texture } from 'three';
 declare class Editor extends EventDispatcher {
     private state;
     private selector;
@@ -12,7 +12,7 @@ declare class Editor extends EventDispatcher {
     constructor();
     get needsUpdate(): boolean;
     set needsUpdate(value: boolean);
-    addObject(object: Object3D, parent: Object3D | null, index: number | null): void;
+    addObject(object: Object3D, parent?: Object3D | null, index?: number | null): void;
     removeObject(object: Object3D): void;
     removeObjectByUuid(uuid: string): void;
     getObjectByUuid(uuid: string): Object3D<import("three").Event> | undefined;

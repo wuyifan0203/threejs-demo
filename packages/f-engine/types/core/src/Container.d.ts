@@ -15,7 +15,7 @@ declare class Container {
     removeCamera(camera: Camera): void;
     addLight(key: string, light: Light): void;
     removeLight(light: Light): void;
-    addObject(object: Object3D): void;
+    addObject(object: Object3D | any): void;
     removeObject(object: Object3D): void;
     getObjectByUuid(uuid: string): Object3D<import("three").Event> | undefined;
     addGeometry(geometry: BufferGeometry): void;
@@ -27,10 +27,10 @@ declare class Container {
     addTexture(texture: Texture): void;
     removeTexture(texture: Texture): void;
     getTextureByUUID(uuid: string): Texture | undefined;
-    addHelper(key: string, helper: Object3D): void;
-    removeHelper(helper: Object3D): void;
+    private addHelper;
+    private removeHelper;
     getHelperByKey(key: string): Object3D<import("three").Event> | undefined;
-    addObjectToRefCounter(object: Texture | BufferGeometry | Material, counter: Map<string, number>, map: Map<string, Material | Texture | BufferGeometry>): void;
-    removeObjectToRefCounter(object: Texture | BufferGeometry | Material, counter: Map<string, number>, map: Map<string, Material | Texture | BufferGeometry>): void;
+    private addObjectToRefCounter;
+    private removeObjectToRefCounter;
 }
 export { Container };

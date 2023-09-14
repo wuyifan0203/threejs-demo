@@ -1,4 +1,4 @@
-import { WebGLRenderer, OrthographicCamera, PerspectiveCamera, Vector2 } from 'three';
+import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';

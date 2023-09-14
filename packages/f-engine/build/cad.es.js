@@ -1,4 +1,4 @@
-import { Scene, Color, OrthographicCamera, BufferGeometry, Float32BufferAttribute, Mesh, ShaderMaterial, UniformsUtils, Vector2, WebGLRenderTarget, HalfFloatType, NoBlending, Clock, Ray, Plane, MathUtils, EventDispatcher as EventDispatcher$1, Vector3, MOUSE, TOUCH, Quaternion, Spherical, WebGLRenderer, PerspectiveCamera, Raycaster, Object3D, Euler, Matrix4, MeshBasicMaterial, LineBasicMaterial, CylinderGeometry, BoxGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, Sprite, Vector4, CanvasTexture, SpriteMaterial, MeshDepthMaterial, RGBADepthPacking, AdditiveBlending } from "three";
+import { Scene, Color, OrthographicCamera, BufferGeometry, Float32BufferAttribute, Mesh, ShaderMaterial, UniformsUtils, Vector2, WebGLRenderTarget, HalfFloatType, NoBlending, Clock, Ray, Plane, MathUtils, EventDispatcher as EventDispatcher$1, Vector3, MOUSE, TOUCH, Quaternion, Spherical, WebGLRenderer, Raycaster, Object3D, Euler, Matrix4, MeshBasicMaterial, LineBasicMaterial, CylinderGeometry, BoxGeometry, OctahedronGeometry, Line, SphereGeometry, TorusGeometry, PlaneGeometry, DoubleSide, Sprite, Vector4, CanvasTexture, SpriteMaterial, MeshDepthMaterial, RGBADepthPacking, AdditiveBlending } from "three";
 class EventDispatcher {
   constructor() {
     this._listeners = {};
@@ -416,7 +416,7 @@ class Editor extends EventDispatcher {
       this.signals.sceneGraphChanged.dispatch();
     }
   }
-  addObject(object, parent, index) {
+  addObject(object, parent = null, index = null) {
     if (parent === null) {
       this.scene.add(object);
     } else {
@@ -1564,41 +1564,6 @@ class RenderPass extends Pass {
     renderer.autoClear = oldAutoClear;
   }
 }
-const GammaCorrectionShader = {
-  name: "GammaCorrectionShader",
-  uniforms: {
-    "tDiffuse": { value: null }
-  },
-  vertexShader: (
-    /* glsl */
-    `
-
-		varying vec2 vUv;
-
-		void main() {
-
-			vUv = uv;
-			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
-		}`
-  ),
-  fragmentShader: (
-    /* glsl */
-    `
-
-		uniform sampler2D tDiffuse;
-
-		varying vec2 vUv;
-
-		void main() {
-
-			vec4 tex = texture2D( tDiffuse, vUv );
-
-			gl_FragColor = LinearTosRGB( tex );
-
-		}`
-  )
-};
 const FXAAShader = {
   uniforms: {
     "tDiffuse": { value: null },
@@ -1881,7 +1846,7 @@ class ViewPort extends EventDispatcher {
     };
     this.onBeforeRender = () => {
     };
-    this.renderer = new WebGLRenderer({ antialias: true });
+    this.renderer = new WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
     this.renderer.setClearColor(15724527);
     this.renderer.autoClear = false;
     this.domElement = document.createElement("div");
@@ -1896,12 +1861,7 @@ class ViewPort extends EventDispatcher {
     mainRenderPass.clear = false;
     const helperRenderPass = new RenderPass(sceneHelper, this.camera);
     helperRenderPass.clear = false;
-    new MaskPass(sceneBackground, this.camera);
-    new MaskPass(scene, this.camera);
-    new MaskPass(sceneHelper, this.camera);
-    new ClearMaskPass();
     const copyPass = new ShaderPass(CopyShader);
-    new ShaderPass(GammaCorrectionShader);
     const fxaaPass = new ShaderPass(FXAAShader);
     this.composer = new EffectComposer(this.renderer);
     this.composer.addPass(bgRenderPass);
@@ -1921,13 +1881,15 @@ class ViewPort extends EventDispatcher {
     this.onAfterRender(this.editor, this.camera);
   }
   setSize(width, height) {
+    var _a, _b;
     this.size.set(width, height);
     this.renderer.setSize(width, height);
     this.composer.setSize(width, height);
-    if (this.camera instanceof OrthographicCamera) {
+    this.composer.passes.at(-2).uniforms["resolution"].value.set(1 / width, 1 / height);
+    if ((_a = this.camera) == null ? void 0 : _a.isOrthographicCamera) {
       this.camera.top = 15 * (height / width);
       this.camera.bottom = -15 * (height / width);
-    } else if (this.camera instanceof PerspectiveCamera) {
+    } else if ((_b = this.camera) == null ? void 0 : _b.isPerspectiveCamera) {
       this.camera.aspect = width / height;
     }
     this.camera.updateProjectionMatrix();
@@ -3872,7 +3834,7 @@ class MainViewPort extends ViewPort {
       }
       return _raycaster.intersectObjects(objects, false);
     };
-    const mutiSelectId = [];
+    const multiSelectId = [];
     const handelClick = (event) => {
       if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
         const intersects = getIntersects(_onUpPosition);
@@ -3881,13 +3843,13 @@ class MainViewPort extends ViewPort {
           return (_a = item == null ? void 0 : item.object) == null ? void 0 : _a.uuid;
         }).filter((id) => id !== void 0);
         if (intersectsObjectsUUId.length === 0) {
-          mutiSelectId.length = 0;
+          multiSelectId.length = 0;
         } else {
-          mutiSelectId.push(intersectsObjectsUUId[0]);
+          multiSelectId.push(intersectsObjectsUUId[0]);
         }
-        this.editor.signals.intersectionsDetected.dispatch(mutiSelectId);
+        this.editor.signals.intersectionsDetected.dispatch(multiSelectId);
         if (!event.ctrlKey) {
-          mutiSelectId.length = 0;
+          multiSelectId.length = 0;
         }
       }
     };
@@ -3964,22 +3926,14 @@ class Container {
   }
   // camera
   addCamera(key, camera) {
-    if (camera == null ? void 0 : camera.isCamera) {
-      this.cameras.set(key, camera);
-    } else {
-      console.error("Container.addCamera: object not an instance of THREE.Camera.", camera);
-    }
+    this.cameras.set(key, camera);
   }
   removeCamera(camera) {
     this.cameras.delete(camera == null ? void 0 : camera.uuid);
   }
   // light
   addLight(key, light) {
-    if (light == null ? void 0 : light.isLight) {
-      this.lights.set(key, light);
-    } else {
-      console.error("Container.addLight: object not an instance of THREE.Light.", light);
-    }
+    this.lights.set(key, light);
   }
   removeLight(light) {
     this.lights.delete(light == null ? void 0 : light.uuid);
@@ -3988,6 +3942,8 @@ class Container {
   addObject(object) {
     if (object == null ? void 0 : object.isObject3D) {
       this.objects.set(object.uuid, object);
+      if (object == null ? void 0 : object.isCamera)
+        ;
     } else {
       console.error("Container.addObject: object not an instance of THREE.Object3D.", object);
     }

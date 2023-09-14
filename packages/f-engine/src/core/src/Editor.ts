@@ -1,33 +1,33 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 20:22:29
+ * @LastEditTime: 2023-09-14 20:49:04
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 
 import { EventDispatcher } from '@f/utils';
 import { Signal } from 'signals';
 import { Selector } from './Selector';
-import { SignalTypes,SignalsMap } from '../../types/SignalTypes';
-import { Color, Object3D, Scene, Texture } from 'three';
+import { SignalTypes, SignalsMap } from '../../types/SignalTypes';
+import { Color, type Object3D, Scene, Texture } from 'three';
 
 class Editor extends EventDispatcher {
-  
-  private state:{
-    selections:Set<string>
-    [key:string]:any
+
+  private state: {
+    selections: Set<string>
+    [key: string]: any
   };
-  private selector:Selector
-  public signals:SignalTypes<SignalsMap>;
+  private selector: Selector
+  public signals: SignalTypes<SignalsMap>;
   public sceneBackground: Scene;
-  public scene:Scene;
-  public sceneHelper:Scene
+  public scene: Scene;
+  public sceneHelper: Scene
   private _needsUpdate: boolean;
 
   constructor() {
     super();
     this.state = {
-      selections:new Set()
+      selections: new Set()
     };
     this.signals = {
       objectsSelected: new Signal(),
@@ -55,14 +55,14 @@ class Editor extends EventDispatcher {
     return this._needsUpdate;
   }
 
-  set needsUpdate(value:boolean) {
+  set needsUpdate(value: boolean) {
     this._needsUpdate = value;
-    if(!!value){
+    if (!!value) {
       this.signals.sceneGraphChanged.dispatch()
     }
   }
 
-  addObject(object:Object3D, parent:Object3D| null = null, index:number |null = null) {
+  addObject(object: Object3D, parent: Object3D | null = null, index: number | null = null) {
 
     if (parent === null) {
       this.scene.add(object);
@@ -80,7 +80,7 @@ class Editor extends EventDispatcher {
     this.dispatchEvent('objectAdded', object);
   }
 
-  removeObject(object:Object3D) {
+  removeObject(object: Object3D) {
     // 排除场景和视图相机
     if (object.parent === null) return;
 
@@ -90,16 +90,16 @@ class Editor extends EventDispatcher {
     this.signals.sceneGraphChanged.dispatch();
   }
 
-  removeObjectByUuid(uuid:string) {
+  removeObjectByUuid(uuid: string) {
     const object = this.getObjectByUuid(uuid);
     object && this.removeObject(object);
   }
 
-  getObjectByUuid(uuid:string) {
+  getObjectByUuid(uuid: string) {
     return this.scene.getObjectByProperty('uuid', uuid)
   }
 
-  getObjectsByProperty(key:string, value:any) {
+  getObjectsByProperty(key: string, value: any) {
     let result = this.scene.getObjectsByProperty(key, value);
     const sceneHelperResult = this.sceneHelper.getObjectsByProperty(key, value);
     if (sceneHelperResult.length > 0) {
@@ -109,37 +109,37 @@ class Editor extends EventDispatcher {
     return result;
   }
 
-  addHelper(helper:Object3D){
+  addHelper(helper: Object3D) {
     this.sceneHelper.add(helper)
   }
 
 
 
-  setState(key:string, value:any) {
+  setState(key: string, value: any) {
     this.state[key] = value;
   }
 
-  getState(key:string) {
+  getState(key: string) {
     return this.state[key];
   }
 
-  select(object:Object3D[]) {
+  select(object: Object3D[]) {
     if (object.length) {
-        this.selector.select(object.map((obj) => obj.uuid));
+      this.selector.select(object.map((obj) => obj.uuid));
     } else {
       this.selector.detach();
     }
   }
 
-  selectByIds(uuids:Array<string> | undefined) {
+  selectByIds(uuids: Array<string> | undefined) {
     if (uuids !== undefined) {
-        this.selector.select(uuids);
+      this.selector.select(uuids);
     } else {
       this.selector.detach();
     }
   }
 
-  setSceneBackground(background:Color|Texture|null) {
+  setSceneBackground(background: Color | Texture | null) {
     this.sceneBackground.background = background;
     this.signals.sceneGraphChanged.dispatch();
   }
