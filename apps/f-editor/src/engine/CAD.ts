@@ -1,21 +1,16 @@
 /*
  * @Date: 2023-08-20 23:51:53
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 20:55:43
+ * @LastEditTime: 2023-09-15 17:36:53
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/CAD.ts
  */
+import type { Object3D } from 'three';
 import { Editor, MainViewPort, Container } from '@f/engine';
-import { GridHelper, type Object3D, OrthographicCamera } from 'three';
+import { createGridHelper, createOrthographicCamera } from '@/utils/cad';
 
-const aspect = window.innerWidth / window.innerHeight;
-const camera = new OrthographicCamera(-15, 15, 15 * aspect, - 15 * aspect, 1, 10000);
-camera.position.set(0, 200, 500);
-camera.up.set(0, 0, 1);
-camera.lookAt(0, 0, 0);
-camera.updateProjectionMatrix();
+const camera = createOrthographicCamera();
+const grid = createGridHelper();
 
-const grid = new GridHelper(50, 50, '#aaaaaa', '#bbbbbb');
-grid.rotateX(Math.PI / 2);
 
 class CAD {
     editor: Editor;
@@ -39,12 +34,21 @@ class CAD {
     }
 
     resetState() {
+        grid.rotation.set(0,0,0);
+        grid.rotateX(Math.PI / 2);
         this.editor.addHelper(grid);
-        this.editor.needsUpdate = true;
     }
 
-    addObject(object: Object3D|any, parent: Object3D | null = null, index: number | null = 0) {
-        object.traverse((obj)=>{
+    resetCamera() {
+        camera.position.set(0, 200, 500);
+        camera.up.set(0, 0, 1);
+        camera.lookAt(0, 0, 0);
+        this.mainViewPort.orbitControls.target.set(0,0,0);
+        this.mainViewPort.orbitControls.update();
+    }
+
+    addObject(object: Object3D | any, parent: Object3D | null = null, index: number | null = null) {
+        object.traverse((obj) => {
             obj?.geometry && this.container.addGeometry(obj.geometry);
             obj?.material && this.container.addMaterial(obj.material);
 

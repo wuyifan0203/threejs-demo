@@ -1,15 +1,15 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 20:49:04
+ * @LastEditTime: 2023-09-15 17:39:53
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
-
-import { EventDispatcher } from '@f/utils';
-import { Signal } from 'signals';
-import { Selector } from './Selector';
-import { SignalTypes, SignalsMap } from '../../types/SignalTypes';
 import { Color, type Object3D, Scene, Texture } from 'three';
+import { Signal } from 'signals';
+import { EventDispatcher } from '@f/utils';
+import { SignalTypes, SignalsMap } from '@/types/SignalTypes';
+import { Selector } from './Selector';
+
 
 class Editor extends EventDispatcher {
 
@@ -62,7 +62,7 @@ class Editor extends EventDispatcher {
     }
   }
 
-  addObject(object: Object3D, parent: Object3D | null = null, index: number | null = null) {
+  addObject(object: Object3D, parent: Object3D | null = null , index: number | null = null ) {
 
     if (parent === null) {
       this.scene.add(object);

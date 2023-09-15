@@ -7,6 +7,10 @@
       "LastEditTime": "Do not edit", // 文件最后编辑时间
       "FilePath": "Do not edit" // 文件在项目中的相对路径 自动更新
     },
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.fixAll.stylelint": true
+    },
     "cSpell.words": [
       "contactmaterials",
       "FXAA",

@@ -1,6 +1,6 @@
+import { Color, type Object3D, Scene, Texture } from 'three';
 import { EventDispatcher } from '@f/utils';
 import { SignalTypes, SignalsMap } from '../../types/SignalTypes';
-import { Color, type Object3D, Scene, Texture } from 'three';
 declare class Editor extends EventDispatcher {
     private state;
     private selector;

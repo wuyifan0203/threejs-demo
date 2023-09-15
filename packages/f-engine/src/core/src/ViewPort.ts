@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 20:31:58
+ * @LastEditTime: 2023-09-15 17:22:32
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
 import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three'
@@ -21,7 +21,7 @@ class ViewPort extends EventDispatcher {
   protected editor: Editor;
   protected domElement: HTMLElement;
   protected renderer: WebGLRenderer;
-  protected camera: OrthographicCamera | PerspectiveCamera;
+  protected camera: PerspectiveCamera | OrthographicCamera;
   protected size: Vector2;
   public orbitControls: OrbitControls;
   public name: string;
@@ -29,7 +29,7 @@ class ViewPort extends EventDispatcher {
   public onBeforeRender: Function;
   protected composer: EffectComposer;
 
-  constructor(editor: Editor, camera: OrthographicCamera | PerspectiveCamera, domElement: HTMLElement) {
+  constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super();
     this.editor = editor;
     this.camera = camera;
