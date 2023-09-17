@@ -1,17 +1,17 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-31 19:50:41
+ * @LastEditTime: 2023-09-16 22:06:11
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls'
 import StatsPanel from 'three/examples/jsm/libs/stats.module';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
-import { TransformControlHandler } from "./TransformControlHandler";
-import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { TransformControlHandler } from "@/controls";
 
 
 type uuids = Array<string>;

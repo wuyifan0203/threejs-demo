@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-15 17:39:53
+ * @LastEditTime: 2023-09-16 21:55:06
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 import { Color, type Object3D, Scene, Texture } from 'three';

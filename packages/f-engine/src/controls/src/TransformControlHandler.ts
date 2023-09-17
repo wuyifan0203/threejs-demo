@@ -6,8 +6,8 @@
  */
 import { Euler, Vector3 } from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls";
-import { Editor } from "./Editor";
-import { MainViewPort } from "./MainViewPort";
+import { Editor } from "../../core/src/Editor";
+import { MainViewPort } from "../../core/src/MainViewPort";
 
 
 class TransformControlHandler {
