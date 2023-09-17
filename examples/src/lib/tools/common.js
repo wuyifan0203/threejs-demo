@@ -12,6 +12,7 @@ import {
   ArrowHelper,
   Group,
   OrthographicCamera,
+  Scene,
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
@@ -178,6 +179,9 @@ function initOrbitControls(camera, container) {
 function initGUI() {
   return new GUI()
 }
+function initScene() {
+  return new Scene();
+}
 
 export {
   initAxesHelper,
@@ -189,5 +193,6 @@ export {
   initCustomGrid,
   initOrbitControls,
   initGUI,
+  initScene,
   resize,
 };
