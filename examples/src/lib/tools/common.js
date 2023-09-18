@@ -15,6 +15,7 @@ import {
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
+import { GUI } from '../util/lil-gui.module.min.js'
 
 /**
  * @description: 初始化渲染器
@@ -90,7 +91,7 @@ function initGroundPlane(scene, size = { x: 200, y: 200 }) {
  * @param {Vector3} initialPosition
  * @return {SpotLight}
  */
-function initDefaultLighting(scene, initialPosition,color = 0x343434 ) {
+function initDefaultLighting(scene, initialPosition, color = 0x343434) {
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
 
   const spotLight = new SpotLight(0xffffff);
@@ -174,6 +175,10 @@ function initOrbitControls(camera, container) {
   return new OrbitControls(camera, container);
 }
 
+function initGUI() {
+  return new GUI()
+}
+
 export {
   initAxesHelper,
   initDefaultLighting,
@@ -183,5 +188,6 @@ export {
   initOrthographicCamera,
   initCustomGrid,
   initOrbitControls,
+  initGUI,
   resize,
 };
