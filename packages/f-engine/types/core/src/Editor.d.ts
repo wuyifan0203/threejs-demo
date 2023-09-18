@@ -15,8 +15,8 @@ declare class Editor extends EventDispatcher {
     addObject(object: Object3D, parent?: Object3D | null, index?: number | null): void;
     removeObject(object: Object3D): void;
     removeObjectByUuid(uuid: string): void;
-    getObjectByUuid(uuid: string): Object3D<import("three").Event> | undefined;
-    getObjectsByProperty(key: string, value: any): Object3D<import("three").Event>[];
+    getObjectByUuid(uuid: string): Object3D<import("three").Object3DEventMap> | undefined;
+    getObjectsByProperty(key: string, value: any): Object3D<import("three").Object3DEventMap>[];
     addHelper(helper: Object3D): void;
     setState(key: string, value: any): void;
     getState(key: string): any;

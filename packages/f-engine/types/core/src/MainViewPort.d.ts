@@ -1,7 +1,7 @@
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera } from "three";
 import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
-type Mode = 'select' | 'translate' | 'rotate' | 'scale';
+import { OptionMode } from '../../types/coreTypes';
 declare class MainViewPort extends ViewPort {
     excludeObjects: Array<Object3D>;
     excludeTypes: Array<string>;
@@ -15,6 +15,6 @@ declare class MainViewPort extends ViewPort {
     get currentMode(): string;
     protected render(): void;
     private animate;
-    changeMode(mode: Mode): void;
+    setOptionMode(mode: OptionMode): void;
 }
 export { MainViewPort };

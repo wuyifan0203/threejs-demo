@@ -17,7 +17,7 @@ declare class Container {
     removeLight(light: Light): void;
     addObject(object: Object3D | any): void;
     removeObject(object: Object3D): void;
-    getObjectByUuid(uuid: string): Object3D<import("three").Event> | undefined;
+    getObjectByUuid(uuid: string): Object3D<import("three").Object3DEventMap> | undefined;
     addGeometry(geometry: BufferGeometry): void;
     removeGeometry(geometry: BufferGeometry): void;
     getGeometryByUUID(uuid: string): BufferGeometry<import("three").NormalBufferAttributes> | undefined;
@@ -29,7 +29,7 @@ declare class Container {
     getTextureByUUID(uuid: string): Texture | undefined;
     private addHelper;
     private removeHelper;
-    getHelperByKey(key: string): Object3D<import("three").Event> | undefined;
+    getHelperByKey(key: string): Object3D<import("three").Object3DEventMap> | undefined;
     private addObjectToRefCounter;
     private removeObjectToRefCounter;
 }

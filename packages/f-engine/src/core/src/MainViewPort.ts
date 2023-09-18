@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-16 22:06:11
+ * @LastEditTime: 2023-09-18 17:53:58
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -12,10 +12,8 @@ import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
 import { TransformControlHandler } from "@/controls";
+import { Uuids, OptionMode } from '@/types/coreTypes'
 
-
-type uuids = Array<string>;
-type Mode = 'select' | 'translate' | 'rotate' | 'scale'
 
 
 const _raycaster = new Raycaster();
@@ -58,11 +56,11 @@ class MainViewPort extends ViewPort {
     this.transformControl = new TransformControls(camera, this.renderer.domElement);
     this.editor.addHelper(this.transformControl);
 
-    const handler = new TransformControlHandler(this.transformControl);
+    const handler = new TransformControlHandler(this.transformControl, editor);
 
-    this.transformControl.addEventListener('change', () => handler.handleChange(editor))
-    this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this))
-    this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this))
+    this.transformControl.addEventListener('change', () => handler.handleChange())
+    this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this.orbitControls))
+    this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this.orbitControls))
 
     const outlinePass = new OutlinePass(this.size, this.editor.scene, this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
@@ -73,9 +71,9 @@ class MainViewPort extends ViewPort {
 
 
 
-    const selectId: uuids = [];
+    const selectId: Uuids = [];
 
-    this.editor.signals.objectsRemoved.add((uuids: uuids) => {
+    this.editor.signals.objectsRemoved.add((uuids: Uuids) => {
       const selections: Set<string> = this.editor.getState('selections');
 
       const originSize = selections.size;
@@ -92,7 +90,7 @@ class MainViewPort extends ViewPort {
 
     const selectObjects: Array<Object3D> = []
 
-    this.editor.signals.objectsSelected.add((uuids: uuids) => {
+    this.editor.signals.objectsSelected.add((uuids: Uuids) => {
       selectObjects.length = 0;
 
       uuids.forEach(uuid => {
@@ -208,7 +206,7 @@ class MainViewPort extends ViewPort {
     }
   }
 
-  public changeMode(mode: Mode) {
+  public setOptionMode(mode: OptionMode) {
     this._currentMode = mode;
 
     if (mode !== 'select') {
@@ -231,7 +229,7 @@ function getMousePosition(x: number, y: number, dom: HTMLElement): [number, numb
   return [(x - left) / width, (y - top) / height];
 }
 
-function traverseObject(object: Object3D, extrudeIds: uuids, type: Array<string>, target: Object3D[]) {
+function traverseObject(object: Object3D, extrudeIds: Uuids, type: Array<string>, target: Object3D[]) {
   if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
     target.push(object);
   }
