@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-21 00:22:00
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-11 20:42:33
+ * @LastEditTime: 2023-09-18 17:11:26
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/instance.ts
  */
 
@@ -20,4 +20,8 @@ class Instance {
     }
 }
 
-export { Instance }
+function getCadInstance() {
+    return Instance.getInstance();
+}
+
+export { getCadInstance }
