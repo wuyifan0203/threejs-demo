@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-19 21:00:40
+ * @LastEditTime: 2023-09-20 01:43:15
  * @FilePath: /threejs-demo/examples/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
@@ -78,24 +78,38 @@ function init() {
     console.log({ viewMatrix });
 
     const modelMatrix = new Matrix4().makeTranslation(new Vector3(0, 1, 2));
-    console.log({ modelMatrix }, mesh.matrix);
+    console.log({ modelMatrix });
 
-    const mvpMatrix = new Matrix4().multiplyMatrices(projectionMatrix, viewMatrix).multiply(modelMatrix);
-    console.log({ mvpMatrix });
 
     // 立方体左下角坐标
     const point = new Vector3(-2, -2, -2);
 
     // 转换到实际坐标
 
-    point.applyMatrix4(modelMatrix.multiply(viewMatrix.multiply(projectionMatrix)));
+    // 模型坐标转世界坐标
+    point.applyMatrix4(modelMatrix); 
 
-    console.log({ point });
+    console.log('世界坐标:',point);
 
-    const x = 1000 - (1-point.x) * 500;
-    const y = -400 * point.y + 400;
+    // 世界坐标转相机坐标
 
-    console.log({ x, y });
+    const point2 = point.clone().applyMatrix4(viewMatrix);
+    console.log('相机坐标:',point2);
+
+    // 相机坐标转投影坐标
+    const point3 = point2.clone().applyMatrix4(projectionMatrix);
+    console.log('投影坐标:',point3);
+
+
+ 
+
+    // 投影坐标转屏幕坐标
+    const x = 1000- (500 - point3.x * 500) ;
+    const y = 800 - (1- point3.y) * 400;
+
+    console.log('屏幕坐标:',x,y);
+
+
 
 
 }
