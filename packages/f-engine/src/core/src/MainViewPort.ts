@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:53:58
+ * @LastEditTime: 2023-09-20 21:00:37
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -12,31 +12,34 @@ import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
 import { TransformControlHandler } from "@/controls";
-import { Uuids, OptionMode } from '@/types/coreTypes'
+import { Uuids, OptionModeType } from '@/types'
 
 
 
-const _raycaster = new Raycaster();
+const _transformControlsChangeEvent = 'change';
+const _transformControlsMouseUpEvent = 'mouseup';
+const _transformControlsMouseDownEvent = 'mousedown';
+
 const _mouse = new Vector2();
 
 const _onDownPosition = new Vector2();
 const _onUpPosition = new Vector2();
 
 class MainViewPort extends ViewPort {
+  public override type = 'MainViewPort';
   public excludeObjects: Array<Object3D>;
   public excludeTypes: Array<string>;
   private transformControl: TransformControls;
   private viewHelper: ViewHelper;
   private statePanel: StatsPanel;
-  private clock: Clock;
-  private needsUpdate: boolean
-  private _currentMode: string;
+  private _clock = new Clock();
+  private needsUpdate = false;
+  private _currentMode: OptionModeType = 'select';
+  public animation!: (Clock: Clock) => void;
+  private _raycaster = new Raycaster();
 
   constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super(editor, camera, domElement);
-    this.type = 'MainViewPort';
-    this.clock = new Clock();
-    this.needsUpdate = false;
 
     this.renderer.setAnimationLoop(() => this.animate());
 
@@ -56,20 +59,14 @@ class MainViewPort extends ViewPort {
     this.transformControl = new TransformControls(camera, this.renderer.domElement);
     this.editor.addHelper(this.transformControl);
 
-    const handler = new TransformControlHandler(this.transformControl, editor);
+    const transformControlHandler = new TransformControlHandler(this.transformControl, editor);
 
-    this.transformControl.addEventListener('change', () => handler.handleChange())
-    this.transformControl.addEventListener('mouseDown', () => handler.handleMouseDown(this.orbitControls))
-    this.transformControl.addEventListener('mouseUp', () => handler.handleMouseUp(this.orbitControls))
+ 
 
     const outlinePass = new OutlinePass(this.size, this.editor.scene, this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
     outlinePass.edgeStrength = 4;
     this.composer.insertPass(outlinePass, 3);
-
-    this._currentMode = 'select';
-
-
 
     const selectId: Uuids = [];
 
@@ -111,7 +108,7 @@ class MainViewPort extends ViewPort {
 
     const getIntersects = (point: Vector2) => {
       _mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      _raycaster.setFromCamera(_mouse, camera);
+      this._raycaster.setFromCamera(_mouse, camera);
 
       // 筛选需要检测的对象
       const objects: Object3D[] = [];
@@ -132,7 +129,7 @@ class MainViewPort extends ViewPort {
       }
 
 
-      return _raycaster.intersectObjects(objects, false);
+      return this._raycaster.intersectObjects(objects, false);
     }
 
     const multiSelectId: Array<string> = [];
@@ -178,7 +175,29 @@ class MainViewPort extends ViewPort {
       this.renderer.domElement.addEventListener('pointerup', onMouseUp);
     }
 
+    this.eventBus.transformControlsMouseUp = () => transformControlHandler.handleMouseUp(this.orbitControls);
+    this.eventBus.transformControlsMouseDown = () => transformControlHandler.handleMouseDown(this.orbitControls);
+    this.eventBus.transformControlsChange = () => transformControlHandler.handleChange();
+
+    this.animation = () => { };
+
     this.renderer.domElement.addEventListener('pointerdown', onMouseDown);
+  }
+
+  protected mountEvents(): void {
+    super.mountEvents();
+    this.renderer.setAnimationLoop(this.animate)
+    this.transformControl.addEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange)
+    this.transformControl.addEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown)
+    this.transformControl.addEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp)
+  }
+
+  protected unmountEvents(): void {
+    super.unmountEvents();
+    this.renderer.setAnimationLoop(null);
+    this.transformControl.removeEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange)
+    this.transformControl.removeEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown)
+    this.transformControl.removeEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp)
   }
 
   get currentMode() {
@@ -194,8 +213,11 @@ class MainViewPort extends ViewPort {
   }
 
   private animate() {
-    const delta = this.clock.getDelta();
+    const delta = this._clock.getDelta();
     this.statePanel.update();
+
+    this.animation(this._clock)
+
     if (this.viewHelper.animating === true) {
       this.viewHelper.update(delta);
       this.needsUpdate = true;
@@ -206,7 +228,7 @@ class MainViewPort extends ViewPort {
     }
   }
 
-  public setOptionMode(mode: OptionMode) {
+  public setOptionMode(mode: OptionModeType) {
     this._currentMode = mode;
 
     if (mode !== 'select') {
@@ -221,6 +243,10 @@ class MainViewPort extends ViewPort {
       this.transformControl.detach();
     }
     this.editor.needsUpdate = true;
+  }
+
+  public getRaycaster() {
+    return this._raycaster;
   }
 }
 

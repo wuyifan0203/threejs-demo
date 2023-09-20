@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-15 17:22:32
+ * @LastEditTime: 2023-09-20 20:36:30
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
 import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three'
-import { generateUUID } from 'three/src/math/MathUtils';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { EventDispatcher } from '@f/utils';
@@ -14,33 +13,33 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass';
 import { CopyShader } from 'three/examples/jsm/shaders/CopyShader';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { EventBusType } from '@/types';
+
+const _orbitControlChangeEvent = 'change'
 
 class ViewPort extends EventDispatcher {
-  readonly uuid: string;
-  protected type: string;
+  public type = 'ViewPort';
   protected editor: Editor;
   protected domElement: HTMLElement;
   protected renderer: WebGLRenderer;
   protected camera: PerspectiveCamera | OrthographicCamera;
-  protected size: Vector2;
+  protected size = new Vector2();
   public orbitControls: OrbitControls;
-  public name: string;
-  public onAfterRender: Function;
-  public onBeforeRender: Function;
+  public name = '';
+  public onAfterRender: (editor: Editor, camera: PerspectiveCamera | OrthographicCamera) => void;
+  public onBeforeRender: (editor: Editor, camera: PerspectiveCamera | OrthographicCamera) => void;
   protected composer: EffectComposer;
+  protected eventBus: EventBusType;
+  private _active = false;
 
   constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super();
     this.editor = editor;
     this.camera = camera;
-    this.uuid = generateUUID();
-    this.size = new Vector2();
-    this.name = '';
-    this.type = 'ViewPort';
     this.onAfterRender = () => { };
     this.onBeforeRender = () => { };
 
-    this.renderer = new WebGLRenderer({ antialias: true ,logarithmicDepthBuffer:true});
+    this.renderer = new WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
     this.renderer.setClearColor(0xefefef);
     this.renderer.autoClear = false;
 
@@ -66,7 +65,7 @@ class ViewPort extends EventDispatcher {
     const fxaaPass = new ShaderPass(FXAAShader);
 
     this.composer = new EffectComposer(this.renderer);
-    
+
     this.composer.addPass(bgRenderPass);
     this.composer.addPass(mainRenderPass);
     this.composer.addPass(helperRenderPass);
@@ -76,12 +75,38 @@ class ViewPort extends EventDispatcher {
 
 
     this.orbitControls = new OrbitControls(camera, this.renderer.domElement);
-    this.orbitControls.addEventListener('change', () => this.render());
+
 
     this.domElement.append(this.renderer.domElement);
 
-    // signals
-    this.editor.signals.sceneGraphChanged.add(() => this.render());
+    this.eventBus = {
+      renderPort: () => this.render()
+    }
+  }
+
+  get active(){
+    return this._active;
+  }
+
+  set active(value: boolean){
+    this._active = value;
+    if (value){
+      this.mountEvents();
+      this.render();
+    } else {
+     this.unmountEvents();
+     this.renderer.clear();
+    }
+  }
+
+  protected mountEvents() {
+    this.orbitControls.addEventListener(_orbitControlChangeEvent, this.eventBus.renderPort);
+    this.editor.signals.sceneGraphChanged.add(this.eventBus.renderPort);
+  }
+
+  protected unmountEvents() {
+    this.orbitControls.removeEventListener(_orbitControlChangeEvent, this.eventBus.renderPort);
+    this.editor.signals.sceneGraphChanged.remove(this.eventBus.renderPort);
   }
 
   protected render() {
@@ -93,10 +118,10 @@ class ViewPort extends EventDispatcher {
   }
 
   public setSize(width: number, height: number) {
-    this.size.set(width,height)
-    this.renderer.setSize(width,height)
+    this.size.set(width, height)
+    this.renderer.setSize(width, height)
     this.composer.setSize(width, height);
-    (this.composer.passes.at(-2) as ShaderPass).uniforms[ 'resolution' ].value.set( 1 / width, 1 / height );
+    (this.composer.passes.at(-2) as ShaderPass).uniforms['resolution'].value.set(1 / width, 1 / height);
 
     if ((this.camera as OrthographicCamera)?.isOrthographicCamera) {
       (this.camera as OrthographicCamera).top = 15 * (height / width);
