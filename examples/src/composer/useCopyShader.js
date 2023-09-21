@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-19 10:03:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-19 14:39:31
+ * @LastEditTime: 2023-09-21 20:28:01
  * @FilePath: /threejs-demo/examples/src/composer/useCopyShader.js
  */
 /*
@@ -16,8 +16,9 @@ import {
     Mesh,
     SRGBColorSpace,
     SphereGeometry,
-    Vector2,
+    TextureLoader,
     MeshBasicMaterial,
+    GridHelper,
 } from '../lib/three/three.module.js';
 
 import { RenderPass } from '../lib/three/RenderPass.js'
@@ -39,6 +40,8 @@ window.onload = () => {
 
 function init() {
     const renderer = initRenderer();
+
+    const loader = new TextureLoader();
     const camera = initOrthographicCamera(new Vector3(1000, -1000, 1000));
 
     renderer.setClearColor(0xffffff);
@@ -48,36 +51,47 @@ function init() {
     camera.up.set(0, 0, 1);
     resize(renderer, camera);
 
-    const controls = initOrbitControls(camera, renderer.domElement);
-    controls.addEventListener('change', render)
+    initOrbitControls(camera, renderer.domElement);
+    renderer.setAnimationLoop(render);
 
     const scene = new Scene();
-
     const sphere = new Mesh(new SphereGeometry(5, 32, 32), new MeshBasicMaterial({ color: 'green' }));
     scene.add(sphere)
 
     const composer = new EffectComposer(renderer);
+
     const renderPass = new RenderPass(scene, camera);
-    renderPass.renderToScreen = true;
+    // renderPass.clear = false;
     composer.addPass(renderPass);
+
+    const texture = loader.load('../../public/images/sky2/nx.png');
+
+    scene.background = texture;
+
+    const scene2 = new Scene();
+    const grid = new GridHelper(30, 30);
+    grid.rotateX(Math.PI / 2);
+    scene2.add(grid);
+
+    const renderPass2 = new RenderPass(scene2, camera);
+    renderPass2.clear = false;
+    composer.addPass(renderPass2);
 
     composer.addPass(new ShaderPass(GammaCorrectionShader))
 
     const effectCopy = new ShaderPass(CopyShader);
-    effectCopy.clear = true
-    renderPass.renderToScreen = false;
+    effectCopy.renderToScreen = true;
     composer.addPass(effectCopy);
 
     function render() {
         renderer.clear()
-        renderer.setRenderTarget(null)
+        renderer.setRenderTarget(null);
         composer.render();
     }
 
 
     const gui = new GUI();
 
-    const size = new Vector2();
 
     const o = {
         snap() {
@@ -99,6 +113,5 @@ function init() {
     }
 
 
-    render()
     gui.add(o, 'snap')
 }

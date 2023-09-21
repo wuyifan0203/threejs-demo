@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 18:08:05
- * @FilePath: /threejs-demo/packages/examples/render/renderMultiScene.js
+ * @LastEditTime: 2023-09-21 20:02:35
+ * @FilePath: /threejs-demo/examples/src/render/renderMultiScene.js
  */
 import {
   Scene,
@@ -15,6 +15,7 @@ import {
   Clock,
   GridHelper,
   Vector2,
+  TextureLoader
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 
@@ -30,11 +31,13 @@ window.onload = () => {
 };
 
 function init() {
+  const loader= new TextureLoader()
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
   renderer.shadowMap.enabled = true;
   renderer.setAnimationLoop(animate);
   renderer.setClearColor(0xfffee);
   renderer.autoClear = false;
+
 
   const camera = initOrthographicCamera(new Vector3(-1000, 1000, 1000));
   camera.lookAt(0, 0, 0);
@@ -50,6 +53,8 @@ function init() {
   light.shadow.camera.far = 10000; // default
   light.position.set(20, 20, 20);
   light.target = scene1;
+
+  scene1.background = loader.load("../../public/images/sky2/nx.png")
 
   scene1.add(light);
   scene1.add(new AmbientLight());

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-20 01:43:15
+ * @LastEditTime: 2023-09-21 18:59:11
  * @FilePath: /threejs-demo/examples/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
@@ -15,16 +15,11 @@ import {
     BoxGeometry,
     MeshLambertMaterial,
     AmbientLight,
-    PointLight,
     DirectionalLight,
     Matrix4
 } from '../lib/three/three.module.js';
 
-import {
-    initRenderer,
-    initOrthographicCamera,
-    resize,
-} from '../lib/tools/index.js';
+import { initRenderer } from '../lib/tools/index.js';
 
 
 window.onload = function () {
@@ -101,13 +96,27 @@ function init() {
     console.log('投影坐标:',point3);
 
 
+ // 投影坐标转屏幕坐标
+    const point4 = point3.clone().applyMatrix4(createNDCMatrix(1000,800));
+    console.log('屏幕坐标:',point4);
+
+    function createNDCMatrix(width,height) {
+        const W = width / 2;
+        const H = height / 2;
+        return new Matrix4().set(
+            W,0,0,W,
+            0,H,0,H,
+            0,0,1,0,
+            0,0,0,1
+        )
+    }
  
 
-    // 投影坐标转屏幕坐标
-    const x = 1000- (500 - point3.x * 500) ;
-    const y = 800 - (1- point3.y) * 400;
+   
+    // const x = 1000- (500 - point3.x * 500) ;
+    // const y = 800 - (1- point3.y) * 400;
 
-    console.log('屏幕坐标:',x,y);
+    console.log('屏幕坐标:',point4.x,point4.y);
 
 
 
