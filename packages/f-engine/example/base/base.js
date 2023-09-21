@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:59:23
+ * @LastEditTime: 2023-09-21 11:15:31
  * @FilePath: /threejs-demo/packages/f-engine/example/base/base.js
  */
 import {
@@ -104,11 +104,16 @@ function init() {
   CFolder.addColor(control, 'sceneColor1').onChange(() => {
     setBackGround(control.sceneBackgroundType)
   })
+  const viewPortFolder = gui.addFolder('Viewport');
+  viewPortFolder.add(mainViewPort, 'active').name('Main View active:');
+  viewPortFolder.add(viewPort, 'active').name('View active:');
 
   const OFolder = gui.addFolder('Operation')
   OFolder.add(operation, 'addObject').name('Add Object');
   OFolder.add(operation, 'removeLastObject').name('Remove Last Object');
-  OFolder.add(operation, 'removeSelectedObject').name('Remove Selected Object')
+  OFolder.add(operation, 'removeSelectedObject').name('Remove Selected Object');
+
+  
 
 
 

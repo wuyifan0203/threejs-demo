@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-09 00:36:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-20 21:00:37
+ * @LastEditTime: 2023-09-21 13:23:12
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/MainViewPort.ts
  */
 import { type Object3D, type OrthographicCamera, type PerspectiveCamera, Clock, Vector2, Raycaster, Color, Mesh } from "three";
@@ -11,22 +11,18 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { ViewPort } from "./ViewPort";
 import type { Editor } from "./Editor";
 import { ViewHelper } from "@/helper";
-import { TransformControlHandler } from "@/controls";
+import { MouseControlHandler, TransformControlHandler } from "@/controls";
 import { Uuids, OptionModeType } from '@/types'
 
 
 
 const _transformControlsChangeEvent = 'change';
-const _transformControlsMouseUpEvent = 'mouseup';
-const _transformControlsMouseDownEvent = 'mousedown';
+const _transformControlsMouseUpEvent = 'mouseUp';
+const _transformControlsMouseDownEvent = 'mouseDown';
 
-const _mouse = new Vector2();
-
-const _onDownPosition = new Vector2();
-const _onUpPosition = new Vector2();
+const _domMouseDownEvent = 'pointerdown';
 
 class MainViewPort extends ViewPort {
-  public override type = 'MainViewPort';
   public excludeObjects: Array<Object3D>;
   public excludeTypes: Array<string>;
   private transformControl: TransformControls;
@@ -40,8 +36,7 @@ class MainViewPort extends ViewPort {
 
   constructor(editor: Editor, camera: PerspectiveCamera | OrthographicCamera, domElement: HTMLElement) {
     super(editor, camera, domElement);
-
-    this.renderer.setAnimationLoop(() => this.animate());
+    this.type = 'MainViewPort';
 
     this.excludeObjects = [];
     this.excludeTypes = [];
@@ -59,9 +54,8 @@ class MainViewPort extends ViewPort {
     this.transformControl = new TransformControls(camera, this.renderer.domElement);
     this.editor.addHelper(this.transformControl);
 
-    const transformControlHandler = new TransformControlHandler(this.transformControl, editor);
-
- 
+    this.animation = () => { };
+    const transformControlHandler = new TransformControlHandler(this, editor);
 
     const outlinePass = new OutlinePass(this.size, this.editor.scene, this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new Color('#e29240');
@@ -105,91 +99,25 @@ class MainViewPort extends ViewPort {
       (this.composer.passes[3] as OutlinePass).selectedObjects = selectObjects as Mesh[]
       this.editor.signals.sceneGraphChanged.dispatch()
     })
-
-    const getIntersects = (point: Vector2) => {
-      _mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      this._raycaster.setFromCamera(_mouse, camera);
-
-      // 筛选需要检测的对象
-      const objects: Object3D[] = [];
-
-      // 排除的物体的id数组
-      // 排除掉transformControl 和 selectionBox 和 extrudeObjects 和 不可见的
-      const excludeUuids = [
-        this.transformControl.uuid,
-        ...this.excludeObjects.map((o) => o.uuid),
-      ];
-
-      for (let i = 0, l = editor.scene.children.length; i < l; i++) {
-        traverseObject(editor.scene.children[i], excludeUuids, this.excludeTypes, objects);
-      }
-
-      for (let i = 0, l = editor.sceneHelper.children.length; i < l; i++) {
-        traverseObject(editor.sceneHelper.children[i], excludeUuids, this.excludeTypes, objects);
-      }
-
-
-      return this._raycaster.intersectObjects(objects, false);
-    }
-
-    const multiSelectId: Array<string> = [];
-
-    const handelClick = (event: PointerEvent) => {
-      if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
-        const intersects = getIntersects(_onUpPosition);
-
-        const intersectsObjectsUUId = intersects
-          .map((item: { object: { uuid: any; }; }) => item?.object?.uuid)
-          .filter((id: undefined) => id !== undefined);
-
-        if (intersectsObjectsUUId.length === 0) {
-          multiSelectId.length = 0;
-        } else {
-          multiSelectId.push(intersectsObjectsUUId[0]);
-        }
-
-        this.editor.signals.intersectionsDetected.dispatch(multiSelectId);
-
-        // 非多选模式需要清空，为下次单选做准备
-        if (!event.ctrlKey) {
-          multiSelectId.length = 0;
-        }
-      }
-    }
-
-    const onMouseUp = (event: PointerEvent) => {
-      const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
-      _onUpPosition.fromArray(mousePosition);
-
-      handelClick(event);
-
-      this.renderer.domElement.removeEventListener('pointerup', onMouseUp);
-    }
-
-    const onMouseDown = (event: PointerEvent) => {
-      // 鼠标左键点击则执行
-      if (event.button !== 0) return;
-      const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
-      _onDownPosition.fromArray(mousePosition);
-
-      this.renderer.domElement.addEventListener('pointerup', onMouseUp);
-    }
-
-    this.eventBus.transformControlsMouseUp = () => transformControlHandler.handleMouseUp(this.orbitControls);
-    this.eventBus.transformControlsMouseDown = () => transformControlHandler.handleMouseDown(this.orbitControls);
+ 
+    this.eventBus.transformControlsMouseUp = () => transformControlHandler.handleMouseUp();
+    this.eventBus.transformControlsMouseDown = () => transformControlHandler.handleMouseDown();
     this.eventBus.transformControlsChange = () => transformControlHandler.handleChange();
 
-    this.animation = () => { };
-
-    this.renderer.domElement.addEventListener('pointerdown', onMouseDown);
+    const mouseHandler = new MouseControlHandler(this,this.editor)
+    this.eventBus.domMouseDown = (e:PointerEvent) => mouseHandler.handleMouseDown(e);
+  
   }
 
   protected mountEvents(): void {
     super.mountEvents();
-    this.renderer.setAnimationLoop(this.animate)
+    console.log('mountEvents');
+    
+    this.renderer.setAnimationLoop(this.animate.bind(this));
     this.transformControl.addEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange)
     this.transformControl.addEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown)
     this.transformControl.addEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp)
+    this.renderer.domElement.addEventListener(_domMouseDownEvent,this.eventBus.domMouseDown);
   }
 
   protected unmountEvents(): void {
@@ -198,6 +126,7 @@ class MainViewPort extends ViewPort {
     this.transformControl.removeEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange)
     this.transformControl.removeEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown)
     this.transformControl.removeEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp)
+    this.renderer.domElement.removeEventListener(_domMouseDownEvent,this.eventBus.domMouseDown);
   }
 
   get currentMode() {
@@ -214,6 +143,7 @@ class MainViewPort extends ViewPort {
 
   private animate() {
     const delta = this._clock.getDelta();
+    
     this.statePanel.update();
 
     this.animation(this._clock)
@@ -248,16 +178,9 @@ class MainViewPort extends ViewPort {
   public getRaycaster() {
     return this._raycaster;
   }
-}
 
-function getMousePosition(x: number, y: number, dom: HTMLElement): [number, number] {
-  const { left, top, width, height } = dom.getBoundingClientRect();
-  return [(x - left) / width, (y - top) / height];
-}
-
-function traverseObject(object: Object3D, extrudeIds: Uuids, type: Array<string>, target: Object3D[]) {
-  if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
-    target.push(object);
+  public getTransformControls() {
+    return this.transformControl;
   }
 }
 

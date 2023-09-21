@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-20 20:36:30
+ * @LastEditTime: 2023-09-21 11:10:53
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
 import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three'
@@ -18,11 +18,11 @@ import { EventBusType } from '@/types';
 const _orbitControlChangeEvent = 'change'
 
 class ViewPort extends EventDispatcher {
-  public type = 'ViewPort';
+  public  type = 'ViewPort';
   protected editor: Editor;
   protected domElement: HTMLElement;
   protected renderer: WebGLRenderer;
-  protected camera: PerspectiveCamera | OrthographicCamera;
+  public camera: PerspectiveCamera | OrthographicCamera;
   protected size = new Vector2();
   public orbitControls: OrbitControls;
   public name = '';
@@ -131,7 +131,10 @@ class ViewPort extends EventDispatcher {
     }
 
     this.camera.updateProjectionMatrix();
-    this.render();
+  }
+
+  public getRenderer(){
+    return this.renderer;
   }
 }
 

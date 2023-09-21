@@ -1,13 +1,14 @@
 /*
  * @Date: 2023-08-11 00:42:23
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:43:18
+ * @LastEditTime: 2023-09-21 13:24:00
  * @FilePath: /threejs-demo/packages/f-engine/src/controls/src/TransformControlHandler.ts
  */
 import { Quaternion, Vector3 } from "three";
 import { TransformControls } from "three/examples/jsm/controls/TransformControls";
 import { Editor } from "../../core/src/Editor";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { MainViewPort } from "@/core";
 
 
 class TransformControlHandler {
@@ -16,9 +17,11 @@ class TransformControlHandler {
     private objectRotationOnDown: Quaternion;
     private objectScaleOnDown: Vector3;
     private editor: Editor;
+    private orbitControls: OrbitControls;
   
-    constructor(transformControl: TransformControls,editor:Editor) {
-      this.transformControl = transformControl;
+    constructor(mainViewPort: MainViewPort,editor:Editor) {
+      this.transformControl = mainViewPort.getTransformControls();
+      this.orbitControls = mainViewPort.orbitControls;
       this.objectPositionOnDown = new Vector3();
       this.objectRotationOnDown = new Quaternion();
       this.objectScaleOnDown = new Vector3();
@@ -33,7 +36,7 @@ class TransformControlHandler {
         }
     }
 
-    public handleMouseDown(orbitControls:OrbitControls) {
+    public handleMouseDown() {
         const { object } = this.transformControl;
 
         if (object !== undefined) {
@@ -41,12 +44,11 @@ class TransformControlHandler {
             this.objectRotationOnDown.copy(object.quaternion);
             this.objectScaleOnDown.copy(object.scale);
 
-           
-            orbitControls.enabled = false;
+            this.orbitControls.enabled = false;
         }
     }
 
-    public handleMouseUp(orbitControls:OrbitControls){
+    public handleMouseUp(){
         const { object } = this.transformControl;
 
         if (object !== undefined) {
@@ -68,7 +70,7 @@ class TransformControlHandler {
                     break;
                 // skip default
             }
-            orbitControls.enabled = true;
+            this.orbitControls.enabled = true;
         }
     }
   }
