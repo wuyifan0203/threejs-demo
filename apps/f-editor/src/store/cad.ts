@@ -1,12 +1,12 @@
 /*
  * @Date: 2023-08-21 00:15:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:56:02
+ * @LastEditTime: 2023-09-25 20:04:01
  * @FilePath: /threejs-demo/apps/f-editor/src/store/cad.ts
  */
 
 import { getCadInstance } from "@/engine/instance";
-import { OptionMode } from "@f/engine";
+import type { OptionModeType } from "@f/engine";
 import { defineStore } from "pinia";
 import type { Object3D } from "three";
 
@@ -28,6 +28,8 @@ const useCADStore = defineStore({
             instance.addEventListener('objectScale',(object,originValue,newValue) =>{
                 console.log(' CAD objectScale',object,originValue,newValue);
             })
+
+            this.setActive(true);
         },
 
         setSize() {
@@ -38,8 +40,12 @@ const useCADStore = defineStore({
             getCadInstance().addObject(object, parent, index)
         },
 
-        setOptionMode(mode:OptionMode){
+        setOptionMode(mode:OptionModeType){
             getCadInstance().setOptionMode(mode);
+        },
+
+        setActive(active: boolean){
+            getCadInstance().setActive(active);
         }
     }
 })

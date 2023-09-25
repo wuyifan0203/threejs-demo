@@ -1,11 +1,11 @@
 /*
  * @Date: 2023-08-20 23:51:53
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:54:12
+ * @LastEditTime: 2023-09-25 20:02:53
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/CAD.ts
  */
 import type { Object3D } from 'three';
-import { Editor, MainViewPort, Container, type OptionMode } from '@f/engine';
+import { Editor, MainViewPort, Container, type OptionModeType } from '@f/engine';
 import { EventDispatcher } from '@f/utils'
 import { createGridHelper, createOrthographicCamera } from '@/utils/cad';
 
@@ -25,7 +25,8 @@ class CAD extends EventDispatcher {
         this.deputyDOM = deputyDOM;
         this.editor = new Editor();
         this.mainViewPort = new MainViewPort(this.editor, camera, mainDOM);
-        this.container = new Container()
+        this.container = new Container();
+
 
         this.resetState();
 
@@ -69,8 +70,12 @@ class CAD extends EventDispatcher {
         this.editor.addObject(object, parent, index);
     }
 
-    setOptionMode(mode: OptionMode) {
+    setOptionMode(mode: OptionModeType) {
         this.mainViewPort.setOptionMode(mode);
+    }
+
+    setActive(active:boolean){
+        this.mainViewPort.active = active;
     }
 }
 

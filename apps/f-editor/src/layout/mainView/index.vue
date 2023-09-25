@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-23 09:39:47
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 20:27:13
+ * @LastEditTime: 2023-09-25 19:36:34
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/mainView/index.vue
 -->
 <template>
@@ -18,6 +18,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
+import { useMessage } from 'naive-ui'
 import { store } from "@/store";
 import { config } from '@/config/mainView';
 import Menu from '@/components/Menu/index.vue';
@@ -31,11 +32,13 @@ export default defineComponent({
     onMounted(() => {
       store.cad.setupCAD();
     })
+    const message = useMessage()
     return {
       config,
-      menuSelect:(key:string,option)=>{
-        console.log(key,option);
-        
+      menuSelect: (key: string, option) => {
+        message.info(String(key))
+        console.log(key, option);
+
       }
     }
   }
