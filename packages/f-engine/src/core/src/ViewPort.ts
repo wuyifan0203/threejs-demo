@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-14 10:44:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-21 11:10:53
+ * @LastEditTime: 2023-09-25 19:56:28
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/ViewPort.ts
  */
 import { WebGLRenderer, type OrthographicCamera, type PerspectiveCamera, Vector2 } from 'three'
@@ -47,7 +47,7 @@ class ViewPort extends EventDispatcher {
     this.domElement.style.position = 'absolute';
     this.domElement.setAttribute('id', 'F-ViewPort');
     this.domElement.appendChild(this.renderer.domElement);
-    domElement.append(this.domElement)
+    domElement.append(this.domElement);
 
     const { sceneBackground, scene, sceneHelper } = this.editor
 

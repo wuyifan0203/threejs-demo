@@ -186,15 +186,6 @@ class Editor extends EventDispatcher {
     this.signals.sceneGraphChanged.dispatch();
   }
 }
-const _lut = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "0a", "0b", "0c", "0d", "0e", "0f", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "1a", "1b", "1c", "1d", "1e", "1f", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "2a", "2b", "2c", "2d", "2e", "2f", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "3a", "3b", "3c", "3d", "3e", "3f", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "4a", "4b", "4c", "4d", "4e", "4f", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "5a", "5b", "5c", "5d", "5e", "5f", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "6a", "6b", "6c", "6d", "6e", "6f", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "7a", "7b", "7c", "7d", "7e", "7f", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "8a", "8b", "8c", "8d", "8e", "8f", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99", "9a", "9b", "9c", "9d", "9e", "9f", "a0", "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "aa", "ab", "ac", "ad", "ae", "af", "b0", "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8", "b9", "ba", "bb", "bc", "bd", "be", "bf", "c0", "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9", "ca", "cb", "cc", "cd", "ce", "cf", "d0", "d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8", "d9", "da", "db", "dc", "dd", "de", "df", "e0", "e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8", "e9", "ea", "eb", "ec", "ed", "ee", "ef", "f0", "f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8", "f9", "fa", "fb", "fc", "fd", "fe", "ff"];
-function generateUUID() {
-  const d0 = Math.random() * 4294967295 | 0;
-  const d1 = Math.random() * 4294967295 | 0;
-  const d2 = Math.random() * 4294967295 | 0;
-  const d3 = Math.random() * 4294967295 | 0;
-  const uuid = _lut[d0 & 255] + _lut[d0 >> 8 & 255] + _lut[d0 >> 16 & 255] + _lut[d0 >> 24 & 255] + "-" + _lut[d1 & 255] + _lut[d1 >> 8 & 255] + "-" + _lut[d1 >> 16 & 15 | 64] + _lut[d1 >> 24 & 255] + "-" + _lut[d2 & 63 | 128] + _lut[d2 >> 8 & 255] + "-" + _lut[d2 >> 16 & 255] + _lut[d2 >> 24 & 255] + _lut[d3 & 255] + _lut[d3 >> 8 & 255] + _lut[d3 >> 16 & 255] + _lut[d3 >> 24 & 255];
-  return uuid.toLowerCase();
-}
 const FXAAShader = {
   uniforms: {
     "tDiffuse": { value: null },
@@ -464,15 +455,16 @@ const FXAAShader = {
 	}
 	`
 };
+const _orbitControlChangeEvent = "change";
 class ViewPort extends EventDispatcher {
   constructor(editor, camera, domElement) {
     super();
-    this.editor = editor;
-    this.camera = camera;
-    this.uuid = generateUUID();
+    this.type = "ViewPort";
     this.size = new three.Vector2();
     this.name = "";
-    this.type = "ViewPort";
+    this._active = false;
+    this.editor = editor;
+    this.camera = camera;
     this.onAfterRender = () => {
     };
     this.onBeforeRender = () => {
@@ -501,9 +493,31 @@ class ViewPort extends EventDispatcher {
     this.composer.addPass(fxaaPass);
     this.composer.addPass(copyPass);
     this.orbitControls = new OrbitControls.OrbitControls(camera, this.renderer.domElement);
-    this.orbitControls.addEventListener("change", () => this.render());
     this.domElement.append(this.renderer.domElement);
-    this.editor.signals.sceneGraphChanged.add(() => this.render());
+    this.eventBus = {
+      renderPort: () => this.render()
+    };
+  }
+  get active() {
+    return this._active;
+  }
+  set active(value) {
+    this._active = value;
+    if (value) {
+      this.mountEvents();
+      this.render();
+    } else {
+      this.unmountEvents();
+      this.renderer.clear();
+    }
+  }
+  mountEvents() {
+    this.orbitControls.addEventListener(_orbitControlChangeEvent, this.eventBus.renderPort);
+    this.editor.signals.sceneGraphChanged.add(this.eventBus.renderPort);
+  }
+  unmountEvents() {
+    this.orbitControls.removeEventListener(_orbitControlChangeEvent, this.eventBus.renderPort);
+    this.editor.signals.sceneGraphChanged.remove(this.eventBus.renderPort);
   }
   render() {
     this.renderer.clear();
@@ -524,7 +538,9 @@ class ViewPort extends EventDispatcher {
       this.camera.aspect = width / height;
     }
     this.camera.updateProjectionMatrix();
-    this.render();
+  }
+  getRenderer() {
+    return this.renderer;
   }
 }
 class Pass {
@@ -1358,8 +1374,9 @@ class ViewHelper2 extends ViewHelper$1 {
   }
 }
 class TransformControlHandler {
-  constructor(transformControl, editor) {
-    this.transformControl = transformControl;
+  constructor(mainViewPort, editor) {
+    this.transformControl = mainViewPort.getTransformControls();
+    this.orbitControls = mainViewPort.orbitControls;
     this.objectPositionOnDown = new three.Vector3();
     this.objectRotationOnDown = new three.Quaternion();
     this.objectScaleOnDown = new three.Vector3();
@@ -1371,16 +1388,16 @@ class TransformControlHandler {
       this.editor.signals.sceneGraphChanged.dispatch();
     }
   }
-  handleMouseDown(orbitControls) {
+  handleMouseDown() {
     const { object } = this.transformControl;
     if (object !== void 0) {
       this.objectPositionOnDown.copy(object.position);
       this.objectRotationOnDown.copy(object.quaternion);
       this.objectScaleOnDown.copy(object.scale);
-      orbitControls.enabled = false;
+      this.orbitControls.enabled = false;
     }
   }
-  handleMouseUp(orbitControls) {
+  handleMouseUp() {
     const { object } = this.transformControl;
     if (object !== void 0) {
       switch (this.transformControl.getMode()) {
@@ -1400,21 +1417,93 @@ class TransformControlHandler {
           }
           break;
       }
-      orbitControls.enabled = true;
+      this.orbitControls.enabled = true;
     }
   }
 }
-const _raycaster = new three.Raycaster();
-const _mouse = new three.Vector2();
-const _onDownPosition = new three.Vector2();
-const _onUpPosition = new three.Vector2();
+class MouseControlHandler {
+  constructor(mainViewPort, editor) {
+    this._mouse = new three.Vector2();
+    this._onDownPosition = new three.Vector2();
+    this._onUpPosition = new three.Vector2();
+    this.multiSelectId = [];
+    this.viewPort = mainViewPort;
+    this.domElement = mainViewPort.getRenderer().domElement;
+    this._raycaster = mainViewPort.getRaycaster();
+    this.editor = editor;
+    this.transformControls = mainViewPort.getTransformControls();
+  }
+  handleMouseDown(event) {
+    if (event.button !== 0)
+      return;
+    const mousePosition = getMousePosition(event.clientX, event.clientY, this.domElement);
+    this._onDownPosition.fromArray(mousePosition);
+    this.domElement.addEventListener("pointerup", this.handleMouseUp.bind(this));
+  }
+  handleMouseUp(event) {
+    const mousePosition = getMousePosition(event.clientX, event.clientY, this.domElement);
+    this._onUpPosition.fromArray(mousePosition);
+    this.handelClick(event);
+    this.domElement.removeEventListener("pointerup", this.handleMouseUp);
+  }
+  handelClick(event) {
+    if (this._onDownPosition.distanceTo(this._onUpPosition) === 0) {
+      const intersects = this.getIntersects(this._onUpPosition);
+      const intersectsObjectsUUId = intersects.map((item) => {
+        var _a;
+        return (_a = item == null ? void 0 : item.object) == null ? void 0 : _a.uuid;
+      }).filter((id) => id !== void 0);
+      if (intersectsObjectsUUId.length === 0) {
+        this.multiSelectId.length = 0;
+      } else {
+        this.multiSelectId.push(intersectsObjectsUUId[0]);
+      }
+      this.editor.signals.intersectionsDetected.dispatch(this.multiSelectId);
+      if (!event.ctrlKey) {
+        this.multiSelectId.length = 0;
+      }
+    }
+  }
+  getIntersects(point) {
+    this._mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
+    this._raycaster.setFromCamera(this._mouse, this.viewPort.camera);
+    const objects = [];
+    const excludeUuids = [
+      this.transformControls.uuid,
+      ...this.viewPort.excludeObjects.map((o) => o.uuid)
+    ];
+    const excludeTypes = this.viewPort.excludeTypes;
+    const { scene, sceneHelper } = this.editor;
+    for (let i = 0, l = scene.children.length; i < l; i++) {
+      traverseObject(scene.children[i], excludeUuids, excludeTypes, objects);
+    }
+    for (let i = 0, l = sceneHelper.children.length; i < l; i++) {
+      traverseObject(sceneHelper.children[i], excludeUuids, excludeTypes, objects);
+    }
+    return this._raycaster.intersectObjects(objects, false);
+  }
+}
+function getMousePosition(x, y, dom) {
+  const { left, top, width, height } = dom.getBoundingClientRect();
+  return [(x - left) / width, (y - top) / height];
+}
+function traverseObject(object, extrudeIds, type, target) {
+  if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
+    target.push(object);
+  }
+}
+const _transformControlsChangeEvent = "change";
+const _transformControlsMouseUpEvent = "mouseUp";
+const _transformControlsMouseDownEvent = "mouseDown";
+const _domMouseDownEvent = "pointerdown";
 class MainViewPort extends ViewPort {
   constructor(editor, camera, domElement) {
     super(editor, camera, domElement);
-    this.type = "MainViewPort";
-    this.clock = new three.Clock();
+    this._clock = new three.Clock();
     this.needsUpdate = false;
-    this.renderer.setAnimationLoop(() => this.animate());
+    this._currentMode = "select";
+    this._raycaster = new three.Raycaster();
+    this.type = "MainViewPort";
     this.excludeObjects = [];
     this.excludeTypes = [];
     this.statePanel = new StatsPanel();
@@ -1426,15 +1515,13 @@ class MainViewPort extends ViewPort {
     this.viewHelper = new ViewHelper2(camera, this.domElement);
     this.transformControl = new TransformControls.TransformControls(camera, this.renderer.domElement);
     this.editor.addHelper(this.transformControl);
-    const handler = new TransformControlHandler(this.transformControl, editor);
-    this.transformControl.addEventListener("change", () => handler.handleChange());
-    this.transformControl.addEventListener("mouseDown", () => handler.handleMouseDown(this.orbitControls));
-    this.transformControl.addEventListener("mouseUp", () => handler.handleMouseUp(this.orbitControls));
+    this.animation = () => {
+    };
+    const transformControlHandler = new TransformControlHandler(this, editor);
     const outlinePass = new OutlinePass(this.size, this.editor.scene, this.camera);
     outlinePass.hiddenEdgeColor = outlinePass.visibleEdgeColor = new three.Color("#e29240");
     outlinePass.edgeStrength = 4;
     this.composer.insertPass(outlinePass, 3);
-    this._currentMode = "select";
     const selectId = [];
     this.editor.signals.objectsRemoved.add((uuids) => {
       const selections = this.editor.getState("selections");
@@ -1463,55 +1550,28 @@ class MainViewPort extends ViewPort {
       this.composer.passes[3].selectedObjects = selectObjects;
       this.editor.signals.sceneGraphChanged.dispatch();
     });
-    const getIntersects = (point) => {
-      _mouse.set(point.x * 2 - 1, -(point.y * 2) + 1);
-      _raycaster.setFromCamera(_mouse, camera);
-      const objects = [];
-      const excludeUuids = [
-        this.transformControl.uuid,
-        ...this.excludeObjects.map((o) => o.uuid)
-      ];
-      for (let i = 0, l = editor.scene.children.length; i < l; i++) {
-        traverseObject(editor.scene.children[i], excludeUuids, this.excludeTypes, objects);
-      }
-      for (let i = 0, l = editor.sceneHelper.children.length; i < l; i++) {
-        traverseObject(editor.sceneHelper.children[i], excludeUuids, this.excludeTypes, objects);
-      }
-      return _raycaster.intersectObjects(objects, false);
-    };
-    const multiSelectId = [];
-    const handelClick = (event) => {
-      if (_onDownPosition.distanceTo(_onUpPosition) === 0) {
-        const intersects = getIntersects(_onUpPosition);
-        const intersectsObjectsUUId = intersects.map((item) => {
-          var _a;
-          return (_a = item == null ? void 0 : item.object) == null ? void 0 : _a.uuid;
-        }).filter((id) => id !== void 0);
-        if (intersectsObjectsUUId.length === 0) {
-          multiSelectId.length = 0;
-        } else {
-          multiSelectId.push(intersectsObjectsUUId[0]);
-        }
-        this.editor.signals.intersectionsDetected.dispatch(multiSelectId);
-        if (!event.ctrlKey) {
-          multiSelectId.length = 0;
-        }
-      }
-    };
-    const onMouseUp = (event) => {
-      const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
-      _onUpPosition.fromArray(mousePosition);
-      handelClick(event);
-      this.renderer.domElement.removeEventListener("pointerup", onMouseUp);
-    };
-    const onMouseDown = (event) => {
-      if (event.button !== 0)
-        return;
-      const mousePosition = getMousePosition(event.clientX, event.clientY, this.renderer.domElement);
-      _onDownPosition.fromArray(mousePosition);
-      this.renderer.domElement.addEventListener("pointerup", onMouseUp);
-    };
-    this.renderer.domElement.addEventListener("pointerdown", onMouseDown);
+    this.eventBus.transformControlsMouseUp = () => transformControlHandler.handleMouseUp();
+    this.eventBus.transformControlsMouseDown = () => transformControlHandler.handleMouseDown();
+    this.eventBus.transformControlsChange = () => transformControlHandler.handleChange();
+    const mouseHandler = new MouseControlHandler(this, this.editor);
+    this.eventBus.domMouseDown = (e) => mouseHandler.handleMouseDown(e);
+  }
+  mountEvents() {
+    super.mountEvents();
+    console.log("mountEvents");
+    this.renderer.setAnimationLoop(this.animate.bind(this));
+    this.transformControl.addEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange);
+    this.transformControl.addEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown);
+    this.transformControl.addEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp);
+    this.renderer.domElement.addEventListener(_domMouseDownEvent, this.eventBus.domMouseDown);
+  }
+  unmountEvents() {
+    super.unmountEvents();
+    this.renderer.setAnimationLoop(null);
+    this.transformControl.removeEventListener(_transformControlsChangeEvent, this.eventBus.transformControlsChange);
+    this.transformControl.removeEventListener(_transformControlsMouseDownEvent, this.eventBus.transformControlsMouseDown);
+    this.transformControl.removeEventListener(_transformControlsMouseUpEvent, this.eventBus.transformControlsMouseUp);
+    this.renderer.domElement.removeEventListener(_domMouseDownEvent, this.eventBus.domMouseDown);
   }
   get currentMode() {
     return this._currentMode;
@@ -1522,8 +1582,9 @@ class MainViewPort extends ViewPort {
     this.needsUpdate = false;
   }
   animate() {
-    const delta = this.clock.getDelta();
+    const delta = this._clock.getDelta();
     this.statePanel.update();
+    this.animation(this._clock);
     if (this.viewHelper.animating === true) {
       this.viewHelper.update(delta);
       this.needsUpdate = true;
@@ -1546,14 +1607,11 @@ class MainViewPort extends ViewPort {
     }
     this.editor.needsUpdate = true;
   }
-}
-function getMousePosition(x, y, dom) {
-  const { left, top, width, height } = dom.getBoundingClientRect();
-  return [(x - left) / width, (y - top) / height];
-}
-function traverseObject(object, extrudeIds, type, target) {
-  if (!extrudeIds.includes(object.uuid) && object.visible && !type.includes(object.type)) {
-    target.push(object);
+  getRaycaster() {
+    return this._raycaster;
+  }
+  getTransformControls() {
+    return this.transformControl;
   }
 }
 class Container {
