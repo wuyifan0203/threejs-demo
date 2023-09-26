@@ -178,6 +178,11 @@
       this.sceneBackground.background = background;
       this.signals.sceneGraphChanged.dispatch();
     }
+    clear() {
+      this.scene.clear();
+      this.sceneHelper.clear();
+      this.sceneBackground.clear();
+    }
   }
   const FXAAShader = {
     uniforms: {

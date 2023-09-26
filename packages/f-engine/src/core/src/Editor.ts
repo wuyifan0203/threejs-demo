@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-12 23:25:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:34:53
+ * @LastEditTime: 2023-09-26 19:07:29
  * @FilePath: /threejs-demo/packages/f-engine/src/core/src/Editor.ts
  */
 import { Color, type Object3D, Scene, Texture } from 'three';
@@ -142,6 +142,12 @@ class Editor extends EventDispatcher {
   setSceneBackground(background: Color | Texture | null) {
     this.sceneBackground.background = background;
     this.signals.sceneGraphChanged.dispatch();
+  }
+
+  clear(){
+    this.scene.clear();
+    this.sceneHelper.clear();
+    this.sceneBackground.clear();
   }
 }
 

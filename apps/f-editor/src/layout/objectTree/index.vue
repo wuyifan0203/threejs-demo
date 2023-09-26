@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 02:02:52
+ * @LastEditTime: 2023-09-26 17:38:02
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
@@ -21,7 +21,7 @@
 import { computed, defineComponent, h, ref, onMounted } from 'vue';
 import { NTree, TreeSelectRenderPrefix, NInput, TreeSelectRenderSuffix } from 'naive-ui';
 import { store } from '@/store';
-import type { Node } from '@/engine/Node';
+import type { TreeNode } from '@/engine/Node';
 
 const iconMap = {
   Root: 'f-_collection',
@@ -39,16 +39,16 @@ export default defineComponent({
   },
   props: [],
   setup() {
-    const treeData = computed(() => [store.tree.currentTree]);
+    const treeData = computed(() => [store.tree.sceneTree]);
     const pattern = ref('');
 
     const renderPrefix: TreeSelectRenderPrefix = ({ option }) => {
-      const iconName = iconMap[(option as unknown as Node).type];
+      const iconName = iconMap[(option as unknown as TreeNode).type];
       return h('i', { class: [iconName,'f-iconfont']})
     }
 
     const renderSuffix: TreeSelectRenderSuffix = ({ option }) => {
-      const iconName = !(option as unknown as Node).visible ? 'f-yanjing_xianshi' : 'f-yanjing_yincang';
+      const iconName = !(option as unknown as TreeNode).visible ? 'f-yanjing_xianshi' : 'f-yanjing_yincang';
       return h('i', { class: [iconName,'f-iconfont']})
     }
 

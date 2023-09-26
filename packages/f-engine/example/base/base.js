@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-13 23:01:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-21 11:15:31
+ * @LastEditTime: 2023-09-26 17:44:04
  * @FilePath: /threejs-demo/packages/f-engine/example/base/base.js
  */
 import {
@@ -23,7 +23,7 @@ function init() {
   const editor = new Editor();
 
   editor.addEventListener('objectTranslate', (object, originValue, newValue) => {
-    console.log('objectTranslate',object, originValue, newValue);
+    console.log('objectTranslate', object, originValue, newValue);
   })
 
   const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
@@ -35,7 +35,8 @@ function init() {
   const mainViewPort = new MainViewPort(editor, camera, dom);
   const viewPort = new ViewPort(editor, camera2, dom2);
 
-
+  mainViewPort.active = true;
+  viewPort.active = true;
   function resize() {
     mainViewPort.setSize(dom.clientWidth, dom.clientHeight);
     viewPort.setSize(dom2.clientWidth, dom2.clientHeight)
@@ -113,7 +114,7 @@ function init() {
   OFolder.add(operation, 'removeLastObject').name('Remove Last Object');
   OFolder.add(operation, 'removeSelectedObject').name('Remove Selected Object');
 
-  
+
 
 
 

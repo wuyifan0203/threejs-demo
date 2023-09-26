@@ -1,15 +1,17 @@
 /*
  * @Date: 2023-08-20 23:51:53
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-25 20:02:53
+ * @LastEditTime: 2023-09-26 19:17:49
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/CAD.ts
  */
-import type { Object3D } from 'three';
+import { Color, Texture, type Object3D } from 'three';
 import { Editor, MainViewPort, Container, type OptionModeType } from '@f/engine';
 import { EventDispatcher } from '@f/utils'
 import { createGridHelper, createOrthographicCamera } from '@/utils/cad';
 
 const camera = createOrthographicCamera();
+camera.up.set(0, 0, 1);
+
 const grid = createGridHelper();
 
 
@@ -53,10 +55,10 @@ class CAD extends EventDispatcher {
     }
 
     resetCamera() {
-        camera.position.set(0, 200, 500);
-        camera.up.set(0, 0, 1);
+        camera.position.set(100, -100, 100);
         camera.lookAt(0, 0, 0);
         this.mainViewPort.orbitControls.target.set(0, 0, 0);
+        camera.updateProjectionMatrix();
         this.mainViewPort.orbitControls.update();
     }
 
@@ -74,8 +76,16 @@ class CAD extends EventDispatcher {
         this.mainViewPort.setOptionMode(mode);
     }
 
-    setActive(active:boolean){
+    setActive(active: boolean) {
         this.mainViewPort.active = active;
+    }
+
+    setBackgroundColor(background: Color | Texture | null) {
+        this.editor.sceneBackground.background = background
+    }
+
+    clear() {
+        this.editor.clear();
     }
 }
 

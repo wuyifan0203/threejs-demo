@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-21 00:22:00
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 17:11:26
+ * @LastEditTime: 2023-09-26 21:00:38
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/instance.ts
  */
 
@@ -23,5 +23,7 @@ class Instance {
 function getCadInstance() {
     return Instance.getInstance();
 }
+
+(window as any).getCadInstance = getCadInstance;
 
 export { getCadInstance }

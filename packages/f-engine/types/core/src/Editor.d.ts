@@ -23,5 +23,6 @@ declare class Editor extends EventDispatcher {
     select(object: Object3D[]): void;
     selectByIds(uuids: Array<string> | undefined): void;
     setSceneBackground(background: Color | Texture | null): void;
+    clear(): void;
 }
 export { Editor };

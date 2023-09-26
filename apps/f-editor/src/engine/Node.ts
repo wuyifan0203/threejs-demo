@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 13:53:17
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-06 19:50:19
+ * @LastEditTime: 2023-09-26 16:56:51
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/Node.ts
  */
 import { TreeNode } from '@f/utils'
@@ -22,4 +22,4 @@ class Node extends TreeNode {
   }
 }
 
-export { Node } 
+export { Node as TreeNode } 

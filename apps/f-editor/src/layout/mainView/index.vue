@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-23 09:39:47
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-25 19:36:34
+ * @LastEditTime: 2023-09-26 20:52:35
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/mainView/index.vue
 -->
 <template>
@@ -22,6 +22,7 @@ import { useMessage } from 'naive-ui'
 import { store } from "@/store";
 import { config } from '@/config/mainView';
 import Menu from '@/components/Menu/index.vue';
+import { menuClickEvent } from '@/modules/mainMenu'
 export default defineComponent({
   name: 'MainView',
   components: {
@@ -37,6 +38,10 @@ export default defineComponent({
       config,
       menuSelect: (key: string, option) => {
         message.info(String(key))
+        if (menuClickEvent[key]) {
+          menuClickEvent[key](option)
+        }
+
         console.log(key, option);
 
       }
