@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-24 01:23:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 01:08:23
+ * @LastEditTime: 2023-09-28 17:38:11
  * @FilePath: /threejs-demo/apps/f-editor/src/config/theme.ts
  */
 const dark = {

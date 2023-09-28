@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-08-21 00:15:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-26 20:50:02
+ * @LastEditTime: 2023-09-28 17:33:02
  * @FilePath: /threejs-demo/apps/f-editor/src/store/tree.ts
  */
 
-import { Meshes } from "@/engine/Factory";
 import { TreeNode } from "@/engine/Node";
 import { defineStore } from "pinia";
 import { store } from "@/store";
@@ -40,14 +39,18 @@ const useTreeStore = defineStore({
 
 
             const defaultGeometry = this.createNode('Geometry');
-            this.geometries.add(defaultGeometry)
+            this.geometries.add(defaultGeometry);
+
+            
         },
 
         createNode(typeName: string, attribute = {}): TreeNode {
-            return new TreeNode(typeName, attribute);
+            const node = new TreeNode(typeName, attribute);
+            node.name = typeName;
+            return node;
         },
 
-        appendNode(parentNode: TreeNode, node: TreeNode) {
+        appendNode(node: TreeNode, parentNode: TreeNode = store.tree.root) {
             parentNode.add(node);
             if (parentNode === this.root) {
                 store.cad.addObject(node, null)

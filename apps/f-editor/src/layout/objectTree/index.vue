@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-26 17:38:02
+ * @LastEditTime: 2023-09-28 17:50:30
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
@@ -13,8 +13,8 @@
       </template>
     </n-input>
   </div>
-  <n-tree block-line :data="treeData" key-field="id" label-field="name" :selectable="false" :render-prefix="renderPrefix"
-    :render-suffix="renderSuffix" />
+  <n-tree block-line :data="treeData" key-field="id" label-field="name" :render-prefix="renderPrefix"
+    :render-suffix="renderSuffix" :default-expand-all="true" />
 </template>
 
 <script lang="ts">
@@ -26,9 +26,10 @@ import type { TreeNode } from '@/engine/Node';
 const iconMap = {
   Root: 'f-_collection',
   Group: 'f-_collection',
-  Camera:'f-camera',
-  Light:'f-light',
-  Modal:'f-moxing2'
+  Camera: 'f-camera',
+  Light: 'f-light',
+  Modal: 'f-moxing2',
+  Mesh: 'f-moxing2'
 }
 
 export default defineComponent({
@@ -44,15 +45,22 @@ export default defineComponent({
 
     const renderPrefix: TreeSelectRenderPrefix = ({ option }) => {
       const iconName = iconMap[(option as unknown as TreeNode).type];
-      return h('i', { class: [iconName,'f-iconfont']})
+      return h('i', { class: [iconName, 'f-iconfont'] })
     }
 
     const renderSuffix: TreeSelectRenderSuffix = ({ option }) => {
       const iconName = !(option as unknown as TreeNode).visible ? 'f-yanjing_xianshi' : 'f-yanjing_yincang';
-      return h('i', { class: [iconName,'f-iconfont']})
+      return h('i', { class: [iconName, 'f-iconfont'] ,onclick:visibleClick})
     }
 
-    onMounted(()=>{
+    const visibleClick = (e: MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      console.log(6);
+      
+    }
+
+    onMounted(() => {
       store.tree.resetTree();
     })
 
@@ -66,17 +74,20 @@ export default defineComponent({
 })
 </script>
 <style scoped lang="scss">
-.tree-head{
+.tree-head {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
 }
-.tree-filter,.tree-search{
-height:20px;
+
+.tree-filter,
+.tree-search {
+  height: 20px;
 }
+
 .n-tree {
- :deep(.n-tree-node-wrapper){
-  padding:0;
- }
+  :deep(.n-tree-node-wrapper) {
+    padding: 0;
+  }
 }
 </style>
