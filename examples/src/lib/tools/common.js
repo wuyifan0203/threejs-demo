@@ -17,6 +17,7 @@ import {
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
 import { GUI } from '../util/lil-gui.module.min.js'
+import { CoordinateHelper } from '../three/CoordinateHelper.js';
 
 /**
  * @description: 初始化渲染器
@@ -183,6 +184,11 @@ function initScene() {
   return new Scene();
 }
 
+function initCoordinates(axesLength) {
+  return new CoordinateHelper(axesLength)
+
+}
+
 export {
   initAxesHelper,
   initDefaultLighting,
@@ -195,4 +201,5 @@ export {
   initGUI,
   initScene,
   resize,
+  initCoordinates
 };

@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-09-06 10:24:49
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-10-07 21:01:39
+ * @FilePath: /threejs-demo/apps/cube/index.js
+ */
 /* eslint-disable no-unused-vars */
 /*
  * @Date: 2023-01-05 17:20:07
