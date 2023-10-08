@@ -25,6 +25,6 @@
   "dependencies": {
     "@f/utils": "workspace:*",
     "signals": "^1.0.0",
-    "three": "^0.156.0"
+    "three": "^0.157.0"
   }
 }

@@ -21,8 +21,8 @@ importers:
         specifier: ^1.2.0
         version: registry.npmmirror.com/polybooljs@1.2.0
       three:
-        specifier: ^0.156.0
-        version: registry.npmmirror.com/three@0.156.0
+        specifier: ^0.157.0
+        version: registry.npmmirror.com/three@0.157.0
     devDependencies:
       '@types/three':
         specifier: ^0.156.0
@@ -57,6 +57,9 @@ importers:
       pinia:
         specifier: ^2.1.6
         version: registry.npmmirror.com/pinia@2.1.6(typescript@4.6.4)(vue@3.3.4)
+      three:
+        specifier: ^0.157.0
+        version: registry.npmmirror.com/three@0.157.0
       vue:
         specifier: ^3.2.37
         version: registry.npmmirror.com/vue@3.3.4
@@ -105,8 +108,8 @@ importers:
         specifier: ^1.0.0
         version: registry.npmmirror.com/signals@1.0.0
       three:
-        specifier: ^0.156.0
-        version: registry.npmmirror.com/three@0.156.0
+        specifier: ^0.157.0
+        version: registry.npmmirror.com/three@0.157.0
     devDependencies:
       '@types/signals':
         specifier: ^1.0.1
@@ -124,8 +127,8 @@ importers:
   packages/f-utils:
     dependencies:
       three:
-        specifier: ^0.156.0
-        version: registry.npmmirror.com/three@0.156.0
+        specifier: ^0.157.0
+        version: registry.npmmirror.com/three@0.157.0
     devDependencies:
       '@types/three':
         specifier: ^0.155.0
@@ -4986,6 +4989,12 @@ packages:
     resolution: {integrity: sha512-r6meetGWDk3aYjDRh6NpKuUkzoPlI3yldDQe2SkwCcqTTB5NZn7vKQBUXyMExvlwZShaLmvAbsVWaFzp1rkk3A==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/three/-/three-0.156.0.tgz}
     name: three
     version: 0.156.0
+    dev: false
+
+  registry.npmmirror.com/three@0.157.0:
+    resolution: {integrity: sha512-CeAwQrf4x3z0/e+MC4F+nXLW5t0gh3pw+L6CCBqpHvOq3bGYIgRYub7Pv0j/9wR+d++OiEglyZzWyuSYbwWGOA==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/three/-/three-0.157.0.tgz}
+    name: three
+    version: 0.157.0
     dev: false
 
   registry.npmmirror.com/to-fast-properties@2.0.0:

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-21 00:15:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-28 17:33:02
+ * @LastEditTime: 2023-10-08 20:45:13
  * @FilePath: /threejs-demo/apps/f-editor/src/store/tree.ts
  */
 
@@ -10,7 +10,7 @@ import { defineStore } from "pinia";
 import { store } from "@/store";
 
 const useTreeStore = defineStore({
-    id: "Tree",
+    id: "tree",
     state: () => ({
         root: new TreeNode('Root'),
         materials: new TreeNode('Materials'),
@@ -26,22 +26,18 @@ const useTreeStore = defineStore({
             this.root.name = 'Scene'
             this.root.clear();
 
-            const light = this.createNode('Light', { color: 0xffffff });
+            const light = this.createNode('Light', { type: 'ambient' });
             light.name = 'Light';
-            const camera = this.createNode('Camera', { fov: 45 });
+            const directional = this.createNode('Light', { type: 'directional' });
+            directional.name = 'directional';
+            const camera = this.createNode('Camera', { type: 'perspective' });
             camera.name = 'Camera';
-            this.root.add(light);
-            this.root.add(camera);
-
-            const defaultMaterial = this.createNode('Material', { color: 0xffffff });
-
-            this.materialTree.add(defaultMaterial);
-
-
-            const defaultGeometry = this.createNode('Geometry');
-            this.geometries.add(defaultGeometry);
-
             
+            this.appendNode(light);
+            this.appendNode(directional);
+            this.appendNode(camera);
+
+
         },
 
         createNode(typeName: string, attribute = {}): TreeNode {
@@ -57,7 +53,6 @@ const useTreeStore = defineStore({
             } else {
                 store.cad.addObject(node, parentNode)
             }
-
         }
 
 

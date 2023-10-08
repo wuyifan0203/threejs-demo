@@ -1,21 +1,42 @@
 /*
  * @Date: 2023-09-25 19:38:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-26 16:52:58
+ * @LastEditTime: 2023-10-08 20:57:27
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/Factory.ts
  */
 
-import { BoxGeometry, BufferGeometry, CylinderGeometry, type Material, Mesh, MeshBasicMaterial, SphereGeometry, MaterialParameters, MeshBasicMaterialParameters, MeshPhongMaterialParameters, MeshPhongMaterial } from 'three';
+import {
+    BoxGeometry,
+    BufferGeometry,
+    CylinderGeometry,
+    type Material,
+    Mesh,
+    MeshBasicMaterial,
+    SphereGeometry,
+    MeshBasicMaterialParameters,
+    MeshPhongMaterialParameters,
+    MeshPhongMaterial,
+    Light,
+    AmbientLight,
+    DirectionalLight,
+    PointLight,
+    SpotLight,
+    PerspectiveCamera,
+    OrthographicCamera,
+    Camera
+} from 'three';
+
+import { Cube, Sphere } from '@/modules/structures';
 
 
 type GeometryOptionsType = {}
 class Meshes {
-    public static createMesh(geometryOptions, materialOptions: MaterialOptionsType): Mesh {
-        const geometry = Geometries.createGeometry(geometryOptions);
-        const material = Materials.createMaterial(materialOptions);
-        const mesh = new Mesh(geometry, material);
-        mesh.userData.geometryOptions = geometryOptions;
-        mesh.userData.materialOptions = materialOptions;
+    static MeshMap = {
+        cube: Cube,
+        sphere: Sphere
+    }
+    public static createMesh(type): Mesh {
+        const mesh = new Meshes.MeshMap[type]()
         return mesh;
     }
 
@@ -74,4 +95,30 @@ class Materials {
 
 }
 
-export { Meshes, Materials, Geometries } 
+class Lights {
+    static LightMap = {
+        ambient: AmbientLight,
+        directional: DirectionalLight,
+        point: PointLight,
+        spot: SpotLight,
+    }
+    public static createLight(type): Light {
+        const light:Light = new Lights.LightMap[type]();
+        if(!(light as AmbientLight)?.isAmbientLight){
+            light.position.set(10, 10, 10);
+        }
+        return light;
+    }
+}
+
+class Cameras {
+    static CameraMap = {
+        perspective: PerspectiveCamera,
+        orthographic: OrthographicCamera,
+    }
+    public static createCamera(type): Camera {
+        return new Cameras.CameraMap[type]();
+    }
+}
+
+export { Meshes, Materials, Geometries, Lights, Cameras } 

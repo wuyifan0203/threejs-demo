@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-28 17:50:30
+ * @LastEditTime: 2023-10-08 20:53:04
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, h, ref, onMounted } from 'vue';
+import { computed, defineComponent, h, ref, onMounted, nextTick } from 'vue';
 import { NTree, TreeSelectRenderPrefix, NInput, TreeSelectRenderSuffix } from 'naive-ui';
 import { store } from '@/store';
 import type { TreeNode } from '@/engine/Node';
@@ -61,7 +61,12 @@ export default defineComponent({
     }
 
     onMounted(() => {
-      store.tree.resetTree();
+      nextTick(()=>{
+        console.log(1);
+        
+    
+      })
+  
     })
 
     return {

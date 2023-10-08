@@ -11,7 +11,7 @@
     "delaunator": "^5.0.0",
     "poly2tri": "^1.5.0",
     "polybooljs": "^1.2.0",
-    "three": "^0.156.0"
+    "three": "^0.157.0"
   },
   "devDependencies": {
     "@types/three": "^0.156.0",

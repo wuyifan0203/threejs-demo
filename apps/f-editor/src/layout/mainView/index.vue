@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-23 09:39:47
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-26 20:52:35
+ * @LastEditTime: 2023-10-08 20:54:05
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/mainView/index.vue
 -->
 <template>
@@ -32,6 +32,7 @@ export default defineComponent({
   setup() {
     onMounted(() => {
       store.cad.setupCAD();
+      store.tree.resetTree();
     })
     const message = useMessage()
     return {
