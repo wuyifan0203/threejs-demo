@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-14 00:59:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 20:36:58
+ * @LastEditTime: 2023-10-09 20:52:45
  * @FilePath: /threejs-demo/apps/f-editor/src/config/mainView.ts
  */
 
@@ -21,6 +21,10 @@ export const config = [
                     {
                         label: 'Sphere',
                         key: 'sphere'
+                    },
+                    {
+                        label: 'Cylinder',
+                        key: 'cylinder'
                     },
                 ]
             },

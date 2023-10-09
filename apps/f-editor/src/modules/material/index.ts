@@ -1,1 +1,0 @@
-export { DefaultMaterial } from './DefaultMaterial'

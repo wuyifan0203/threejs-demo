@@ -30,7 +30,7 @@ class Cube extends Mesh {
     depthSegments = _depthSegments;
     public readonly typeName = 'Cube';
     constructor(material = defaultMaterial) {
-        const geometry = new BoxGeometry(_width, _height, _depth, _widthSegments, _heightSegments, _depthSegments)
+        const geometry = new BoxGeometry(_width, _height, _depth, _widthSegments, _heightSegments, _depthSegments);
         super(geometry, material);
     }
 

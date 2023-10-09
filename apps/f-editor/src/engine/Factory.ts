@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-25 19:38:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-08 20:57:27
+ * @LastEditTime: 2023-10-09 20:53:23
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/Factory.ts
  */
 
@@ -26,14 +26,15 @@ import {
     Camera
 } from 'three';
 
-import { Cube, Sphere } from '@/modules/structures';
+import { Cube, Cylinder, Sphere } from '@/modules/structures';
 
 
 type GeometryOptionsType = {}
 class Meshes {
     static MeshMap = {
         cube: Cube,
-        sphere: Sphere
+        sphere: Sphere,
+        cylinder:Cylinder
     }
     public static createMesh(type): Mesh {
         const mesh = new Meshes.MeshMap[type]()

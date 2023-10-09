@@ -14,6 +14,10 @@ const menuClickEvent = {
     sphere(){
         const node = store.tree.createNode('Mesh', {type: 'sphere'})
         store.tree.appendNode(node);
+    },
+    cylinder(){
+        const node = store.tree.createNode('Mesh', {type: 'cylinder'})
+        store.tree.appendNode(node);
     }
 }
 

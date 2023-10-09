@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-21 00:15:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-08 20:46:51
+ * @LastEditTime: 2023-10-09 20:18:38
  * @FilePath: /threejs-demo/apps/f-editor/src/store/cad.ts
  */
 
@@ -11,7 +11,6 @@ import type { OptionModeType } from "@f/engine";
 import { TreeNode } from "@/engine/Node";
 import { Color, Material } from "three";
 import { Cameras, Geometries, Lights, Materials, Meshes } from "@/engine/Factory";
-import { store } from ".";
 
 
 const useCADStore = defineStore({
@@ -118,7 +117,7 @@ const useCADStore = defineStore({
             }
         },
 
-        setOptionMode(mode: OptionModeType) {
+        setOptionMode(mode: OptionModeType) {     
             getCadInstance().setOptionMode(mode);
         },
 
@@ -136,7 +135,7 @@ const useCADStore = defineStore({
 
         getObject3DByUuid(uuid: string) {
             return getCadInstance().container.getObjectByUuid(uuid);
-        }
+        },
     }
 })
 
