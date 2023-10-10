@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/apps/f-editor/src/config/form.ts
  */
 
-enum FormItemType {
+enum FormItemEnum {
     BUTTON = 'button',
     FlOAT_INPUT = 'floatInput',
     INT_INPUT = 'intInput',
@@ -25,12 +25,12 @@ const formTestConfig = {
             span:24, // 一行的栅格数
             columns:[
                 {
-                    type:FormItemType.BUTTON,
+                    type:FormItemEnum.BUTTON,
                     label:'按钮',
                     span:12
                 },
                 {
-                    type:FormItemType.CHECKBOX,
+                    type:FormItemEnum.CHECKBOX,
                     label:'复选框',
                     span:12
                 }
@@ -41,7 +41,7 @@ const formTestConfig = {
             span:24, // 一行的栅格数
             columns:[
                 {
-                    type:FormItemType.CHECKBOX,
+                    type:FormItemEnum.CHECKBOX,
                     label:'复选框2',
                     span:12
                 }
@@ -51,5 +51,6 @@ const formTestConfig = {
 }
 
 export {
-    formTestConfig
+    formTestConfig,
+    FormItemEnum
 }
