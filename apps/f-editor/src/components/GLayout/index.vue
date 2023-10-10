@@ -1,3 +1,9 @@
+<!--
+ * @Date: 2023-09-06 10:24:49
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-10-10 20:07:08
+ * @FilePath: /threejs-demo/apps/f-editor/src/components/GLayout/index.vue
+-->
 <template>
   <div style="position: relative">
     <div ref="GLRoot" style="position: absolute; width: 100%; height: 100%">
