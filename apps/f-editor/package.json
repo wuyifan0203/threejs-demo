@@ -19,7 +19,8 @@
     "naive-ui": "^2.34.4",
     "pinia": "^2.1.6",
     "vue": "^3.2.37",
-    "three":"^0.157.0"
+    "three":"^0.157.0",
+    "lodash-es": "^4.17.21"
   },
   "devDependencies": {
     "@types/three": "^0.156.0",
@@ -28,6 +29,7 @@
     "typescript": "^4.6.4",
     "vite": "^4.4.6",
     "vue-tsc": "^0.38.4",
-    "vuepress": "^2.0.0-beta.49"
+    "vuepress": "^2.0.0-beta.49",
+    "@types/lodash-es": "^4.17.7"
   }
 }

@@ -48,6 +48,9 @@ importers:
       golden-layout:
         specifier: ^2.6.0
         version: registry.npmmirror.com/golden-layout@2.6.0
+      lodash-es:
+        specifier: ^4.17.21
+        version: registry.npmmirror.com/lodash-es@4.17.21
       mitt:
         specifier: ^3.0.1
         version: registry.npmmirror.com/mitt@3.0.1
@@ -64,6 +67,9 @@ importers:
         specifier: ^3.2.37
         version: registry.npmmirror.com/vue@3.3.4
     devDependencies:
+      '@types/lodash-es':
+        specifier: ^4.17.7
+        version: registry.npmmirror.com/@types/lodash-es@4.17.8
       '@types/three':
         specifier: ^0.156.0
         version: registry.npmmirror.com/@types/three@0.156.0
@@ -1427,13 +1433,11 @@ packages:
     version: 4.17.8
     dependencies:
       '@types/lodash': registry.npmmirror.com/@types/lodash@4.14.197
-    dev: false
 
   registry.npmmirror.com/@types/lodash@4.14.197:
     resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/lodash/-/lodash-4.14.197.tgz}
     name: '@types/lodash'
     version: 4.14.197
-    dev: false
 
   registry.npmmirror.com/@types/markdown-it-emoji@2.0.2:
     resolution: {integrity: sha512-2ln8Wjbcj/0oRi/6VnuMeWEHHuK8uapFttvcLmDIe1GKCsFBLOLBX+D+xhDa9oWOQV0IpvxwrSfKKssAqqroog==, registry: https://registry.npm.taobao.org/, tarball: https://registry.npmmirror.com/@types/markdown-it-emoji/-/markdown-it-emoji-2.0.2.tgz}

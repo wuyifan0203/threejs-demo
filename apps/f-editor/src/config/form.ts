@@ -1,32 +1,14 @@
 /*
  * @Date: 2023-10-10 20:35:40
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-11 20:56:03
+ * @LastEditTime: 2023-10-13 18:01:14
  * @FilePath: /threejs-demo/apps/f-editor/src/config/form.ts
  */
 
-import { FormItemEnum,type FormType } from '@/types/form'
+import { FormItemEnum, type FormGroupType,type FormType, FormRowType } from '@/types/form'
+import { cloneDeep } from 'lodash-es';
 
-const formTestConfig :FormType = {
-    xGap: 12, // col横向间隔
-    yGap: 8, // row 的纵向间隔
-    rows: [
-        {
-            span: 24, // 一行的栅格数
-            columns: [
-                {
-                    type: FormItemEnum.BUTTON,
-                    label: '按钮',
-                    span: 12
-                },
-                {
-                    type: FormItemEnum.CHECKBOX,
-                    label: '复选框',
-                    span: 12
-                }
-
-            ]
-        },
+const formBlockPosition: Array<FormRowType> = [
         {
             span: 24, // 一行的栅格数
             columns: [
@@ -92,6 +74,19 @@ const formTestConfig :FormType = {
                 }
             ]
         },
+    ]
+
+
+const formTestConfig: FormType = {
+    type:'collapse',
+    groups:[
+        {
+            xGap:8,
+            yGap:12,
+            title:'Position',
+            rows:formBlockPosition
+
+        }
     ]
 }
 

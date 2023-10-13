@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-11 20:58:43
+ * @LastEditTime: 2023-10-13 17:53:42
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -16,11 +16,40 @@ enum FormItemEnum {
     COLOR_PICKER = 'colorPicker',
 }
 
-type FormType = {
+type FormGroupType = {
     xGap: number, // col横向间隔
     yGap: number, // row 的纵向间隔
     rows: Array<FormRowType>
 }
+
+type FormCardType = {
+    xGap: number, // col横向间隔
+    yGap: number, // row 的纵向间隔
+    border: boolean,
+    title: string,
+    rows: Array<FormRowType>
+}
+
+type FormCollapseType = {
+    xGap: number, // col横向间隔
+    yGap: number, // row 的纵向间隔
+    name: string|number,
+    title: string,
+    explain:string,
+    rows: Array<FormRowType>
+}
+
+type FormCardsType = {
+    type:'card' 
+    groups: Array<FormCardType>
+}
+
+type FormCollapsesType = {
+    type:'collapse' 
+    groups: Array<FormCollapseType>
+}
+
+type FormType = FormCollapsesType | FormCardsType;
 
 type FormRowType = {
     span: number
@@ -90,4 +119,5 @@ export type {
     FormItemColorPickerType,
     FormItemButtonType,
     FormItemType,
+    FormGroupType
 }
