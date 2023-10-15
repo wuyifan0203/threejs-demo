@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-10-10 20:04:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-15 18:55:18
+ * @LastEditTime: 2023-10-15 22:10:41
  * @FilePath: /threejs-demo/apps/f-editor/src/components/Form/form.vue
 -->
 
@@ -19,6 +19,7 @@ import {
     NInput,
     NCollapse,
     NCollapseItem,
+    NGridItem
 } from 'naive-ui';
 import { FormItemEnum } from '@/types/form';
 
@@ -83,16 +84,16 @@ export default defineComponent({
         }
 
         const renderColumn = (columnConfig) => {
+            console.log(columnConfig);
+
+            
             return (
-                <NFormItemGi
-                    span={columnConfig.span}
-                    labelPlacement='left'
-                    labelAlign='right'
-                    labelWidth='auto'
-                    showFeedback={false}
-                    label={columnConfig.type === FormItemEnum.BUTTON ? '' : columnConfig.label}>
-                    {renderFormElement(columnConfig)}
-                </NFormItemGi>)
+                <>
+                    <NGridItem span={10} class='labelAlign'>
+                        {columnConfig.label}
+                    </NGridItem>
+                    <NGridItem span={14}>{renderFormElement(columnConfig)}</NGridItem>
+                </>)
         };
 
         const renderRow = (rowConfig) => {
@@ -103,11 +104,7 @@ export default defineComponent({
 
         const rendrCollapse = (collapseConfig) => {
             return (<NCollapseItem title={collapseConfig.title} class='n-collapse-custom-border'>
-                {/* <NForm size='small' labelPlacement='left' */}
-                    {/* labelWidth='auto'> */}
-                    {collapseConfig.rows.map((rowConfig) => renderRow(rowConfig))}
-
-                {/* </NForm> */}
+                {collapseConfig.rows.map((rowConfig) => renderRow(rowConfig))}
             </NCollapseItem>)
         };
 
@@ -135,7 +132,10 @@ export default defineComponent({
 
 .f-form {
     font-size: 12px;
-    @include font_color("fontColor");
+
+    .n-collapse-item{
+        @include font_color("fontColor");
+    }
 
     .n-collapse .n-collapse-item:not(:first-child) {
         border-top: 1px solid #ffffff;
@@ -154,6 +154,10 @@ export default defineComponent({
 
     .n-collapse .n-collapse-item .n-collapse-item__header {
         padding: 0;
+    }
+    .labelAlign{
+        text-align: right;
+        padding: 0 5px;
     }
 }
 </style>
