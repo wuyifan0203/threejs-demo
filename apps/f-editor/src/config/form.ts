@@ -1,20 +1,19 @@
 /*
  * @Date: 2023-10-10 20:35:40
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-13 18:01:14
+ * @LastEditTime: 2023-10-15 18:32:27
  * @FilePath: /threejs-demo/apps/f-editor/src/config/form.ts
  */
 
 import { FormItemEnum, type FormGroupType,type FormType, FormRowType } from '@/types/form'
-import { cloneDeep } from 'lodash-es';
 
-const formBlockPosition: Array<FormRowType> = [
+const formBlockTransform: Array<FormRowType> = [
         {
             span: 24, // 一行的栅格数
             columns: [
                 {
-                    type: FormItemEnum.CHECKBOX,
-                    label: '复选框2',
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Location X',
                     span: 24
                 }
             ]
@@ -24,7 +23,7 @@ const formBlockPosition: Array<FormRowType> = [
             columns: [
                 {
                     type: FormItemEnum.FlOAT_INPUT,
-                    label: '小数输入框',
+                    label:  'Y',
                     span: 24
                 }
             ]
@@ -33,8 +32,38 @@ const formBlockPosition: Array<FormRowType> = [
             span: 24, // 一行的栅格数
             columns: [
                 {
-                    type: FormItemEnum.INT_INPUT,
-                    label: '整数输入框',
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Z',
+                    span: 24
+                }
+            ]
+        },
+        {
+            span: 24, // 一行的栅格数
+            columns: [
+                {
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Rotation X',
+                    span: 24,
+                }
+            ]
+        },
+        {
+            span: 24, // 一行的栅格数
+            columns: [
+                {
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label:  'Y',
+                    span: 24
+                }
+            ]
+        },
+        {
+            span: 24, // 一行的栅格数
+            columns: [
+                {
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Z',
                     span: 24
                 }
             ]
@@ -44,22 +73,22 @@ const formBlockPosition: Array<FormRowType> = [
             columns: [
                 {
                     type: FormItemEnum.SELECT,
-                    label: '选择框',
+                    label: 'Mode',
                     span: 24,
-                    options: [
+                    options:[
                         {
-                            label: 'Drive My Car',
-                            value: 'song1'
+                            label: 'XYZ',
+                            value: 'xyz'
                         },
                         {
-                            label: 'Norwegian Wood',
-                            value: 'song2'
+                            label: 'YZX',
+                            value: 'yzx'
                         },
                         {
-                            label: "You Won't See",
-                            value: 'song3',
-                            disabled: true
+                            label: 'ZYX',
+                            value: 'zyx'
                         },
+
                     ]
                 }
             ]
@@ -68,9 +97,29 @@ const formBlockPosition: Array<FormRowType> = [
             span: 24, // 一行的栅格数
             columns: [
                 {
-                    type: FormItemEnum.COLOR_PICKER,
-                    label: 'colorPicker',
-                    span: 24,
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Sclae X',
+                    span: 24
+                }
+            ]
+        },
+        {
+            span: 24, // 一行的栅格数
+            columns: [
+                {
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label:  'Y',
+                    span: 24
+                }
+            ]
+        },
+        {
+            span: 24, // 一行的栅格数
+            columns: [
+                {
+                    type: FormItemEnum.FlOAT_INPUT,
+                    label: 'Z',
+                    span: 24
                 }
             ]
         },
@@ -83,9 +132,16 @@ const formTestConfig: FormType = {
         {
             xGap:8,
             yGap:12,
-            title:'Position',
-            rows:formBlockPosition
-
+            title:'Transform',
+            name:'transform',
+            rows:formBlockTransform
+        },
+        {
+            xGap:8,
+            yGap:12,
+            title:'Collection',
+            name:'collection',
+            rows:formBlockTransform
         }
     ]
 }

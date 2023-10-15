@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-24 01:23:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-28 17:38:11
+ * @LastEditTime: 2023-10-15 17:58:08
  * @FilePath: /threejs-demo/apps/f-editor/src/config/theme.ts
  */
 const dark = {
@@ -22,6 +22,15 @@ const dark = {
       "itemTextColor": "rgba(255, 255, 255, 1)",
       "itemHeight": "25px",
       "fontSize": "12px"
+    },
+    "Collapse": {
+      "titleFontSize": "12px",
+      "titleTextColor": "#ffffffff",
+      "arrowColor": "#ffffffff",
+    },
+    "Form": {
+      "labelTextColor": "#ffffffff",
+      "labelFontSizeLeftSmall":"12px"
     }
   }
 
@@ -43,7 +52,12 @@ const dark = {
       "itemTextColor": "rgba(255, 255, 255, 1)",
       "itemHeight": "25px",
       "fontSize": "12px"
+    },
+    "Collapse": {
+      "titleTextColor": "#00000000",
+      "arrowColor": "#00000000",
     }
+
   }
 
   export {dark,light}

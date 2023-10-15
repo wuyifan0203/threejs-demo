@@ -1,13 +1,25 @@
 <!--
  * @Date: 2023-10-10 20:04:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-11 20:45:35
+ * @LastEditTime: 2023-10-15 18:55:18
  * @FilePath: /threejs-demo/apps/f-editor/src/components/Form/form.vue
 -->
 
 <script lang="tsx">
 import { defineComponent } from 'vue';
-import { NButton, NInputNumber, NCheckbox, NForm, NFormItemGi, NGrid, NSelect, NColorPicker, NInput } from 'naive-ui';
+import {
+    NButton,
+    NInputNumber,
+    NCheckbox,
+    NForm,
+    NFormItemGi,
+    NGrid,
+    NSelect,
+    NColorPicker,
+    NInput,
+    NCollapse,
+    NCollapseItem,
+} from 'naive-ui';
 import { FormItemEnum } from '@/types/form';
 
 
@@ -48,7 +60,7 @@ export default defineComponent({
             />)
 
         const renderStringInput = (columnConfig) => (
-            <NInput 
+            <NInput
                 maxlength={columnConfig.maxlength}
                 minlength={columnConfig.minlength}
                 size='tiny'
@@ -74,6 +86,9 @@ export default defineComponent({
             return (
                 <NFormItemGi
                     span={columnConfig.span}
+                    labelPlacement='left'
+                    labelAlign='right'
+                    labelWidth='auto'
                     showFeedback={false}
                     label={columnConfig.type === FormItemEnum.BUTTON ? '' : columnConfig.label}>
                     {renderFormElement(columnConfig)}
@@ -81,24 +96,64 @@ export default defineComponent({
         };
 
         const renderRow = (rowConfig) => {
-            return (
-                <NGrid xGap={props.config.xGap} yGap={props.config.xGap}>
-                    {rowConfig.columns.map((columnConfig) => renderColumn(columnConfig))}
-                </NGrid>)
+            return (<NGrid xGap={props.config.xGap} yGap={props.config.xGap}>
+                {rowConfig.columns.map((columnConfig) => renderColumn(columnConfig))}
+            </NGrid>)
         }
 
+        const rendrCollapse = (collapseConfig) => {
+            return (<NCollapseItem title={collapseConfig.title} class='n-collapse-custom-border'>
+                {/* <NForm size='small' labelPlacement='left' */}
+                    {/* labelWidth='auto'> */}
+                    {collapseConfig.rows.map((rowConfig) => renderRow(rowConfig))}
+
+                {/* </NForm> */}
+            </NCollapseItem>)
+        };
+
         const renderMain = () => {
-            return props.config.rows.map((rowConfig) => renderRow(rowConfig))
+            return [(<NCollapse> {
+                props.config.groups.map((groups) => rendrCollapse(groups))
+            }</NCollapse>)]
+
         }
 
         return () => (
-            <NForm
-                size='small'
-                labelPlacement='left'
+            <div
+                class='f-form'
             >
                 {...renderMain()}
-            </NForm>
+
+            </div>
         );
     }
 })
 </script>
+
+<style lang="scss">
+@import '../../assets/scss/mixin.scss';
+
+.f-form {
+    font-size: 12px;
+    @include font_color("fontColor");
+
+    .n-collapse .n-collapse-item:not(:first-child) {
+        border-top: 1px solid #ffffff;
+    }
+
+    .n-collapse .n-collapse-item .n-collapse-item__content-wrapper .n-collapse-item__content-inner {
+        padding-top: 5px;
+    }
+
+    .n-collapse .n-collapse-custom-border {
+        border: 1px solid #ffffff;
+        margin: 1px 0;
+        border-radius: 5px;
+        padding: 0 8px;
+    }
+
+    .n-collapse .n-collapse-item .n-collapse-item__header {
+        padding: 0;
+    }
+}
+</style>

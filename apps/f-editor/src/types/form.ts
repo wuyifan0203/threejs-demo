@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-13 17:53:42
+ * @LastEditTime: 2023-10-14 00:40:57
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -35,7 +35,7 @@ type FormCollapseType = {
     yGap: number, // row 的纵向间隔
     name: string|number,
     title: string,
-    explain:string,
+    explain?:string,
     rows: Array<FormRowType>
 }
 
