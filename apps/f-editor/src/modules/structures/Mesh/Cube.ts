@@ -4,22 +4,16 @@
  * @LastEditTime: 2023-10-08 20:28:30
  * @FilePath: /threejs-demo/apps/f-editor/src/modules/structures/Mesh/Cube.ts
  */
-/*
- * @Date: 2023-09-28 17:54:44
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-08 20:02:27
- * @FilePath: /threejs-demo/apps/f-editor/src/modules/structures/Mesh/Cube.ts
- */
-
 import { BoxGeometry, Mesh } from "three";
-import { defaultMaterial } from '@/config/material'
+import { defaultMaterial } from '@/config/material';
+import { Cube as CubeOption } from '@/config/structures';
 
-const _width = 2;
-const _height = 2;
-const _depth = 2;
-const _widthSegments = 1;
-const _heightSegments = 1;
-const _depthSegments = 1;
+const _width = CubeOption.width;
+const _height = CubeOption.height;
+const _depth = CubeOption.depth;
+const _widthSegments = CubeOption.widthSegments;
+const _heightSegments = CubeOption.heightSegments;
+const _depthSegments = CubeOption.depthSegments;
 
 class Cube extends Mesh {
     width = _width;

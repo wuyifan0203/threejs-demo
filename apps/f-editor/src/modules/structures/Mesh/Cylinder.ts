@@ -1,22 +1,22 @@
 /*
  * @Date: 2023-10-09 20:34:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-09 20:54:11
+ * @LastEditTime: 2023-10-16 20:16:36
  * @FilePath: /threejs-demo/apps/f-editor/src/modules/structures/Mesh/Cylinder.ts
  */
 
 import { Mesh, CylinderGeometry } from "three";
 import { defaultMaterial } from '@/config/material';
-import { PI2 } from '@/utils/constant';
+import { Cylinder as CylinderOption } from '@/config/structures';
 
-const _radiusTop = 5;
-const _radiusBottom = 5;
-const _height = 5;
-const _radialSegments = 16;
-const _heightSegments = 1;
-const _openEnded = false;
-const _thetaStart = 0;
-const _thetaLength = PI2;
+const _radiusTop = CylinderOption.radiusTop;
+const _radiusBottom = CylinderOption.radiusBottom;
+const _height = CylinderOption.height;
+const _radialSegments = CylinderOption.radialSegments;
+const _heightSegments = CylinderOption.heightSegments;
+const _openEnded = CylinderOption.openEnded;
+const _thetaStart = CylinderOption.thetaStart;
+const _thetaLength = CylinderOption.thetaLength;
 
 class Cylinder extends Mesh {
     radiusTop = _radiusTop;

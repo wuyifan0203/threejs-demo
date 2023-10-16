@@ -1,21 +1,21 @@
 /*
  * @Date: 2023-09-28 17:54:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-09 19:56:33
+ * @LastEditTime: 2023-10-16 20:19:54
  * @FilePath: /threejs-demo/apps/f-editor/src/modules/structures/Mesh/Sphere.ts
  */
 
 import { Mesh, SphereGeometry } from "three";
 import { defaultMaterial } from '@/config/material';
-import { PI2 } from '@/utils/constant'
+import { Sphere as SphereOption } from '@/config/structures';
 
-const _radius = 2;
-const _widthSegments = 36;
-const _heightSegments = 16;
-const _phiStart = 0;
-const _phiLength = PI2;
-const _thetaStart = 0;
-const _thetaLength = PI2;
+const _radius = SphereOption.radius;
+const _widthSegments = SphereOption.widthSegments;
+const _heightSegments = SphereOption.heightSegments;
+const _phiStart = SphereOption.phiStart;
+const _phiLength = SphereOption.phiLength;
+const _thetaStart = SphereOption.thetaStart;
+const _thetaLength = SphereOption.thetaLength;
 
 class Sphere extends Mesh {
     radius = _radius;

@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 10:37:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-15 17:42:04
+ * @LastEditTime: 2023-10-16 20:58:40
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/editor/index.vue
 -->
 <template>
@@ -10,7 +10,7 @@
       <NScrollbar :style="{
         maxHeight:formHeight
       }">
-        <Form :config="formTestConfig"></Form>
+        <Form :config="formConfig"></Form>
       </NScrollbar>
     </div>
   </div>
@@ -20,7 +20,7 @@
 import { computed, defineComponent, ref } from 'vue';
 import Form from '@/components/Form/form.vue';
 import {NScrollbar} from 'naive-ui'
-import { formTestConfig } from '@/config/form'
+import { generateFormConfig } from '@/modules/form/generateConfig'
 export default defineComponent({
   name: 'EditBar',
   components: {
@@ -33,8 +33,10 @@ export default defineComponent({
     const formHeight = computed(()=>{
       return (formRef.value?.clientHeight ?? 330) + 'px'
     })
+
+    const formConfig = generateFormConfig('Cube')
     return {
-      formTestConfig,
+      formConfig,
       formHeight
     }
   }

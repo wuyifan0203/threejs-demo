@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-14 00:40:57
+ * @LastEditTime: 2023-10-16 20:04:48
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -60,6 +60,7 @@ type FormColumnType = {
     span: number
     type: FormItemEnum
     label: string
+    key:string
     disabled?: (...arg) => boolean
 }
 
