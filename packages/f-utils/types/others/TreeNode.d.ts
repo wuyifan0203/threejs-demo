@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-09-06 15:34:29
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-10-17 20:22:28
+ * @FilePath: /threejs-demo/packages/f-utils/types/others/TreeNode.d.ts
+ */
 import { EventDispatcher } from './EventDispatcher';
 declare class TreeNode extends EventDispatcher {
     readonly id: string;

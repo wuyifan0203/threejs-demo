@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-16 20:04:48
+ * @LastEditTime: 2023-10-17 20:16:27
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -22,14 +22,6 @@ type FormGroupType = {
     rows: Array<FormRowType>
 }
 
-type FormCardType = {
-    xGap: number, // col横向间隔
-    yGap: number, // row 的纵向间隔
-    border: boolean,
-    title: string,
-    rows: Array<FormRowType>
-}
-
 type FormCollapseType = {
     xGap: number, // col横向间隔
     yGap: number, // row 的纵向间隔
@@ -39,17 +31,12 @@ type FormCollapseType = {
     rows: Array<FormRowType>
 }
 
-type FormCardsType = {
-    type:'card' 
-    groups: Array<FormCardType>
-}
-
 type FormCollapsesType = {
     type:'collapse' 
     groups: Array<FormCollapseType>
 }
 
-type FormType = FormCollapsesType | FormCardsType;
+type FormConfigType = FormCollapsesType;
 
 type FormRowType = {
     span: number
@@ -109,7 +96,7 @@ type FormItemType =
 export { FormItemEnum }
 
 export type {
-    FormType,
+    FormConfigType,
     FormRowType,
     FormColumnType,
     FormItemIntInputType,

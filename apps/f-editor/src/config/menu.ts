@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/apps/f-editor/src/config/menu.ts
  */
 
-import { MenuOption } from "@/types/config";
+import { MenuOption } from "@/types/menu";
 
 
 export const config: MenuOption[] = [

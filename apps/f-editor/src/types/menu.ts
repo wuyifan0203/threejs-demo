@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-14 19:39:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-14 20:21:44
- * @FilePath: /threejs-demo/apps/f-editor/src/types/config.ts
+ * @LastEditTime: 2023-10-17 20:14:12
+ * @FilePath: /threejs-demo/apps/f-editor/src/types/menu.ts
  */
 
 

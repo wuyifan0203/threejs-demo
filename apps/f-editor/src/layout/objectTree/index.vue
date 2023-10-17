@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-08-16 21:31:59
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-08 20:53:04
+ * @LastEditTime: 2023-10-17 19:57:55
  * @FilePath: /threejs-demo/apps/f-editor/src/layout/objectTree/index.vue
 -->
 <template>
@@ -56,15 +56,11 @@ export default defineComponent({
     const visibleClick = (e: MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
-      console.log(6);
-      
     }
 
     onMounted(() => {
       nextTick(()=>{
-        console.log(1);
-        
-    
+
       })
   
     })
