@@ -1,9 +1,10 @@
 /*
  * @Date: 2023-09-06 13:53:17
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-17 20:48:44
+ * @LastEditTime: 2023-10-18 20:40:15
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/Node.ts
  */
+import { MeshType } from '@/types';
 import { TreeNode } from '@f/utils'
 
 class Node extends TreeNode {

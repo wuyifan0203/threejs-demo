@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-17 20:10:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-17 20:38:24
+ * @LastEditTime: 2023-10-18 20:43:38
  * @FilePath: /threejs-demo/apps/f-editor/src/engine/Form.ts
  */
 
@@ -11,16 +11,21 @@ import type { TreeNode } from "./Node";
 import type { FormConfigType, MeshType } from '@/types'
 
 
-class Form {
+class DynamicForm {
     public config: FormConfigType;
     public attributes: any;
 
-    constructor(typeName: MeshType, node: TreeNode) {
-        this.config = generateFormConfig(typeName);
+    constructor(type:MeshType,node: TreeNode) {
+        this.config = generateFormConfig(type);
 
         this.attributes = reactive(node.getAttribute());
     }
 
+    changeAttributes(value,config){
+        console.log(value,config);
+        
+    }
+
 }
 
-export { Form }
+export { DynamicForm }

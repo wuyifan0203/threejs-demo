@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-10-10 20:04:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-15 22:10:41
+ * @LastEditTime: 2023-10-18 20:57:33
  * @FilePath: /threejs-demo/apps/f-editor/src/components/Form/form.vue
 -->
 
@@ -11,8 +11,6 @@ import {
     NButton,
     NInputNumber,
     NCheckbox,
-    NForm,
-    NFormItemGi,
     NGrid,
     NSelect,
     NColorPicker,
@@ -21,18 +19,27 @@ import {
     NCollapseItem,
     NGridItem
 } from 'naive-ui';
-import { FormItemEnum } from '@/types/form';
+import { FormItemEnum, FormCollapseType, FormRowType, FormItemType } from '@/types/form';
+import { DynamicForm } from '@/engine/Form';
 
 
 export default defineComponent({
     name: 'Form',
     props: {
-        config: {
-            type: Object,
+        instance: {
+            type: DynamicForm,
             default: () => { }
         }
     },
     setup(props) {
+
+        const { instance } = props;
+
+        const changeEvent = (val, config) => {
+            console.log(val, config, 'changeEvent');
+
+            instance.changeAttributes(val, config)
+        }
 
         const renderButton = (columnConfig) => (<NButton>{columnConfig.label}</NButton>)
         const renderSelect = (columnConfig) => (<NSelect size='tiny' options={columnConfig.options}></NSelect>)
@@ -43,6 +50,7 @@ export default defineComponent({
                 max={columnConfig.max}
                 min={columnConfig.min}
                 precision={columnConfig.precision}
+                onChange={(value) => changeEvent(value, columnConfig)}
                 step={0.001}
             />);
         const renderIntInput = (columnConfig) => (
@@ -79,14 +87,11 @@ export default defineComponent({
             [FormItemEnum.STRING_INPUT]: renderStringInput,
         }
 
-        const renderFormElement = (columnConfig) => {
+        const renderFormElement = (columnConfig: FormItemType) => {
             return ElementMap[columnConfig.type](columnConfig);
         }
 
-        const renderColumn = (columnConfig) => {
-            console.log(columnConfig);
-
-            
+        const renderColumn = (columnConfig: FormItemType) => {
             return (
                 <>
                     <NGridItem span={10} class='labelAlign'>
@@ -96,21 +101,21 @@ export default defineComponent({
                 </>)
         };
 
-        const renderRow = (rowConfig) => {
-            return (<NGrid xGap={props.config.xGap} yGap={props.config.xGap}>
+        const renderRow = (rowConfig: FormRowType, collapseConfig: FormCollapseType) => {
+            return (<NGrid xGap={collapseConfig.xGap} yGap={collapseConfig.xGap}>
                 {rowConfig.columns.map((columnConfig) => renderColumn(columnConfig))}
             </NGrid>)
         }
 
-        const rendrCollapse = (collapseConfig) => {
+        const renderCollapse = (collapseConfig: FormCollapseType) => {
             return (<NCollapseItem title={collapseConfig.title} class='n-collapse-custom-border'>
-                {collapseConfig.rows.map((rowConfig) => renderRow(rowConfig))}
+                {collapseConfig.rows.map((rowConfig) => renderRow(rowConfig, collapseConfig))}
             </NCollapseItem>)
         };
 
         const renderMain = () => {
             return [(<NCollapse> {
-                props.config.groups.map((groups) => rendrCollapse(groups))
+                instance.config.groups.map((groups) => renderCollapse(groups))
             }</NCollapse>)]
 
         }
@@ -133,7 +138,7 @@ export default defineComponent({
 .f-form {
     font-size: 12px;
 
-    .n-collapse-item{
+    .n-collapse-item {
         @include font_color("fontColor");
     }
 
@@ -155,7 +160,8 @@ export default defineComponent({
     .n-collapse .n-collapse-item .n-collapse-item__header {
         padding: 0;
     }
-    .labelAlign{
+
+    .labelAlign {
         text-align: right;
         padding: 0 5px;
     }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-17 20:16:27
+ * @LastEditTime: 2023-10-18 20:23:35
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -107,5 +107,6 @@ export type {
     FormItemColorPickerType,
     FormItemButtonType,
     FormItemType,
-    FormGroupType
+    FormGroupType,
+    FormCollapseType
 }

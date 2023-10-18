@@ -4,7 +4,7 @@
  * @LastEditTime: 2023-10-16 20:54:56
  * @FilePath: /threejs-demo/apps/f-editor/src/modules/form/default.ts
  */
-import { FormItemEnum, type FormType, FormRowType } from '@/types/form'
+import { FormItemEnum, type FormRowType } from '@/types/form'
 
 const transformForm: Array<FormRowType> = [
     {
