@@ -1,7 +1,7 @@
 <!--
  * @Date: 2023-10-10 20:04:26
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-18 20:57:33
+ * @LastEditTime: 2023-10-19 21:01:07
  * @FilePath: /threejs-demo/apps/f-editor/src/components/Form/form.vue
 -->
 
@@ -19,7 +19,7 @@ import {
     NCollapseItem,
     NGridItem
 } from 'naive-ui';
-import { FormItemEnum, FormCollapseType, FormRowType, FormItemType } from '@/types/form';
+import { FormItemEnum, FormCollapseType, FormRowType, FormItemType, FormItemButtonType, FormItemSelectType, FormItemStringInputType, FormItemIntInputType, FormItemFloatInputType, FormItemCheckboxType, FormItemColorPickerType } from '@/types/form';
 import { DynamicForm } from '@/engine/Form';
 
 
@@ -27,24 +27,26 @@ export default defineComponent({
     name: 'Form',
     props: {
         instance: {
-            type: DynamicForm,
-            default: () => { }
+            type: Object as () => DynamicForm | null,
+            default: null
         }
     },
     setup(props) {
 
-        const { instance } = props;
 
         const changeEvent = (val, config) => {
             console.log(val, config, 'changeEvent');
 
-            instance.changeAttributes(val, config)
+            props.instance!.changeAttributes(val, config)
         }
 
-        const renderButton = (columnConfig) => (<NButton>{columnConfig.label}</NButton>)
-        const renderSelect = (columnConfig) => (<NSelect size='tiny' options={columnConfig.options}></NSelect>)
-        const renderCheckbox = (columnConfig) => (<NCheckbox value={columnConfig.key}></NCheckbox>)
-        const renderFloatInput = (columnConfig) => (
+        const renderButton = (columnConfig: FormItemButtonType) => (<NButton>{columnConfig.label}</NButton>)
+
+        const renderSelect = (columnConfig: FormItemSelectType) => (<NSelect size='tiny' options={columnConfig.options}></NSelect>)
+
+        const renderCheckbox = (columnConfig: FormItemCheckboxType) => (<NCheckbox value={columnConfig.key}></NCheckbox>)
+
+        const renderFloatInput = (columnConfig: FormItemFloatInputType) => (
             <NInputNumber
                 size='tiny'
                 max={columnConfig.max}
@@ -53,7 +55,8 @@ export default defineComponent({
                 onChange={(value) => changeEvent(value, columnConfig)}
                 step={0.001}
             />);
-        const renderIntInput = (columnConfig) => (
+            
+        const renderIntInput = (columnConfig: FormItemIntInputType) => (
             <NInputNumber
                 size='tiny'
                 max={columnConfig.max}
@@ -61,17 +64,17 @@ export default defineComponent({
                 step={1}
             />)
 
-        const renderColorPicker = (columnConfig) => (
+        const renderColorPicker = (columnConfig: FormItemColorPickerType) => (
             <NColorPicker
                 size='small'
                 showAlpha={false}
                 defaultValue={columnConfig.defaultValue}
             />)
 
-        const renderStringInput = (columnConfig) => (
+        const renderStringInput = (columnConfig: FormItemStringInputType) => (
             <NInput
-                maxlength={columnConfig.maxlength}
-                minlength={columnConfig.minlength}
+                maxlength={columnConfig.maxLength}
+                minlength={columnConfig.minLength}
                 size='tiny'
             />
 
@@ -87,7 +90,7 @@ export default defineComponent({
             [FormItemEnum.STRING_INPUT]: renderStringInput,
         }
 
-        const renderFormElement = (columnConfig: FormItemType) => {
+        const renderFormElement = (columnConfig) => {
             return ElementMap[columnConfig.type](columnConfig);
         }
 
@@ -114,9 +117,9 @@ export default defineComponent({
         };
 
         const renderMain = () => {
-            return [(<NCollapse> {
-                instance.config.groups.map((groups) => renderCollapse(groups))
-            }</NCollapse>)]
+            return props.instance ? [(<NCollapse> {
+                props.instance.config.groups.map((groups) => renderCollapse(groups))
+            }</NCollapse>)] : [<div></div>]
 
         }
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-11 20:32:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-18 20:23:35
+ * @LastEditTime: 2023-10-19 20:58:42
  * @FilePath: /threejs-demo/apps/f-editor/src/types/form.ts
  */
 
@@ -79,7 +79,7 @@ type FormItemSelectType = {
 type FormItemCheckboxType = FormColumnType
 
 type FormItemColorPickerType = {
-    defaultValue?: boolean
+    defaultValue?: string
 } & FormColumnType
 
 type FormItemButtonType = FormColumnType
