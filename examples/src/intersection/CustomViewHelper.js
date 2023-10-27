@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-10-26 14:19:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-26 17:38:53
- * @FilePath: /threejs-demo/examples/src/intersection/box.js
+ * @LastEditTime: 2023-10-27 18:00:22
+ * @FilePath: /threejs-demo/examples/src/intersection/CustomViewHelper.js
  */
 import {
     Mesh,
@@ -16,7 +16,8 @@ import {
     MeshBasicMaterial,
     Raycaster,
     Vector2,
-    Quaternion
+    Quaternion,
+    Euler
 } from '../lib/three/three.module.js'
 
 const point = new Vector3();
@@ -52,7 +53,16 @@ const q1 = new Quaternion();
 const q2 = new Quaternion();
 let radius = 0;
 
-class ViewHelper extends Object3D {
+const euler = new Euler();
+
+// 这是个角速度
+const speed = Math.PI; //Angular velocity
+
+const HP = Math.PI / 2;
+
+const P = Math.PI
+
+class CustomViewHelper extends Object3D {
     constructor(camera, dom) {
         super();
 
@@ -65,6 +75,7 @@ class ViewHelper extends Object3D {
 
         this._camera = new OrthographicCamera(-2, 2, 2, -2, 0, 4);
         this._camera.position.set(0, 0, 2);
+        this._camera.up.set(0, 1, 0);
         this._camera.lookAt(0, 0, 0);
         this._camera.up.copy(this.camera.up)
         this._camera.updateProjectionMatrix();
@@ -83,10 +94,14 @@ class ViewHelper extends Object3D {
 
         this.target = new Vector3();
 
+        this.dummy = new Object3D();
+
 
 
         this.object = new Mesh(geometry, [posXM, negXM, posYM, negYM, posZM, negZM])
         this.add(this.object);
+
+        this.finishCallback = () => { }
 
     }
 
@@ -130,7 +145,7 @@ class ViewHelper extends Object3D {
             const intersection = intersects[0];
             const normal = intersection.normal;
 
-            prepareAnimationData(normal)
+            this.prepareAnimationData(normal)
 
             this.animating = true;
             return true;
@@ -141,26 +156,80 @@ class ViewHelper extends Object3D {
 
     prepareAnimationData(direction) {
         if (posX.equals(direction)) {
-
+            targetPosition.copy(posX);
+            euler.set(0, HP, HP);
         } else if (negX.equals(direction)) {
-
+            targetPosition.copy(negX);
+            euler.set(0, -HP, -HP);
         } else if (posY.equals(direction)) {
-
+            targetPosition.copy(posY);
+            euler.set(-HP, 0, P);
         } else if (negY.equals(direction)) {
-
+            targetPosition.copy(negY);
+            euler.set(HP, 0, 0);
         } else if (posZ.equals(direction)) {
-
+            targetPosition.copy(posZ);
+            euler.set(0, 0, 0);
         } else if (negZ.equals(direction)) {
-
+            targetPosition.copy(negZ);
+            euler.set(P, 0, P);
         } else {
             console.error('ViewHelper: Invalid axis.');
         }
 
+        targetQuaternion.setFromEuler(euler)
 
+        // 球半径
+        radius = this.camera.position.distanceTo(this.target);
+
+        // 相机最后的位置
+        targetPosition.multiplyScalar(radius).add(this.target);
+
+        // 这是一个假的物体
+        this.dummy.position.copy(this.target);
+
+        // 记录初始位置
+        this.dummy.lookAt(this.camera.position);
+        q1.copy(this.dummy.quaternion);
+
+        // 记录目标位置
+        this.dummy.lookAt(targetPosition);
+        q2.copy(this.dummy.quaternion);
+
+
+        /// 然后我猜做差就求出该旋转的角度
     }
 
     // 更新
-    update(delta) {
+    update(deltaTime) {
+        // 每次转的角度
+        const step = deltaTime * speed;
+
+        // q1向q2转，每次增量为step
+        q1.rotateTowards(q2, step);
+        // 计算每一步相机的位置
+        ///先将其设置为默认位置
+        this.camera.position.set(0, 0, 1);
+        /// 然后转刚才求出的角度，得到了相机这时的方向
+        this.camera.position.applyQuaternion(q1);
+        /// 乘半径，回到球坐标系中
+        this.camera.position.multiplyScalar(radius);
+        /// 将球坐标系移动到之前的中间
+        this.camera.position.add(this.target);
+
+        // 计算每一步相机的角度
+        this.camera.quaternion.rotateTowards(targetQuaternion, step);
+
+        // console.log('Q',q1.equals(q2));
+        // console.log('P',targetPosition.equals(this.camera.position));
+
+        // console.log(targetPosition,this.camera.position);
+        // 如果转到目标停止动画
+        if (q1.angleTo(q2) === 0) {
+            this.animating = false;
+            this.finishCallback()
+        }
+
 
     }
 
@@ -200,4 +269,4 @@ function getMaterial(color, text = null) {
     return new MeshBasicMaterial({ map: texture, toneMapped: false });
 }
 
-export { ViewHelper }
+export { CustomViewHelper }
