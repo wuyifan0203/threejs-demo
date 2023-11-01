@@ -1,10 +1,9 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-13 11:46:57
+ * @LastEditTime: 2023-11-01 16:57:25
  * @FilePath: /threejs-demo/examples/src/material/stencil.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   Scene,
   Vector3,
@@ -22,6 +21,7 @@ import {
   initOrthographicCamera,
   resize,
   initCustomGrid,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -38,7 +38,7 @@ function init() {
   camera.up.set(0, 0, 1);
   camera.updateProjectionMatrix();
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const scene = new Scene();
   initCustomGrid(scene);

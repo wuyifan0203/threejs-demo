@@ -4,7 +4,6 @@
  * @LastEditTime: 2023-07-10 15:13:07
  * @FilePath: /threejs-demo/packages/examples/material/clipping.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   Scene,
   Vector3,
@@ -22,6 +21,7 @@ import {
   initOrthographicCamera,
   resize,
   initGroundPlane,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 import { GUI } from '../lib/util/lil-gui.module.min.js';
@@ -68,7 +68,7 @@ function init() {
   renderer.localClippingEnabled = true;
   renderer.clippingPlanes = [globalPlane];
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const geometry = new TorusKnotGeometry(8, 2, 100, 36);
 
