@@ -186,7 +186,11 @@ function initScene() {
 
 function initCoordinates(axesLength) {
   return new CoordinateHelper(axesLength)
+}
 
+function initProgress(params) {
+  const progress = document.createElement('progress');
+  
 }
 
 export {
