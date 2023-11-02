@@ -21,9 +21,7 @@ import {
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import {
-  initRenderer,
-} from '../lib/tools/index.js';
+import { initRenderer, } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/house/';
 const url = {
@@ -71,20 +69,14 @@ const positionMap = {
     toilet: [2.54, 0, -9],
     livingRoom2: [6.6, -3.5, -6],
   },
-  toilet: {
-    livingRoom: [4, 0, 8],
-  },
+  toilet: { livingRoom: [4, 0, 8], },
   livingRoom2: {
     livingRoom: [8, -3.5, -4],
     masterBedroom: [-6, 0, 7],
     guestBedroom: [-9, 0, 0],
   },
-  masterBedroom: {
-    livingRoom2: [-6.5, 0, 6],
-  },
-  guestBedroom: {
-    livingRoom2: [-7, 0, -5.5],
-  },
+  masterBedroom: { livingRoom2: [-6.5, 0, 6], },
+  guestBedroom: { livingRoom2: [-7, 0, -5.5], },
 };
 
 (function () {
