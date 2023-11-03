@@ -188,8 +188,51 @@ function initCoordinates(axesLength) {
   return new CoordinateHelper(axesLength)
 }
 
-function initProgress(params) {
+function initProgress() {
+
+  const main = document.createElement('div');
+  main.style.position = 'absolute';
+  main.style.left = '50%';
+  main.style.bottom = '20%';
+  main.style.transform = 'translateX(-50%)';
+
   const progress = document.createElement('progress');
+  progress.max = 100;
+  progress.min = 0;
+  progress.style.width = '300px';
+  progress.style.height = '20px';
+  main.appendChild(progress)
+
+  const value = document.createElement('span');
+  value.style.marginLeft = '20px';
+  main.appendChild(value);
+
+  const label = document.createElement('div');
+  label.style.textAlign = 'center';
+  label.innerText = 'Loading...';
+  main.appendChild(label);
+
+
+  main.setText = function(text) {
+    label.innerText = text;
+  };
+
+  main.setProgress = function(num) {
+    progress.value = num;
+    value.innerText = num + '%';
+  }
+
+
+  main.show = function() {
+    main.style.display = 'block';
+  }
+
+  main.hide = function() {
+    main.style.display = 'none';
+  }
+
+
+  return main
   
 }
 
@@ -205,5 +248,6 @@ export {
   initGUI,
   initScene,
   resize,
-  initCoordinates
+  initCoordinates,
+  initProgress
 };
