@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-06 18:08:09
+ * @LastEditTime: 2023-11-09 16:49:39
  * @FilePath: /threejs-demo/examples/src/canvas/useOne.js
  */
 import {
@@ -29,22 +29,30 @@ function init() {
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
     const coord = initCoordinates();
+
+    scene.background = new Color(0xffffff);
     scene.add(coord);
     const grid = initCustomGrid(scene, 50, 50);
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
     const uiScene = initScene();
-    const uiCamera = new OrthographicCamera(0, renderer.domElement.clientWidth / 2, renderer.domElement.clientHeight / 2, 0, 0, 1);
+
+    const uiCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
 
-    const plane = new Mesh(new PlaneGeometry(renderer.domElement.clientWidth / 2, renderer.domElement.clientHeight), new MeshBasicMaterial({ color: 'red' }));
+    const plane = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ color: 'red' }));
+
+    // plane.position.set(renderer.domElement.clientWidth, renderer.domElement.clientHeight, 0);
+
+    uiCamera.zoom =2
+    uiCamera.updateProjectionMatrix();
 
     uiScene.add(plane);
 
     // uiScene.background = new Color(0xdf2345);
 
     const canvas = document.createElement('canvas');
-    canvas.width = renderer.domElement.clientWidth / 2;
+    canvas.width = renderer.domElement.clientWidth;
     canvas.height = renderer.domElement.clientHeight;
 
     var context = canvas.getContext('2d');
@@ -54,7 +62,7 @@ function init() {
 
     context.fillStyle = 'white';
     context.font = '30px Arial';
-    context.fillText('Hello, CanvasTexture!', 650, 30);
+    context.fillText('Hello, CanvasTexture!', 0, 30);
 
     const planeTexture = new CanvasTexture(canvas);
 
@@ -77,16 +85,28 @@ function init() {
 
     function render() {
         renderer.clear();
-        renderer.render(scene, camera);
-        renderer.getViewport(vtmp);
+        renderer.setScissorTest( true );
 
+        renderer.setClearColor( 0x000000, 0 );
+        renderer.setScissor( 0, 0, renderer.domElement.clientWidth, renderer.domElement.clientHeight );
+        renderer.setViewport(0,0,renderer.domElement.clientWidth,renderer.domElement.clientHeight);
+
+        renderer.render(plane, uiCamera);
+
+        // renderer.clear()
+
+        // renderer.setClearColor( 0xffffff, 1 );
         renderer.clearDepth();
-        // renderer.setViewport(0,0,1353,938)
-        renderer.render(uiScene, uiCamera);
+        // renderer.clearColor();
 
-        // console.log(vtmp);
 
-        renderer.setViewport(vtmp.x, vtmp.y, vtmp.z, vtmp.w)
+        renderer.setScissor( 40, 0, renderer.domElement.clientWidth - 40, renderer.domElement.clientHeight- 40 );
+
+        renderer.setViewport(40, 0, renderer.domElement.clientWidth - 40, renderer.domElement.clientHeight- 40);
+
+        renderer.render(scene, camera);
+
+        renderer.setScissorTest( false );
 
     }
 

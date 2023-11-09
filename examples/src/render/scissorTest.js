@@ -1,0 +1,125 @@
+/*
+ * @Date: 2023-04-28 13:30:57
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-11-09 13:04:44
+ * @FilePath: /threejs-demo/examples/src/render/scissorTest.js
+ */
+import {
+    Scene,
+    Mesh,
+    Vector3,
+    AmbientLight,
+    DirectionalLight,
+    BoxGeometry,
+    MeshStandardMaterial,
+    Clock,
+    GridHelper,
+    Vector2,
+    TextureLoader
+} from '../lib/three/three.module.js';
+import { OrbitControls } from '../lib/three/OrbitControls.js';
+
+import {
+    initRenderer,
+    initOrthographicCamera,
+    resize,
+    initGroundPlane,
+    initScene,
+} from '../lib/tools/index.js';
+
+window.onload = () => {
+    init();
+};
+
+function init() {
+    const loader = new TextureLoader()
+    const renderer = initRenderer({ logarithmicDepthBuffer: true });
+    renderer.shadowMap.enabled = true;
+    renderer.setAnimationLoop(animate);
+    renderer.autoClear = false;
+
+
+    const camera = initOrthographicCamera(new Vector3(-1000, 1000, 1000));
+    camera.lookAt(0, 0, 0);
+    camera.up.set(0, 0, 1);
+
+    const scene1 = initScene();
+    scene1.background = loader.load("../../public/images/sky2/nx.png")
+
+    const scene2 = initScene();
+
+    const light = new DirectionalLight();
+    light.castShadow = true;
+    light.shadow.mapSize.height = 2048;
+    light.shadow.mapSize.width = 2048;
+    light.shadow.camera.near = 1; // default
+    light.shadow.camera.far = 10000; // default
+    light.position.set(20, 20, 20);
+    light.target = scene2;
+
+    
+
+    scene2.add(light);
+    scene2.add(new AmbientLight());
+
+    initGroundPlane(scene2, new Vector2(20, 20));
+
+    const orbitControl = new OrbitControls(camera, renderer.domElement);
+
+    const mesh = new Mesh(new BoxGeometry(5, 4, 3), new MeshStandardMaterial({ color: 0x049ef4, roughness: 0 }));
+    mesh.position.set(0, 0, 6);
+    mesh.castShadow = true;
+    scene2.add(mesh);
+
+    const scene3 = initScene();
+    const grid = new GridHelper(10, 10);
+    grid.castShadow = true;
+    scene3.add(grid);
+
+    const clock = new Clock();
+
+    let needUpdate = false;
+
+    let width = renderer.domElement.clientWidth / 2;
+    let height = renderer.domElement.clientHeight / 2;
+
+    function render() {
+        renderer.clear();
+        orbitControl.update();
+
+        renderer.setScissorTest(true);
+        renderer.setScissor(0, 0,width, height);
+        renderer.setViewport(0, 0, width,height);
+        renderer.render(scene1, camera);
+        renderer.render(scene2, camera);
+        renderer.render(scene3, camera);
+
+        renderer.setScissor(width, 0, width, height);
+        renderer.setViewport(width, 0, width, height);
+        renderer.render(scene1, camera);
+
+        renderer.setScissor(0, height, width, height);
+        renderer.setViewport(0, height, width, height);
+        renderer.render(scene2, camera);
+
+        renderer.setScissor(width, height, width, height);
+        renderer.setViewport(width, height, width, height);
+        renderer.render(scene3, camera);
+
+        renderer.setScissorTest(false);
+    }
+
+    function animate() {
+        const time = clock.getElapsedTime();
+        mesh.rotation.x = time * 2;
+        mesh.rotation.y = time * 2;
+        grid.rotation.z = time * 3;
+        needUpdate = true;
+
+        if (needUpdate) {
+            render();
+        }
+    }
+
+    resize(renderer, camera);
+}

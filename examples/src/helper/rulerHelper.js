@@ -100,11 +100,11 @@ function init() {
     const X = 50; // 尺子的起点位置
     const Y = 50; // 尺子的起点位置
     const lineWidth = 900; // 长度
-    const [tenHeight, fiveHeeight, oneHeight] = [20, 15, 10];
+    const [tenHeight, fiveHeight, oneHeight] = [20, 15, 10];
 
     const l1 = height - tenHeight;
     const l11 = height - tenHeight - 10;
-    const l2 = height - fiveHeeight;
+    const l2 = height - fiveHeight;
     const l3 = height - oneHeight;
     // 下划线
     ctx.beginPath();
@@ -135,9 +135,9 @@ function init() {
 
     const tip = right;
     // let textScale = split > 10 ? split / 10 : 1;
-    let sacle = 1;
+    let scale = 1;
     if (unit < 20) {
-      sacle = 10;
+      scale = 10;
     }
     // console.table({offset});
 
@@ -147,9 +147,9 @@ function init() {
       ctx.beginPath();
       ctx.moveTo(x, X);
 
-      if (i % (split * sacle) === 0) {
+      if (i % (split * scale) === 0) {
         ctx.lineTo(x, l1);
-        const text = tip + g * sacle; // 标量文字为当前刻度值
+        const text = tip + g * scale; // 标量文字为当前刻度值
         const textWidth = ctx.measureText(text).width; // 计算标量文字的宽度
         ctx.fillText(text, x - textWidth / 2, l11); // 绘制标量文字
         g++;
@@ -205,17 +205,17 @@ function init() {
     const Y = 50; // 尺子的起点位置
     const lineWidth = 900; // 长度
     const lineHeight = 400; // 高度
-    const [tenHeight, fiveHeeight, oneHeight] = [20, 15, 10];
+    const [tenHeight, fiveHeight, oneHeight] = [20, 15, 10];
     // 基线
 
     const X10 = Y - tenHeight;
     const textHeightX = X10 - 10;
-    const X5 = Y - fiveHeeight;
+    const X5 = Y - fiveHeight;
     const X1 = Y - oneHeight;
 
     const Y10 = X - tenHeight;
     const textHeightY = Y10 - 10;
-    const Y5 = X - fiveHeeight;
+    const Y5 = X - fiveHeight;
     const Y1 = X - oneHeight;
 
     ctx.beginPath();
