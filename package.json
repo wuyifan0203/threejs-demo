@@ -1,25 +1,22 @@
 {
-  "name": "threejsdemo",
-  "version": "0.0.3",
-  "description": "this is a demo which was written when I learn threejs",
-  "main": "no",
-  "author": "Yifan Wu",
-  "private": true,
-  "license": "MIT",
+  "name": "examples",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs"
+  },
+  "keywords": [],
+  "author": "",
   "dependencies": {
-    "@tweenjs/tween.js": "^20.0.3",
-    "delaunator": "^5.0.0",
-    "poly2tri": "^1.5.0",
-    "polybooljs": "^1.2.0",
-    "three": "^0.157.0"
+    "three": "^0.156.0"
   },
+  "license": "MIT",
   "devDependencies": {
-    "@types/three": "^0.156.0",
-    "eslint": "^8.43.0",
-    "vite": "^4.4.8"
-  },
-  "engines": {
-    "node": ">=16.14.0",
-    "pnpm": ">=8.6.9"
+    "vite": "^4.4.8",
+    "vitepress": "1.0.0-rc.10"
   }
 }
