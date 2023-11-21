@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:24:41
- * @FilePath: /threejs-demo/examples/src/zFighting/pologyOffsetTest.js
+ * @LastEditTime: 2023-11-21 20:58:28
+ * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
   Scene,
@@ -59,21 +59,20 @@ function init() {
   window.camera = camera;
   window.scene = scene;
   const redMaterial = new MeshPhongMaterial({ color: 'red' });
-  const greenMaterial = new MeshPhongMaterial({ color: 'blue' });
-  const blueMaterial = new MeshPhongMaterial({ color: 'yellow' });
+  const blueMaterial = new MeshPhongMaterial({ color: 'blue' });
+  const yellowMaterial = new MeshPhongMaterial({ color: 'yellow' });
 
-  const mlist = [redMaterial, greenMaterial, blueMaterial];
   const plane = new PlaneGeometry(1, 1);
 
   const mesh = new Mesh(plane, redMaterial);
   mesh.scale.set(10, 10, 1);
   scene.add(mesh);
 
-  const mesh2 = new Mesh(plane, greenMaterial);
+  const mesh2 = new Mesh(plane, blueMaterial);
   mesh2.scale.set(4, 4, 1);
   scene.add(mesh2);
 
-  const mesh3 = new Mesh(plane, blueMaterial);
+  const mesh3 = new Mesh(plane, yellowMaterial);
   mesh3.scale.set(2, 2, 1);
   scene.add(mesh3);
 
@@ -90,60 +89,22 @@ function init() {
     opacity: 1,
   };
 
-  gui.add(material, 'polygonOffset').onChange((e) => {
-    mlist.forEach((m) => {
-      renderer.state.setPolygonOffset(true, 1);
-      m.polygonOffset = e;
-      m.needsUpdate = true;
-    });
-  });
+  const redFolder = gui.addFolder('Red');
+  redFolder.add(redMaterial, 'polygonOffset').onChange(() => redMaterial.needsUpdate = true);
+  redFolder.add(redMaterial, 'polygonOffsetFactor', -100, 100, 0.1).onChange(() => redMaterial.needsUpdate = true);
+  redFolder.add(redMaterial, 'polygonOffsetUnits', -100, 100, 0.1).onChange(() => redMaterial.needsUpdate = true);
+  redFolder.add(redMaterial, 'depthTest').onChange(() => redMaterial.needsUpdate = true);
 
-  gui.add(material, 'polygonOffsetFactor', -100, 100, 1).onChange((e) => {
-    mlist.forEach((m) => {
-      m.polygonOffsetFactor = e;
-      m.needsUpdate = true;
-    });
-  });
+  const blueFolder = gui.addFolder('Blue');
+  blueFolder.add(blueMaterial, 'polygonOffset').onChange(() => blueMaterial.needsUpdate = true);
+  blueFolder.add(blueMaterial, 'polygonOffsetFactor', -100, 100, 0.1).onChange(() => blueMaterial.needsUpdate = true);
+  blueFolder.add(blueMaterial, 'polygonOffsetUnits', -100, 100, 0.1).onChange(() => blueMaterial.needsUpdate = true);
+  blueFolder.add(blueMaterial, 'depthTest').onChange(() => blueMaterial.needsUpdate = true);
 
-  gui.add(material, 'polygonOffsetUnits', -100, 100, 0.1).onChange((e) => {
-    mlist.forEach((m) => {
-      m.polygonOffsetUnits = e;
-      m.needsUpdate = true;
-    });
-  });
+  const yellowFolder = gui.addFolder('Yellow');
+  yellowFolder.add(yellowMaterial, 'polygonOffset').onChange(() => yellowMaterial.needsUpdate = true);
+  yellowFolder.add(yellowMaterial, 'polygonOffsetFactor', -100, 100, 0.1).onChange(() => yellowMaterial.needsUpdate = true);
+  yellowFolder.add(yellowMaterial, 'polygonOffsetUnits', -100, 100, 0.1).onChange(() => yellowMaterial.needsUpdate = true);
+  yellowFolder.add(yellowMaterial, 'depthTest').onChange(() => yellowMaterial.needsUpdate = true);
 
-  gui.add(material, 'shininess', 0, 100, 0.01).onChange((e) => {
-    mlist.forEach((m) => {
-      m.shininess = e;
-      m.needsUpdate = true;
-    });
-  });
-
-  gui.add(material, 'transparent').onChange((e) => {
-    mlist.forEach((m) => {
-      m.transparent = e;
-      m.needsUpdate = true;
-    });
-  });
-
-  gui.add(material, 'depthTest').onChange((e) => {
-    mlist.forEach((m) => {
-      m.depthTest = e;
-      m.needsUpdate = true;
-    });
-  });
-
-  gui.add(material, 'depthWrite', 0, 100, 0.01).onChange((e) => {
-    mlist.forEach((m) => {
-      m.depthWrite = e;
-      m.needsUpdate = true;
-    });
-  });
-
-  gui.add(material, 'opacity', 0, 1, 0.01).onChange((e) => {
-    mlist.forEach((m) => {
-      m.opacity = e;
-      m.needsUpdate = true;
-    });
-  });
 }
