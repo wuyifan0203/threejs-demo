@@ -2,8 +2,8 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-27 20:50:16
- * @FilePath: /threejs-demo/src/tween/potal.js
+ * @LastEditTime: 2023-11-29 20:08:58
+ * @FilePath: /threejs-demo/src/tween/portal.js
  */
 import {
     Mesh,
@@ -28,7 +28,6 @@ import {
     resize,
     initPerspectiveCamera,
     initGUI,
-    initCustomGrid
 } from '../lib/tools/index.js';
 import {
     Tween, update, Easing,
@@ -62,7 +61,9 @@ async function init() {
     const cameraEye = new Mesh(new SphereGeometry(2), new MeshBasicMaterial({ color: 0xdddddd }));
     parent.add(cameraEye);
 
-    scene.add(parent)
+    scene.add(parent);
+
+
 
     parent.position.set(-20, 0, 0);
 
@@ -70,15 +71,16 @@ async function init() {
 
     const loader = new TextureLoader();
 
-    const loaderAudio = new AudioLoader();
+    // const loaderAudio = new AudioLoader();
     const listener = new AudioListener();
-    const buffer = await loaderAudio.loadAsync('../../public/audio/Shooting Star.mp3');
+    // const buffer = await loaderAudio.loadAsync('../../public/audio/Shooting Star.mp3');
 
     const audio = new Audio(listener);
-    audio.setBuffer(buffer);
+    const songElement = document.getElementById( 'song' )
+    audio.setMediaElementSource(songElement )
     audio.setLoop(true);
     audio.setVolume(0.5);
-    audio.play();
+    songElement.play();
 
     splineCamera.add( listener );
 
