@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-29 20:08:58
+ * @LastEditTime: 2023-11-29 20:26:49
  * @FilePath: /threejs-demo/src/tween/portal.js
  */
 import {
@@ -19,7 +19,6 @@ import {
     TextureLoader,
     MirroredRepeatWrapping,
     AudioListener,
-    AudioLoader,
     Audio
 } from '../lib/three/three.module.js';
 import {
@@ -63,17 +62,13 @@ async function init() {
 
     scene.add(parent);
 
-
-
     parent.position.set(-20, 0, 0);
 
     const gui = initGUI();
 
     const loader = new TextureLoader();
 
-    // const loaderAudio = new AudioLoader();
     const listener = new AudioListener();
-    // const buffer = await loaderAudio.loadAsync('../../public/audio/Shooting Star.mp3');
 
     const audio = new Audio(listener);
     const songElement = document.getElementById( 'song' )
@@ -84,8 +79,6 @@ async function init() {
 
     splineCamera.add( listener );
 
-
-
     const texture = await loader.loadAsync('../../public/images/start/start.jpg');
 
     texture.wrapS = MirroredRepeatWrapping;
@@ -95,14 +88,13 @@ async function init() {
 
     const tween = new Tween({ speed: 2, repeatY: 2 }).to({ speed: [8, 2], repeatY: [6, 2] }, 6000).easing(Easing.Quartic.In);
     const o = {
-        godMode: true,
+        godMode: false,
         speed: 2,
         addSpeed() {
             tween.start()
         }
     };
 
-    console.log(tween);
 
     tween.onUpdate((e) => {
         texture.repeat.y = e.repeatY;
