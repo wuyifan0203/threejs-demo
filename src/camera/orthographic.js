@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-17 14:41:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-17 19:10:26
- * @FilePath: /threejs-demo/examples/src/camera/orthographic.js
+ * @LastEditTime: 2023-11-28 13:20:43
+ * @FilePath: /threejs-demo/src/camera/orthographic.js
  */
 import {
     Vector3,
@@ -40,6 +40,8 @@ function init() {
     const cameraHelper = new CameraHelper(orthographicCamera);
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
+
+    window.target = orthographicCamera
 
     const light = new PointLight(0xffffff, 1);
     light.position.copy(orthographicCamera);

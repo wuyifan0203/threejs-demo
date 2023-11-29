@@ -34,6 +34,8 @@ function initRenderer(props = {}) {
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById('webgl-output').appendChild(renderer.domElement);
 
+  window.renderer = renderer;
+
   return renderer;
 }
 
@@ -48,6 +50,8 @@ function initPerspectiveCamera(initialPosition) {
   const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
+
+  window.camera = camera;
 
   return camera;
 }
@@ -66,6 +70,8 @@ function initOrthographicCamera(initialPosition) {
   const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
+
+  window.camera = camera;
 
   return camera;
 }
