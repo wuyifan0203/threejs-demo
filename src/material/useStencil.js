@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-29 20:20:50
+ * @LastEditTime: 2023-11-29 20:58:41
  * @FilePath: /threejs-demo/src/material/useStencil.js
  */
 import {
@@ -10,6 +10,10 @@ import {
     MeshBasicMaterial,
     Scene,
     Vector3,
+    ConeGeometry,
+    MeshPhongMaterial,
+    AmbientLight,
+    DirectionalLight
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -35,14 +39,20 @@ function init() {
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
+    const envLight = new AmbientLight();
+    const directionalLight = new DirectionalLight();
+    directionalLight.target
+
+    camera.add(directionalLight);
+
     const sceneX = new Scene();
     const sceneY = new Scene();
     const sceneZ = new Scene();
     const sceneMain = new Scene();
 
-    const geometry = new BoxGeometry(10, 10, 10);
+    const box = new BoxGeometry(10, 10, 10);
 
-    const material = [
+    const boxMaterial = [
         new MeshBasicMaterial({ color: 'red' }),
         new MeshBasicMaterial({ color: 'orange' }),
         new MeshBasicMaterial({ color: 'skyblue' }),
@@ -50,18 +60,24 @@ function init() {
         new MeshBasicMaterial({ color: 'yellow' }),
         new MeshBasicMaterial({ color: 'lime' }),
     ]
-    const boxMesh = new Mesh(geometry,material);
+    const boxMesh = new Mesh(box, boxMaterial);
 
-    sceneMain.add(boxMesh);
+    sceneMain.add(boxMesh,envLight);
 
-    sceneX.add()
+    const coneMaterial = new MeshPhongMaterial({ color: 0xaaaaaa })
+    const cone = new ConeGeometry(2, 6, 32);
+    const coneMesh = new Mesh(cone, coneMaterial);
+
+    sceneX.add(coneMesh,envLight.clone())
 
     const o = { debug: false }
 
     const gui = initGUI();
 
     gui.add(o, 'debug').onChange((e) => {
-        renderer.setAnimationLoop(!e ? render : renderDebug)
+        renderer.setAnimationLoop(!e ? render : renderDebug);
+
+        console.log({sceneMain,sceneX});
     })
 
     function render() {
