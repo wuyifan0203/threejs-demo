@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-29 20:58:41
+ * @LastEditTime: 2023-11-30 17:53:30
  * @FilePath: /threejs-demo/src/material/useStencil.js
  */
 import {
@@ -13,7 +13,9 @@ import {
     ConeGeometry,
     MeshPhongMaterial,
     AmbientLight,
-    DirectionalLight
+    DirectionalLight,
+    PerspectiveCamera,
+    Color
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -41,14 +43,20 @@ function init() {
 
     const envLight = new AmbientLight();
     const directionalLight = new DirectionalLight();
-    directionalLight.target
-
-    camera.add(directionalLight);
 
     const sceneX = new Scene();
     const sceneY = new Scene();
     const sceneZ = new Scene();
     const sceneMain = new Scene();
+
+
+    sceneX.add(directionalLight.clone());
+    sceneY.add(directionalLight.clone());
+    sceneZ.add(directionalLight.clone());
+
+    sceneX.background = new Color('#cffccf');
+    sceneY.background = new Color('orange');
+    sceneZ.background = new Color('#050589');
 
     const box = new BoxGeometry(10, 10, 10);
 
@@ -62,13 +70,13 @@ function init() {
     ]
     const boxMesh = new Mesh(box, boxMaterial);
 
-    sceneMain.add(boxMesh,envLight);
+    sceneMain.add(boxMesh, envLight);
 
     const coneMaterial = new MeshPhongMaterial({ color: 0xaaaaaa })
     const cone = new ConeGeometry(2, 6, 32);
     const coneMesh = new Mesh(cone, coneMaterial);
 
-    sceneX.add(coneMesh,envLight.clone())
+    sceneX.add(coneMesh, envLight.clone())
 
     const o = { debug: false }
 
@@ -77,18 +85,46 @@ function init() {
     gui.add(o, 'debug').onChange((e) => {
         renderer.setAnimationLoop(!e ? render : renderDebug);
 
-        console.log({sceneMain,sceneX});
+        renderer.setScissorTest(e);
+        console.log({ sceneMain, sceneX });
     })
 
     function render() {
         renderer.clear();
+        directionalLight.position.copy(camera.position);
+        const [w, h] = [window.innerWidth, window.innerHeight];
+        renderer.setViewport(0,0,w,h);
         renderer.render(sceneMain, camera);
+
         orbitControls.update();
     }
 
     function renderDebug() {
         renderer.clear();
+
+        const [w, h] = [window.innerWidth, window.innerHeight];
+        directionalLight.position.copy(camera.position);
+
+        const [hw, hh] = [w / 2, h / 2];
+
+
+        renderer.setScissor(0, hh, hw, hh);
+        renderer.setViewport(0, hh, hw, hh);
+        renderer.render(sceneMain, camera);
+
+        renderer.setScissor(hw, hh, hw, hh);
+        renderer.setViewport(hw, hh, hw, hh);
         renderer.render(sceneX, camera);
+
+        renderer.setScissor(0, 0, hw, hh);
+        renderer.setViewport(0, 0, hw, hh);
+        renderer.render(sceneY, camera);
+
+        renderer.setScissor(hw, 0, hw, hh);
+        renderer.setViewport(hw, 0, hw, hh);
+        renderer.render(sceneZ, camera);
+
+
         orbitControls.update();
     }
 
