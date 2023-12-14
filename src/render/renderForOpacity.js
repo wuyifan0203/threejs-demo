@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-22 13:10:02
- * @FilePath: /threejs-demo/examples/src/render/renderForOpacity.js
+ * @LastEditTime: 2023-12-14 19:37:25
+ * @FilePath: /threejs-demo/src/render/renderForOpacity.js
  */
 import {
     Scene,
@@ -12,7 +12,6 @@ import {
     DirectionalLight,
     BoxGeometry,
     MeshStandardMaterial,
-    Clock,
     MeshPhysicalMaterial,
     Vector2,
     TextureLoader
@@ -31,8 +30,7 @@ window.onload = () => {
 };
 
 function init() {
-    const loader = new TextureLoader()
-    const renderer = initRenderer({ logarithmicDepthBuffer: true });
+    const renderer = initRenderer();
     renderer.shadowMap.enabled = true;
     renderer.setClearColor(0xfffee);
     renderer.autoClear = false;
@@ -53,13 +51,11 @@ function init() {
     light.position.set(20, 20, 20);
     light.target = scene1;
 
-    scene1.background = loader.load("../../public/images/sky2/nx.png")
 
     scene1.add(light);
     scene1.add(new AmbientLight());
 
 
-    initGroundPlane(scene1, new Vector2(20, 20));
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
@@ -69,6 +65,7 @@ function init() {
     scene1.add(mesh);
 
     const scene2 = new Scene();
+
     const geometry = new BoxGeometry(6, 4, 4);
     const material = new MeshPhysicalMaterial({
         color: 0xaaaaaa, 

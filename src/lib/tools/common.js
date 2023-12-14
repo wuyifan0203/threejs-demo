@@ -13,6 +13,8 @@ import {
   Group,
   OrthographicCamera,
   Scene,
+  CanvasTexture,
+  ClampToEdgeWrapping
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
@@ -67,7 +69,7 @@ function initOrthographicCamera(initialPosition) {
   const w = window.innerWidth;
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000000);
+  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
@@ -242,6 +244,28 @@ function initProgress() {
   
 }
 
+function createBackgroundTexture(color, color2) {
+  const canvas = document.createElement('canvas');
+  canvas.width = window.screen.width;
+  canvas.height = window.screen.height;
+  const ctx = canvas.getContext('2d');
+
+  return (function () {
+    const gradient = ctx.createLinearGradient(0, 0, 0, window.screen.height);
+
+    gradient.addColorStop(0.25, color2);
+    gradient.addColorStop(1, color);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, window.screen.width, window.screen.height);
+
+    // 1
+    const texture = new CanvasTexture(canvas);
+    texture.wrapS = texture.wrapT = ClampToEdgeWrapping;
+    return texture;
+  })();
+}
+
 export {
   initAxesHelper,
   initDefaultLighting,
@@ -255,5 +279,6 @@ export {
   initScene,
   resize,
   initCoordinates,
-  initProgress
+  initProgress,
+  createBackgroundTexture
 };

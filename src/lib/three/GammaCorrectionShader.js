@@ -7,11 +7,7 @@ const GammaCorrectionShader = {
 
 	name: 'GammaCorrectionShader',
 
-	uniforms: {
-
-		'tDiffuse': { value: null }
-
-	},
+	uniforms: {'tDiffuse': { value: null }},
 
 	vertexShader: /* glsl */`
 
