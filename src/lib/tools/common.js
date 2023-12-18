@@ -31,8 +31,9 @@ function initRenderer(props = {}) {
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.setPixelRatio(devicePixelRatio);
 
-  renderer.setClearColor(new Color(0x000000));
+  renderer.setClearColor(new Color(0xffffff));
   renderer.setSize(window.innerWidth, window.innerHeight);
   document.getElementById('webgl-output').appendChild(renderer.domElement);
 
@@ -182,14 +183,18 @@ function initCustomGrid(scene, width = 50, height = 50) {
 }
 
 function initOrbitControls(camera, container) {
-  return new OrbitControls(camera, container);
+  const controls =  new OrbitControls(camera, container);
+  window.controls = controls;
+  return controls;
 }
 
 function initGUI() {
   return new GUI()
 }
 function initScene() {
-  return new Scene();
+  const scene = new Scene();
+  window.scene = scene
+  return scene;
 }
 
 function initCoordinates(axesLength) {

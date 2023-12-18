@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-14 17:51:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-14 21:00:43
+ * @LastEditTime: 2023-12-15 14:24:34
  * @FilePath: /threejs-demo/src/render/sawtooth.js
  */
 
@@ -79,10 +79,6 @@ function init() {
     mesh2.position.set(1, 1, 1);
     scene.add(mesh2);
 
-    const mesh3 = new Mesh(geometry, material);
-    mesh3.position.set(2, 2, 2);
-    scene.add(mesh3);
-
 
     const renderTarget = new WebGLRenderTarget(window.innerWidth, window.innerHeight, { colorSpace: SRGBColorSpace, });
 
@@ -90,7 +86,6 @@ function init() {
     const rendererPass = new RenderPass(scene, camera);
     const backgroundPass = new RenderPass(scene2, camera);
     rendererPass.clear = false;
-    const outputPass = new OutputPass();
     const gamma = new ShaderPass(GammaCorrectionShader);
     const copyPass = new ShaderPass(CopyShader);
     const FXAA = new ShaderPass(FXAAShader);
@@ -99,7 +94,7 @@ function init() {
     composer.addPass(backgroundPass)
     composer.addPass(rendererPass);
     // composer.addPass(gamma);
-    composer.addPass(FXAA);
+    // composer.addPass(FXAA);
     // composer.addPass(outputPass);
     composer.addPass(copyPass);
 
@@ -113,19 +108,19 @@ function init() {
         orbitControl.update();
 
 
-        const halfWidth = renderer.domElement.offsetWidth / 2;
+        // const halfWidth = renderer.domElement.offsetWidth / 2;
 
 
-        renderer.setScissorTest(true);
+        // renderer.setScissorTest(true);
 
-        renderer.setScissor(0, 0, halfWidth - 1, renderer.domElement.offsetHeight);
-        renderer.render(scene2, camera)
-        renderer.render(scene, camera);
+        // renderer.setScissor(0, 0, halfWidth - 1, renderer.domElement.offsetHeight);
+        // renderer.render(scene2, camera)
+        // renderer.render(scene, camera);
 
-        renderer.setScissor(halfWidth, 0, halfWidth, renderer.domElement.offsetHeight);
+        // renderer.setScissor(halfWidth, 0, halfWidth, renderer.domElement.offsetHeight);
         composer.render();
 
-        renderer.setScissorTest(false);
+        // renderer.setScissorTest(false);
     }
 
     renderer.setAnimationLoop(render);

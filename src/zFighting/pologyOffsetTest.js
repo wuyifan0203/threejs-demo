@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-21 20:58:28
+ * @LastEditTime: 2023-12-18 14:49:39
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
@@ -24,7 +24,7 @@ window.onload = () => {
 };
 
 function init() {
-  const renderer = initRenderer();
+  const renderer = initRenderer({ precision: 'highp' });
   const stats = new Stats();
   stats.showPanel(0);
   document.getElementById('webgl-output').append(stats.dom);
