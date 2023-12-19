@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-18 21:01:45
+ * @LastEditTime: 2023-12-19 20:05:24
  * @FilePath: /threejs-demo/src/render/DepthPeeling.js
  */
 
@@ -62,14 +62,40 @@ class DepthPeeling {
                 // 关闭混合
                 cloneMaterial.blending = NoBlending;
 
+                console.log(cloneMaterial);
+
                 cloneMaterial.onBeforeCompile = (shader) => {
                     console.log(shader);
+
+                    // 赋值
+                    shader.uniforms.uReciprocalScreenSize = this.globalUniforms.uReciprocalScreenSize;
+                    shader.uniforms.uPrevDepthTexture = this.globalUniforms.uPrevDepthTexture;
+
+                    shader.fragmentShader = /* glsl */ `
+                    // --- DEPTH PEELING SHADER CHUNK (START) (uniform definition)
+                    uniform vec2 uReciprocalScreenSize;
+                    uniform sampler2D uPrevDepthTexture;
+                    // --- DEPTH PEELING SHADER CHUNK (END)
+                    ${shader.fragmentShader}`;
+
+                    //peel depth
+                    shader.fragmentShader = shader.fragmentShader.replace(
+                        /}$/gm,
+                        /* glsl */`
+                        // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
+                          vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+                          float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
+                          if( prevDepth >= gl_FragCoord.z )
+                              discard;
+                        // --- DEPTH PEELING SHADER CHUNK (END)
+                        }`);
                 }
-
+                object.material = cloneMaterial;
+                object.material.needsUpdate = true;
             }
-
         })
 
+        this.scene.add(cloneObject);
     }
 
     render(renderer, camera) {
@@ -96,13 +122,15 @@ class DepthPeeling {
         renderer.autoClear = originAutoClear;
         renderer.clear();
 
-        this.layers.forEach((layer)=>{
+        this.layers.forEach((layer) => {
             this.quad.material.uniforms.tDiffuse.value = layer.texture;
             this.quad.material.needsUpdate = true;
             this.quad.render(renderer);
         })
 
         renderer.setClearColor(this.originClearColor);
+
+        console.log('render');
     }
 
     setScreenSize(width, height, pixelRatio) {
@@ -117,6 +145,7 @@ class DepthPeeling {
             renderTarget.depthTexture.dispose();
             renderTarget.depthTexture = new DepthTexture(w, h);
         })
+        console.log(this, 'setScreenSize');
 
     }
 
@@ -136,6 +165,7 @@ class DepthPeeling {
             const renderTarget = new WebGLRenderTarget(w, h, { depthTexture: new DepthTexture(w, h) });
             this.layers.push(renderTarget);
         }
+        console.log(this, 'setDepth');
     }
 }
 

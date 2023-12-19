@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-18 14:49:39
+ * @LastEditTime: 2023-12-19 10:08:15
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
@@ -24,7 +24,7 @@ window.onload = () => {
 };
 
 function init() {
-  const renderer = initRenderer({ precision: 'highp' });
+  const renderer = initRenderer();
   const stats = new Stats();
   stats.showPanel(0);
   document.getElementById('webgl-output').append(stats.dom);
@@ -58,9 +58,9 @@ function init() {
   render();
   window.camera = camera;
   window.scene = scene;
-  const redMaterial = new MeshPhongMaterial({ color: 'red' });
-  const blueMaterial = new MeshPhongMaterial({ color: 'blue' });
-  const yellowMaterial = new MeshPhongMaterial({ color: 'yellow' });
+  const redMaterial = new MeshPhongMaterial({ color: 'red', polygonOffset: true });
+  const blueMaterial = new MeshPhongMaterial({ color: 'blue', polygonOffset: true });
+  const yellowMaterial = new MeshPhongMaterial({ color: 'yellow', polygonOffset: true });
 
   const plane = new PlaneGeometry(1, 1);
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-18 20:44:09
+ * @LastEditTime: 2023-12-19 14:21:35
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
@@ -72,6 +72,7 @@ async function init() {
     scene.add(new AmbientLight());
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
+    orbitControl.addEventListener('change', render);
 
     const sphereMesh = new Mesh(new SphereGeometry(), new MeshStandardMaterial());
     sphereMesh.position.set(1.5, 0, 3);
@@ -105,29 +106,34 @@ async function init() {
     planeMesh2.position.set(-1.2, 0, -1.5);
     scene.add(planeMesh2);
 
-    const gui = initGUI();
-
-    gui.add(params, 'size', Object.keys(sizeMap)).onChange(() => {
-        resize()
-    });
-    gui.add(params, 'layers', [1, 2, 3, 4, 5, 6]);
-    gui.add(params, 'enable');
-
-    function render() {
-        params.enable ? renderer.render(scene, camera) : () => { };
-    }
-    render();
-
-    orbitControl.addEventListener('change', render);
-
     const depthPeeling = new DepthPeeling(size.x, size.y, params.layers, renderer.getPixelRatio());
     depthPeeling.add(scene)
+
+    const gui = initGUI();
+
+    gui.add(params, 'size', Object.keys(sizeMap)).onChange(()=>{
+        resize();
+        render();
+    });
+    gui.add(params, 'layers', [1, 2, 3, 4, 5, 6]).onChange((e)=>{
+        depthPeeling.setDepth(e);
+        render()
+    });
+    gui.add(params, 'enable').onChange(render);
+
+
+    function render() {
+        params.enable ? renderer.render(scene, camera) : depthPeeling.render(renderer,camera);
+    }
+
+    render();
 
     function resize() {
         const { x, y } = sizeMap[params.size];
         renderer.setSize(x, y);
         camera.aspect = x / y;
         camera.updateProjectionMatrix();
+        depthPeeling.setScreenSize(x,y,renderer.getPixelRatio());
     }
 
     window.addEventListener('resize', resize);
