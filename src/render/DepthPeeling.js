@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-19 20:05:24
+ * @LastEditTime: 2023-12-20 15:21:33
  * @FilePath: /threejs-demo/src/render/DepthPeeling.js
  */
 
@@ -60,7 +60,7 @@ class DepthPeeling {
             if (object instanceof Mesh && object.material instanceof Material) {
                 const cloneMaterial = object.material.clone();
                 // 关闭混合
-                cloneMaterial.blending = NoBlending;
+                // cloneMaterial.blending = NoBlending;
 
                 console.log(cloneMaterial);
 
@@ -118,8 +118,9 @@ class DepthPeeling {
 
         }, this.result);
 
+        
+        renderer.setClearColor(this.originClearColor);
         renderer.setRenderTarget(originTarget);
-        renderer.autoClear = originAutoClear;
         renderer.clear();
 
         this.layers.forEach((layer) => {
@@ -128,9 +129,14 @@ class DepthPeeling {
             this.quad.render(renderer);
         })
 
-        renderer.setClearColor(this.originClearColor);
+  
+        renderer.autoClear = originAutoClear;
 
         console.log('render');
+    }
+
+    getDepth(){
+        return this._depth;
     }
 
     setScreenSize(width, height, pixelRatio) {
@@ -146,7 +152,6 @@ class DepthPeeling {
             renderTarget.depthTexture = new DepthTexture(w, h);
         })
         console.log(this, 'setScreenSize');
-
     }
 
     setDepth(depth) {

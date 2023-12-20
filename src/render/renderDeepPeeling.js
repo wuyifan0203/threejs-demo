@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-19 14:21:35
+ * @LastEditTime: 2023-12-20 16:55:35
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
@@ -27,7 +27,8 @@ import {
     initOrbitControls,
     initGUI,
 } from '../lib/tools/index.js';
-import { DepthPeeling } from './DepthPeeling.js'
+import { DepthPeeling } from './DepthPeeling.js';
+import { debugDeepPeeling } from './debugDepthPeeling.js'
 
 window.onload = () => {
     init();
@@ -81,7 +82,7 @@ async function init() {
 
     const knotMesh = new Mesh(
         new TorusKnotGeometry(1, 0.4, 128, 32),
-        new MeshStandardMaterial({ transparent: true, opacity: 0.7, side: 2 })
+        new MeshStandardMaterial({ transparent: true, opacity: 0.5, side: 2 })
     );
     knotMesh.receiveShadow = true;
     scene.add(knotMesh);
@@ -106,26 +107,38 @@ async function init() {
     planeMesh2.position.set(-1.2, 0, -1.5);
     scene.add(planeMesh2);
 
+
+    /// depthPeeling 
     const depthPeeling = new DepthPeeling(size.x, size.y, params.layers, renderer.getPixelRatio());
-    depthPeeling.add(scene)
+    // add scene
+    depthPeeling.add(scene);
+
+    const debug = debugDeepPeeling(scene,camera);
+    debug.setDepth(params.layers);
 
     const gui = initGUI();
 
-    gui.add(params, 'size', Object.keys(sizeMap)).onChange(()=>{
+    gui.add(params, 'size', Object.keys(sizeMap)).onChange(() => {
         resize();
         render();
     });
-    gui.add(params, 'layers', [1, 2, 3, 4, 5, 6]).onChange((e)=>{
+    gui.add(params, 'layers', [1, 2, 3, 4, 5, 6]).onChange((e) => {
         depthPeeling.setDepth(e);
+        debug.setDepth(e)
         render()
     });
     gui.add(params, 'enable').onChange(render);
 
 
     function render() {
-        params.enable ? renderer.render(scene, camera) : depthPeeling.render(renderer,camera);
+        if (!params.enable) {
+            renderer.render(scene, camera)
+        } else {
+            depthPeeling.render(renderer, camera);
+            debug.renderImage()
+        }
     }
-
+    resize();
     render();
 
     function resize() {
@@ -133,7 +146,8 @@ async function init() {
         renderer.setSize(x, y);
         camera.aspect = x / y;
         camera.updateProjectionMatrix();
-        depthPeeling.setScreenSize(x,y,renderer.getPixelRatio());
+        depthPeeling.setScreenSize(x, y, renderer.getPixelRatio());
+        debug.setSize(x, y)
     }
 
     window.addEventListener('resize', resize);
