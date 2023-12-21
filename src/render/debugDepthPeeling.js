@@ -1,12 +1,12 @@
 /*
  * @Date: 2023-12-20 13:19:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-20 16:53:56
+ * @LastEditTime: 2023-12-21 16:17:24
  * @FilePath: /threejs-demo/src/render/debugDepthPeeling.js
  */
 import { FullScreenQuad } from '../lib/three/Pass.js';
 import {
-    WebGLRenderTarget, DepthTexture, DataTexture, Vector2, Mesh, Material, Color, WebGLRenderer, ShaderMaterial,NoBlending
+    WebGLRenderTarget, DepthTexture, DataTexture, Vector2, Mesh, Material, Color, WebGLRenderer, ShaderMaterial, NoBlending
 } from '../lib/three/three.module.js'
 
 
@@ -62,7 +62,8 @@ function debugDeepPeeling(scene, camera) {
                       vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
                       float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
                       if( prevDepth >= gl_FragCoord.z )
-                          discard;
+                        discard;
+                        // gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
                     // --- DEPTH PEELING SHADER CHUNK (END)
                     }`);
             }
@@ -77,7 +78,7 @@ function debugDeepPeeling(scene, camera) {
 
     const layers = [];
 
-    const result = new DataTexture(new Uint8Array([1, 1, 1, 1]), 100, 100);
+    let result = new DataTexture(new Uint8Array([1, 1, 1, 1]), 100, 100);
 
     const material = new ShaderMaterial({
         uniforms: { 'tDepth': { value: null }, },
@@ -145,6 +146,8 @@ function debugDeepPeeling(scene, camera) {
     function setSize(width, height) {
         screenSize.set(width, height);
         const [w, h] = [width * pixelRatio, height * pixelRatio];
+        result.dispose();
+        result = new DataTexture(new Uint8Array(w * h), w, h)
 
         globalUniforms.uReciprocalScreenSize.value.set(1 / w, 1 / h);
 
@@ -174,12 +177,10 @@ function debugDeepPeeling(scene, camera) {
     function renderImage() {
         // 记录调用前的状态，最后设置回去
         renderer.setClearColor(0x000000);
-    
         layers.reduceRight((prevDepthTexture, layer, index) => {
             globalUniforms.uPrevDepthTexture.value = prevDepthTexture;
             const originTarget = renderer.getRenderTarget();
             drawTexture(targetCanvas[index], renderer, layer)
-            
             renderer.setRenderTarget(layer);
             renderer.clear();
             renderer.render(scene, camera);

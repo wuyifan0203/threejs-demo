@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-20 15:21:33
+ * @LastEditTime: 2023-12-21 16:20:59
  * @FilePath: /threejs-demo/src/render/DepthPeeling.js
  */
 
@@ -20,6 +20,31 @@ import {
 import { FullScreenQuad } from "../lib/three/Pass.js";
 import { CopyShader } from "../lib/three/CopyShader.js";
 
+const vertexShader = /* glsl */`
+		varying vec2 vUv;
+
+		void main() {
+
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+
+		}`
+
+const fragmentShader = /* glsl */`
+	uniform float opacity;
+
+    uniform sampler2D tDiffuse;
+
+    varying vec2 vUv;
+
+    void main() {
+
+       // CopyShader with GammaCorrectionShader 
+        gl_FragColor = LinearTosRGB(texture2D( tDiffuse, vUv ));
+        gl_FragColor.a *= opacity;
+
+    }`;
+
 class DepthPeeling {
     constructor(width, height, depth, pixelRatio) {
         this.globalUniforms = {
@@ -31,7 +56,12 @@ class DepthPeeling {
         this._depth = 3;
 
         const material = new ShaderMaterial({
-            ...CopyShader,
+            uniforms: {
+                tDiffuse: { value: null },
+                opacity: { value: 1.0 }
+            },
+            vertexShader,
+            fragmentShader,
             transparent: true,
             depthTest: false,
             depthWrite: false,
@@ -65,8 +95,6 @@ class DepthPeeling {
                 console.log(cloneMaterial);
 
                 cloneMaterial.onBeforeCompile = (shader) => {
-                    console.log(shader);
-
                     // 赋值
                     shader.uniforms.uReciprocalScreenSize = this.globalUniforms.uReciprocalScreenSize;
                     shader.uniforms.uPrevDepthTexture = this.globalUniforms.uPrevDepthTexture;
@@ -76,19 +104,19 @@ class DepthPeeling {
                     uniform vec2 uReciprocalScreenSize;
                     uniform sampler2D uPrevDepthTexture;
                     // --- DEPTH PEELING SHADER CHUNK (END)
-                    ${shader.fragmentShader}`;
+                    ${shader.fragmentShader} `;
+
+                    const replaceShader =  /* glsl */`
+                        // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
+                        vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+                        float prevDepth = texture2D(uPrevDepthTexture, screenPos).x;
+                        if (prevDepth >= gl_FragCoord.z)
+                            discard;
+                        // --- DEPTH PEELING SHADER CHUNK (END)
+                    }`
 
                     //peel depth
-                    shader.fragmentShader = shader.fragmentShader.replace(
-                        /}$/gm,
-                        /* glsl */`
-                        // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
-                          vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
-                          float prevDepth = texture2D(uPrevDepthTexture,screenPos).x;
-                          if( prevDepth >= gl_FragCoord.z )
-                              discard;
-                        // --- DEPTH PEELING SHADER CHUNK (END)
-                        }`);
+                    shader.fragmentShader = shader.fragmentShader.replace(/}$/gm, replaceShader);
                 }
                 object.material = cloneMaterial;
                 object.material.needsUpdate = true;
@@ -109,16 +137,13 @@ class DepthPeeling {
 
         this.layers.reduceRight((prevDepthTexture, layer) => {
             this.globalUniforms.uPrevDepthTexture = prevDepthTexture;
-
             renderer.setRenderTarget(layer);
             renderer.clear();
             renderer.render(this.scene, camera);
-
             return layer.depthTexture;
-
         }, this.result);
 
-        
+
         renderer.setClearColor(this.originClearColor);
         renderer.setRenderTarget(originTarget);
         renderer.clear();
@@ -129,13 +154,12 @@ class DepthPeeling {
             this.quad.render(renderer);
         })
 
-  
-        renderer.autoClear = originAutoClear;
 
+        renderer.autoClear = originAutoClear;
         console.log('render');
     }
 
-    getDepth(){
+    getDepth() {
         return this._depth;
     }
 
