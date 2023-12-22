@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-20 13:19:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-21 16:17:24
+ * @LastEditTime: 2023-12-22 13:15:41
  * @FilePath: /threejs-demo/src/render/debugDepthPeeling.js
  */
 import { FullScreenQuad } from '../lib/three/Pass.js';
@@ -34,14 +34,16 @@ function debugDeepPeeling(scene, camera) {
     }
 
 
-    const deepLayersTarget = new WebGLRenderTarget()
+    const deepLayersTarget = new WebGLRenderTarget();
+
+    const sceneLayersTarget = new WebGLRenderTarget();
 
     scene = scene.clone();
     scene.traverse((object) => {
         if (object instanceof Mesh && object.material instanceof Material) {
             const cloneMaterial = object.material.clone();
             // 关闭混合
-            // cloneMaterial.blending = NoBlending;
+            cloneMaterial.blending = NoBlending;
             cloneMaterial.onBeforeCompile = (shader) => {
                 // 赋值
                 shader.uniforms.uReciprocalScreenSize = globalUniforms.uReciprocalScreenSize;
@@ -80,7 +82,7 @@ function debugDeepPeeling(scene, camera) {
 
     let result = new DataTexture(new Uint8Array([1, 1, 1, 1]), 100, 100);
 
-    const material = new ShaderMaterial({
+    const depthMaterial = new ShaderMaterial({
         uniforms: { 'tDepth': { value: null }, },
         vertexShader: /* glsl */`
             varying vec2 vUv;
@@ -99,7 +101,28 @@ function debugDeepPeeling(scene, camera) {
             }
         `
     })
-    const quad = new FullScreenQuad(material)
+    const quad = new FullScreenQuad(depthMaterial);
+
+
+
+    const sceneMaterial = new ShaderMaterial({
+        uniforms: {tDiffuse: { value: null },},
+        vertexShader:/* glsl */`
+		varying vec2 vUv;
+		void main() {
+			vUv = uv;
+			gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+		}`,
+        fragmentShader: /* glsl */`
+        uniform sampler2D tDiffuse;
+        varying vec2 vUv;
+        void main() {
+           // CopyShader with GammaCorrectionShader 
+            gl_FragColor = LinearTosRGB(texture2D( tDiffuse, vUv ));
+            gl_FragColor.a *= 1.0;
+    
+        }`,
+    })
 
 
     function setDepth(depth) {
@@ -121,8 +144,8 @@ function debugDeepPeeling(scene, camera) {
             const canvas = document.createElement('canvas');
             canvas.width = screenSize.x;
             canvas.height = screenSize.y;
-            canvas.style.width = screenSize.x / 4 + 'px';
-            canvas.style.height = screenSize.y / 4 + 'px';
+            canvas.style.width = screenSize.x + 'px';
+            canvas.style.height = screenSize.y + 'px';
             depthCanvas.push(canvas);
             depthCanvasGroup.appendChild(canvas);
         }
@@ -136,8 +159,8 @@ function debugDeepPeeling(scene, camera) {
             const canvas = document.createElement('canvas');
             canvas.width = screenSize.x;
             canvas.height = screenSize.y;
-            canvas.style.width = screenSize.x / 4 + 'px';
-            canvas.style.height = screenSize.y / 4 + 'px';
+            canvas.style.width = screenSize.x + 'px';
+            canvas.style.height = screenSize.y + 'px';
             targetCanvas.push(canvas);
             targetCanvasGroup.appendChild(canvas);
         }
@@ -160,18 +183,19 @@ function debugDeepPeeling(scene, camera) {
         depthCanvas.forEach((canvas) => {
             canvas.width = width;
             canvas.height = height;
-            canvas.style.width = width / 4 + 'px';
-            canvas.style.height = height / 4 + 'px';
+            canvas.style.width = width  + 'px';
+            canvas.style.height = height + 'px';
         });
 
         targetCanvas.forEach((canvas) => {
             canvas.width = width;
             canvas.height = height;
-            canvas.style.width = width / 4 + 'px';
-            canvas.style.height = height / 4 + 'px';
+            canvas.style.width = width + 'px';
+            canvas.style.height = height + 'px';
         })
 
         deepLayersTarget.setSize(w, h);
+        sceneLayersTarget.setSize(w, h);
     }
 
     function renderImage() {
@@ -180,17 +204,27 @@ function debugDeepPeeling(scene, camera) {
         layers.reduceRight((prevDepthTexture, layer, index) => {
             globalUniforms.uPrevDepthTexture.value = prevDepthTexture;
             const originTarget = renderer.getRenderTarget();
-            drawTexture(targetCanvas[index], renderer, layer)
+           
             renderer.setRenderTarget(layer);
             renderer.clear();
             renderer.render(scene, camera);
 
-            material.uniforms.tDepth.value = layer.depthTexture;
+            sceneMaterial.uniforms.tDiffuse.value = layer.texture;
+            renderer.setRenderTarget(sceneLayersTarget);
+            renderer.clear();
+            quad.material = sceneMaterial   
+            quad.render(renderer);
+            drawTexture(targetCanvas[index], renderer, sceneLayersTarget)
+            
+            depthMaterial.uniforms.tDepth.value = layer.depthTexture;
             renderer.setRenderTarget(deepLayersTarget);
             renderer.clear();
+            quad.material = depthMaterial   
             quad.render(renderer);
             drawTexture(depthCanvas[index], renderer, deepLayersTarget)
+            
             renderer.setRenderTarget(originTarget);
+
 
             return layer.depthTexture;
 

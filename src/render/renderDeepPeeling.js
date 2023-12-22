@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-21 16:00:36
+ * @LastEditTime: 2023-12-22 18:39:27
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
@@ -27,7 +27,8 @@ import {
     initOrbitControls,
     initGUI,
 } from '../lib/tools/index.js';
-import { DepthPeeling } from './DepthPeeling.js';
+// import { DepthPeeling } from './DepthPeeling.js';
+import { DepthPeeling } from './DepthPeeling2.js';
 import { debugDeepPeeling } from './debugDepthPeeling.js'
 
 window.onload = () => {
@@ -38,6 +39,7 @@ window.onload = () => {
 async function init() {
 
     const sizeMap = {
+        '1024*1024': new Vector2(1024, 1024),
         '1280*720': new Vector2(1280, 720),
         '1600*900': new Vector2(1600, 900),
         '1600*1200': new Vector2(1600, 1200),
@@ -45,7 +47,7 @@ async function init() {
     };
 
     const params = {
-        size: '1280*720',
+        size: '1024*1024',
         layers: 3,
         enable: true
     }
@@ -55,7 +57,7 @@ async function init() {
 
     const scene = new Scene();
     const camera = new PerspectiveCamera(75, size.x / size.y, 0.1, 100);
-    camera.position.set(0, 0, 8);
+    camera.position.set(0, 0, 5);
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 
@@ -84,6 +86,7 @@ async function init() {
         new TorusKnotGeometry(1, 0.4, 128, 32),
         new MeshStandardMaterial({ transparent: true, opacity: 0.5, side: 2 })
     );
+    knotMesh.rotateX(Math.PI / 2)
     knotMesh.receiveShadow = true;
     scene.add(knotMesh);
 
@@ -92,7 +95,6 @@ async function init() {
 
     const loader = new TextureLoader();
     const texture1 = await loader.loadAsync('../../public/images/render/sprite.png');
-    const texture2 = await loader.loadAsync('../../public/images/render/icon.png');
 
     const planeGeometry = new PlaneGeometry(3, 3);
 
@@ -101,7 +103,7 @@ async function init() {
     planeMesh1.position.set(-1.6, 0, 1.5);
     scene.add(planeMesh1);
 
-    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture2, transparent: true }));
+    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture1, transparent: true }));
     planeMesh2.rotation.x = Math.PI / 2;
     planeMesh2.rotation.y = Math.PI * -0.2;
     planeMesh2.position.set(-1.2, 0, -1.5);
@@ -113,8 +115,8 @@ async function init() {
     // add scene
     depthPeeling.add(scene);
 
-    const debug = debugDeepPeeling(scene,camera);
-    debug.setDepth(params.layers);
+    // const debug = debugDeepPeeling(scene,camera);
+    // debug.setDepth(params.layers);
 
     const gui = initGUI();
 
@@ -135,11 +137,13 @@ async function init() {
             renderer.render(scene, camera)
         } else {
             depthPeeling.render(renderer, camera);
-            debug.renderImage()
+            // debug.renderImage()
         }
     }
     resize();
-    render();
+    // render();
+
+    // renderer.setAnimationLoop(render)
 
     function resize() {
         const { x, y } = sizeMap[params.size];
@@ -147,7 +151,7 @@ async function init() {
         camera.aspect = x / y;
         camera.updateProjectionMatrix();
         depthPeeling.setScreenSize(x, y, renderer.getPixelRatio());
-        debug.setSize(x, y)
+        // debug.setSize(x, y)
     }
 
     window.addEventListener('resize', resize);
