@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:13:40
- * @FilePath: /threejs-demo/examples/src/particle/common.js
+ * @LastEditTime: 2023-12-24 01:28:50
+ * @FilePath: /threejs-demo/src/particle/common.js
  */
 import {
   Scene,
@@ -81,9 +81,7 @@ function draw(scene) {
     const hy = controls.col / 2;
     for (let x = 0; x < controls.row; x++) {
       for (let y = 0; y < controls.col; y++) {
-        const material = new SpriteMaterial({
-          color: Math.random() * 0xffffff,
-        });
+        const material = new SpriteMaterial({color: Math.random() * 0xffffff,});
         const sprite = new Sprite(material);
         sprite.position.set((x - hx) * 4, (y - hy) * 4, 0);
         scene.add(sprite);
