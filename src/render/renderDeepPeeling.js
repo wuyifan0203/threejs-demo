@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-22 18:39:27
+ * @LastEditTime: 2023-12-24 01:02:31
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
@@ -27,8 +27,8 @@ import {
     initOrbitControls,
     initGUI,
 } from '../lib/tools/index.js';
-// import { DepthPeeling } from './DepthPeeling.js';
-import { DepthPeeling } from './DepthPeeling2.js';
+import { DepthPeeling } from './DepthPeeling.js';
+// import { DepthPeeling } from './DepthPeeling2.js';
 import { debugDeepPeeling } from './debugDepthPeeling.js'
 
 window.onload = () => {
@@ -143,7 +143,7 @@ async function init() {
     resize();
     // render();
 
-    // renderer.setAnimationLoop(render)
+    renderer.setAnimationLoop(render)
 
     function resize() {
         const { x, y } = sizeMap[params.size];

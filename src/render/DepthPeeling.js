@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-22 18:40:57
+ * @LastEditTime: 2023-12-24 01:03:19
  * @FilePath: /threejs-demo/src/render/DepthPeeling.js
  */
 
@@ -37,6 +37,15 @@ const fragmentShader = /* glsl */`
         gl_FragColor.a *= opacity;
 
     }`;
+
+const replaceShader =  /* glsl */`
+        // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
+        vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+        float prevDepth = texture2D(uPrevDepthTexture, screenPos).x;
+        if (prevDepth >= gl_FragCoord.z)
+            discard;
+        // --- DEPTH PEELING SHADER CHUNK (END)
+    }`
 
 class DepthPeeling {
     constructor(width, height, depth, pixelRatio) {
@@ -87,16 +96,8 @@ class DepthPeeling {
                     uniform vec2 uReciprocalScreenSize;
                     uniform sampler2D uPrevDepthTexture;
                     // --- DEPTH PEELING SHADER CHUNK (END)
-                    ${shader.fragmentShader} `;
+                    ${shader.fragmentShader}`;
 
-                    const replaceShader =  /* glsl */`
-                        // --- DEPTH PEELING SHADER CHUNK (START) (peeling)
-                        vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
-                        float prevDepth = texture2D(uPrevDepthTexture, screenPos).x;
-                        if (prevDepth >= gl_FragCoord.z)
-                            discard;
-                        // --- DEPTH PEELING SHADER CHUNK (END)
-                    }`
                     //peel depth
                     shader.fragmentShader = shader.fragmentShader.replace(/}$/gm, replaceShader);
                 }
@@ -135,7 +136,6 @@ class DepthPeeling {
         })
 
         renderer.autoClear = originAutoClear;
-        console.log('render');
     }
 
     setScreenSize(width, height, pixelRatio) {
@@ -150,12 +150,9 @@ class DepthPeeling {
             renderTarget.depthTexture.dispose();
             renderTarget.depthTexture = new DepthTexture(w, h);
         })
-        console.log(this, 'setScreenSize');
 
         this.result.dispose();
         this.result = new DataTexture(new Uint8Array(w * h), w, h);
-
-      
     }
 
     setDepth(depth) {
