@@ -17,9 +17,9 @@ function init() {
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   const vertexShaderCode = 'attribute vec4 a_Position;\n'
-  + 'void main() {\n'
-  + '  gl_Position = a_Position;\n'
-  + '}\n';
+    + 'void main() {\n'
+    + '  gl_Position = a_Position;\n'
+    + '}\n';
   const fragmentShaderCode = 'precision mediump float;\n'
     + 'void main() {\n'
     + '  gl_FragColor = vec4(0.0,0.0,1.0,1.0);\n'
@@ -60,6 +60,7 @@ function init() {
   const canvas2DDOM = document.createElement('canvas');
   canvas2DDOM.width = window.innerWidth;
   canvas2DDOM.height = window.innerHeight;
+  
   const ctx = canvas2DDOM.getContext('2d');
   ctx.drawImage(canvasWebglDOM, 0, 0);
   //   ctx.clearRect(0, 0, 300, 300);

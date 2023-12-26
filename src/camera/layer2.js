@@ -13,8 +13,11 @@ import {
   BoxGeometry,
   MeshLambertMaterial,
 } from '../lib/three/three.module.js';
-import { initRenderer, initPerspectiveCamera } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { 
+  initRenderer, 
+  initPerspectiveCamera, 
+  initScene,
+ } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -69,7 +72,7 @@ function init() {
       isEnable === 1 ? camera.layers.enable(i) : camera.layers.disable(i)
     })
 
-    console.log('camera.layer.mask:',camera.layers.mask);
+    console.log('camera.layer.mask:', camera.layers.mask);
     return camera
   })
 
@@ -79,7 +82,7 @@ function init() {
   light.layers.enable(1);
   light.layers.enable(2);
 
-  const scene = new Scene();
+  const scene = initScene();
   scene.background = new Color(0xf0f0f0);
   scene.add(light);
 
@@ -145,9 +148,9 @@ function init() {
   mesh3.layers.disable(1);
   mesh3.layers.enable(2);
 
-  const meshes = [mesh1,mesh2,mesh3];
-  meshes.forEach((m)=>{
-    console.log('mesh.layers.mask:',m.layers.mask);
+  const meshes = [mesh1, mesh2, mesh3];
+  meshes.forEach((m) => {
+    console.log('mesh.layers.mask:', m.layers.mask);
   });
 
   // 为 z.y.x 即 2^x + 2^y + 2^z
@@ -157,7 +160,7 @@ function init() {
 
   views.forEach((_, i) => {
     const cameraMask = cameras[i].layers.mask;
-    meshes.forEach((m,j)=>{
+    meshes.forEach((m, j) => {
       const meshMask = m.layers.mask;
       console.log(`camera${i}.layers & mesh${j}.layers: ${cameraMask & meshMask} ,show:${((cameraMask & meshMask) > 0)}`);
       // 结论 与运算为0的一定不展示
@@ -166,6 +169,4 @@ function init() {
 
   scene.add(mesh1, mesh2, mesh3);
 
-
-  const gui = new GUI();
 }

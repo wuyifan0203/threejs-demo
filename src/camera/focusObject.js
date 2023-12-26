@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:41:07
+ * @LastEditTime: 2023-12-26 18:07:37
  * @FilePath: /threejs-demo/src/camera/focusObject.js
  */
 
@@ -41,28 +41,19 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, 0, 100))
     camera.up.set(0, 0, 1);
 
-
-    camera.updateProjectionMatrix();
-
-    console.log(camera);
-
     const light = initDirectionLight();
-
-
 
     const scene = initScene();
     scene.background = new Color(0xf0f0f0);
 
     scene.add(light);
 
-
-
-
     const orbitControls = initOrbitControls(camera, renderer.domElement);
     orbitControls.zoomToCursor = true
     resize(renderer, camera);
 
     initCustomGrid(scene);
+    
     const coord = initCoordinates();
 
     orbitControls.addEventListener('change', () => {
@@ -73,19 +64,11 @@ function init() {
         console.log('times');
         renderer.clear();
 
-
-        // camera.rotation.set(-0.014, -0.012, -2.4)
-        // camera.updateMatrixWorld();
-
         light.position.copy(camera.position);
 
         renderer.render(scene, camera);
         renderer.render(coord, camera)
     }
-
-    window.camera = camera;
-    window.scene = scene;
-    window.orbitControls = orbitControls;
 
     const redMaterial = new MeshLambertMaterial({ color: 'red' });
     const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -130,8 +113,10 @@ function init() {
         Yellow: 3
     });
 
-    gui.add(o, 'focus').name('Focus Objects')
-    createNDCMatrix(window.innerWidth, window.innerHeight, ndcMatrix)
+    gui.add(o, 'focus').name('Focus Objects');
+
+    createNDCMatrix(window.innerWidth, window.innerHeight, ndcMatrix);
+
     window.addEventListener('resize', () => {
         createNDCMatrix(window.innerWidth, window.innerHeight, ndcMatrix)
     });
@@ -218,34 +203,25 @@ function focusObject(objects) {
     });
 
 
-    _q.copy(window.orbitControls.object.quaternion);
+    _q.copy(window.controls.object.quaternion);
 
     const zoom = Math.min(
         (targetWidth * tempZoom) / boxWidth,
         (targetHeight * tempZoom) / boxHeight,
     );
 
-    const radius = window.camera.position.distanceTo(window.orbitControls.target);
+    const radius = window.camera.position.distanceTo(window.controls.target);
 
 
-    const direction = new Vector3().subVectors(window.camera.position, window.orbitControls.target).normalize();
+    const direction = new Vector3().subVectors(window.camera.position, window.controls.target).normalize();
 
     const position = direction.multiplyScalar(radius).add(center);
 
-    window.orbitControls.object.position.copy(position);
-    window.orbitControls.object.zoom = zoom;
-    window.orbitControls.target.copy(center);
+    window.controls.object.position.copy(position);
+    window.controls.object.zoom = zoom;
+    window.controls.target.copy(center);
 
-
-
-    window.orbitControls.update();
-
-    // window.orbitControls.object.quaternion.copy(_q);
-
-
-
-    // window.camera.updateProjectionMatrix();
-
+    window.controls.update();
 
     console.log({
         pos: window.camera.position.clone(),
@@ -253,10 +229,6 @@ function focusObject(objects) {
         rotation: window.camera.rotation.clone(),
         up: window.camera.up.clone(),
     });
-
-
-
-
 
 }
 

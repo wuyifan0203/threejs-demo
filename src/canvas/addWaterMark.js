@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-05-17 10:09:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-06 18:31:13
- * @FilePath: /threejs-demo/packages/examples/canvas/addWaterMark.js
+ * @LastEditTime: 2023-12-26 17:57:32
+ * @FilePath: /threejs-demo/src/canvas/addWaterMark.js
  */
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { initGUI } from '../lib/tools/common.js';
 
 function init() {
   const width = window.innerWidth;
@@ -55,7 +55,7 @@ function init() {
 
   updateCtx();
 
-  const gui = new GUI();
+  const gui = initGUI();
 }
 
 window.onload = () => {

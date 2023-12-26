@@ -39,7 +39,7 @@ const control = {
 };
 
 function init() {
-  const scene = new Scene();
+  const scene = initScene();
   const renderer = initRenderer();
   renderer.setClearColor(0xffffff);
   const camera = initOrthographicCamera(new Vector3(0, 0, 1000));

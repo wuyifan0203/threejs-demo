@@ -2,11 +2,10 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-06 17:51:47
- * @FilePath: /threejs-demo/packages/examples/cannon/index.js
+ * @LastEditTime: 2023-12-26 17:20:40
+ * @FilePath: /threejs-demo/src/cannon/index.js
  */
 import {
-  Scene,
   Mesh,
   Clock,
   SphereGeometry,
@@ -14,15 +13,18 @@ import {
   MeshPhongMaterial,
   PlaneGeometry,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
-  initRenderer, initOrthographicCamera, initDefaultLighting,
+  initRenderer,
+  initOrthographicCamera,
+  initSpotLight,
+  initOrbitControls,
+  initGUI,
+  initScene,
+  initAmbientLight
 } from '../lib/tools/index.js';
 import {
   World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase,
 } from '../lib/other/physijs/cannon.js';
-
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -30,16 +32,22 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer({});
-  renderer.shadowMap.enabled = true;
-  renderer.setClearColor(0xffffff);
+
   const camera = initOrthographicCamera(new Vector3(-500, 1100, 700));
   camera.zoom = 0.13;
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
   camera.updateProjectionMatrix();
-  const scene = new Scene();
-  initDefaultLighting(scene, new Vector3(40, 40, 70));
-  const orbitControl = new OrbitControls(camera, renderer.domElement);
+
+  const scene = initScene();
+
+  initAmbientLight(scene);
+  
+  const light = initSpotLight();
+  light.position.set(40, 40, 70);
+  scene.add(light);
+
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
 
   // constant
   const sphereSize = 2;
@@ -124,7 +132,7 @@ function init() {
 
   render();
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const control = {
     reset() {

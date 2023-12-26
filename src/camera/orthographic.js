@@ -1,14 +1,13 @@
 /*
  * @Date: 2023-09-17 14:41:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-28 13:20:43
+ * @LastEditTime: 2023-12-26 17:51:52
  * @FilePath: /threejs-demo/src/camera/orthographic.js
  */
 import {
     Vector3,
     PointLight,
     Mesh,
-    Color,
     BoxGeometry,
     MeshLambertMaterial,
     OrthographicCamera,
@@ -16,9 +15,12 @@ import {
     AmbientLight
 } from '../lib/three/three.module.js';
 import {
-    initRenderer, initOrthographicCamera, initScene, initOrbitControls
+    initRenderer, 
+    initOrthographicCamera, 
+    initScene, 
+    initOrbitControls, 
+    initGUI
 } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
     init();
@@ -73,13 +75,13 @@ function init() {
         zoom: 1
     }
 
-    function updateCanera() {
+    function updateCamera() {
         orthographicCamera.left = params.left;
         orthographicCamera.right = params.right;
         orthographicCamera.far = params.far;
         orthographicCamera.near = params.near;
         orthographicCamera.top = params.top * window.innerHeight / window.innerWidth;
-        orthographicCamera.bottom = params.bottom  * window.innerHeight / window.innerWidth;
+        orthographicCamera.bottom = params.bottom * window.innerHeight / window.innerWidth;
         orthographicCamera.zoom = params.zoom;
         orthographicCamera.updateProjectionMatrix();
 
@@ -91,7 +93,7 @@ function init() {
     }
 
     scene.add(cameraHelper);
-    updateCanera();
+    updateCamera();
 
 
     function animate() {
@@ -120,13 +122,13 @@ function init() {
 
     renderer.setAnimationLoop(animate);
 
-    const gui = new GUI();
+    const gui = initGUI();
 
-    gui.add(params, 'bottom', -20, -1, 1).onChange(updateCanera);
-    gui.add(params, 'left', -20, -1, -1).onChange(updateCanera);
-    gui.add(params, 'right', 1, 20, 1).onChange(updateCanera);
-    gui.add(params, 'top', 1, 20, 1).onChange(updateCanera);
-    gui.add(params, 'near', 0, 10, 1).onChange(updateCanera);
-    gui.add(params, 'far', 10, 35, 1).onChange(updateCanera);
-    gui.add(params, 'zoom', 0.2, 3, 0.01).onChange(updateCanera);
+    gui.add(params, 'bottom', -20, -1, 1).onChange(updateCamera);
+    gui.add(params, 'left', -20, -1, -1).onChange(updateCamera);
+    gui.add(params, 'right', 1, 20, 1).onChange(updateCamera);
+    gui.add(params, 'top', 1, 20, 1).onChange(updateCamera);
+    gui.add(params, 'near', 0, 10, 1).onChange(updateCamera);
+    gui.add(params, 'far', 10, 35, 1).onChange(updateCamera);
+    gui.add(params, 'zoom', 0.2, 3, 0.01).onChange(updateCamera);
 }

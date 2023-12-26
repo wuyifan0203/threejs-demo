@@ -44,7 +44,7 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(100, 100, 100));
   camera.up.set(0, 0, 1);
 
-  const scene1 = new Scene();
+  const scene1 = initScene();
   scene1.background = new Color('#ffffff');
   const sphere = new Mesh(new SphereGeometry(5), new MeshBasicMaterial({ color: '#00ff00' }));
   sphere.name = 'sphere';
@@ -53,7 +53,7 @@ function init() {
   const gridHelper = new GridHelper(50, 50);
   gridHelper.name = 'gridHelper';
   scene1.add(gridHelper);
-  let scene2 = new Scene();
+  let scene2 = initScene();
 
   //   initCustomGrid(scene1);
   // 会加载不出来报错，因为内部不会转译自定义Mesh

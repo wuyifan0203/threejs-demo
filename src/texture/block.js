@@ -44,7 +44,7 @@ function init() {
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 200;
   camera.lookAt(0, 0, 0);
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
 
   const dom = document.querySelector('#webgl-output');

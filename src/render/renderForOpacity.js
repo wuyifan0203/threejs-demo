@@ -37,7 +37,7 @@ function init() {
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 
-    const scene1 = new Scene();
+    const scene1 = initScene();
 
     const light = initDirectionLight();
     light.position.set(20, 20, 20);
@@ -56,7 +56,7 @@ function init() {
     mesh.castShadow = true;
     scene1.add(mesh);
 
-    const scene2 = new Scene();
+    const scene2 = initScene();
 
     const geometry = new BoxGeometry(6, 4, 4);
     const material = new MeshPhysicalMaterial({

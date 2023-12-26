@@ -33,7 +33,7 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
   const camera = initOrthographicCamera(new Vector3(0, 0, 100));
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
   renderer.autoClear = false;
   camera.up.set(0, 0, 1);

@@ -30,7 +30,7 @@ function init() {
   const renderer = initRenderer();
   const camera = initOrthographicCamera(new Vector3(0, 0, 100));
   camera.up.set(0, 0, 1);
-  const scene = new Scene();
+  const scene = initScene();
   initAxesHelper(scene);
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);

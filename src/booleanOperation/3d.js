@@ -1,21 +1,18 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 00:46:03
- * @FilePath: /threejs-demo/examples/src/booleanOperation/3d.js
+ * @LastEditTime: 2023-12-26 17:33:05
+ * @FilePath: /threejs-demo/src/booleanOperation/3d.js
  */
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
   SphereGeometry,
   BoxGeometry,
   Matrix4,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { CSG } from '../lib/other/CSGMesh.js';
 import {
   initRenderer,
@@ -23,6 +20,9 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initScene,
+  initGUI,
+  initOrbitControls,
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -32,30 +32,27 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
   const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
-  const scene = new Scene();
-  renderer.setClearColor(0xffffff);
+  const scene = initScene();
+
   renderer.autoClear = false;
   camera.up.set(0, 0, 1);
+
   resize(renderer, camera);
   initCustomGrid(scene, 100, 100);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-  draw(scene);
-
-  render();
   function render() {
     renderer.clear();
-    controls.update();
+    orbitControl.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
-}
 
-function draw(scene) {
+  renderer.setAnimationLoop(render);
+
   const sphere1 = new SphereGeometry(5, 20, 16);
   const sphere2 = new SphereGeometry(3, 20, 16);
   const box = new BoxGeometry(4, 4, 4);
@@ -164,7 +161,8 @@ function draw(scene) {
     },
   };
 
-  const gui = new GUI();
+  const gui = initGUI();
+
   console.log('有时候选none会栈溢出。是正常现象，因为我没有修');
   const sphere1Folder = gui.addFolder('sphere1');
   sphere1Folder.open();

@@ -44,9 +44,9 @@ function init() {
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
-    const sceneA = new Scene();
-    const sceneB = new Scene();
-    const sceneC = new Scene();
+    const sceneA = initScene();
+    const sceneB = initScene();
+    const sceneC = initScene();
 
     const sphere1 = new Mesh(new SphereGeometry(10, 32, 32), new MeshPhongMaterial({ color: 'green' }));
     const objA = new Object3D();

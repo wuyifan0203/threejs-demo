@@ -7,9 +7,13 @@ import {
   BoxGeometry,
   MeshLambertMaterial,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
+import {
+  initOrbitControls,
+  initRenderer,
+  initScene,
+  resize,
+  initGUI
+} from '../lib/tools/index.js';
 import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
@@ -21,35 +25,36 @@ function init() {
   const stats = new Stats();
   stats.showPanel(0);
   document.getElementById('webgl-output').append(stats.dom);
-  const camera = new PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 100000);
+
+  const camera = new PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.set(0, 0, 10);
   camera.layers.enable(0);
   camera.layers.enable(1);
   camera.layers.enable(2);
 
-  const light = new PointLight(0xffffff, 1);
+  const light = new PointLight(0xffffff, 3);
+
   light.layers.enable(0);
   light.layers.enable(1);
   light.layers.enable(2);
 
   camera.add(light);
-  const scene = new Scene();
+
+  const scene = initScene();
   scene.background = new Color(0xf0f0f0);
   scene.add(camera);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
   function render() {
     stats.begin();
     orbitControls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
     stats.end();
   }
-  render();
-  window.camera = camera;
-  window.scene = scene;
+
+  renderer.setAnimationLoop(render);
 
   const redMaterial = new MeshLambertMaterial({ color: 'red' });
   const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -99,9 +104,7 @@ function init() {
 
   };
 
-  //
-  // Init gui
-  const gui = new GUI();
+  const gui = initGUI();
   gui.add(layers, 'toggle red');
   gui.add(layers, 'toggle green');
   gui.add(layers, 'toggle blue');

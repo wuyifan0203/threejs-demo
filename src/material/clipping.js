@@ -37,7 +37,7 @@ function init() {
   camera.zoom = 0.4;
   camera.updateProjectionMatrix();
 
-  const scene = new Scene();
+  const scene = initScene();
   initGroundPlane(scene);
 
   scene.add(new AmbientLight());

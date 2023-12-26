@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 17:28:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:08:13
+ * @LastEditTime: 2023-12-26 17:46:08
  * @FilePath: /threejs-demo/src/texture/colorMap.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -21,7 +21,7 @@ import {
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { initRenderer, } from '../lib/tools/index.js';
+import { initRenderer, initScene, } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/house/';
 const url = {
@@ -79,18 +79,19 @@ const positionMap = {
   guestBedroom: { livingRoom2: [-7, 0, -5.5], },
 };
 
-(function () {
-  init();
-}());
+window.onload = () => {
+  init()
+}
 
 function init() {
   const renderer = initRenderer();
   renderer.autoClear = false;
+
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   camera.position.z = 0.5;
   camera.lookAt(10, 0, 0);
-  const scene = new Scene();
-  renderer.setClearColor(0xffffff);
+
+  const scene = initScene();
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
@@ -99,6 +100,7 @@ function init() {
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   renderer.setAnimationLoop(render);
+  
   function render() {
     controls.update();
     renderer.clear();

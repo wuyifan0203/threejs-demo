@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-15 16:41:21
- * @FilePath: /threejs-demo/packages/examples/camera/arrayCamera.js
+ * @LastEditTime: 2023-12-26 17:49:52
+ * @FilePath: /threejs-demo/src/camera/arrayCamera.js
  */
 import {
-  Scene,
   Mesh,
   MeshNormalMaterial,
   SphereGeometry,
@@ -18,6 +17,7 @@ import {
   initAxesHelper,
   initCustomGrid,
   initPerspectiveCamera,
+  initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -26,8 +26,8 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const scene = new Scene();
-  renderer.setClearColor(0xffffff);
+
+  const scene = initScene();
   initCustomGrid(scene, 100, 100);
   initAxesHelper(scene);
 
@@ -43,7 +43,7 @@ function init() {
     const aspect = window.innerWidth / window.innerHeight;
     const height = window.innerHeight / 2;
     const width = window.innerWidth / 3;
-    console.log(window.devicePixelRatio);
+
     for (let i = 0; i < 3; i++) {
       for (let j = 0; j < 2; j++) {
         const sub = arrayCamera.cameras[i + j];

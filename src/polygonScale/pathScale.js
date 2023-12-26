@@ -17,7 +17,7 @@ window.onload = function () {
 
 function init() {
   const camera = initOrthographicCamera(new Vector3(0, 0, 10000));
-  const scene = new Scene();
+  const scene = initScene();
   const renderer = initRenderer();
   renderer.setAnimationLoop(render);
   renderer.setClearColor(0xffffff);

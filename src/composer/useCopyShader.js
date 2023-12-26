@@ -54,7 +54,7 @@ function init() {
     initOrbitControls(camera, renderer.domElement);
     renderer.setAnimationLoop(render);
 
-    const scene = new Scene();
+    const scene = initScene();
     const sphere = new Mesh(new SphereGeometry(5, 32, 32), new MeshBasicMaterial({ color: 'green' }));
     scene.add(sphere)
 
@@ -68,7 +68,7 @@ function init() {
 
     scene.background = texture;
 
-    const scene2 = new Scene();
+    const scene2 = initScene();
     const grid = new GridHelper(30, 30);
     grid.rotateX(Math.PI / 2);
     scene2.add(grid);

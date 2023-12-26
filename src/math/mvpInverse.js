@@ -44,7 +44,7 @@ function init() {
 
     camera.updateProjectionMatrix();
 
-    const scene = new Scene();
+    const scene = initScene();
 
     const control = initOrbitControls(camera, renderer.domElement);
 

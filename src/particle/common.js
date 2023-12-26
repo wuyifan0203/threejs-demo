@@ -36,7 +36,7 @@ function init() {
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000000);
   camera.position.set(3, 3, 63);
   camera.lookAt(10, 0, 0);
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
 
   const controls = new OrbitControls(camera, renderer.domElement);

@@ -43,7 +43,7 @@ async function init() {
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 
-    const scene = new Scene();
+    const scene = initScene();
 
     const parent = new Object3D();
     scene.add(parent);

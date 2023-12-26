@@ -1,17 +1,10 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:34:23
+ * @LastEditTime: 2023-12-26 17:12:44
  * @FilePath: /threejs-demo/src/animate/loadModalWithAnimation.js
  */
-/*
- * @Date: 2023-09-01 13:44:22
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-01 14:31:02
- * @FilePath: /threejs-demo/examples/src/animate/animateTest1.js
- */
 import {
-    Scene,
     Vector3,
     QuaternionKeyframeTrack,
     VectorKeyframeTrack,
@@ -20,14 +13,18 @@ import {
     Clock,
     Matrix4,
     Quaternion,
-    SRGBColorSpace
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
-    initRenderer, initOrthographicCamera, initDefaultLighting, initGroundPlane,
+    initRenderer, 
+    initOrthographicCamera, 
+    initGroundPlane, 
+    initSpotLight, 
+    initScene, 
+    initOrbitControls, 
+    initAmbientLight,
+    initGUI
 } from '../lib/tools/index.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
 
 window.onload = () => {
@@ -45,15 +42,15 @@ async function init() {
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
-    const scene = new Scene();
-    const light = initDefaultLighting(scene, new Vector3(40, 40, 70),0xffffff);
-    light.shadow.camera.left = camera.left;
-    light.shadow.camera.right = camera.right;
-    light.shadow.camera.top = camera.top;
-    light.shadow.camera.bottom = camera.bottom;
-    light.shadow.camera.near = camera.near;
-    light.shadow.camera.far = camera.far;
-    const orbitControl = new OrbitControls(camera, renderer.domElement);
+    const scene = initScene();
+
+    const light = initSpotLight();
+    light.position.set(40, 40, 70);
+    scene.add(light);
+
+    initAmbientLight(scene);
+
+    const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     initGroundPlane(scene);
 
@@ -61,13 +58,13 @@ async function init() {
 
     const loader = new GLTFLoader();
 
-    const [parrotData,flamingoData,storkData] = await Promise.all([
+    const [parrotData, flamingoData, storkData] = await Promise.all([
         loader.loadAsync(`${basePath}Parrot.glb`),
         loader.loadAsync(`${basePath}Flamingo.glb`),
         loader.loadAsync(`${basePath}Stork.glb`),
     ])
 
-    console.log({parrotData,flamingoData,storkData});
+    console.log({ parrotData, flamingoData, storkData });
 
     const parrot = parrotData.scenes[0];
     parrot.children[0].castShadow = true;
@@ -90,34 +87,34 @@ async function init() {
     scene.add(stork);
 
     // fly Forward
-    const positionKeyFrame = new VectorKeyframeTrack('.position',[0,4,8,12,16],[0,0,8,0,-30,10,0,0,12,0,20,8,0,0,8]);
+    const positionKeyFrame = new VectorKeyframeTrack('.position', [0, 4, 8, 12, 16], [0, 0, 8, 0, -30, 10, 0, 0, 12, 0, 20, 8, 0, 0, 8]);
 
     // fly circle
-    const circlePosKeyFrame = new VectorKeyframeTrack('.position',[0,2,4,6,8],[15,0,12,0,-15,12,-15,0,12,0,15,12,15,0,12]);
+    const circlePosKeyFrame = new VectorKeyframeTrack('.position', [0, 2, 4, 6, 8], [15, 0, 12, 0, -15, 12, -15, 0, 12, 0, 15, 12, 15, 0, 12]);
     const quaternionArray = []
-    const  angles =  [0,Math.PI*0.5,Math.PI,Math.PI*1.5,Math.PI*2];
+    const angles = [0, Math.PI * 0.5, Math.PI, Math.PI * 1.5, Math.PI * 2];
     // 这是个bug
-    angles.forEach((angle,i)=>{
-        const m = new Matrix4().makeRotationAxis(new Vector3(0,0,-1),angle).premultiply(new Matrix4().makeRotationY(-Math.PI/2));
+    angles.forEach((angle, i) => {
+        const m = new Matrix4().makeRotationAxis(new Vector3(0, 0, -1), angle).premultiply(new Matrix4().makeRotationY(-Math.PI / 2));
         const q = new Quaternion().setFromRotationMatrix(m);
-        q.toArray(quaternionArray,i*4)
+        q.toArray(quaternionArray, i * 4)
     })
-    const circleQueKeyFrame = new QuaternionKeyframeTrack('.quaternion',[0,2,4,6,8],quaternionArray)
+    const circleQueKeyFrame = new QuaternionKeyframeTrack('.quaternion', [0, 2, 4, 6, 8], quaternionArray)
 
     const clock = new Clock();
 
     const parrotMixer = new AnimationMixer(parrot);
     const parrotFly = parrotMixer.clipAction(parrotData.animations[0]);
-    const parrotForward = parrotMixer.clipAction(new AnimationClip('Forward',-1,[positionKeyFrame]));
+    const parrotForward = parrotMixer.clipAction(new AnimationClip('Forward', -1, [positionKeyFrame]));
 
     const flamingoMixer = new AnimationMixer(flamingo);
     const flamingoFly = flamingoMixer.clipAction(flamingoData.animations[0]);
-    const flamingoCircle = flamingoMixer.clipAction(new AnimationClip('Circle',-1,[circlePosKeyFrame,circleQueKeyFrame]));
+    const flamingoCircle = flamingoMixer.clipAction(new AnimationClip('Circle', -1, [circlePosKeyFrame, circleQueKeyFrame]));
 
     const storkMixer = new AnimationMixer(stork);
     const storkFly = storkMixer.clipAction(storkData.animations[0]);
 
-    const gui = new GUI();;
+    const gui = initGUI();;
 
     const o = {
         start() {

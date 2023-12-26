@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:54:59
+ * @LastEditTime: 2023-12-26 17:41:08
  * @FilePath: /threejs-demo/src/zFighting/test.js
  */
 import {
-  Scene,
   PerspectiveCamera,
   MeshPhongMaterial,
   DoubleSide,
@@ -17,7 +16,8 @@ import {
   initRenderer, 
   resize,
   initOrbitControls,
-  initDirectionLight
+  initDirectionLight,
+  initScene
  } from '../lib/tools/index.js';
 import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
 
@@ -29,17 +29,18 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-
+  renderer.autoClear = false;
+  
   const stats = new Stats();
   stats.showPanel(0);
   document.getElementById('webgl-output').append(stats.dom);
-  renderer.autoClear = false;
+
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000000);
   camera.up.set(0, 0, 1);
   camera.position.set(5, 5, 5);
   camera.lookAt(10, 0, 0);
-  const scene = new Scene();
-  renderer.setClearColor(0xffffff);
+
+  const scene = initScene();
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
@@ -48,15 +49,14 @@ function init() {
   function render() {
     stats.begin();
     orbitControls.update();
-    requestAnimationFrame(render);
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
     stats.end();
   }
-  render();
-  window.camera = camera;
-  window.scene = scene;
+
+  renderer.setAnimationLoop(render);
+
 
   const defaultParams = {
     side: DoubleSide,

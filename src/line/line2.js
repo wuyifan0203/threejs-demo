@@ -1,30 +1,30 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-05 15:38:10
- * @FilePath: /threejs-demo/examples/src/line/line2.js
+ * @LastEditTime: 2023-12-26 17:55:43
+ * @FilePath: /threejs-demo/src/line/line2.js
  */
 
 import {
-  Scene,
   Vector3,
   LineBasicMaterial,
   EdgesGeometry,
   LineSegments,
   BoxGeometry,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
+  initScene,
+  initGUI,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 import { LineMaterial } from '../lib/three/LineMaterial.js';
 import { LineSegments2 } from '../lib/three/LineSegments2.js';
 import { LineSegmentsGeometry } from '../lib/three/LineSegmentsGeometry.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -32,26 +32,23 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
+
   const camera = initOrthographicCamera(new Vector3(100, -100, 100));
   camera.up.set(0, 0, 1);
-  const scene = new Scene();
+
+  const scene = initScene();
+
   initAxesHelper(scene);
-  renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  draw(scene);
+  const controls = initOrbitControls(camera, renderer.domElement);
 
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
-}
 
-function draw(scene) {
-//   const [x, y, z] = [6, 10, 4];
+  renderer.setAnimationLoop(render);
 
   // 2. 创建 LineGeometry，并设置空间点
   const g = new BoxGeometry(5, 6, 4);
@@ -77,7 +74,8 @@ function draw(scene) {
   scene.add(line);
   scene.add(l);
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui.add(material, 'linewidth', 0.5, 10, 0.1);
   gui.add(material, 'wireframe');
 }
+

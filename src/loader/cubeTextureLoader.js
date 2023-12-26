@@ -56,7 +56,7 @@ function init() {
   renderer.autoClear = false;
   const camera = initPerspectiveCamera(new Vector3(0, 0, 5));
   camera.lookAt(0, 0, 0);
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
   const ambientLight = new AmbientLight(0xffffff, 1);
   scene.add(ambientLight);

@@ -47,9 +47,9 @@ function init() {
     const controls = initOrbitControls(camera, renderer.domElement);
     controls.addEventListener('change', render)
 
-    const scene = new Scene();
+    const scene = initScene();
 
-    const sceneHelper = new Scene();
+    const sceneHelper = initScene();
 
     const material = new MeshNormalMaterial()
 

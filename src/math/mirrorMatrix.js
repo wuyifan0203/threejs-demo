@@ -1,5 +1,4 @@
 import {
-  Scene,
   Mesh,
   BufferGeometry,
   Vector3,
@@ -12,16 +11,17 @@ import {
   Points,
   PointsMaterial,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
-
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
-  initDefaultLighting,
   rotationFormula,
   createMirrorMatrix,
+  initScene,
+  initOrbitControls,
+  initSpotLight,
+  initAmbientLight
 } from '../lib/tools/index.js';
 
 (function () {
@@ -30,28 +30,31 @@ import {
 
 function init() {
   const renderer = initRenderer();
+
   const camera = initOrthographicCamera(new Vector3(100, -100, 100));
   camera.up.set(0, 0, 1);
-  const scene = new Scene();
+  const scene = initScene();
 
-  renderer.setClearColor(0xffffff);
+ 
+
+  const light = initSpotLight();
+  light.position.set(40, 40, 70);
+  scene.add(light);
+
+  initAmbientLight(scene);
   initCustomGrid(scene);
-  const light = initDefaultLighting(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
-  draw(scene);
-
-  render();
+  const controls = initOrbitControls(camera, renderer.domElement);
+ 
   function render() {
     controls.update();
     light.position.copy(camera.position);
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
-}
 
-function draw(scene) {
+  renderer.setAnimationLoop(render);
+
   const basicMaterial = new MeshLambertMaterial({
     // side: DoubleSide,
     transparent: true,
@@ -109,4 +112,8 @@ function draw(scene) {
   boxMesh2.applyMatrix4(bool === 1 ? MResult : MResult2);
 
   console.dir(scene.children);
+}
+
+function draw(scene) {
+ 
 }

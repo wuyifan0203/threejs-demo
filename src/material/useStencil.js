@@ -40,7 +40,7 @@ async function init() {
     const envLight = new AmbientLight();
     const directionalLight = initDirectionLight();
 
-    const scene = new Scene();
+    const scene = initScene();
 
     scene.add(envLight, directionalLight);
 

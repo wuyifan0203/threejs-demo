@@ -40,7 +40,7 @@ function init() {
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-  const scene = new Scene();
+  const scene = initScene();
   initCustomGrid(scene);
 
   scene.add(new AmbientLight());

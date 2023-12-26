@@ -38,7 +38,7 @@ function init() {
   const renderer = initRenderer();
   const camera = initPerspectiveCamera(new Vector3(0, -2, 33));
   camera.lookAt(0, 0, 0);
-  const scene = new Scene();
+  const scene = initScene();
   renderer.outputEncoding = sRGBEncoding;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.setClearColor(0xffffff);

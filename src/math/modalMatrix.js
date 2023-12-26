@@ -37,7 +37,7 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
-  const scene = new Scene();
+  const scene = initScene();
 
   renderer.setClearColor(0xffffff);
 

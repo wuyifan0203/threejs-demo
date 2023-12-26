@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-05 20:45:26
- * @FilePath: /threejs-demo/examples/src/animate/useAnimation.js
+ * @LastEditTime: 2023-12-26 18:04:10
+ * @FilePath: /threejs-demo/src/animate/useAnimation.js
  */
 import {
     BoxGeometry,
-    Scene,
     Vector3,
     MeshPhongMaterial,
     Mesh,
@@ -16,12 +15,16 @@ import {
     AnimationMixer,
     Clock
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
-    initRenderer, initOrthographicCamera, initDefaultLighting, initGroundPlane,
+    initRenderer,
+    initOrthographicCamera,
+    initSpotLight,
+    initGroundPlane,
+    initOrbitControls,
+    initGUI,
+    initScene
 } from '../lib/tools/index.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
     init();
@@ -29,23 +32,25 @@ window.onload = () => {
 
 function init() {
     const renderer = initRenderer({});
-    renderer.shadowMap.enabled = true;
-    renderer.setClearColor(0xffffff);
-    renderer.setPixelRatio(window.devicePixelRatio);
 
     const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
-    const scene = new Scene();
-    initDefaultLighting(scene, new Vector3(40, 40, 70));
-    const orbitControl = new OrbitControls(camera, renderer.domElement);
+    const scene = initScene();
+
+    const light = initSpotLight();
+    light.position.set(40, 40, 70);
+    scene.add(light);
+
+    const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     initGroundPlane(scene);
+
     const geometry = new BoxGeometry(3, 3, 3);
     const material = new MeshPhongMaterial({
         color: 'orange',
-        transparent:true,
+        transparent: true,
         polygonOffset: true,
         polygonOffsetFactor: - 4,
     });
@@ -55,9 +60,6 @@ function init() {
     scene.add(boxMesh);
 
     const clock = new Clock();
-
-
-
 
     // 
     const opacityTime = [0, 1, 2, 3, 4, 5, 6];
@@ -70,32 +72,32 @@ function init() {
 
     const positionKeyframe = new VectorKeyframeTrack(".position", positionTime, positionValues);
 
-    const animationClip = new AnimationClip("box-Move-changeOpacity", -1, [opacityKeyframe,positionKeyframe]);
+    const animationClip = new AnimationClip("box-Move-changeOpacity", -1, [opacityKeyframe, positionKeyframe]);
 
     const mixer = new AnimationMixer(boxMesh);
     const action = mixer.clipAction(animationClip);
 
-    const gui = new GUI();;
+    const gui = initGUI();;
 
     const o = {
-        start(){
+        start() {
             action.play();
         },
-        paused(){
+        paused() {
             action.paused = !action.paused;
         },
-        stop(){
+        stop() {
             action.stop();
         },
-        reset(){
+        reset() {
             action.reset();
         }
     }
 
-    gui.add(o,'start');
-    gui.add(o,'paused').name('paused/continue');
-    gui.add(o,'stop');
-    gui.add(o,'reset');
+    gui.add(o, 'start');
+    gui.add(o, 'paused').name('paused/continue');
+    gui.add(o, 'stop');
+    gui.add(o, 'reset');
 
 
     function render() {
@@ -103,6 +105,7 @@ function init() {
         renderer.render(scene, camera);
         mixer.update(clock.getDelta());
     }
+
     renderer.setAnimationLoop(render)
 
 }

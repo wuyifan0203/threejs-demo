@@ -36,7 +36,7 @@ function init() {
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
 
-  const scene = new Scene();
+  const scene = initScene();
   scene.add(new AmbientLight());
   const light = new PointLight();
   light.position.set(10, 10, 10);

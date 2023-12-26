@@ -1,16 +1,15 @@
 /*
  * @Date: 2023-05-17 10:09:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-06 18:08:17
- * @FilePath: /threejs-demo/packages/examples/canvas/canvasGradient.js
+ * @LastEditTime: 2023-12-26 17:57:48
+ * @FilePath: /threejs-demo/src/canvas/canvasGradient.js
  */
-/*
- * @Date: 2023-05-17 10:09:04
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-06 17:51:12
- * @FilePath: /threejs-demo/packages/examples/canvas/canvasGradient.js
- */
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+
+import { initGUI } from '../lib/tools/common.js';
+
+window.onload = () => {
+  init();
+};
 
 function init() {
   const width = window.innerWidth / 3;
@@ -66,7 +65,7 @@ function init() {
   updateLinear();
   updateRadial();
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const linearFolder = gui.addFolder('Linear');
   const radialFolder = gui.addFolder('Radial');
@@ -84,6 +83,4 @@ function init() {
   radialFolder.add(radialControl, 'r1', 0, 500, 0.1).onChange(() => updateRadial());
 }
 
-window.onload = () => {
-  init();
-};
+

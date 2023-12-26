@@ -7,11 +7,14 @@ import {
   WebGLRenderer,
   MeshNormalMaterial,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { DynamicGrid } from '../lib/three/GridHelper2.js';
 import {
-  initRenderer, resize,
+  initRenderer, 
+  resize,
   initOrthographicCamera,
+  initScene,
+  initOrbitControls,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 import { Stats } from '../lib/util/Stats.js';
@@ -29,10 +32,10 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(0, 0, 100));
   camera.up.set(0, 0, 1);
 
-  const scene = new Scene();
+  const scene = initScene();
   scene.background = new Color(0xf0f0f0);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
   let customGrid = new DynamicGrid(50, 1);

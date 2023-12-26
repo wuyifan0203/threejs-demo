@@ -74,7 +74,7 @@ class DepthPeeling {
         this.pixelRatio = 1;
         // 用来暂存原始render得颜色
         this.originClearColor = new Color();
-        this.scene = new Scene();
+        this.scene = initScene();
 
         this.setScreenSize(width, height, pixelRatio);
         this.setDepth(depth);

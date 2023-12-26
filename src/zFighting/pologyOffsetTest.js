@@ -1,23 +1,25 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:52:04
+ * @LastEditTime: 2023-12-26 17:44:48
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
-  Scene,
   PerspectiveCamera,
   MeshPhongMaterial,
   Mesh,
-  AmbientLight,
   PlaneGeometry,
+  Vector3,
 } from '../lib/three/three.module.js';
-import { 
-  initRenderer, 
-  resize, 
-  initDirectionLight, 
-  initOrbitControls, 
-  initGUI 
+import {
+  initRenderer,
+  resize,
+  initDirectionLight,
+  initOrbitControls,
+  initGUI,
+  initScene,
+  initAmbientLight,
+  initPerspectiveCamera
 } from '../lib/tools/index.js';
 import { Stats } from '../lib/util/Stats.js';
 
@@ -27,39 +29,37 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
+
   const stats = new Stats();
   stats.showPanel(0);
   document.getElementById('webgl-output').append(stats.dom);
-  const camera = new PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    1,
-    100000,
-  );
+
+  const camera = initPerspectiveCamera(new Vector3(5, 5, 5));
   camera.up.set(0, 0, 1);
-  camera.position.set(5, 5, 5);
-  renderer.setClearColor(0xffffff);
+
+  const scene = initScene();
 
   const light = initDirectionLight();
+  light.position.set(70, 70, 70);
+  scene.add(light);
 
-  const scene = new Scene();
-  const ambientLight = new AmbientLight(0xffffff);
-  scene.add(ambientLight, light);
+
+  initAmbientLight(scene);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
+  
   resize(renderer, camera);
 
   function render() {
     stats.begin();
     orbitControls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
     light.position.copy(camera.position);
     stats.end();
   }
-  render();
-  window.camera = camera;
-  window.scene = scene;
+
+  renderer.setAnimationLoop(render);
+
   const redMaterial = new MeshPhongMaterial({ color: 'red', polygonOffset: true });
   const blueMaterial = new MeshPhongMaterial({ color: 'blue', polygonOffset: true });
   const yellowMaterial = new MeshPhongMaterial({ color: 'yellow', polygonOffset: true });

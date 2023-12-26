@@ -36,7 +36,7 @@ const init = () => {
   const camera = initPerspectiveCamera(new Vector3(20, 20, 20));
   camera.up.set(0, 0, 1);
 
-  const scene = new Scene();
+  const scene = initScene();
   initAxesHelper(scene);
   const ambientLight = new AmbientLight(0x3c3c3c);
   scene.add(ambientLight);

@@ -103,11 +103,8 @@ function initGroundPlane(scene, size = { x: 200, y: 200 }) {
  * @param {Vector3} initialPosition
  * @return {SpotLight}
  */
-function initDefaultLighting(scene, initialPosition, color = 0x343434) {
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(100, 300, 400);
-
-  const spotLight = new SpotLight(0xffffff);
-  spotLight.position.copy(position);
+function initSpotLight(color = 0xffffff, intensity = 3) {
+  const spotLight = new SpotLight(color, intensity);
   spotLight.shadow.mapSize.width = 2048;
   spotLight.shadow.mapSize.height = 2048;
   spotLight.shadow.camera.fov = 15;
@@ -116,13 +113,15 @@ function initDefaultLighting(scene, initialPosition, color = 0x343434) {
   spotLight.penumbra = 0.05;
   spotLight.name = 'spotLight';
 
-  scene.add(spotLight);
+  return spotLight;
+}
 
-  const ambientLight = new AmbientLight(color);
+
+function initAmbientLight(scene, color = 0xffffff, intensity = 1) {
+  const ambientLight = new AmbientLight(color, intensity);
   ambientLight.name = 'ambientLight';
   scene.add(ambientLight);
-
-  return spotLight;
+  return ambientLight;
 }
 
 /**
@@ -284,7 +283,7 @@ function createBackgroundTexture(color, color2) {
 
 export {
   initAxesHelper,
-  initDefaultLighting,
+  initSpotLight,
   initGroundPlane,
   initPerspectiveCamera,
   initRenderer,
@@ -297,5 +296,6 @@ export {
   initCoordinates,
   initProgress,
   createBackgroundTexture,
-  initDirectionLight
+  initDirectionLight,
+  initAmbientLight
 };

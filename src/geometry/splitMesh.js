@@ -36,7 +36,7 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
   const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
   renderer.autoClear = false;
   camera.up.set(0, 0, 1);

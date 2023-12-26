@@ -43,7 +43,7 @@ import {
   
     const orbitControls = initOrbitControls(camera, renderer.domElement);
   
-    const scene = new Scene();
+    const scene = initScene();
     const plane = initGroundPlane(scene,{x:50,y:50});
     plane.material.color.setHex(0x121212);
   

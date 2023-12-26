@@ -1,17 +1,28 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-09 16:49:39
- * @FilePath: /threejs-demo/examples/src/canvas/useOne.js
+ * @LastEditTime: 2023-12-26 17:59:47
+ * @FilePath: /threejs-demo/src/canvas/useOne.js
  */
 import {
     BoxGeometry,
-    Mesh, Vector3, MeshBasicMaterial, Quaternion, Euler, Clock, OrthographicCamera, PlaneGeometry, MeshDepthMaterial, Vector4, Color, CanvasTexture
+    Mesh, 
+    Vector3, 
+    MeshBasicMaterial, 
+    OrthographicCamera, 
+    PlaneGeometry, 
+    Vector4, 
+    Color, 
+    CanvasTexture
 } from '../lib/three/three.module.js'
 import {
     initCoordinates,
     initCustomGrid,
-    initGUI, initOrbitControls, initOrthographicCamera, initRenderer, initScene
+    initGUI, 
+    initOrbitControls, 
+    initOrthographicCamera, 
+    initRenderer, 
+    initScene
 } from '../lib/tools/common.js';
 
 window.onload = () => {
@@ -32,13 +43,12 @@ function init() {
 
     scene.background = new Color(0xffffff);
     scene.add(coord);
-    const grid = initCustomGrid(scene, 50, 50);
+    initCustomGrid(scene, 50, 50);
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
     const uiScene = initScene();
 
     const uiCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-
 
     const plane = new Mesh(new PlaneGeometry(1, 1), new MeshBasicMaterial({ color: 'red' }));
 
@@ -66,20 +76,14 @@ function init() {
 
     const planeTexture = new CanvasTexture(canvas);
 
-
-
     plane.material.map = planeTexture;
 
-
-
-
-
-
-    renderer.setAnimationLoop(animation);
+  
     function animation() {
-
         render()
     }
+
+    renderer.setAnimationLoop(animation);
 
     const vtmp = new Vector4()
 
@@ -110,18 +114,11 @@ function init() {
 
     }
 
-
     orbitControls.addEventListener('change', () => {
-
         render()
-
     })
 
     const box = new Mesh(new BoxGeometry(5, 3, 2), new MeshBasicMaterial({ color: 0xfd6789 }))
-
     scene.add(box);
-
-
-
 
 }

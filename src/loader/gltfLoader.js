@@ -30,7 +30,7 @@ function init() {
   );
   camera.position.set(-43, 13, 0.6);
   camera.lookAt(0, 0, 0);
-  const scene = new Scene();
+  const scene = initScene();
   renderer.setClearColor(0xffffff);
 
   const light = new PointLight(0xffffff, 2);
