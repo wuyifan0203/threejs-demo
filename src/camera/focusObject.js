@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-05 17:18:51
+ * @LastEditTime: 2023-12-26 16:41:07
  * @FilePath: /threejs-demo/src/camera/focusObject.js
  */
 
@@ -12,7 +12,6 @@ import {
     BoxGeometry,
     MeshLambertMaterial,
     Vector3,
-    DirectionalLight,
     Matrix4,
     Box2,
     Quaternion,
@@ -25,6 +24,7 @@ import {
     initRenderer,
     initScene,
     resize,
+    initDirectionLight,
     initGUI
 } from '../lib/tools/index.js';
 import { createNDCMatrix } from '../lib/tools/math.js';
@@ -46,17 +46,17 @@ function init() {
 
     console.log(camera);
 
-    const light = new DirectionalLight(0xffffff, 1);
+    const light = initDirectionLight();
 
-  
+
 
     const scene = initScene();
     scene.background = new Color(0xf0f0f0);
 
     scene.add(light);
 
-   
-  
+
+
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
     orbitControls.zoomToCursor = true

@@ -1,15 +1,14 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-21 20:02:35
- * @FilePath: /threejs-demo/examples/src/render/renderMultiScene.js
+ * @LastEditTime: 2023-12-26 16:46:30
+ * @FilePath: /threejs-demo/src/render/renderMultiScene.js
  */
 import {
   Scene,
   Mesh,
   Vector3,
   AmbientLight,
-  DirectionalLight,
   BoxGeometry,
   MeshStandardMaterial,
   Clock,
@@ -45,12 +44,7 @@ function init() {
 
   const scene1 = new Scene();
 
-  const light = new DirectionalLight();
-  light.castShadow = true;
-  light.shadow.mapSize.height = 2048;
-  light.shadow.mapSize.width = 2048;
-  light.shadow.camera.near = 1; // default
-  light.shadow.camera.far = 10000; // default
+  const light = initDirectionLight();
   light.position.set(20, 20, 20);
   light.target = scene1;
 

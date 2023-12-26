@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-08-14 19:11:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-14 20:58:12
- * @FilePath: /threejs-demo/examples/src/intersection/raycaster.js
+ * @LastEditTime: 2023-12-26 16:17:00
+ * @FilePath: /threejs-demo/src/intersection/raycaster.js
  */
 
 import { OrbitControls } from '../lib/three/OrbitControls.js';
@@ -16,16 +16,15 @@ import {
     MeshBasicMaterial,
     ReplaceStencilOp,
     NotEqualStencilFunc,
-    PointLight,
     Raycaster,
     MeshLambertMaterial,
-    DirectionalLight
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
     initOrthographicCamera,
     resize,
     initCustomGrid,
+    initDirectionLight
 } from '../lib/tools/index.js';
 
 import { TransformControls } from '../lib/three/TransformControls.js'
@@ -64,17 +63,11 @@ function init() {
 
     scene.add(new AmbientLight());
 
-    const pointLight = new DirectionalLight(0xffffff);
-    pointLight.angle = Math.PI / 4;
-    pointLight.castShadow = true;
-    pointLight.shadow.mapSize.width = 2048;
-    pointLight.shadow.mapSize.height = 2048;
-    pointLight.shadow.camera.near = camera.near;
-    pointLight.shadow.camera.far = camera.far;
-    pointLight.intensity = 1;
-    pointLight.position.set(100, 100, 100);
+    const light = initDirectionLight();
+    light.angle = Math.PI / 4;
+    light.position.set(100, 100, 100);
 
-    scene.add(pointLight);
+    scene.add(light);
     scene.add(transformControls);
 
     const geometry = new BoxGeometry(2, 2, 2);

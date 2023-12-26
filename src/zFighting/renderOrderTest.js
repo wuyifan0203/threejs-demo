@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 13:14:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-21 14:33:55
+ * @LastEditTime: 2023-12-26 16:53:22
  * @FilePath: /threejs-demo/src/zFighting/renderOrderTest.js
  */
 import {
@@ -10,14 +10,17 @@ import {
     AmbientLight,
     Vector3,
     MeshLambertMaterial,
-    DirectionalLight,
     OrthographicCamera,
     Box3
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
     initCustomGrid,
-    initRenderer, initScene, resize, initGUI
+    initRenderer, 
+    initScene, 
+    resize, 
+    initGUI,
+    initDirectionLight,
+    initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -38,7 +41,7 @@ function init() {
     window.camera = camera;
     camera.up.set(0, 0, 1);
 
-    const light = new DirectionalLight(0xffffff, 1);
+    const light = initDirectionLight();
     light.position.copy(camera);
 
     const scene = initScene();
@@ -48,7 +51,7 @@ function init() {
 
     initCustomGrid(scene);
 
-    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    const orbitControls = initOrbitControls(camera, renderer.domElement);
     resize(renderer, camera);
 
     function render() {

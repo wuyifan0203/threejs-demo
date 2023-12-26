@@ -1,21 +1,20 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-01 18:02:12
+ * @LastEditTime: 2023-12-26 16:43:19
  * @FilePath: /threejs-demo/src/material/useStencil.js
  */
 import {
     Scene,
     Vector3,
     AmbientLight,
-    DirectionalLight,
     Mesh,
     MeshBasicMaterial,
 } from '../lib/three/three.module.js';
 import { STLLoader } from '../lib/three/STLLoader.js'
 import {
     initRenderer,
-    initOrthographicCamera,
+    initDirectionLight,
     resize,
     initOrbitControls,
     initGUI,
@@ -39,7 +38,7 @@ async function init() {
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
     const envLight = new AmbientLight();
-    const directionalLight = new DirectionalLight();
+    const directionalLight = initDirectionLight();
 
     const scene = new Scene();
 

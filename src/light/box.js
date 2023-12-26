@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-05 09:36:12
- * @FilePath: /threejs-demo/examples/src/light/box.js
+ * @LastEditTime: 2023-12-26 16:41:37
+ * @FilePath: /threejs-demo/src/light/box.js
  */
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
@@ -10,6 +10,7 @@ import {
   initPerspectiveCamera,
   initAxesHelper,
   initGroundPlane,
+  initDirectionLight,
   resize,
 } from '../lib/tools/index.js';
 import {
@@ -21,7 +22,6 @@ import {
   BoxGeometry,
   BufferGeometry,
   BufferAttribute,
-  DirectionalLight,
   PlaneGeometry,
 } from '../lib/three/three.module.js';
 
@@ -43,8 +43,7 @@ const init = () => {
   // 2
   groundPlane.receiveShadow = true;
 
-  const directionalLight = new DirectionalLight('#ffffff', 1);
-  directionalLight.castShadow = true;
+  const directionalLight = initDirectionLight();
   scene.add(directionalLight);
   directionalLight.position.set(5, 5, 5);
 

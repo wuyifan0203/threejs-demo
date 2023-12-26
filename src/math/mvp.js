@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-21 18:59:11
- * @FilePath: /threejs-demo/examples/src/math/mvp.js
+ * @LastEditTime: 2023-12-26 16:29:40
+ * @FilePath: /threejs-demo/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
 
@@ -15,11 +15,10 @@ import {
     BoxGeometry,
     MeshLambertMaterial,
     AmbientLight,
-    DirectionalLight,
     Matrix4
 } from '../lib/three/three.module.js';
 
-import { initRenderer } from '../lib/tools/index.js';
+import { initRenderer, initDirectionLight } from '../lib/tools/index.js';
 
 
 window.onload = function () {
@@ -41,7 +40,7 @@ function init() {
     const scene = new Scene();
 
     scene.add(new AmbientLight());
-    const light = new DirectionalLight();
+    const light = initDirectionLight();
     light.position.set(0, -10, 5);
     scene.add(light)
 
@@ -82,41 +81,41 @@ function init() {
     // 转换到实际坐标
 
     // 模型坐标转世界坐标
-    point.applyMatrix4(modelMatrix); 
+    point.applyMatrix4(modelMatrix);
 
-    console.log('世界坐标:',point);
+    console.log('世界坐标:', point);
 
     // 世界坐标转相机坐标
 
     const point2 = point.clone().applyMatrix4(viewMatrix);
-    console.log('相机坐标:',point2);
+    console.log('相机坐标:', point2);
 
     // 相机坐标转投影坐标
     const point3 = point2.clone().applyMatrix4(projectionMatrix);
-    console.log('投影坐标:',point3);
+    console.log('投影坐标:', point3);
 
 
- // 投影坐标转屏幕坐标
-    const point4 = point3.clone().applyMatrix4(createNDCMatrix(1000,800));
-    console.log('屏幕坐标:',point4);
+    // 投影坐标转屏幕坐标
+    const point4 = point3.clone().applyMatrix4(createNDCMatrix(1000, 800));
+    console.log('屏幕坐标:', point4);
 
-    function createNDCMatrix(width,height) {
+    function createNDCMatrix(width, height) {
         const W = width / 2;
         const H = height / 2;
         return new Matrix4().set(
-            W,0,0,W,
-            0,H,0,H,
-            0,0,1,0,
-            0,0,0,1
+            W, 0, 0, W,
+            0, H, 0, H,
+            0, 0, 1, 0,
+            0, 0, 0, 1
         )
     }
- 
 
-   
+
+
     // const x = 1000- (500 - point3.x * 500) ;
     // const y = 800 - (1- point3.y) * 400;
 
-    console.log('屏幕坐标:',point4.x,point4.y);
+    console.log('屏幕坐标:', point4.x, point4.y);
 
 
 

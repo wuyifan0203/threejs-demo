@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-01 14:21:41
- * @FilePath: /threejs-demo/examples/src/math/mvpInverse.js
+ * @LastEditTime: 2023-12-26 16:29:56
+ * @FilePath: /threejs-demo/src/math/mvpInverse.js
  */
 /* eslint-disable no-unused-vars */
 
@@ -15,12 +15,11 @@ import {
     BoxGeometry,
     MeshLambertMaterial,
     AmbientLight,
-    DirectionalLight,
     Matrix4
 } from '../lib/three/three.module.js';
 
 import {
-    initRenderer, initOrbitControls, initGUI
+    initRenderer, initOrbitControls, initGUI, initDirectionLight
 } from '../lib/tools/index.js';
 
 
@@ -59,7 +58,7 @@ function init() {
 
 
     scene.add(new AmbientLight());
-    const light = new DirectionalLight();
+    const light = initDirectionLight();
     light.position.set(0, -10, 5);
     scene.add(light)
 

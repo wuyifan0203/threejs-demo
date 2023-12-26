@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-19 10:08:15
+ * @LastEditTime: 2023-12-26 16:52:04
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
@@ -10,13 +10,15 @@ import {
   MeshPhongMaterial,
   Mesh,
   AmbientLight,
-  DirectionalLight,
   PlaneGeometry,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
-
+import { 
+  initRenderer, 
+  resize, 
+  initDirectionLight, 
+  initOrbitControls, 
+  initGUI 
+} from '../lib/tools/index.js';
 import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
@@ -38,13 +40,13 @@ function init() {
   camera.position.set(5, 5, 5);
   renderer.setClearColor(0xffffff);
 
-  const light = new DirectionalLight(0xffffff, 1);
+  const light = initDirectionLight();
 
   const scene = new Scene();
   const ambientLight = new AmbientLight(0xffffff);
   scene.add(ambientLight, light);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
   function render() {
@@ -76,7 +78,7 @@ function init() {
   mesh3.scale.set(2, 2, 1);
   scene.add(mesh3);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const material = {
     polygonOffset: true,

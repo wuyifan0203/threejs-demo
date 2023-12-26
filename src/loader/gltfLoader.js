@@ -1,20 +1,19 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:02:48
- * @FilePath: /threejs-demo/examples/src/loader/gltfLoader.js
+ * @LastEditTime: 2023-12-26 16:18:07
+ * @FilePath: /threejs-demo/src/loader/gltfLoader.js
  */
 import {
   Scene,
   PointLight,
   PerspectiveCamera,
   AmbientLight,
-  DirectionalLight,
   MeshPhongMaterial,
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
+import { initDirectionLight, initRenderer, resize } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -40,7 +39,7 @@ function init() {
   const light3 = new PointLight(0xffffff, 2);
   light3.position.set(-50, -50, 75);
 
-  const light2 = new DirectionalLight(0xffffff, 1);
+  const light2 = initDirectionLight();
 
   const ambientLight = new AmbientLight(0xffffff, 1);
   scene.add(light, light2, ambientLight);

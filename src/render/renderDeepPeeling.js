@@ -1,17 +1,14 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-24 01:02:31
+ * @LastEditTime: 2023-12-26 16:30:14
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
 import {
     Mesh,
-    Vector3,
     AmbientLight,
-    DirectionalLight,
     BoxGeometry,
-    MeshNormalMaterial,
     WebGLRenderer,
     Vector2,
     Scene,
@@ -68,7 +65,7 @@ async function init() {
     dom.appendChild(renderer.domElement);
 
 
-    const light = new DirectionalLight();
+    const light = initDirectionLight();
     light.castShadow = true;
     light.position.set(0, 0, 3);
     scene.add(light);

@@ -14,7 +14,8 @@ import {
   OrthographicCamera,
   Scene,
   CanvasTexture,
-  ClampToEdgeWrapping
+  ClampToEdgeWrapping,
+  DirectionalLight
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
@@ -50,7 +51,7 @@ function initRenderer(props = {}) {
 function initPerspectiveCamera(initialPosition) {
   const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
 
-  const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
+  const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
@@ -183,7 +184,7 @@ function initCustomGrid(scene, width = 50, height = 50) {
 }
 
 function initOrbitControls(camera, container) {
-  const controls =  new OrbitControls(camera, container);
+  const controls = new OrbitControls(camera, container);
   window.controls = controls;
   return controls;
 }
@@ -199,6 +200,16 @@ function initScene() {
 
 function initCoordinates(axesLength) {
   return new CoordinateHelper(axesLength)
+}
+
+function initDirectionLight(color = 0xffffff, intensity = 3) {
+  const light = new DirectionalLight(color, intensity);
+  light.castShadow = true;
+  light.shadow.mapSize.width = 2048;
+  light.shadow.mapSize.height = 2048;
+  light.shadow.camera.near = 1;
+  light.shadow.camera.far = 10000;
+  return light;
 }
 
 function initProgress() {
@@ -226,27 +237,27 @@ function initProgress() {
   main.appendChild(label);
 
 
-  main.setText = function(text) {
+  main.setText = function (text) {
     label.innerText = text;
   };
 
-  main.setProgress = function(num) {
+  main.setProgress = function (num) {
     progress.value = num;
     value.innerText = num + '%';
   }
 
 
-  main.show = function() {
+  main.show = function () {
     main.style.display = 'block';
   }
 
-  main.hide = function() {
+  main.hide = function () {
     main.style.display = 'none';
   }
 
 
   return main
-  
+
 }
 
 function createBackgroundTexture(color, color2) {
@@ -285,5 +296,6 @@ export {
   resize,
   initCoordinates,
   initProgress,
-  createBackgroundTexture
+  createBackgroundTexture,
+  initDirectionLight
 };

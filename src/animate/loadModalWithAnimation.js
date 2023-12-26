@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-01 18:10:39
- * @FilePath: /threejs-demo/examples/src/animate/loadModalWithAnimation.js
+ * @LastEditTime: 2023-12-26 16:34:23
+ * @FilePath: /threejs-demo/src/animate/loadModalWithAnimation.js
  */
 /*
  * @Date: 2023-09-01 13:44:22
@@ -19,7 +19,8 @@ import {
     AnimationMixer,
     Clock,
     Matrix4,
-    Quaternion
+    Quaternion,
+    SRGBColorSpace
 } from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {

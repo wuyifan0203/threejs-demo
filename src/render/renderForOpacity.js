@@ -9,19 +9,16 @@ import {
     Mesh,
     Vector3,
     AmbientLight,
-    DirectionalLight,
     BoxGeometry,
     MeshStandardMaterial,
     MeshPhysicalMaterial,
-    Vector2,
-    TextureLoader
 } from '../lib/three/three.module.js';
 
 import {
     initRenderer,
     initOrthographicCamera,
     resize,
-    initGroundPlane,
+    initDirectionLight,
     initOrbitControls,
 } from '../lib/tools/index.js';
 
@@ -42,12 +39,7 @@ function init() {
 
     const scene1 = new Scene();
 
-    const light = new DirectionalLight();
-    light.castShadow = true;
-    light.shadow.mapSize.height = 2048;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.camera.near = 1; // default
-    light.shadow.camera.far = 10000; // default
+    const light = initDirectionLight();
     light.position.set(20, 20, 20);
     light.target = scene1;
 

@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-02-10 14:34:32
- * @FilePath: /threejs-demo/src/examples/zFighting/test.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-26 16:54:59
+ * @FilePath: /threejs-demo/src/zFighting/test.js
  */
 import {
   Scene,
@@ -10,12 +10,15 @@ import {
   MeshPhongMaterial,
   DoubleSide,
   Mesh,
-  DirectionalLight,
   BoxGeometry,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
+import { 
+  initRenderer, 
+  resize,
+  initOrbitControls,
+  initDirectionLight
+ } from '../lib/tools/index.js';
 import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
 
 import { Stats } from '../lib/util/Stats.js';
@@ -38,7 +41,7 @@ function init() {
   const scene = new Scene();
   renderer.setClearColor(0xffffff);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
   resize(renderer, camera);
 
@@ -65,9 +68,7 @@ function init() {
   };
 
   function addLight(x, y, z) {
-    const color = 0xFFFFFF;
-    const intensity = 1;
-    const light = new DirectionalLight(color, intensity);
+    const light = initDirectionLight();
     light.position.set(x, y, z);
     scene.add(light);
   }

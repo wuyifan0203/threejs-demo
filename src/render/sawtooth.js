@@ -9,7 +9,6 @@ import {
     Mesh,
     Vector3,
     AmbientLight,
-    DirectionalLight,
     BoxGeometry,
     MeshNormalMaterial,
     WebGLRenderTarget,
@@ -30,6 +29,7 @@ import {
     initOrbitControls,
     initScene,
     createBackgroundTexture,
+    initDirectionLight
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -53,12 +53,7 @@ function init() {
 
     scene2.background = createBackgroundTexture('#ffffff', '#c6e9f7')
 
-    const light = new DirectionalLight();
-    light.castShadow = true;
-    light.shadow.mapSize.height = 2048;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.camera.near = 1; // default
-    light.shadow.camera.far = 10000; // default
+    const light = initDirectionLight();
     light.position.set(20, 20, 20);
     light.target = scene;
 

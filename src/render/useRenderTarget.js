@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-19 18:16:37
- * @FilePath: /threejs-demo/examples/src/render/useRenderTarget.js
+ * @LastEditTime: 2023-12-26 16:50:14
+ * @FilePath: /threejs-demo/src/render/useRenderTarget.js
  */
 /* eslint-disable no-unused-vars */
 
@@ -11,24 +11,23 @@ import {
   Mesh,
   Vector3,
   AmbientLight,
-  DirectionalLight,
   BoxGeometry,
   MeshStandardMaterial,
   Clock,
   WebGLRenderTarget,
   Vector2,
   SRGBColorSpace,
-  Color,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   initGroundPlane,
+  initDirectionLight,
+  initOrbitControls,
+  initGUI
 } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -47,10 +46,9 @@ function init() {
 
   renderer.setClearColor(0xffffff);
 
-  const orbitControl = new OrbitControls(camera, renderer.domElement);
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
 
-  const light = new DirectionalLight();
-  light.castShadow = true;
+  const light = initDirectionLight();
   light.position.set(20, 20, 20);
   light.target = scene;
 
@@ -139,7 +137,7 @@ function init() {
     },
   };
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui.add(func, 'renderTarget');
 }
 

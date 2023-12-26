@@ -5,11 +5,9 @@
  * @FilePath: /threejs-demo/examples/src/render/scissorTest.js
  */
 import {
-    Scene,
     Mesh,
     Vector3,
     AmbientLight,
-    DirectionalLight,
     BoxGeometry,
     MeshStandardMaterial,
     Clock,
@@ -17,14 +15,14 @@ import {
     Vector2,
     TextureLoader
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
-
 import {
     initRenderer,
     initOrthographicCamera,
     resize,
     initGroundPlane,
     initScene,
+    initDirectionLight,
+    initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -48,12 +46,7 @@ function init() {
 
     const scene2 = initScene();
 
-    const light = new DirectionalLight();
-    light.castShadow = true;
-    light.shadow.mapSize.height = 2048;
-    light.shadow.mapSize.width = 2048;
-    light.shadow.camera.near = 1; // default
-    light.shadow.camera.far = 10000; // default
+    const light = initDirectionLight();
     light.position.set(20, 20, 20);
     light.target = scene2;
 
@@ -64,7 +57,7 @@ function init() {
 
     initGroundPlane(scene2, new Vector2(20, 20));
 
-    const orbitControl = new OrbitControls(camera, renderer.domElement);
+    const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     const mesh = new Mesh(new BoxGeometry(5, 4, 3), new MeshStandardMaterial({ color: 0x049ef4, roughness: 0 }));
     mesh.position.set(0, 0, 6);
