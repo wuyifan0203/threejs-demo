@@ -1,14 +1,13 @@
 /*
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-23 16:05:22
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-24 10:49:49
- * @FilePath: /threejs-demo/packages/examples/geometry/lathePolygon.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-27 17:16:50
+ * @FilePath: /threejs-demo/src/geometry/lathePolygon.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
   Vector2,
@@ -20,12 +19,12 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initGUI,
+  initOrbitControls,
+  initScene
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
-// eslint-disable-next-line no-undef
 const { compile, isComplex } = math;
 
 window.onload = () => {
@@ -43,19 +42,19 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -133,7 +132,7 @@ function draw(scene) {
 
   const mesh = new Mesh(latheGeometry, material);
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui.width = 350;
   const rangeSettingFolder = gui.addFolder('Range Setting');
   rangeSettingFolder.add(geometryParams, 'xMin', -25, 10, 0.01).onChange(() => update());

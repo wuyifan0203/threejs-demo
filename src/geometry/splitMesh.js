@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-04-13 13:42:58
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:05:27
- * @FilePath: /threejs-demo/packages/examples/geometry/splitMesh.js
+ * @LastEditTime: 2023-12-27 17:24:55
+ * @FilePath: /threejs-demo/src/geometry/splitMesh.js
  */
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
   Plane,
@@ -22,10 +21,11 @@ import {
   initPerspectiveCamera,
   initAxesHelper,
   resize,
+  initScene,
+  initGUI,
+  initOrbitControls
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 const { EPSILON } = Number;
 
@@ -43,19 +43,19 @@ function init() {
   resize(renderer, camera);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -69,7 +69,7 @@ function draw(scene) {
 
   scene.add(mesh);
 
-  const getAllTrangles = (geometry) => {
+  const getAllTriangles = (geometry) => {
     let vertex = [];
     const index = geometry?.index?.array;
     const position = geometry?.attributes?.position?.array;
@@ -94,7 +94,7 @@ function draw(scene) {
     return Number(num.toFixed(16));
   }
 
-  function getDistancefromPointToPlane(point, planeNormal, planePoint) {
+  function getDistanceFromPointToPlane(point, planeNormal, planePoint) {
     const { x: Nx, y: Ny, z: Nz } = planeNormal;
     const { x: Px, y: Py, z: Pz } = planePoint;
     const { x, y, z } = point;
@@ -102,19 +102,19 @@ function draw(scene) {
   }
 
   function isIntersectingPlane(geometry, planeNormal, planePoint) {
-    const trangles = getAllTrangles(geometry);
-    // console.log(trangles);
+    const triangles = getAllTriangles(geometry);
+    // console.log(triangles);
     const intersecting = [];
-    for (let i = 0, { length } = trangles; i < length; i += 9) {
-      const point1 = new Vector3(r(trangles[i]), r(trangles[i + 1]), r(trangles[i + 2]));
-      const point2 = new Vector3(r(trangles[i + 3]), r(trangles[i + 4]), r(trangles[i + 5]));
-      const point3 = new Vector3(r(trangles[i + 6]), r(trangles[i + 7]), r(trangles[i + 8]));
+    for (let i = 0, { length } = triangles; i < length; i += 9) {
+      const point1 = new Vector3(r(triangles[i]), r(triangles[i + 1]), r(triangles[i + 2]));
+      const point2 = new Vector3(r(triangles[i + 3]), r(triangles[i + 4]), r(triangles[i + 5]));
+      const point3 = new Vector3(r(triangles[i + 6]), r(triangles[i + 7]), r(triangles[i + 8]));
 
-      // if (i === trangles.length - 9) {
+      // if (i === triangles.length - 9) {
       //   debugger
       // }
       // debugger
-      filterTrangle(point1, point2, point3, planeNormal, planePoint, intersecting);
+      filterTriangle(point1, point2, point3, planeNormal, planePoint, intersecting);
       // console.log(intersecting);
     }
     return intersecting;
@@ -129,10 +129,10 @@ function draw(scene) {
 
   const segments = [];
 
-  function filterTrangle(pointA, pointB, pointC, planeNormal, planePoint, array) {
-    const dis1 = rounds(getDistancefromPointToPlane(pointA, planeNormal, planePoint));
-    const dis2 = rounds(getDistancefromPointToPlane(pointB, planeNormal, planePoint));
-    const dis3 = rounds(getDistancefromPointToPlane(pointC, planeNormal, planePoint));
+  function filterTriangle(pointA, pointB, pointC, planeNormal, planePoint, array) {
+    const dis1 = rounds(getDistanceFromPointToPlane(pointA, planeNormal, planePoint));
+    const dis2 = rounds(getDistanceFromPointToPlane(pointB, planeNormal, planePoint));
+    const dis3 = rounds(getDistanceFromPointToPlane(pointC, planeNormal, planePoint));
 
     if (Number.isNaN(dis1) || Number.isNaN(dis2) || Number.isNaN(dis3)) {
       console.log('Nan => points', pointA, pointB, pointC);
@@ -257,8 +257,8 @@ function draw(scene) {
       return false;
     }
     for (let index = 0, { length } = segments; index < length; index++) {
-      const copmpler = segments[index];
-      const result = isSameLines(value, copmpler);
+      const comparer = segments[index];
+      const result = isSameLines(value, comparer);
       if (result) {
         return true;
       }
@@ -270,8 +270,8 @@ function draw(scene) {
     // l1与l2头与头相比，尾与尾相比
     const positiveOrder = compareLines(l1[0], l1[1], l2[0], l2[1]);
     // l1与l2头与尾相比
-    const negetiveOrder = compareLines(l1[1], l1[0], l2[0], l2[1]);
-    return positiveOrder || negetiveOrder;
+    const negativeOrder = compareLines(l1[1], l1[0], l2[0], l2[1]);
+    return positiveOrder || negativeOrder;
   }
 
   function compareLines(l1A, l1B, l2A, l2B) {
@@ -338,15 +338,15 @@ function draw(scene) {
     const { x: x4, y: y4 } = segment2[1];
     let order = 0;
     const positiveOrder = (Math.abs(x2 - x3) <= 1e-14 && Math.abs(y2 - y3) <= 1e-14);
-    const negetiveOrder = (Math.abs(x2 - x4) <= 1e-14 && Math.abs(y2 - y4) <= 1e-14);
+    const negativeOrder = (Math.abs(x2 - x4) <= 1e-14 && Math.abs(y2 - y4) <= 1e-14);
     if (positiveOrder) {
       order = 1;
-    } else if (negetiveOrder) {
+    } else if (negativeOrder) {
       order = -1;
     }
 
     return {
-      enable: positiveOrder || negetiveOrder,
+      enable: positiveOrder || negativeOrder,
       order,
     };
   }
@@ -448,17 +448,16 @@ function draw(scene) {
 
   function getLoopArea(loop) {
     const { max, min } = Math;
-    let xmin = 0; let xmax = 0; let ymin = 0; let
-      ymax = 0;
+    let [xMax, xMin, yMax, yMin] = [0, 0, 0, 0]
     for (let index = 0, { length } = loop; index < length; index++) {
       const { x, y } = loop[index][0];
-      xmin = min(x, xmin);
-      xmax = max(x, xmax);
-      ymin = min(y, ymin);
-      ymax = max(y, ymax);
+      xMin = min(x, xMin);
+      xMax = max(x, xMax);
+      yMin = min(y, yMin);
+      yMax = max(y, yMax);
     }
 
-    return (xmax - xmin) * (ymax - ymin);
+    return (xMax - xMin) * (yMax - yMin);
   }
 
   function getBodyIndex(areas) {
@@ -491,7 +490,7 @@ function draw(scene) {
     geometry: 'sphereGeometry',
   };
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const planeNormalFolder = gui.addFolder('Plane Normal');
   planeNormalFolder.add(control.planeNormal, 'x', -1, 1, 0.1).onChange(() => {

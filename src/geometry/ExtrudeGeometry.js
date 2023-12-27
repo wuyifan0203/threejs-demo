@@ -1,6 +1,5 @@
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
   ExtrudeGeometry,
@@ -14,10 +13,11 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initScene,
+  initOrbitControls,
+  initGUI
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -34,7 +34,7 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
@@ -45,8 +45,9 @@ function init() {
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 const funcList = {
@@ -132,7 +133,7 @@ function draw(scene) {
 
   const mesh = new Mesh(parametric, material);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   function update() {
     parametric.dispose();

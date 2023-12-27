@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-11 20:21:06
- * @FilePath: /threejs-demo/examples/src/geometry/ParametricGeometry.js
+ * @LastEditTime: 2023-12-27 17:14:58
+ * @FilePath: /threejs-demo/src/geometry/ParametricGeometry.js
  */
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
 } from '../lib/three/three.module.js';
@@ -16,11 +15,12 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initScene,
+  initOrbitControls,
+  initGUI,
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { ParametricGeometry } from '../lib/three/ParametricGeometry.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 window.onload = () => {
   init();
@@ -37,23 +37,20 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
 
-  // console.log(scene);
-  // console.log(camera);
-  window.camera = camera;
+  renderer.setAnimationLoop(render);
+
 }
 
 const funcList = {
@@ -73,7 +70,7 @@ const funcList = {
     target.set(x, y, z);
   },
 
-  Gaussian2(u,v,target){
+  Gaussian2(u, v, target) {
     const mux = 0;
     const muy = 0;
     const size = 10;
@@ -201,7 +198,7 @@ function draw(scene) {
 
   const mesh = new Mesh(parametric, material);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   gui.add(controls, 'drawFunc', list).onChange((e) => {
     parametric.dispose();

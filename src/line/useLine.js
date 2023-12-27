@@ -1,12 +1,11 @@
 /*
  * @Date: 2022-11-16 15:00:21
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-05 11:17:15
- * @FilePath: /threejs-demo/src/examples/edge/index2.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-27 18:06:44
+ * @FilePath: /threejs-demo/src/line/useLine.js
  */
 
 import {
-  Scene,
   Vector3,
   LineBasicMaterial,
   LineSegments,
@@ -16,8 +15,9 @@ import {
   Line,
   LineLoop,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
+  initScene,
+  initOrbitControls,
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
@@ -31,19 +31,19 @@ function init() {
   const renderer = initRenderer();
   const camera = initOrthographicCamera(new Vector3(100, -100, 100));
   camera.up.set(0, 0, 1);
+  
   const scene = initScene();
   initAxesHelper(scene);
-  renderer.setClearColor(0xffffff);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene);
 
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

@@ -1,18 +1,15 @@
-/* eslint-disable camelcase */
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-05-17 17:57:46
- * @FilePath: /threejs-demo/packages/examples/tween/useTween.js
+ * @LastEditTime: 2023-12-27 17:58:25
+ * @FilePath: /threejs-demo/src/tween/useTween.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   AmbientLight,
   BoxGeometry,
   Mesh,
   MeshLambertMaterial,
   PointLight,
-  Scene,
   Vector3,
 } from '../lib/three/three.module.js';
 import {
@@ -20,6 +17,8 @@ import {
   initOrthographicCamera,
   resize,
   initCustomGrid,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 import {
   Tween, update, Easing,
@@ -31,7 +30,6 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
-  renderer.setClearColor(0xffffff);
   const camera = initOrthographicCamera(new Vector3(30, -30, 30));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
@@ -44,7 +42,7 @@ function init() {
 
   initCustomGrid(scene);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const createMaterial = (color) => new MeshLambertMaterial({ color });
 
@@ -64,13 +62,9 @@ function init() {
     orbitControls.update();
     update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
-
-  window.scene = scene;
-  window.camera = camera;
+  renderer.setAnimationLoop(render);
 }
 
 function useTo(mesh) {

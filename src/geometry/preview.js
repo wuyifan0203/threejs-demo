@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-07-20 10:41:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-20 11:07:21
- * @FilePath: /threejs-demo/packages/examples/geometry/preview.js
+ * @LastEditTime: 2023-12-27 17:11:21
+ * @FilePath: /threejs-demo/src/geometry/preview.js
  */
 import {
   Vector3,
-  Scene,
   BufferGeometry,
   Float32BufferAttribute,
   Group,
@@ -19,10 +18,10 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initGUI,
+  initOrbitControls
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { data } from './previewData.js';
 
 window.onload = () => {
@@ -41,7 +40,7 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   function animate() {
@@ -62,7 +61,7 @@ function init() {
 
   const group = new Group();
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const getOPtions = () => {
     const o = {};

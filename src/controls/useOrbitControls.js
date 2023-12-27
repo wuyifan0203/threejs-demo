@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-17 19:27:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-25 15:43:01
+ * @LastEditTime: 2023-12-27 17:33:09
  * @FilePath: /threejs-demo/src/controls/useOrbitControls.js
  */
 import {
@@ -18,8 +18,8 @@ import {
     initOrthographicCamera,
     initScene,
     initGUI,
+    initOrbitControls
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 
 window.onload = () => {
@@ -37,7 +37,7 @@ function init() {
     initCustomGrid(scene);
     initAxesHelper(scene);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
+    const controls = initOrbitControls(camera, renderer.domElement);
     controls.addEventListener('change',render)
     controls.zoomToCursor = true;
     const viewHelper = new ViewHelper(camera, renderer.domElement);

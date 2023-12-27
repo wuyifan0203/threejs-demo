@@ -1,6 +1,5 @@
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshNormalMaterial,
   ExtrudeGeometry,
@@ -13,12 +12,12 @@ import {
   initCustomGrid,
   resize,
   initPerspectiveCamera,
+  initScene,
+  initOrbitControls,
+  initGUI
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
-// eslint-disable-next-line no-undef
 const { compile, isComplex } = math;
 
 function round(num, bit = 14) {
@@ -40,19 +39,19 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -95,7 +94,7 @@ function draw(scene) {
     resolution: 200,
   };
 
-  function getFormularPoints() {
+  function getFormulaPoints() {
     const {
       xMax, xMin, yMax, yMin, resolution,
     } = geometryParams;
@@ -160,7 +159,7 @@ function draw(scene) {
     };
   }
 
-  const path = getFormularPoints();
+  const path = getFormulaPoints();
   const geometry = new ExtrudeGeometry(path, geometryParams);
   const mesh = new Mesh(geometry, material);
 
@@ -174,7 +173,7 @@ function draw(scene) {
     return options;
   };
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui.width = 320;
   const rangeSettingFolder = gui.addFolder('Range Setting');
   rangeSettingFolder.add(geometryParams, 'xMin', -25, 10, 0.01).onChange(() => update());
@@ -199,7 +198,7 @@ function draw(scene) {
 
   function update() {
     mesh.geometry.dispose();
-    const path = getFormularPoints();
+    const path = getFormulaPoints();
     mesh.geometry = new ExtrudeGeometry(path, extrudeSettings);
     mesh.geometry.needUpdate = true;
   }

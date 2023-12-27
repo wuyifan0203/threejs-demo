@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-05 20:14:11
- * @FilePath: /threejs-demo/examples/src/geometry/shapeGeometry.js
+ * @LastEditTime: 2023-12-27 17:13:22
+ * @FilePath: /threejs-demo/src/geometry/shapeGeometry.js
  */
 import {
-  Scene,
   Vector3,
   Vector2,
   Shape,
@@ -14,14 +13,15 @@ import {
   MeshNormalMaterial,
   Mesh,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
   initCustomGrid,
+  initGUI,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { angle2Radians } from '../lib/tools/func.js';
 
 window.onload = () => {
@@ -38,14 +38,15 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   controls.enableRotate = false;
 
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 
   const params = {
     innerRadius: 2,
@@ -62,7 +63,7 @@ function init() {
 
   scene.add(mesh);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   gui.add(material, 'wireframe');
   gui.add(params, 'innerRadius', 0, 4, 0.1).onChange(update);

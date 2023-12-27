@@ -7,7 +7,6 @@
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
-  Scene,
   TextureLoader,
   PerspectiveCamera,
   LoadingManager,
@@ -20,7 +19,11 @@ import {
 import { EXRLoader } from '../lib/three/EXRLoader.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
-  initOrbitControls, initProgress, initRenderer, initDirectionLight
+  initOrbitControls, 
+  initProgress, 
+  initRenderer, 
+  initDirectionLight,
+  initScene
 } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/block/rock_wall_';
@@ -31,12 +34,9 @@ const url = {
   roughness: `${basePath}rough.exr`,
 };
 
-
-
 window.onload = async () => {
   init()
 }
-
 
 function init() {
   const renderer = initRenderer();

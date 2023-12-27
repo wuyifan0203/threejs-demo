@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 13:27:22
+ * @LastEditTime: 2023-12-27 14:05:59
  * @FilePath: /threejs-demo/src/camera/focusObjectByArcballControls.js
  */
 
@@ -14,7 +14,6 @@ import {
     Vector3,
     Matrix4,
     Box2,
-    Quaternion,
 } from '../lib/three/three.module.js';
 import {
     initCoordinates,
@@ -52,8 +51,10 @@ function init() {
     const controls = new ArcballControls(camera, renderer.domElement,scene);
     controls.cursorZoom = true;
     window.controls = controls;
-    controls.setGizmosVisible(false)
+    // controls.setGizmosVisible(false)
     controls.addEventListener('change', () => {
+        console.log(controls.target);
+        console.log(controls._gizmos.position);
         render()
     })
 

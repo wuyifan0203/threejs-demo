@@ -1,10 +1,9 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:41:37
+ * @LastEditTime: 2023-12-27 18:07:51
  * @FilePath: /threejs-demo/src/light/box.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
@@ -12,9 +11,12 @@ import {
   initGroundPlane,
   initDirectionLight,
   resize,
+  initScene,
+  initOrbitControls,
+  initAmbientLight,
+
 } from '../lib/tools/index.js';
 import {
-  Scene,
   Vector3,
   Mesh,
   MeshLambertMaterial,
@@ -34,8 +36,8 @@ const init = () => {
 
   const scene = initScene();
   initAxesHelper(scene);
-  const ambientLight = new AmbientLight(0x3c3c3c);
-  scene.add(ambientLight);
+  initAmbientLight(scene,0x3c3c3c)
+
 
   const groundPlane = initGroundPlane(scene);
   groundPlane.position.set(0, 0, -3);
@@ -47,19 +49,16 @@ const init = () => {
   scene.add(directionalLight);
   directionalLight.position.set(5, 5, 5);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene);
   resize(renderer, camera);
 
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
-  render();
 
-  window.camera = camera;
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
 };
 
 function draw(scene) {

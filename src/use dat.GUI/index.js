@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:22:51
- * @FilePath: /threejs-demo/examples/src/use dat.GUI/index.js
+ * @LastEditTime: 2023-12-27 17:59:31
+ * @FilePath: /threejs-demo/src/use dat.GUI/index.js
  */
 import {
   Vector3,
-  Scene,
   Mesh,
   MeshBasicMaterial,
   SphereGeometry,
@@ -18,10 +17,11 @@ import {
   initAxesHelper,
   initCustomGrid,
   resize,
+  initScene,
+  initOrbitControls,
+  initGUI
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
 
 import { addMaterialGUI } from '../lib/tools/datGUIutils.js';
 
@@ -40,19 +40,19 @@ function init() {
   initCustomGrid(scene, 100, 100);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -83,7 +83,7 @@ function draw(scene) {
   };
 
   // 创建 gui 对象
-  const gui = new GUI();
+  const gui = initGUI();
   console.log(gui);
   // gui 有 domElement属性 ， saveToLocalStorageIfPossible函数,width，等属性
   // 比如 修改宽度

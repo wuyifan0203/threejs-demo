@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-06-09 13:05:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-09 17:09:38
- * @FilePath: /threejs-demo/packages/examples/loader/jsonloader.js
+ * @LastEditTime: 2023-12-27 17:48:43
+ * @FilePath: /threejs-demo/src/loader/jsonloader.js
  */
 
 import {
@@ -11,17 +11,22 @@ import {
   GridHelper,
   Mesh,
   MeshBasicMaterial,
-  ObjectLoader, Scene, SphereGeometry, Vector3, WebGLRenderer,
+  ObjectLoader, 
+  SphereGeometry, 
+  Vector3, 
+  WebGLRenderer,
 } from '../lib/three/three.module.js';
 import {
-  initOrbitControls, initOrthographicCamera, resize,
+  initOrbitControls, 
+  initOrthographicCamera, 
+  resize,
+  initScene
 } from '../lib/tools/common.js';
 
 window.onload = () => {
   init();
 };
 
-// eslint-disable-next-line consistent-return
 function init() {
   const inputDOM = document.querySelector('#input');
   const outputDOM = document.querySelector('#output');
@@ -67,10 +72,11 @@ function init() {
     orbitControls.update();
     renderer1.render(scene1, camera);
     renderer2.render(scene2, camera);
-    requestAnimationFrame(render);
   }
-  render();
 
+
+  renderer1.setAnimationLoop(render);
+  
   let result;
 
   const loader = new ObjectLoader();

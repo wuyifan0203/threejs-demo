@@ -2,12 +2,11 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 09:25:33
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:18:00
- * @FilePath: /threejs-demo/examples/src/texture/commonTexture.js
+ * @LastEditTime: 2023-12-27 18:03:20
+ * @FilePath: /threejs-demo/src/texture/commonTexture.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
-  Scene,
   TextureLoader,
   PerspectiveCamera,
   AmbientLight,
@@ -15,10 +14,13 @@ import {
   WebGLRenderer,
   Color,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
+import { 
+  initGUI,
+  initScene,
+  initOrbitControls
+ } from '../lib/tools/index.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { FBXLoader } from '../lib/three/FBXLoader.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = function () {
   init();
@@ -45,7 +47,7 @@ async function init() {
   scene.add(camera);
   camera.add(light);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   const modelLoader = new FBXLoader();
@@ -104,15 +106,11 @@ async function init() {
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
-  render();
 
-  window.scene = scene;
-  window.camera = camera;
-  window.orbitControls = orbitControls;
+  renderer.setAnimationLoop(render);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const controls = {
     map: true,

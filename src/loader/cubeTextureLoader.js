@@ -2,22 +2,48 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:01:36
- * @FilePath: /threejs-demo/examples/src/loader/cubeTextureLoader.js
+ * @LastEditTime: 2023-12-27 17:46:55
+ * @FilePath: /threejs-demo/src/loader/cubeTextureLoader.js
  */
 import {
-  Scene,
-  AmbientLight,
   Vector3,
   CubeTextureLoader,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   resize,
   initPerspectiveCamera,
+  initScene,
+  initGUI,
+  initAmbientLight,
+  initOrbitControls
 } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+
+window.onload = () => {
+  init();
+};
+
+function init() {
+  const renderer = initRenderer();
+  renderer.autoClear = false;
+  const camera = initPerspectiveCamera(new Vector3(0, 0, 5));
+  camera.lookAt(0, 0, 0);
+  const scene = initScene();
+  renderer.setClearColor(0xffffff);
+  initAmbientLight(scene)
+
+  const controls = initOrbitControls(camera, renderer.domElement);
+  draw(scene, camera);
+  resize(renderer, camera);
+
+  function render() {
+    controls.update();
+    renderer.clear();
+    renderer.render(scene, camera);
+  }
+
+  renderer.setAnimationLoop(render);
+}
 
 function draw(scene) {
   const controls = {
@@ -43,7 +69,7 @@ function draw(scene) {
   };
   loadBackground(controls.background);
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui
     .add(controls, 'background', ['sky1', 'sky2', 'snow_field'])
     .onChange((e) => {
@@ -51,33 +77,3 @@ function draw(scene) {
     });
 }
 
-function init() {
-  const renderer = initRenderer();
-  renderer.autoClear = false;
-  const camera = initPerspectiveCamera(new Vector3(0, 0, 5));
-  camera.lookAt(0, 0, 0);
-  const scene = initScene();
-  renderer.setClearColor(0xffffff);
-  const ambientLight = new AmbientLight(0xffffff, 1);
-  scene.add(ambientLight);
-
-  const controls = new OrbitControls(camera, renderer.domElement);
-  draw(scene, camera);
-  resize(renderer, camera);
-
-  function render() {
-    controls.update();
-    renderer.clear();
-    renderer.render(scene, camera);
-    requestAnimationFrame(render);
-  }
-
-  render();
-
-  window.camera = camera;
-  window.scene = scene;
-}
-
-window.onload = () => {
-  init();
-};

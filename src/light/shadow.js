@@ -1,22 +1,21 @@
-/* eslint-disable no-param-reassign */
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-07 10:11:23
- * @FilePath: /threejs-demo/packages/examples/light/shadow.js
+ * @LastEditTime: 2023-12-27 18:09:58
+ * @FilePath: /threejs-demo/src/light/shadow.js
  */
-/* eslint-disable no-unused-vars */
-import { GUI } from '../lib/util/lil-gui.module.min.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
+
 import {
   initRenderer,
   initPerspectiveCamera,
   initAxesHelper,
   initGroundPlane,
   resize,
+  initScene,
+  initOrbitControls,
+  initAmbientLight
 } from '../lib/tools/index.js';
 import {
-  Scene,
   Vector3,
   Mesh,
   MeshLambertMaterial,
@@ -26,6 +25,11 @@ import {
   BoxGeometry,
   Color,
 } from '../lib/three/three.module.js';
+
+
+window.onload = () => {
+  init();
+};
 
 let stop = false;
 
@@ -38,8 +42,7 @@ const init = () => {
 
   const scene = initScene();
   initAxesHelper(scene);
-  const ambientLight = new AmbientLight(0x3c3c3c);
-  scene.add(ambientLight);
+  initAmbientLight(scene, 0x3c3c3c)
 
   const spotLight = new SpotLight(0xffffff, 1, 180, 0.5);
   spotLight.shadow.mapSize.height = 2048;
@@ -56,7 +59,7 @@ const init = () => {
   // 2
   groundPlane.receiveShadow = true;
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene, spotLight, spotLightHelper);
   resize(renderer, camera);
 
@@ -66,13 +69,10 @@ const init = () => {
       spotLight.position.copy(camera.position);
       spotLightHelper.update();
     }
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
-  render();
 
-  window.camera = camera;
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
 };
 
 function draw(scene, light, helper) {
@@ -130,6 +130,4 @@ function draw(scene, light, helper) {
   });
 }
 
-window.onload = () => {
-  init();
-};
+

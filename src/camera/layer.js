@@ -1,5 +1,4 @@
 import {
-  Scene,
   PerspectiveCamera,
   PointLight,
   Mesh,
@@ -12,7 +11,8 @@ import {
   initRenderer,
   initScene,
   resize,
-  initGUI
+  initGUI,
+  initAmbientLight
 } from '../lib/tools/index.js';
 import { Stats } from '../lib/util/Stats.js';
 
@@ -32,7 +32,7 @@ function init() {
   camera.layers.enable(1);
   camera.layers.enable(2);
 
-  const light = new PointLight(0xffffff, 3);
+  const light = new PointLight(0xffffff, 3,0,0);
 
   light.layers.enable(0);
   light.layers.enable(1);
@@ -43,6 +43,8 @@ function init() {
   const scene = initScene();
   scene.background = new Color(0xf0f0f0);
   scene.add(camera);
+
+  initAmbientLight(scene);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);

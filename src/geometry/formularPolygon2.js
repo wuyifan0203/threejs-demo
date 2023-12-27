@@ -1,6 +1,5 @@
 import {
   Vector3,
-  Scene,
   Vector2,
   BufferGeometry,
   BufferAttribute,
@@ -15,8 +14,9 @@ import {
   initCustomGrid,
   resize,
   initOrthographicCamera,
+  initOrbitControls,
+  initScene
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { PolyBool } from '../lib/other/PolyBool.js';
 
@@ -45,7 +45,7 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   const geometryParams = {
@@ -79,18 +79,16 @@ function init() {
 
   scene.add(new LineLoop(gb, mlb), new Points(gb, mpb));
 
-  //   console.log(result);
 
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
-  render();
 
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
+
 }
 
 function getFormulaPoints(geometryParams, isSymmetric, func1, func2) {

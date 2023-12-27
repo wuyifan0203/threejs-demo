@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-17 14:41:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:51:52
+ * @LastEditTime: 2023-12-27 17:43:48
  * @FilePath: /threejs-demo/src/camera/orthographic.js
  */
 import {
@@ -45,7 +45,7 @@ function init() {
 
     window.target = orthographicCamera
 
-    const light = new PointLight(0xffffff, 1);
+    const light = new PointLight(0xffffff, 3,0,0);
     light.position.copy(orthographicCamera);
     scene.add(light);
     scene.add(new AmbientLight());

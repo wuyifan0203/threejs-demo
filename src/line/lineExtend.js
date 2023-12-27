@@ -1,14 +1,11 @@
-/* eslint-disable max-len */
-/* eslint-disable no-unused-vars */
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:00:07
- * @FilePath: /threejs-demo/examples/src/line/lineExtend.js
+ * @LastEditTime: 2023-12-27 18:04:12
+ * @FilePath: /threejs-demo/src/line/lineExtend.js
  */
 
 import {
-  Scene,
   Mesh,
   BufferGeometry,
   Vector3,
@@ -20,12 +17,13 @@ import {
   BoxGeometry,
   Matrix4,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
+  initOrbitControls,
+  initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -41,15 +39,15 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene);
 
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -61,7 +59,6 @@ function draw(scene) {
   createMesh(l, x, y, z, scene);
   scene.add(l);
 
-  console.log(scene);
 }
 
 function createMesh(l, x, y, z, scene) {

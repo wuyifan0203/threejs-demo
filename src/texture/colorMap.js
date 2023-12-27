@@ -2,12 +2,11 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 17:28:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:46:08
+ * @LastEditTime: 2023-12-27 18:01:40
  * @FilePath: /threejs-demo/src/texture/colorMap.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import {
-  Scene,
   Mesh,
   MeshBasicMaterial,
   SphereGeometry,
@@ -19,9 +18,12 @@ import {
   Raycaster,
   Vector2,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { initRenderer, initScene, } from '../lib/tools/index.js';
+import { 
+  initRenderer, 
+  initScene,
+  initOrbitControls
+ } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/house/';
 const url = {
@@ -93,7 +95,7 @@ function init() {
 
   const scene = initScene();
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.maxDistance = 50;
   draw(scene);

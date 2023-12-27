@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-09-13 16:19:45
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-13 19:49:19
- * @FilePath: /threejs-demo/examples/src/camera/layer2.js
+ * @LastEditTime: 2023-12-27 17:43:30
+ * @FilePath: /threejs-demo/src/camera/layer2.js
  */
 import {
-  Scene,
   Vector3,
   PointLight,
   Mesh,
@@ -17,6 +16,7 @@ import {
   initRenderer, 
   initPerspectiveCamera, 
   initScene,
+  initAmbientLight,
  } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -76,8 +76,8 @@ function init() {
     return camera
   })
 
-  const light = new PointLight(0xffffff, 1);
-  light.position.set(0, 0, 50);
+  const light = new PointLight(0xffffff, 3,0,0);
+  light.position.set(0, 0, 20);
   light.layers.enable(0);
   light.layers.enable(1);
   light.layers.enable(2);
@@ -86,8 +86,7 @@ function init() {
   scene.background = new Color(0xf0f0f0);
   scene.add(light);
 
-
-
+  initAmbientLight(scene);
 
   let windowWidth = 0, windowHeight = 0;
 
@@ -99,7 +98,6 @@ function init() {
     }
   }
   updateSize();
-
 
   renderer.setAnimationLoop(() => {
     views.forEach((view, i) => {
@@ -117,12 +115,9 @@ function init() {
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
 
-
-
       renderer.render(scene, camera);
     })
   })
-
 
   const redMaterial = new MeshLambertMaterial({ color: 'red' });
   const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -156,7 +151,6 @@ function init() {
   // 为 z.y.x 即 2^x + 2^y + 2^z
   // 修改值为  ｜
   // 判断值为  &
-
 
   views.forEach((_, i) => {
     const cameraMask = cameras[i].layers.mask;

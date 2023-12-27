@@ -1,5 +1,4 @@
 import {
-  Scene,
   Mesh,
   BufferGeometry,
   Vector3,
@@ -18,9 +17,10 @@ import {
   initCustomGrid,
   initAxesHelper,
   angle2Radians,
+  initGUI,
+  initScene
 } from '../lib/tools/index.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 function circle(x, r2) {
   return Math.sqrt(r2 - x * x);
@@ -258,12 +258,11 @@ function init() {
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);
 
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -295,7 +294,7 @@ function draw(scene) {
 
   draw3DMesh(object.r, object.angle, object.height, object.width);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   gui.add(object, 'angle', 0, 360, 1).onChange(() => {
     scene.remove(lineMesh, mesh);

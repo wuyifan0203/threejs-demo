@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-06-10 16:00:40
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:18:56
- * @FilePath: /threejs-demo/packages/examples/triangle/triangle.js
+ * @LastEditTime: 2023-12-27 17:57:10
+ * @FilePath: /threejs-demo/src/triangle/triangle.js
  */
 import { SweepContext, Point } from '../lib/other/poly2tri.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { ShapeUtils } from '../lib/three/ShapeUtils.js';
 import { Delaunator } from '../lib/other/delaunator.js';
 import { data } from './data.js';
@@ -13,7 +12,6 @@ import { data } from './data.js';
 import {
   Mesh,
   MeshBasicMaterial,
-  Scene,
   BufferAttribute,
   Vector3,
   BufferGeometry,
@@ -24,6 +22,8 @@ import {
   initOrbitControls,
   initOrthographicCamera,
   initRenderer,
+  initScene,
+  initGUI
 } from '../lib/tools/common.js';
 
 window.onload = () => {
@@ -69,10 +69,9 @@ function init() {
   function render() {
     orbitControls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render);
 
   const update = () => {
     const position = control[control.useType](control.dataSource);
@@ -84,7 +83,7 @@ function init() {
     );
   };
 
-  const gui = new GUI();
+  const gui = initGUI();
   gui.add(control, 'dataSource', data).name('Data Source:').onChange(() => update());
   gui.add(control, 'useType', { useDelaunator: 'useDelaunator', useEarCut: 'useEarCut', usePoly2tri: 'usePoly2tri' }).name('Use :').onChange(() => update());
 

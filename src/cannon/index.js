@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:20:40
+ * @LastEditTime: 2023-12-27 17:34:03
  * @FilePath: /threejs-demo/src/cannon/index.js
  */
 import {
@@ -76,7 +76,6 @@ function init() {
   scene.add(planeMesh);
 
   // cannon
-
   const world = new World();
   world.gravity.set(0, 0, -9.8);
   world.broadphase = new NaiveBroadphase();
@@ -127,10 +126,9 @@ function init() {
 
     orbitControl.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render);
 
   const gui = initGUI();
 
@@ -159,7 +157,5 @@ function init() {
   folder3.add(world.contactmaterials[0], 'restitution', 0, 1, 0.01);
   folder3.add(world.contactmaterials[0], 'friction', 0, 1, 0.01);
 
-  window.scene = scene;
-  window.camera = camera;
   window.world = world;
 }

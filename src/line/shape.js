@@ -1,22 +1,22 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-02 14:52:11
- * @FilePath: /threejs-demo/examples/src/line/shape.js
+ * @LastEditTime: 2023-12-27 18:05:29
+ * @FilePath: /threejs-demo/src/line/shape.js
  */
 import {
-  Scene,
   Vector3,
   Vector2,
   Shape,
   LineCurve,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
   initCustomGrid,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -30,17 +30,17 @@ function init() {
   camera.up.set(0, 0, 1);
   const scene = initScene();
   initAxesHelper(scene);
-  renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   controls.enableRotate = false;
 
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 
   const x = 4 / 2;
   const y = 4 / 2;

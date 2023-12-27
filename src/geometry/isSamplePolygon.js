@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-06-16 16:41:38
- * @FilePath: /threejs-demo/packages/examples/geometry/isSamplePolygon.js
+ * @LastEditTime: 2023-12-27 17:25:58
+ * @FilePath: /threejs-demo/src/geometry/isSamplePolygon.js
  */
 import {
   Vector3,
-  Scene,
   LineLoop,
   BufferGeometry,
   LineBasicMaterial,
@@ -20,11 +19,12 @@ import {
   resize,
   initOrthographicCamera,
   isComplexPolygon,
+  initScene,
+  initOrbitControls,
+  initGUI
 } from '../lib/tools/index.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -41,7 +41,7 @@ function init() {
   initCustomGrid(scene);
   initAxesHelper(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   const test1 = [
@@ -141,23 +141,23 @@ function init() {
     });
   }
 
-  const controlers = {
+  const control = {
     select: 'test1',
     log() {
       console.log(isComplexPolygon(testList[this.select]));
     },
   };
 
-  convertPosition(testList[controlers.select]);
+  convertPosition(testList[control.select]);
   lineLoop.geometry.setAttribute(
     'position',
     new BufferAttribute(new Float32Array(position), 3),
   );
   lineLoop.geometry.getAttribute('position').needsUpdate = true;
 
-  const gui = new GUI();
+  const gui = initGUI();
 
-  gui.add(controlers, 'select', Object.keys(testList)).onChange((e) => {
+  gui.add(control, 'select', Object.keys(testList)).onChange((e) => {
     convertPosition(testList[e]);
     lineLoop.geometry.setAttribute(
       'position',
@@ -166,17 +166,15 @@ function init() {
     lineLoop.geometry.getAttribute('position').needsUpdate = true;
   });
 
-  gui.add(controlers, 'log').name('Log is Sample Polygon (press F12)');
+  gui.add(control, 'log').name('Log is Sample Polygon (press F12)');
 
   function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-    requestAnimationFrame(render);
   }
-  window.camera = camera;
-  window.scene = scene;
 
-  render();
+  renderer.setAnimationLoop(render);
+
 }

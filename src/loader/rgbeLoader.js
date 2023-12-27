@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:11:18
- * @FilePath: /threejs-demo/packages/examples/loader/rgbeLoader.js
+ * @LastEditTime: 2023-12-27 17:53:53
+ * @FilePath: /threejs-demo/src/loader/rgbeLoader.js
  */
 import {
-  Scene,
   Vector3,
   HalfFloatType,
   Mesh,
@@ -20,13 +19,15 @@ import {
   TorusKnotGeometry,
   EquirectangularReflectionMapping,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   resize,
   initPerspectiveCamera,
+  initScene,
+  initOrbitControls,
+  initGUI,
+  initAmbientLight,
 } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
 import { RGBELoader } from '../lib/three/RGBELoader.js';
 
 window.onload = () => {
@@ -36,18 +37,19 @@ window.onload = () => {
 let stop = false;
 function init() {
   const renderer = initRenderer();
-  const camera = initPerspectiveCamera(new Vector3(0, -2, 33));
-  camera.lookAt(0, 0, 0);
-  const scene = initScene();
   renderer.outputEncoding = sRGBEncoding;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.setClearColor(0xffffff);
-  renderer.setPixelRatio(window.devicePixelRatio);
   renderer.setAnimationLoop(animation);
-  scene.add(new AmbientLight(0xffffff));
+
+  const camera = initPerspectiveCamera(new Vector3(0, -2, 33));
+  camera.lookAt(0, 0, 0);
+
+  const scene = initScene();
   scene.backgroundBlurriness = 0.02;
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  initAmbientLight(scene);
+
+  const controls = initOrbitControls(camera, renderer.domElement);
   controls.autoRotate = true;
   const { cubeCamera, cube, torus } = draw(scene, renderer, controls);
   resize(renderer, camera);
@@ -68,14 +70,10 @@ function init() {
     }
 
     cubeCamera.update(renderer, scene);
-
     controls.update();
-
     renderer.render(scene, camera);
   }
 
-  window.camera = camera;
-  window.scene = scene;
 }
 
 function draw(scene, renderer, OrbitControls) {
@@ -129,7 +127,7 @@ function draw(scene, renderer, OrbitControls) {
   };
   loadBackground(controls.background);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   gui.add(renderer, 'toneMappingExposure', 0, 2, 0.01).name('exposure');
   gui.add(material, 'roughness', 0, 1, 0.01);

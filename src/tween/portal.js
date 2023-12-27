@@ -1,14 +1,12 @@
-/* eslint-disable camelcase */
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-29 20:26:49
+ * @LastEditTime: 2023-12-27 17:57:57
  * @FilePath: /threejs-demo/src/tween/portal.js
  */
 import {
     Mesh,
     MeshBasicMaterial,
-    Scene,
     TorusGeometry,
     Vector3,
     PerspectiveCamera,
@@ -38,7 +36,7 @@ window.onload = () => {
 
 async function init() {
     const renderer = initRenderer();
-    renderer.setClearColor(0xffffff);
+    
     const camera = initPerspectiveCamera(new Vector3(30, -30, 30));
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);

@@ -1,31 +1,35 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:06:41
- * @FilePath: /threejs-demo/examples/src/loader/OBJLoader.js
+ * @LastEditTime: 2023-12-27 17:55:05
+ * @FilePath: /threejs-demo/src/loader/OBJLoader.js
  */
 /* eslint-disable no-unused-vars */
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import { OBJLoader } from '../lib/three/OBJLoader.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initPerspectiveCamera,
   resize,
+  initGUI,
+  initScene,
+  initOrbitControls,
+  initAmbientLight
 } from '../lib/tools/index.js';
 import {
-  Scene,
   Vector3,
   Mesh,
   Shape,
   SpotLight,
-  AmbientLight,
   SpotLightHelper,
   ShapeGeometry,
   MeshPhongMaterial,
   Color,
   Matrix4,
 } from '../lib/three/three.module.js';
+
+window.onload = () => {
+  init();
+};
 
 const init = () => {
   const renderer = initRenderer();
@@ -35,8 +39,8 @@ const init = () => {
   camera.up.set(0, 0, 1);
 
   const scene = initScene();
-  const ambientLight = new AmbientLight(0x3c3c3c);
-  scene.add(ambientLight);
+
+  initAmbientLight(scene);
 
   const spotLight = new SpotLight(0xffffff, 1, 180, 0.68, 0, 0.2);
   spotLight.shadow.mapSize.height = 2048;
@@ -63,23 +67,19 @@ const init = () => {
   // 2
   groundPlane.receiveShadow = true;
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene, spotLight, spotLightHelper);
   resize(renderer, camera);
-  render();
+
+
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
 
-  window.camera = camera;
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
 };
 
-window.onload = () => {
-  init();
-};
 
 const stop = false;
 
@@ -128,7 +128,7 @@ function draw(scene, light, helper) {
     );
   });
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   const controls = {
     color: light.color,

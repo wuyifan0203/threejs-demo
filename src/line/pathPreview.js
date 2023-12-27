@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:12:39
- * @FilePath: /threejs-demo/packages/examples/line/pathPreview.js
+ * @LastEditTime: 2023-12-27 18:05:06
+ * @FilePath: /threejs-demo/src/line/pathPreview.js
  */
 import {
-  Scene,
   Vector3,
   LineBasicMaterial,
   BufferGeometry,
@@ -14,12 +13,13 @@ import {
   Points,
   PointsMaterial,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
   initCustomGrid,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -35,16 +35,16 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   controls.enableRotate = false;
   draw(scene);
 
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

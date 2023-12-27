@@ -1,5 +1,4 @@
 import {
-  Scene,
   Mesh,
   Color,
   BoxGeometry,
