@@ -1313,6 +1313,8 @@ class ArcballControls extends EventDispatcher {
 		if ( transformation.gizmos != null ) {
 
 			this._m4_1.copy( this._gizmoMatrixState ).premultiply( transformation.gizmos );
+
+			// maybe
 			this._m4_1.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 			this._gizmos.updateMatrix();
 
@@ -1462,6 +1464,7 @@ class ArcballControls extends EventDispatcher {
 
 		_gizmoMatrixStateTemp.copy( this._gizmoMatrixState );
 		this._gizmoMatrixState.premultiply( this._translationMatrix );
+		// maybe
 		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
 		_cameraMatrixStateTemp.copy( this._cameraMatrixState );
@@ -1764,6 +1767,7 @@ class ArcballControls extends EventDispatcher {
 
 		}
 
+		// maybe
 		this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
 		//
@@ -2580,6 +2584,7 @@ class ArcballControls extends EventDispatcher {
 
 		if ( this.target.equals( this._currentTarget ) === false ) {
 
+			// must
 			this._gizmos.position.copy( this.target );	//for correct radius calculation
 			this._tbRadius = this.calculateTbRadius( this.camera );
 			this.makeGizmos( this.target, this._tbRadius );
@@ -2666,6 +2671,7 @@ class ArcballControls extends EventDispatcher {
 			}
 
 			this._gizmoMatrixState.fromArray( state.arcballState.gizmoMatrix.elements );
+			//maybe
 			this._gizmoMatrixState.decompose( this._gizmos.position, this._gizmos.quaternion, this._gizmos.scale );
 
 			this.camera.updateMatrix();

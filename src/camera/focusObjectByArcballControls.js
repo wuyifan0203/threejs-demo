@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 13:15:40
- * @FilePath: /threejs-demo/src/camera/focusObject.js
+ * @LastEditTime: 2023-12-27 13:27:22
+ * @FilePath: /threejs-demo/src/camera/focusObjectByArcballControls.js
  */
 
 import {
@@ -19,7 +19,6 @@ import {
 import {
     initCoordinates,
     initCustomGrid,
-    initOrbitControls,
     initOrthographicCamera,
     initRenderer,
     initScene,
@@ -28,6 +27,7 @@ import {
     initGUI
 } from '../lib/tools/index.js';
 import { createNDCMatrix } from '../lib/tools/math.js';
+import { ArcballControls } from '../lib/three/ArcballControls.js';
 
 window.onload = () => {
     init();
@@ -39,7 +39,8 @@ function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
     const camera = initOrthographicCamera(new Vector3(0, 0, 100))
-    camera.up.set(0, 0, 1);
+    // camera.up.set(0, 0, 1);
+    camera.updateProjectionMatrix();
 
     const light = initDirectionLight();
 
@@ -48,17 +49,18 @@ function init() {
 
     scene.add(light);
 
-    const orbitControls = initOrbitControls(camera, renderer.domElement);
-    orbitControls.zoomToCursor = true
-    resize(renderer, camera);
-
-    initCustomGrid(scene);
-    
-    const coord = initCoordinates();
-
-    orbitControls.addEventListener('change', () => {
+    const controls = new ArcballControls(camera, renderer.domElement,scene);
+    controls.cursorZoom = true;
+    window.controls = controls;
+    controls.setGizmosVisible(false)
+    controls.addEventListener('change', () => {
         render()
     })
+
+    resize(renderer, camera);
+    initCustomGrid(scene);
+
+    const coord = initCoordinates();
 
     function render() {
         console.log('times');
@@ -125,6 +127,9 @@ function init() {
 const box = new Box3();
 const tempBox3 = new Box3();
 const objectsBox2 = new Box2();
+
+const direction = new Vector3()
+
 
 function focusObject(objects) {
     box.makeEmpty();
@@ -193,13 +198,6 @@ function focusObject(objects) {
         height * 0.8
     ]
 
-    console.log({
-        pos: window.camera.position.clone(),
-        zoom: window.camera.zoom,
-        rotation: window.camera.rotation.clone(),
-        up: window.camera.up.clone(),
-    });
-
     const zoom = Math.min(
         (targetWidth * tempZoom) / boxWidth,
         (targetHeight * tempZoom) / boxHeight,
@@ -207,24 +205,18 @@ function focusObject(objects) {
 
     const radius = window.camera.position.distanceTo(window.controls.target);
 
-
-    const direction = new Vector3().subVectors(window.camera.position, window.controls.target).normalize();
+    direction.copy(window.camera.position).sub(window.controls._gizmos.position).normalize();
 
     const position = direction.multiplyScalar(radius).add(center);
 
-    window.controls.object.position.copy(position);
-    window.controls.object.zoom = zoom;
+    window.controls.camera.position.copy(position);
+    window.controls.camera.zoom = zoom;
     window.controls.target.copy(center);
-
+    window.controls._currentTarget.set(Infinity, Infinity, Infinity);
 
     window.controls.update();
+    window.camera.updateProjectionMatrix();
 
-    console.log({
-        pos: window.camera.position.clone(),
-        zoom: window.camera.zoom,
-        rotation: window.camera.rotation.clone(),
-        up: window.camera.up.clone(),
-    });
 
 }
 
