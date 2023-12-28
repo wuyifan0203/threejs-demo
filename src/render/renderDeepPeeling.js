@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:56:17
+ * @LastEditTime: 2023-12-28 14:56:45
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  */
 
@@ -22,7 +22,8 @@ import {
 import {
     initOrbitControls,
     initGUI,
-    initScene
+    initScene,
+    initDirectionLight
 } from '../lib/tools/index.js';
 import { DepthPeeling } from './DepthPeeling.js';
 // import { DepthPeeling } from './DepthPeeling2.js';

@@ -1,25 +1,25 @@
 /*
  * @Date: 2023-04-28 13:30:57
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-06 09:51:26
- * @FilePath: /threejs-demo/packages/examples/noise/perlinNoiseDemo1.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-28 15:25:38
+ * @FilePath: /threejs-demo/src/noise/perlinNoiseDemo1.js
  */
 
 import {
-  Scene,
   Mesh,
   Vector3,
   AmbientLight,
   PlaneGeometry,
   MeshNormalMaterial,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ImprovedNoise } from '../lib/three/ImprovedNoise.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -33,9 +33,8 @@ function init() {
   camera.up.set(0, 0, 1);
   const scene = initScene();
 
-  renderer.setClearColor(0xffffff);
 
-  const orbitControl = new OrbitControls(camera, renderer.domElement);
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
 
   resize(renderer, camera);
 
@@ -60,10 +59,10 @@ function init() {
   geometry.computeVertexNormals();
   geometry.attributes.position.needsUpdate = true;
 
-  render();
   function render() {
     orbitControl.update();
-    requestAnimationFrame(render);
     renderer.render(scene, camera);
   }
+
+  renderer.setAnimationLoop(render);
 }

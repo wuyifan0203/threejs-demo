@@ -1,13 +1,12 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:29:40
+ * @LastEditTime: 2023-12-28 15:06:22
  * @FilePath: /threejs-demo/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
 
 import {
-    Scene,
     Mesh,
     Vector3,
     OrthographicCamera,
@@ -18,7 +17,7 @@ import {
     Matrix4
 } from '../lib/three/three.module.js';
 
-import { initRenderer, initDirectionLight } from '../lib/tools/index.js';
+import { initRenderer, initDirectionLight,initScene } from '../lib/tools/index.js';
 
 
 window.onload = function () {

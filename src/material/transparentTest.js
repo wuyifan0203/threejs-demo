@@ -1,18 +1,26 @@
 /*
  * @Date: 2023-05-08 17:17:11
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-08 18:21:33
- * @FilePath: /threejs-demo/packages/examples/material/transparentTest.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-28 15:21:58
+ * @FilePath: /threejs-demo/src/material/transparentTest.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   AmbientLight,
-  BoxGeometry, EdgesGeometry, LineBasicMaterial, LineSegments, Mesh, MeshLambertMaterial, PointLight, Scene, Vector3,
+  BoxGeometry,
+  EdgesGeometry,
+  LineBasicMaterial,
+  LineSegments,
+  Mesh,
+  MeshLambertMaterial,
+  PointLight,
+  Vector3,
 } from '../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -30,9 +38,7 @@ function init() {
   camera.add(new PointLight());
   scene.add(camera);
 
-  renderer.setClearColor(0xffffff);
-
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const transparentMaterial = new MeshLambertMaterial({
     color: 'blue',
@@ -62,8 +68,7 @@ function init() {
   function render() {
     orbitControls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render);
 }

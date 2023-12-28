@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:13:07
- * @FilePath: /threejs-demo/packages/examples/material/clipping.js
+ * @LastEditTime: 2023-12-28 15:20:51
+ * @FilePath: /threejs-demo/src/material/clipping.js
  */
 import {
-  Scene,
   Vector3,
   TorusKnotGeometry,
   MeshPhongMaterial,
@@ -21,10 +20,11 @@ import {
   initOrthographicCamera,
   resize,
   initGroundPlane,
-  initOrbitControls
+  initOrbitControls,
+  initScene,
+  initGUI
 } from '../lib/tools/index.js';
 
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
   init();
@@ -95,16 +95,16 @@ function init() {
     mesh.rotation.z = time * 0.2;
     orbitControls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render);
+
 
   resize(renderer, camera);
 
   const control = { useGlobalClipping: true };
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   gui.add(renderer, 'localClippingEnabled');
   const localPlaneFolder = gui.addFolder('Local Plane');

@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-25 01:16:16
- * @FilePath: /threejs-demo/examples/src/particle/GRAVITY.js
+ * @LastEditTime: 2023-12-28 15:30:13
+ * @FilePath: /threejs-demo/src/particle/GRAVITY.js
  */
 import {
   Scene,
@@ -16,9 +16,8 @@ import {
   Float32BufferAttribute,
   AmbientLight,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
+import { initRenderer, resize, initScene, initOrbitControls } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -51,23 +50,20 @@ function init() {
   const ambientLight = new AmbientLight(0xffffff, 0.02);
   scene.add(light1, light2, light3, ambientLight);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const { updateParticles, updateModelMesh } = draw(scene, camera);
   resize(renderer, camera);
 
-  render();
   function render() {
     controls.update();
     renderer.clear();
     renderer.render(scene, camera);
     updateParticles(camera, t);
     updateModelMesh(camera, t);
-    requestAnimationFrame(render);
     t += 0.1;
   }
 
-  window.camera = camera;
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
 }
 const random = (min, max) => min + Math.random() * (max - min);
 

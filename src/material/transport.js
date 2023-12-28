@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-11-05 15:56:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-06 01:33:45
- * @FilePath: /threejs-demo/examples/src/material/transport.js
+ * @LastEditTime: 2023-12-28 15:24:10
+ * @FilePath: /threejs-demo/src/material/transport.js
  */
 import {
-    Scene,
     Vector3,
     Mesh,
     AmbientLight,
@@ -21,9 +20,9 @@ import {
     initRenderer,
     initOrthographicCamera,
     resize,
-    initCustomGrid,
     initOrbitControls,
     initGUI,
+    initScene,
     initGroundPlane
   } from '../lib/tools/index.js';
   

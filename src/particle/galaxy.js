@@ -1,14 +1,10 @@
 /*
  * @Date: 2023-12-24 01:07:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-25 02:05:17
+ * @LastEditTime: 2023-12-28 15:28:46
  * @FilePath: /threejs-demo/src/particle/galaxy.js
  */
 import {
-    Scene,
-    PerspectiveCamera,
-    Sprite,
-    SpriteMaterial,
     BufferGeometry,
     PointsMaterial,
     BufferAttribute,
@@ -23,7 +19,8 @@ import {
     initGUI,
     initOrbitControls,
     initPerspectiveCamera,
-    initCoordinates
+    initCoordinates,
+    initScene
 } from '../lib/tools/index.js';
 
 

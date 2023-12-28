@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-01 16:57:25
- * @FilePath: /threejs-demo/examples/src/material/stencil.js
+ * @LastEditTime: 2023-12-28 15:21:39
+ * @FilePath: /threejs-demo/src/material/stencil.js
  */
 import {
-  Scene,
   Vector3,
   MeshPhongMaterial,
   Mesh,
@@ -21,7 +20,8 @@ import {
   initOrthographicCamera,
   resize,
   initCustomGrid,
-  initOrbitControls
+  initOrbitControls,
+  initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {

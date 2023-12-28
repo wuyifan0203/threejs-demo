@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-24 01:03:19
+ * @LastEditTime: 2023-12-28 14:57:34
  * @FilePath: /threejs-demo/src/render/DepthPeeling.js
  */
 
@@ -74,7 +74,7 @@ class DepthPeeling {
         this.pixelRatio = 1;
         // 用来暂存原始render得颜色
         this.originClearColor = new Color();
-        this.scene = initScene();
+        this.scene = new Scene();
 
         this.setScreenSize(width, height, pixelRatio);
         this.setDepth(depth);

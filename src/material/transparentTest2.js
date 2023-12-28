@@ -1,18 +1,22 @@
 /*
  * @Date: 2023-05-08 17:17:11
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-05-10 18:17:52
- * @FilePath: /threejs-demo/packages/examples/material/transparentTest2.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2023-12-28 15:23:33
+ * @FilePath: /threejs-demo/src/material/transparentTest2.js
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
-  BoxGeometry, Mesh, MeshBasicMaterial, Scene, Vector3,
+  BoxGeometry, 
+  Mesh, 
+  MeshBasicMaterial, 
+  Vector3,
 } from '../lib/three/three.module.js';
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
   getColor,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -27,9 +31,7 @@ function init() {
 
   const scene = initScene();
 
-  renderer.setClearColor(0xffffff);
-
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const createTransparentMaterial = (index) => new MeshBasicMaterial({
     color: getColor(index),
@@ -75,8 +77,7 @@ function init() {
   function render() {
     orbitControls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render)
 }

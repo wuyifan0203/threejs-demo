@@ -5,7 +5,6 @@
  * @FilePath: /threejs-demo/examples/src/material/blendingTest.js
  */
 import {
-  Scene,
   Vector3,
   Mesh,
   AmbientLight,
@@ -25,7 +24,8 @@ import {
   resize,
   initCustomGrid,
   initOrbitControls,
-  initGUI
+  initGUI,
+  initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {

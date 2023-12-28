@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:12:44
+ * @LastEditTime: 2023-12-28 15:45:18
  * @FilePath: /threejs-demo/src/animate/loadModalWithAnimation.js
  */
 import {
@@ -18,11 +18,11 @@ import {
     initRenderer, 
     initOrthographicCamera, 
     initGroundPlane, 
-    initSpotLight, 
     initScene, 
     initOrbitControls, 
     initAmbientLight,
-    initGUI
+    initGUI,
+    initDirectionLight
 } from '../lib/tools/index.js';
 
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
@@ -44,8 +44,8 @@ async function init() {
     camera.updateProjectionMatrix();
     const scene = initScene();
 
-    const light = initSpotLight();
-    light.position.set(40, 40, 70);
+    const light = initDirectionLight();
+    light.position.set(2, 2, 30);
     scene.add(light);
 
     initAmbientLight(scene);

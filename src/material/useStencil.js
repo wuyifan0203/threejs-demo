@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:43:19
+ * @LastEditTime: 2023-12-28 15:25:03
  * @FilePath: /threejs-demo/src/material/useStencil.js
  */
 import {
-    Scene,
     Vector3,
     AmbientLight,
     Mesh,
@@ -18,7 +17,8 @@ import {
     resize,
     initOrbitControls,
     initGUI,
-    initPerspectiveCamera
+    initPerspectiveCamera,
+    initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {

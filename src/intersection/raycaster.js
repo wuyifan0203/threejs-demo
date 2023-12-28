@@ -1,13 +1,11 @@
 /*
  * @Date: 2023-08-14 19:11:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:17:00
+ * @LastEditTime: 2023-12-28 15:33:53
  * @FilePath: /threejs-demo/src/intersection/raycaster.js
  */
 
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
-    Scene,
     Vector3,
     Vector2,
     Mesh,
@@ -24,7 +22,9 @@ import {
     initOrthographicCamera,
     resize,
     initCustomGrid,
-    initDirectionLight
+    initDirectionLight,
+    initOrbitControls,
+    initScene
 } from '../lib/tools/index.js';
 
 import { TransformControls } from '../lib/three/TransformControls.js'
@@ -43,7 +43,7 @@ function init() {
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
 
-    const orbitControls = new OrbitControls(camera, renderer.domElement);
+    const orbitControls = initOrbitControls(camera, renderer.domElement);
     const transformControls = new TransformControls(camera, renderer.domElement);
 
 

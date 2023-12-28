@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-24 01:28:50
+ * @LastEditTime: 2023-12-28 15:28:14
  * @FilePath: /threejs-demo/src/particle/common.js
  */
 import {
-  Scene,
   PerspectiveCamera,
   Sprite,
   SpriteMaterial,
@@ -15,10 +14,13 @@ import {
   Color,
   Points,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
-import { initRenderer, resize } from '../lib/tools/index.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { 
+  initRenderer, 
+  resize,
+  initScene,
+  initOrbitControls
+} from '../lib/tools/index.js';
 
 import { Stats } from '../lib/util/Stats.js';
 
@@ -39,25 +41,22 @@ function init() {
   const scene = initScene();
   renderer.setClearColor(0xffffff);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
 
   draw(scene);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
   resize(renderer, camera);
 
-  render();
   function render() {
     stats.begin();
     controls.update();
-    requestAnimationFrame(render);
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
     stats.end();
   }
 
-  window.camera = camera;
-  window.scene = scene;
+  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

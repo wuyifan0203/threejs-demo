@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 09:25:33
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:03:20
+ * @LastEditTime: 2023-12-28 15:18:48
  * @FilePath: /threejs-demo/src/texture/commonTexture.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -14,11 +14,11 @@ import {
   WebGLRenderer,
   Color,
 } from '../lib/three/three.module.js';
-import { 
+import {
   initGUI,
   initScene,
   initOrbitControls
- } from '../lib/tools/index.js';
+} from '../lib/tools/index.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { FBXLoader } from '../lib/three/FBXLoader.js';
 
@@ -31,21 +31,24 @@ async function init() {
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.shadowMap.type = 2;
-
+  renderer.setClearColor(0xffffff);
   renderer.setClearColor(new Color(0x000000));
   renderer.setSize(1000, window.innerHeight);
-  document.getElementById('webgl-output').appendChild(renderer.domElement);
   renderer.autoClear = false;
+
+  document.getElementById('webgl-output').appendChild(renderer.domElement);
   const camera = new PerspectiveCamera(75, 1000 / window.innerHeight, 0.1, 1000);
   camera.position.z = 10;
   camera.lookAt(0, 0, 0);
+
   const scene = initScene();
-  renderer.setClearColor(0xffffff);
   scene.add(new AmbientLight());
-  const light = new SpotLight();
+  
+  const light = new SpotLight(0xffffff, 3, 0, 0);
+  light.position.set(0, 0, 10);
   scene.add(light);
-  scene.add(camera);
-  camera.add(light);
+  // scene.add(camera);
+  // camera.add(light);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 18:04:10
+ * @LastEditTime: 2023-12-28 15:45:11
  * @FilePath: /threejs-demo/src/animate/useAnimation.js
  */
 import {
@@ -18,11 +18,11 @@ import {
 import {
     initRenderer,
     initOrthographicCamera,
-    initSpotLight,
     initGroundPlane,
     initOrbitControls,
     initGUI,
-    initScene
+    initScene,
+    initDirectionLight
 } from '../lib/tools/index.js';
 
 
@@ -39,7 +39,7 @@ function init() {
     camera.updateProjectionMatrix();
     const scene = initScene();
 
-    const light = initSpotLight();
+    const light = initDirectionLight();
     light.position.set(40, 40, 70);
     scene.add(light);
 

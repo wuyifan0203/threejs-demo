@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-27 17:55:13
- * @FilePath: /threejs-demo/examples/src/intersection/boxSelection.js
+ * @LastEditTime: 2023-12-28 15:34:14
+ * @FilePath: /threejs-demo/src/intersection/boxSelection.js
  */
 import {
     BoxGeometry,
@@ -10,6 +10,7 @@ import {
 } from '../lib/three/three.module.js'
 import {
     initAxesHelper,
+    initScene,
     initCoordinates,
     initCustomGrid,
     initGUI, initOrbitControls, initOrthographicCamera, initRenderer, initScene

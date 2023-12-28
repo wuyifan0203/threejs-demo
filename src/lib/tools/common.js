@@ -103,13 +103,14 @@ function initGroundPlane(scene, size = { x: 200, y: 200 }) {
  * @param {Vector3} initialPosition
  * @return {SpotLight}
  */
-function initSpotLight(color = 0xffffff, intensity = 3) {
+function initSpotLight(color = 0xffffff, intensity = 1000) {
   const spotLight = new SpotLight(color, intensity);
   spotLight.shadow.mapSize.width = 2048;
   spotLight.shadow.mapSize.height = 2048;
-  spotLight.shadow.camera.fov = 15;
+  spotLight.shadow.camera.fov = 30;
   spotLight.castShadow = true;
   spotLight.decay = 2;
+  spotLight.distance = 0;
   spotLight.penumbra = 0.05;
   spotLight.name = 'spotLight';
 
