@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 17:51:26
+ * @LastEditTime: 2023-12-29 18:03:28
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -26,8 +26,9 @@ import {
     initGroundPlane
 } from '../lib/tools/index.js';
 import {
-    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3
+    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh,
 } from '../lib/other/physijs/cannon.js';
+import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
 
 window.onload = () => {
     init();
@@ -89,11 +90,16 @@ function init() {
 
     // cannon
 
+
+
+
     const plasticMaterial = new Material('plastic');
     plasticMaterial.friction = 0.2;
     plasticMaterial.restitution = 0.8;
 
     const world = new World({ gravity: new Vec3(0, 0, -9.82) });
+
+    const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 })
 
     const groundShape = new Plane();
     const groundBody = new Body({ mass: 0, shape: groundShape, material: plasticMaterial });
@@ -101,6 +107,8 @@ function init() {
 
     const bottomShape = new Cylinder(5, 5, 1, 32);
     const bottomBody = new Body({ mass: 1, shape: bottomShape, material: plasticMaterial });
+    bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, 0, 'ZYX');
+    bottomBody.position.set(0, 0, 0.5);
     world.addBody(bottomBody);
 
     const columnShape = new Cylinder(0.5, 0.5, 3, 32);
@@ -108,22 +116,16 @@ function init() {
     for (let index = 0; index < columnNumber; index++) {
         const columnBody = new Body({ mass: 1, shape: columnShape, material: plasticMaterial });
         columnBody.position.copy(group.children[index].position);
+        columnBody.quaternion.copy(group.children[index].quaternion);
         world.addBody(columnBody);
         columnBodies.push(columnBody);
     }
 
-    const circleBody = new Body({ mass: 0.2, material: plasticMaterial });
-    const radius = 4;
-    const piceCircle = 8;
-    // c = 2 * Pi * R
-    // h = c / pice
-    // R = 4 ,pice = 8
-    const height = 2 * Math.PI * radius / piceCircle;
-    for (let index = 0; index < piceCircle; index++) {
-        const partShape = new Cylinder(0.2, 0.2, height);
-        partShape.
+    const circleShape = Trimesh.createTorus(2, 0.1, 16, 16);
+    const circleBody = new Body({ mass: 0.2, material: plasticMaterial, shape: circleShape });
+    circleBody.position.copy(circleMesh.position)
+    world.addBody(circleBody);
 
-    }
 
 
 
@@ -133,7 +135,8 @@ function init() {
     function render() {
         const t = clock.getDelta();
         orbitControl.update();
-        group.rotation.z = group.rotation.z + t;
+        cannonDebugger.update()
+        // group.rotation.z = group.rotation.z + t;
         renderer.render(scene, camera);
     }
 
