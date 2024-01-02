@@ -39,7 +39,6 @@ function init() {
 
   draw(scene);
 
-  render();
   function render() {
     renderer.clear();
     controls.update();

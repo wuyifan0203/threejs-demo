@@ -1,13 +1,12 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:29:56
+ * @LastEditTime: 2024-01-02 14:17:08
  * @FilePath: /threejs-demo/src/math/mvpInverse.js
  */
 /* eslint-disable no-unused-vars */
 
 import {
-    Scene,
     Mesh,
     Vector3,
     OrthographicCamera,
@@ -19,7 +18,7 @@ import {
 } from '../lib/three/three.module.js';
 
 import {
-    initRenderer, initOrbitControls, initGUI, initDirectionLight
+    initRenderer, initOrbitControls, initGUI, initDirectionLight, initScene
 } from '../lib/tools/index.js';
 
 

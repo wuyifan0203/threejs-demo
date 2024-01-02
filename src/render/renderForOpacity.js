@@ -5,7 +5,6 @@
  * @FilePath: /threejs-demo/src/render/renderForOpacity.js
  */
 import {
-    Scene,
     Mesh,
     Vector3,
     AmbientLight,
@@ -20,6 +19,7 @@ import {
     resize,
     initDirectionLight,
     initOrbitControls,
+    initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {

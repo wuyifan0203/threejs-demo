@@ -1,13 +1,12 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:50:14
+ * @LastEditTime: 2024-01-02 14:10:59
  * @FilePath: /threejs-demo/src/render/useRenderTarget.js
  */
 /* eslint-disable no-unused-vars */
 
 import {
-  Scene,
   Mesh,
   Vector3,
   AmbientLight,
@@ -26,7 +25,8 @@ import {
   initGroundPlane,
   initDirectionLight,
   initOrbitControls,
-  initGUI
+  initGUI,
+  initScene
 } from '../lib/tools/index.js';
 
 window.onload = () => {

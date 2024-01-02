@@ -1,14 +1,12 @@
 /*
  * @Date: 2023-05-10 18:26:20
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-10 15:17:00
- * @FilePath: /threejs-demo/packages/examples/shader/shader1.js
+ * @LastEditTime: 2024-01-02 14:09:29
+ * @FilePath: /threejs-demo/src/shader/shader1.js
  * @ShaderExample:https://www.shadertoy.com/view/4dl3zn
  */
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   Vector3,
-  Scene,
   ShaderMaterial,
   PlaneGeometry,
   Mesh,
@@ -18,6 +16,8 @@ import {
   initRenderer,
   initPerspectiveCamera,
   resize,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -34,7 +34,7 @@ function init() {
 
   renderer.setClearColor(0xffffff);
 
-  const orbitControls = new OrbitControls(camera, renderer.domElement);
+  const orbitControls = initOrbitControls(camera, renderer.domElement);
 
   const vertexShader = `
   precision mediump float;
@@ -107,8 +107,8 @@ function init() {
     material.uniformsNeedUpdate = true;
     orbitControls.update();
     renderer.render(scene, camera);
-    requestAnimationFrame(render);
   }
 
-  render();
+  renderer.setAnimationLoop(render);
+
 }

@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:30:13
+ * @LastEditTime: 2024-01-02 14:15:34
  * @FilePath: /threejs-demo/src/particle/GRAVITY.js
  */
 import {
-  Scene,
   PointLight,
   PerspectiveCamera,
   BufferGeometry,

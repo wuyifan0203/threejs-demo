@@ -10,7 +10,6 @@ import {
     Vector2,
     ShaderMaterial,
     Color,
-    Scene,
     WebGLRenderTarget,
     DepthTexture,
     Material,

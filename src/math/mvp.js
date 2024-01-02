@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:06:22
+ * @LastEditTime: 2024-01-02 14:16:42
  * @FilePath: /threejs-demo/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
@@ -17,7 +17,7 @@ import {
     Matrix4
 } from '../lib/three/three.module.js';
 
-import { initRenderer, initDirectionLight,initScene } from '../lib/tools/index.js';
+import { initRenderer, initDirectionLight, initScene, initAmbientLight } from '../lib/tools/index.js';
 
 
 window.onload = function () {
@@ -38,7 +38,7 @@ function init() {
     camera.up.set(0, 0, 1);
     const scene = initScene();
 
-    scene.add(new AmbientLight());
+    initAmbientLight(scene)
     const light = initDirectionLight();
     light.position.set(0, -10, 5);
     scene.add(light)

@@ -1,14 +1,12 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:46:30
+ * @LastEditTime: 2024-01-02 14:13:10
  * @FilePath: /threejs-demo/src/render/renderMultiScene.js
  */
 import {
-  Scene,
   Mesh,
   Vector3,
-  AmbientLight,
   BoxGeometry,
   MeshStandardMaterial,
   Clock,
@@ -16,13 +14,16 @@ import {
   Vector2,
   TextureLoader
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
+  initScene,
+  initOrbitControls,
   initGroundPlane,
+  initAmbientLight,
+  initDirectionLight
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -51,11 +52,11 @@ function init() {
   scene1.background = loader.load("../../public/images/sky2/nx.png")
 
   scene1.add(light);
-  scene1.add(new AmbientLight());
+  initAmbientLight(scene1);
 
   initGroundPlane(scene1, new Vector2(20, 20));
 
-  const orbitControl = new OrbitControls(camera, renderer.domElement);
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
 
   const mesh = new Mesh(new BoxGeometry(5, 4, 3), new MeshStandardMaterial({ color: 0x049ef4, roughness: 0 }));
   mesh.position.set(0, 0, 6);

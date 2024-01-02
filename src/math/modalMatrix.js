@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 
 import {
-  Scene,
   Mesh,
   Vector3,
   SphereGeometry,
@@ -16,12 +15,13 @@ import {
   LineLoop,
   RingGeometry,
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {
   initRenderer,
   initOrthographicCamera,
   resize,
+  initScene,
+  initOrbitControls
 } from '../lib/tools/index.js';
 
 Mesh.prototype.setMultiplyScale = function (unit) {
@@ -41,7 +41,7 @@ function init() {
 
   renderer.setClearColor(0xffffff);
 
-  const orbitControl = new OrbitControls(camera, renderer.domElement);
+  const orbitControl = initOrbitControls(camera, renderer.domElement);
 
   const sphere = new SphereGeometry(1, 32, 32);
 

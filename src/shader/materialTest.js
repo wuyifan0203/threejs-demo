@@ -1,12 +1,11 @@
 /*
  * @Date: 2023-05-10 18:26:20
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-18 20:38:29
- * @FilePath: /threejs-demo/examples/src/shader/materialTest.js
+ * @LastEditTime: 2024-01-02 14:10:13
+ * @FilePath: /threejs-demo/src/shader/materialTest.js
  */
 import {
     Vector3,
-    Scene,
     Mesh,
     BoxGeometry,
 } from '../lib/three/three.module.js';
@@ -16,6 +15,7 @@ import {
     initOrbitControls,
     initGUI,
     resize,
+    initScene
 } from '../lib/tools/index.js';
 
 import { BasicMaterial } from './material/basicMaterial.js'

@@ -2,13 +2,13 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-30 02:28:38
+ * @LastEditTime: 2024-01-02 21:05:47
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
     Mesh,
     Clock,
-    SphereGeometry,
+    Euler,
     Vector3,
     TorusGeometry,
     Group,
@@ -44,7 +44,7 @@ function init() {
 
     const scene = initScene();
 
-    initGroundPlane(scene);
+    // initGroundPlane(scene);
     initAmbientLight(scene);
 
     const light = initDirectionLight();
@@ -113,13 +113,15 @@ function init() {
 
     const columnShape = new Cylinder(0.5, 0.5, 3, 32);
     const columnBodies = [];
+    const tempV = new Vector3()
     for (let index = 0; index < columnNumber; index++) {
         // const columnBody = new Body({ mass: 1, shape: columnShape, material: plasticMaterial });
-        // columnBody.position.copy(columns[index].position);
-        // columnBody.quaternion.setFromEuler(Math.PI / 2, 0, 0, 'ZYX');
-        const v = columns[index].position;
-        console.log(v);
-        bottomBody.addShape(columnShape, new Vec3(v.y,v.x,v.z), new Quaternion().setFromEuler(-Math.PI/2, 0, 0, 'ZYX'))
+        // columns[index].getWorldPosition(tempV);
+        tempV.copy(columns[index].position);
+        tempV.z = 2
+        console.log(tempV);
+        tempV.applyEuler(new Euler(-Math.PI / 2, 0, 0, 'ZYX'));
+        bottomBody.addShape(columnShape, tempV)
         // world.addBody(columnBody);
         // columnBodies.push(columnBody);
     }
@@ -128,11 +130,6 @@ function init() {
     const circleBody = new Body({ mass: 0.2, material: plasticMaterial, shape: circleShape });
     circleBody.position.copy(circleMesh.position)
     world.addBody(circleBody);
-
-
-
-
-
 
 
     const clock = new Clock();

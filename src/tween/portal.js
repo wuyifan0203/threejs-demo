@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:57:57
+ * @LastEditTime: 2024-01-02 14:08:33
  * @FilePath: /threejs-demo/src/tween/portal.js
  */
 import {
@@ -25,6 +25,7 @@ import {
     resize,
     initPerspectiveCamera,
     initGUI,
+    initScene,
 } from '../lib/tools/index.js';
 import {
     Tween, update, Easing,

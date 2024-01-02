@@ -1,11 +1,10 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 16:46:50
+ * @LastEditTime: 2024-01-02 14:12:29
  * @FilePath: /threejs-demo/src/render/renderMutiSceneByTarget.js
  */
 import {
-    Scene,
     Mesh,
     Vector3,
     AmbientLight,
@@ -16,15 +15,16 @@ import {
     Vector2,
     WebGLRenderTarget
 } from '../lib/three/three.module.js';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 import {
     initRenderer,
     initOrthographicCamera,
     resize,
     initGroundPlane,
-    initDirectionLight
+    initDirectionLight,
+    initScene,
+    initGUI,
+    initOrbitControls
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -53,7 +53,7 @@ function init() {
 
     initGroundPlane(scene1, new Vector2(20, 20));
 
-    const orbitControl = new OrbitControls(camera, renderer.domElement);
+    const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     const mesh = new Mesh(new BoxGeometry(5, 4, 3), new MeshStandardMaterial({ color: 0x049ef4, roughness: 0 }));
     mesh.position.set(0, 0, 6);
@@ -131,6 +131,6 @@ function init() {
 
     resize(renderer, camera);
 
-    const gui = new GUI();
+    const gui = initGUI();
     gui.add(o, 'look').name('check result (press F12)')
 }
