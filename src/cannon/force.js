@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 21:05:47
+ * @LastEditTime: 2024-01-03 01:36:39
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -44,22 +44,27 @@ function init() {
 
     const scene = initScene();
 
-    // initGroundPlane(scene);
+    initGroundPlane(scene);
     initAmbientLight(scene);
 
     const light = initDirectionLight();
+    light.shadow.camera.near = camera.near;
+    light.shadow.camera.far = camera.far;
+    light.shadow.camera.left = camera.left;
+    light.shadow.camera.right = camera.right;
+    light.shadow.camera.top = camera.top;
+    light.shadow.camera.bottom = camera.bottom;
     light.position.set(40, 40, 70);
     scene.add(light);
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     const group = new Group();
-    const cylinder = new CylinderGeometry(1, 1, 1, 32);
+    const cylinder = new CylinderGeometry(5, 5, 1, 32);
     cylinder.rotateX(Math.PI / 2);
     // 圆台
     const bottomMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
     const bottom = new Mesh(cylinder, bottomMaterial);
-    bottom.scale.set(5, 5, 1);
     bottom.position.set(0, 0, 0.5);
     bottom.castShadow = bottom.receiveShadow = true;
     group.add(bottom);
@@ -67,10 +72,11 @@ function init() {
     const columnMaterial = new MeshStandardMaterial({ color: 0x0000ff });
     const columnNumber = 5;
     const pice = Math.PI * 2 / columnNumber;
+    const columnGeometry = new CylinderGeometry(0.5, 0.5, 3, 32);
     const columns = []
     for (let index = 0; index < columnNumber; index++) {
-        const column = new Mesh(cylinder, columnMaterial);
-        column.scale.set(0.5, 0.5, 3);
+        const column = new Mesh(columnGeometry, columnMaterial);
+        column.rotateX(Math.PI / 2);
         column.position.x = 4 * Math.cos(pice * index);
         column.position.y = 4 * Math.sin(pice * index);
         column.position.z = 2.5;
@@ -112,18 +118,13 @@ function init() {
     world.addBody(bottomBody);
 
     const columnShape = new Cylinder(0.5, 0.5, 3, 32);
-    const columnBodies = [];
     const tempV = new Vector3()
     for (let index = 0; index < columnNumber; index++) {
-        // const columnBody = new Body({ mass: 1, shape: columnShape, material: plasticMaterial });
-        // columns[index].getWorldPosition(tempV);
         tempV.copy(columns[index].position);
         tempV.z = 2
         console.log(tempV);
         tempV.applyEuler(new Euler(-Math.PI / 2, 0, 0, 'ZYX'));
         bottomBody.addShape(columnShape, tempV)
-        // world.addBody(columnBody);
-        // columnBodies.push(columnBody);
     }
 
     const circleShape = Trimesh.createTorus(2, 0.1, 16, 16);
@@ -131,20 +132,38 @@ function init() {
     circleBody.position.copy(circleMesh.position)
     world.addBody(circleBody);
 
+    const timeStep = 1.0 / 60.0;
+
 
     const clock = new Clock();
     function render() {
-        const t = clock.getDelta();
+        const deltaTime = clock.getDelta();
         orbitControl.update();
-        cannonDebugger.update()
-        // group.rotation.z = group.rotation.z + t;ƒ
+        cannonDebugger.update();
+
+        world.step(timeStep, deltaTime, 3);
+        group.rotation.z = group.rotation.z + deltaTime;
         bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, group.rotation.z, 'ZYX');
+        circleBody.position.copy(circleMesh.position);
+        circleBody.quaternion.copy(circleMesh.quaternion);
         renderer.render(scene, camera);
     }
 
     renderer.setAnimationLoop(render);
 
     const gui = initGUI();
+
+    const offset = new Vec3(0, 0, 0);
+
+    const operation = {
+        throw() {
+            const force = new Vec3(0, 50, 100);
+            const impulse = force.scale(timeStep); // 将力转换为冲量
+            circleBody.applyImpulse(impulse, offset)
+        }
+    }
+
+    gui.add(operation, 'throw')
 
 
 }
