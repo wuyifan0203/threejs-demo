@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-03 20:58:33
+ * @LastEditTime: 2024-01-03 21:06:13
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -138,11 +138,6 @@ function init() {
     // 将接触材料添加到物理世界中
     world.addContactMaterial(contactMaterial);
 
-
-
-
-
-
     const gui = initGUI();
 
     const operation = {
@@ -174,9 +169,7 @@ function init() {
     const defaultUp = new Vector3(0, 1, 0);
 
     function updateShadowFrustum() {
-        // 更新视椎体的位置、方向和投影范围
         light.shadow.matrix.lookAt(light.position, sphere.position, defaultUp);
-        
     }
 
     const helper = new CameraHelper(light.shadow.camera);
