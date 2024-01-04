@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-03 21:06:13
+ * @LastEditTime: 2024-01-04 21:02:18
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -67,6 +67,7 @@ function init() {
     light.position.set(40, 40, 70);
     scene.add(light);
 
+
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
     const sphereMaterial = new MeshStandardMaterial();
@@ -112,47 +113,59 @@ function init() {
 
     scene.add(sphere);
 
+    light.target = sphere;
+
     // cannon
     const world = new World();
     world.gravity.set(0, 0, -9.82);
 
     const groundBody = new Body({ mass: 0, shape: new Plane() });
+    groundBody.material = new Material({ friction: 100 });
     world.addBody(groundBody);
 
     const sphereBody = new Body({ mass: 2, shape: new Sphere(2, 64, 64) });
-    sphereBody.material = new Material({ restitution: 1 });
+    sphereBody.material = new Material({ friction: 100 });
     sphereBody.position.set(0, 0, 2);
+    sphereBody.linearDamping = 0
 
     world.addBody(sphereBody);
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
 
-    const material = new Material();
+    const contactMaterial = new ContactMaterial(groundBody.material, sphereBody.material, { friction: 100, restitution: 1 })
 
-    // 创建接触材料
-    const contactMaterial = new ContactMaterial(material, material, {
-        friction: 0.5, // 摩擦系数
-        restitution: 0.2, // 恢复系数
-    });
+    world.addContactMaterial(contactMaterial)
 
-    // 将接触材料添加到物理世界中
-    world.addContactMaterial(contactMaterial);
 
     const gui = initGUI();
 
+    const positionMap = {
+        top: new Vec3(0, 0, 3),
+        center: new Vec3(0, 0, 2),
+        bottom: new Vec3(0, 0, 1)
+    }
+
     const operation = {
         debug: false,
-        force: new Vec3(100, 0, 0),
-        forceToTop() {
-            sphereBody.applyForce(this.force, new Vec3(0, 0, 1.5))
+        force: new Vec3(10, 0, 0),
+        position: 'center',
+        forceToBall() {
+            sphereBody.applyLocalForce(this.force, positionMap[this.position])
+        },
+        impulseToBall() {
+            sphereBody.applyLocalImpulse(this.force, positionMap[this.position])
         }
     }
 
     gui.add(operation, 'debug');
-    gui.add(operation.force, 'x', 10, 1000, 1).name('Force');
-    gui.add(operation, 'forceToTop').name('Force to Top');
+    gui.add(operation.force, 'x', 10, 1000, 1).name('Force value');
+    gui.add(operation, 'position', Object.keys(positionMap)).name('Position');
+    gui.add(contactMaterial, 'friction', 0, 100, 0.1).name('friction');
+    gui.add(operation, 'forceToBall').name('Force to ball');
+    gui.add(operation, 'impulseToBall').name('Impulse to ball');
 
     resize(renderer, camera);
+
 
     const clock = new Clock();
     const timeStep = 1 / 60
@@ -164,17 +177,8 @@ function init() {
         sphere.position.copy(sphereBody.position);
         sphere.quaternion.copy(sphereBody.quaternion);
         renderer.render(scene, camera);
-        updateShadowFrustum()
+        console.log(sphereBody.velocity.x);
     }
-    const defaultUp = new Vector3(0, 1, 0);
-
-    function updateShadowFrustum() {
-        light.shadow.matrix.lookAt(light.position, sphere.position, defaultUp);
-    }
-
-    const helper = new CameraHelper(light.shadow.camera);
-    scene.add(helper);
-
 
     renderer.setAnimationLoop(render);
 
