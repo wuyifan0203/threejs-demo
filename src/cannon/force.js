@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-04 21:02:18
+ * @LastEditTime: 2024-01-05 18:02:32
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -135,7 +135,6 @@ function init() {
     const contactMaterial = new ContactMaterial(groundBody.material, sphereBody.material, { friction: 100, restitution: 1 })
 
     world.addContactMaterial(contactMaterial)
-
 
     const gui = initGUI();
 
