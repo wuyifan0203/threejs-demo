@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-03 20:11:03
+ * @LastEditTime: 2024-01-07 18:03:00
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -98,11 +98,6 @@ function init() {
     scene.add(circleMesh);
 
     // cannon
-
-    const plasticMaterial = new Material('plastic');
-    plasticMaterial.friction = 0.2;
-    plasticMaterial.restitution = 0.8;
-
     const world = new World({ gravity: new Vec3(0, 0, -9.82) });
     world.broadphase = new NaiveBroadphase();
     world.defaultContactMaterial.contactEquationRelaxation = 5;
@@ -111,11 +106,13 @@ function init() {
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 })
 
     const groundShape = new Plane();
-    const groundBody = new Body({ mass: 0, shape: groundShape, material: plasticMaterial });
+    const groundBody = new Body({ mass: 0, shape: groundShape });
+    groundBody.material = new Material({ friction: 0.5, restitution: 0.3 })
     world.addBody(groundBody);
 
     const bottomShape = new Cylinder(5, 5, 1, 32);
-    const bottomBody = new Body({ mass: 1, shape: bottomShape, material: plasticMaterial });
+    const bottomBody = new Body({ mass: 1, shape: bottomShape });
+    bottomBody.material = new Material({ friction: 0.5, restitution: 0.8 });
     bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, 0, 'ZYX');
     bottomBody.position.set(0, 0, 0.5);
     world.addBody(bottomBody);
@@ -130,9 +127,15 @@ function init() {
     }
 
     const circleShape = Trimesh.createTorus(2, 0.1, 16, 16);
-    const circleBody = new Body({ mass: 0.2, material: plasticMaterial, shape: circleShape });
+    const circleBody = new Body({ mass: 1, shape: circleShape });
+    circleBody.material = new Material({ friction: 0.5, restitution: 0.8 });
     circleBody.position.copy(circleMesh.position)
     world.addBody(circleBody);
+
+    const groundCircle = new ContactMaterial(circleBody.material, groundBody.material, { friction: 0.1, restitution: 0.3 });
+    const bottomCircle = new ContactMaterial(circleBody.material, bottomBody.material, { friction: 0.1, restitution: 0.3 })
+    world.addContactMaterial(groundCircle);
+    world.addContactMaterial(bottomCircle);
 
     const timeStep = 1.0 / 60.0;
 
@@ -146,8 +149,8 @@ function init() {
         world.step(timeStep, deltaTime, 3);
         group.rotation.z = group.rotation.z + deltaTime;
         bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, group.rotation.z, 'ZYX');
-        circleBody.position.copy(circleMesh.position);
-        circleBody.quaternion.copy(circleMesh.quaternion);
+        circleMesh.position.copy(circleBody.position);
+        circleMesh.quaternion.copy(circleBody.quaternion);
 
         renderer.render(scene, camera);
     }
@@ -156,14 +159,13 @@ function init() {
 
     const gui = initGUI();
 
-    const sph1_plane = new ContactMaterial(plasticMaterial, plasticMaterial, { friction: 0.1, restitution: 0.3 });
-    world.addContactMaterial(sph1_plane);
+
 
     const offset = new Vec3(0, 0, 0);
 
     const operation = {
         throw() {
-            const force = new Vec3(0, 50, 100);
+            const force = new Vec3(0, 50, 1000);
             const impulse = force.scale(timeStep); // 将力转换为冲量
             circleBody.applyImpulse(impulse, offset)
         }
