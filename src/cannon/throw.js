@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-07 18:03:00
+ * @LastEditTime: 2024-01-08 19:56:20
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -14,6 +14,7 @@ import {
     Group,
     CylinderGeometry,
     MeshStandardMaterial,
+    BoxGeometry
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -26,7 +27,7 @@ import {
     initGroundPlane
 } from '../lib/tools/index.js';
 import {
-    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh, Quaternion
+    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh, Quaternion, Box
 } from '../lib/other/physijs/cannon.js';
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
 
@@ -88,6 +89,10 @@ function init() {
 
     scene.add(group);
 
+    const testBox = new Mesh(new BoxGeometry(2, 2, 2), new MeshStandardMaterial({ color: 0xff0000 }));
+    testBox.position.z = 10;
+    scene.add(testBox)
+
     // 小环
     const circle = new TorusGeometry(2, 0.1, 16, 16);
     const circleMaterial = new MeshStandardMaterial({ color: 0xff0000 });
@@ -137,6 +142,10 @@ function init() {
     world.addContactMaterial(groundCircle);
     world.addContactMaterial(bottomCircle);
 
+    const testBody = new Body({ mass: 1, shape: new Box(new Vec3(1, 1, 1)) });
+    world.addBody(testBody);
+
+
     const timeStep = 1.0 / 60.0;
 
 
@@ -148,9 +157,14 @@ function init() {
 
         world.step(timeStep, deltaTime, 3);
         group.rotation.z = group.rotation.z + deltaTime;
-        bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, group.rotation.z, 'ZYX');
+        // bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, group.rotation.z, 'ZYX');
+        bottomBody.quaternion.copy(bottomBody.quaternion)
+        group.position.copy(bottomBody.position);
         circleMesh.position.copy(circleBody.position);
         circleMesh.quaternion.copy(circleBody.quaternion);
+
+        testBox.position.copy(testBody.position);
+        testBox.quaternion.copy(testBody.quaternion);
 
         renderer.render(scene, camera);
     }
@@ -168,10 +182,15 @@ function init() {
             const force = new Vec3(0, 50, 1000);
             const impulse = force.scale(timeStep); // 将力转换为冲量
             circleBody.applyImpulse(impulse, offset)
+        },
+        dropTest() {
+            testBody.position.set(0, 0, 10);
+            testBody.quaternion.setFromEuler(0, 0, 0, 'ZYX')
         }
     }
 
-    gui.add(operation, 'throw')
+    gui.add(operation, 'throw');
+    gui.add(operation, 'dropTest');
 
 
 }
