@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-10 20:15:32
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-10 21:02:10
+ * @LastEditTime: 2024-01-11 20:12:32
  * @FilePath: /threejs-demo/src/particle/image.js
  */
 import {
@@ -11,6 +11,9 @@ import {
     Vector3,
     Vector2,
     Float32BufferAttribute,
+    BoxGeometry,
+    MeshBasicMaterial,
+    Mesh
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -28,12 +31,13 @@ window.onload = () => {
 function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
-    const camera = initOrthographicCamera(new Vector3(0, 0, 20))
+    const camera = initOrthographicCamera(new Vector3(0, 0, 2000))
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
+    camera.zoom = 0.01
 
     const scene = initScene();
-    renderer.setClearColor(0xffffff);
+    renderer.setClearColor(0x000000, 1);
 
     const controls = initOrbitControls(camera, renderer.domElement);
     resize(renderer, camera);
@@ -42,9 +46,17 @@ function init() {
     const ctx = canvas.getContext('2d');
 
     const geometry = new BufferGeometry();
-    const material = new PointsMaterial({ vertexColors: true });
+    const material = new PointsMaterial({
+        vertexColors: true,
+        size: 1
+    });
     const points = new Points(geometry, material);
     scene.add(points);
+
+    controls.enableRotate = false;
+
+
+    scene.add(new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial({ color: 'red' })))
 
     const control = {
         unit: 1
@@ -55,38 +67,38 @@ function init() {
     image.onload = () => {
         canvas.width = image.width;
         canvas.height = image.height;
-        console.log(image);
-        ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+        ctx.scale(1, -1); // 垂直镜像翻转
+        ctx.drawImage(image, 0, -canvas.height, canvas.width, canvas.height);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-        const bit = gcd(canvas.width, canvas.height);
-
-        updateGeometry(imageData, bit);
+        updateGeometry(imageData.data);
     }
 
-    function updateGeometry(imageData, bit) {
+    function updateGeometry(imageData) {
         const size = new Vector2()
-        return (() => {
-            const pointsNumber = bit * control.unit
-            size.set(canvas.width / pointsNumber, canvas.height / pointsNumber);
-            console.log(imageData, bit, size);
-            const positionBuffer = new Float32BufferAttribute(size.x * size.y * 3);
-            const colorBuffer = new Float32BufferAttribute(size.x * size.y * 3);
-            for (let j = 0, k = positionBuffer.count / 3; j < k; j++) {
-                const element = array[j];
+        size.set(canvas.width , canvas.height);
+
+        const positionBuffer = [];
+        const colorBuffer = [];
+        for (let j = 0, jl = size.x, hj = jl / 2; j < jl; j++) {
+            for (let k = 0, kl = size.y, hk = kl / 2; k < kl; k++) {
+                positionBuffer.push(j - hj, k - hk, 0);
+                const index = (j + k * jl) * 4;
+                const r = imageData[index] / 255;
+                const g = imageData[index + 1] / 255;
+                const b = imageData[index + 2] / 255;
+                colorBuffer.push(r, g, b); // 设置颜色
 
             }
+        }
 
-            const geometry = new BufferGeometry();
-            points.geometry.dispose();
-            points.geometry = geometry;
-            geometry.setAttribute('position', positionBuffer);
-        })()
+        const geometry = new BufferGeometry();
+        points.geometry.dispose();
+        points.geometry = geometry;
+        geometry.setAttribute('position', new Float32BufferAttribute(positionBuffer, 3));
+        geometry.setAttribute('color', new Float32BufferAttribute(colorBuffer, 3));
+
     }
-
-
-
-
 
     function render() {
         controls.update();
@@ -96,18 +108,5 @@ function init() {
 
     renderer.setAnimationLoop(render);
 
-    const gui = initGUI();
-    gui.add(control, 'unit', 1, 10).onChange(updateGeometry);
 }
 
-function gcd(a, b) {
-    if (b === 0) {
-        return a;
-    }
-    return gcd(b, a % b);
-}
-
-function lcm(a, b) {
-    const gcdValue = gcd(a, b);
-    return (a * b) / gcdValue;
-}
