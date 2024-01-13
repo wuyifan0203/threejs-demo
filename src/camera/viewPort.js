@@ -13,10 +13,10 @@ import {
   initOrthographicCamera,
   initScene,
   initOrbitControls,
-  initOrbitControls
+  initOrbitControls,
+  initStats
 } from '../lib/tools/index.js';
 
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -24,10 +24,8 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const stats = new Stats();
-  stats.showPanel(0);
-  const dom = document.getElementById('webgl-output');
-  dom.append(stats.dom);
+  const stats = new initStats();
+
   const camera = initOrthographicCamera(new Vector3(0, 0, 100));
   camera.up.set(0, 0, 1);
 

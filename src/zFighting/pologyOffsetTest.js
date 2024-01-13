@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:44:48
+ * @LastEditTime: 2024-01-13 15:39:15
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
@@ -19,9 +19,9 @@ import {
   initGUI,
   initScene,
   initAmbientLight,
-  initPerspectiveCamera
+  initPerspectiveCamera,
+  initStats
 } from '../lib/tools/index.js';
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -30,9 +30,8 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
 
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom);
+  const stats = initStats();
+
 
   const camera = initPerspectiveCamera(new Vector3(5, 5, 5));
   camera.up.set(0, 0, 1);

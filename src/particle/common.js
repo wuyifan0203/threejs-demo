@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:28:14
+ * @LastEditTime: 2024-01-13 15:42:13
  * @FilePath: /threejs-demo/src/particle/common.js
  */
 import {
@@ -19,10 +19,11 @@ import {
   initRenderer, 
   resize,
   initScene,
-  initOrbitControls
+  initOrbitControls,
+  initGUI,
+  initStats
 } from '../lib/tools/index.js';
 
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -31,9 +32,7 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
 
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom);
+  const stats = initStats();
   renderer.autoClear = false;
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000000);
   camera.position.set(3, 3, 63);
@@ -60,7 +59,7 @@ function init() {
 }
 
 function draw(scene) {
-  const gui = new GUI();
+  const gui = initGUI();
   const controls = {
     row: 30,
     col: 20,

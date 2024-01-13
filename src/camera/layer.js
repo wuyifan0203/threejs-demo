@@ -12,9 +12,9 @@ import {
   initScene,
   resize,
   initGUI,
-  initAmbientLight
+  initAmbientLight,
+  initStats
 } from '../lib/tools/index.js';
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -22,9 +22,7 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom);
+  const stats = initStats();
 
   const camera = new PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
   camera.position.set(0, 0, 10);
@@ -32,7 +30,7 @@ function init() {
   camera.layers.enable(1);
   camera.layers.enable(2);
 
-  const light = new PointLight(0xffffff, 3,0,0);
+  const light = new PointLight(0xffffff, 3, 0, 0);
 
   light.layers.enable(0);
   light.layers.enable(1);

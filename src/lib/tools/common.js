@@ -21,6 +21,8 @@ import { CustomGrid } from '../three/customGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
 import { GUI } from '../util/lil-gui.module.min.js'
 import { CoordinateHelper } from '../three/CoordinateHelper.js';
+import { Stats } from '../util/Stats.js';
+import { ViewHelper } from '../three/viewHelper.js'
 
 /**
  * @description: 初始化渲染器
@@ -282,6 +284,18 @@ function createBackgroundTexture(color, color2) {
   })();
 }
 
+function initStats(showPanel = 0) {
+  const stats = new Stats();
+  stats.showPanel(showPanel);
+  document.getElementById('webgl-output')?.appendChild(stats.dom);
+  return stats;
+}
+
+function initViewHelper(camera, document) {
+  const viewHelper = new ViewHelper(camera, document);
+  return viewHelper;
+}
+
 export {
   initAxesHelper,
   initSpotLight,
@@ -298,5 +312,7 @@ export {
   initProgress,
   createBackgroundTexture,
   initDirectionLight,
-  initAmbientLight
+  initAmbientLight,
+  initStats,
+  initViewHelper
 };

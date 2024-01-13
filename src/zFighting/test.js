@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:41:08
+ * @LastEditTime: 2024-01-13 15:41:00
  * @FilePath: /threejs-demo/src/zFighting/test.js
  */
 import {
@@ -17,11 +17,11 @@ import {
   resize,
   initOrbitControls,
   initDirectionLight,
-  initScene
+  initScene,
+  initStats
  } from '../lib/tools/index.js';
 import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
 
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -31,9 +31,7 @@ function init() {
   const renderer = initRenderer();
   renderer.autoClear = false;
   
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom);
+  const stats = initStats();
 
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000000);
   camera.up.set(0, 0, 1);

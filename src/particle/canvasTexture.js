@@ -19,10 +19,10 @@ import {
   resize,
   initScene,
   initGUI,
-  initOrbitControls
+  initOrbitControls,
+  initStats
 } from '../lib/tools/index.js';
 
-import { Stats } from '../lib/util/Stats.js';
 
 window.onload = () => {
   init();
@@ -31,9 +31,8 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
 
-  const stats = new Stats();
-  stats.showPanel(0);
-  document.getElementById('webgl-output').append(stats.dom);
+  const stats = initStats();
+
   renderer.autoClear = false;
   const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 10000);
   camera.position.set(3, 3, 63);
