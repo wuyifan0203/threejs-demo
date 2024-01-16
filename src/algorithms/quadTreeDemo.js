@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-13 16:23:05
+ * @LastEditTime: 2024-01-16 20:53:02
  * @FilePath: /threejs-demo/src/algorithms/quadTreeDemo.js
  */
-import { Box2, BoxGeometry, Vector2, Vector3, Mesh } from '../lib/three/three.module.js';
+import { Box2, BoxGeometry, Vector2, Vector3, Mesh,MeshBasicMaterial } from '../lib/three/three.module.js';
 import {
     initRenderer,
     resize,
@@ -12,6 +12,7 @@ import {
     initOrbitControls,
     initStats,
     initOrthographicCamera,
+    initGUI
 } from '../lib/tools/index.js';
 import { QuadTree } from './QuadTree.js';
 
@@ -48,10 +49,12 @@ function init() {
 
 
     const meshes = []
-    for (let j = 0; j < position / 2; j++) {
+    for (let j = 0; j < position.length / 2; j++) {
         const mesh = new Mesh(new BoxGeometry(2, 2, 2), new MeshBasicMaterial({ color: 0x00ff00 }));
         meshes.push(mesh);
         scene.add(mesh);
+
+        console.log(6);
 
         mesh.position.set(position[j * 2], position[j * 2 + 1], 0);
 
@@ -59,15 +62,15 @@ function init() {
 
         const { min, max } = mesh.geometry.boundingBox
         const box = new Box2(new Vector2(min.x, min.y), new Vector2(max.x, max.y));
+        const center = new Vector2(mesh.position.x, mesh.position.y);
+        box.min.add(center);
+        box.max.add(center);
 
-        console.log(box);
 
         quadTree.insertBox(box);
 
     }
 
-
-    quadTree.insertBox();
 
     function render() {
         stats.begin();
@@ -78,4 +81,14 @@ function init() {
     }
 
     renderer.setAnimationLoop(render);
+
+    const operation = {
+        log(){
+            console.log(quadTree);
+        }
+    }
+
+    const gui = initGUI();
+
+    gui.add(operation,'log')
 }
