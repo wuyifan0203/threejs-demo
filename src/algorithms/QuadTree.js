@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-13 14:04:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-13 16:25:00
+ * @LastEditTime: 2024-01-17 19:38:28
  * @FilePath: /threejs-demo/src/algorithms/QuadTree.js
  */
 import { Box2, Vector2 } from '../lib/three/three.module.js';
@@ -12,7 +12,7 @@ import { Box2, Vector2 } from '../lib/three/three.module.js';
 /// |------|-------     rd-> right down
 const _size = new Vector2();
 const _center = new Vector2();
-
+let id = 0
 class QuadTree {
     constructor(boundBox, maxDivideTimes = Number.MAX_SAFE_INTEGER) {
         this.boundBox = boundBox;
@@ -21,6 +21,11 @@ class QuadTree {
         this.divided = false;
         this.times = 0;
         this.parent = null;
+        this.id = id++;
+        this.ld = null;
+        this.lu = null;
+        this.rd = null;
+        this.ru = null;
     }
 
     insertBox(box) {
@@ -40,8 +45,8 @@ class QuadTree {
             } else if (this.rd.insertBox(box)) {
                 return true;
             } else {
-                this.parent && this.parent.children.push(box);
-                return false;
+                this.children.push(box);
+                return true;
             }
         }
     }
@@ -66,6 +71,16 @@ class QuadTree {
 
         this.times++;
         this.divided = true;
+    }
+
+    reset() {
+        this.children = [];
+        this.divided = false;
+        this.times = 0;
+        this.ld = null;
+        this.lu = null;
+        this.rd = null;
+        this.ru = null;
     }
 }
 
