@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-05 18:02:32
+ * @LastEditTime: 2024-01-18 20:47:45
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -123,10 +123,17 @@ function init() {
     groundBody.material = new Material({ friction: 100 });
     world.addBody(groundBody);
 
-    const sphereBody = new Body({ mass: 2, shape: new Sphere(2, 64, 64) });
+    const vertex = sphere.geometry.getAttribute('position').array;
+    const indices = sphere.geometry.getIndex().array;
+
+    console.log(vertex,indices);
+    const sphereShape = new Trimesh(vertex, indices);
+    const sphereBody = new Body({ mass: 2, shape: sphereShape});
     sphereBody.material = new Material({ friction: 100 });
     sphereBody.position.set(0, 0, 2);
-    sphereBody.linearDamping = 0
+    sphereBody.linearDamping = 0;
+
+    console.log(sphere);
 
     world.addBody(sphereBody);
 
@@ -176,7 +183,7 @@ function init() {
         sphere.position.copy(sphereBody.position);
         sphere.quaternion.copy(sphereBody.quaternion);
         renderer.render(scene, camera);
-        console.log(sphereBody.velocity.x);
+        // console.log(sphereBody.velocity.x);
     }
 
     renderer.setAnimationLoop(render);

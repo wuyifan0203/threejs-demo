@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-08 19:56:20
+ * @LastEditTime: 2024-01-18 20:38:55
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -133,12 +133,12 @@ function init() {
 
     const circleShape = Trimesh.createTorus(2, 0.1, 16, 16);
     const circleBody = new Body({ mass: 1, shape: circleShape });
-    circleBody.material = new Material({ friction: 0.5, restitution: 0.8 });
+    circleBody.material = new Material({ friction: 0.1, restitution: 0.8 });
     circleBody.position.copy(circleMesh.position)
     world.addBody(circleBody);
 
-    const groundCircle = new ContactMaterial(circleBody.material, groundBody.material, { friction: 0.1, restitution: 0.3 });
-    const bottomCircle = new ContactMaterial(circleBody.material, bottomBody.material, { friction: 0.1, restitution: 0.3 })
+    const groundCircle = new ContactMaterial(circleBody.material, groundBody.material, { friction: 0.1, restitution: 0.8 });
+    const bottomCircle = new ContactMaterial(circleBody.material, bottomBody.material, { friction: 0.1, restitution: 0.5 })
     world.addContactMaterial(groundCircle);
     world.addContactMaterial(bottomCircle);
 
@@ -150,16 +150,16 @@ function init() {
 
 
     const clock = new Clock();
+
     function render() {
         const deltaTime = clock.getDelta();
         orbitControl.update();
         cannonDebugger.update();
 
         world.step(timeStep, deltaTime, 3);
-        group.rotation.z = group.rotation.z + deltaTime;
-        // bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, group.rotation.z, 'ZYX');
-        bottomBody.quaternion.copy(bottomBody.quaternion)
+        group.quaternion.copy(bottomBody.quaternion.mult(new Quaternion().setFromEuler(-Math.PI / 2, 0, group.rotation.z + deltaTime, 'ZYX')));
         group.position.copy(bottomBody.position);
+        group.position.z = group.position.z - 0.5;
         circleMesh.position.copy(circleBody.position);
         circleMesh.quaternion.copy(circleBody.quaternion);
 
@@ -191,6 +191,8 @@ function init() {
 
     gui.add(operation, 'throw');
     gui.add(operation, 'dropTest');
+
+    console.log(world);
 
 
 }
