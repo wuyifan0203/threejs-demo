@@ -8,11 +8,10 @@ import {
 } from '../lib/three/three.module.js';
 import { DynamicGrid } from '../lib/three/GridHelper2.js';
 import {
-  initRenderer, 
+  initRenderer,
   resize,
   initOrthographicCamera,
   initScene,
-  initOrbitControls,
   initOrbitControls,
   initStats
 } from '../lib/tools/index.js';
@@ -33,6 +32,7 @@ function init() {
   scene.background = new Color(0xf0f0f0);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
+  orbitControls.enableRotate = false;
   resize(renderer, camera);
 
   let customGrid = new DynamicGrid(50, 1);
@@ -58,30 +58,9 @@ function init() {
     requestAnimationFrame(render);
   }
   render();
-  window.camera = camera;
-  window.scene = scene;
-  window.orbitControls = orbitControls;
 
-  // document.addEventListener('click', (e) => {
-  //   const { offsetX, offsetY } = e;
-  //   const { width, height } = dom.getBoundingClientRect();
-  //   const cpi = camera.projectionMatrixInverse.elements;
-  //   const { x, y, z } = camera.position;
 
-  //   const MP0 = cpi[0];
-  //   const MP5 = cpi[5];
-
-  //   const [divisionX, divisionY] = [width / MP0 / 2, height / -MP5 / 2];
-
-  //   const zeroX = (width - x * width / MP0) / 2;
-  //   const zeroY = (height + y * height / MP5) / 2;
-
-  //   const posX = (offsetX - zeroX) / divisionX;
-  //   const posY = (offsetY - zeroY) / divisionY;
-
-  //   // console.log(posX, posY);
-  // });
-
+  const dom = document.querySelector('#webgl-output');
   const canvas = document.createElement('canvas');
   canvas.width = 300;
   canvas.height = 100;

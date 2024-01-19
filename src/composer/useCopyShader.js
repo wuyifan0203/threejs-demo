@@ -1,18 +1,11 @@
 /*
  * @Date: 2023-08-19 10:03:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-09-21 20:28:01
- * @FilePath: /threejs-demo/examples/src/composer/useCopyShader.js
- */
-/*
- * @Date: 2023-01-10 09:37:35
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-19 13:09:59
- * @FilePath: /threejs-demo/examples/src/composer/useCopyShader.js
+ * @LastEditTime: 2024-01-19 16:48:21
+ * @FilePath: /threejs-demo/src/composer/useCopyShader.js
  */
 import {
     Vector3,
-    Scene,
     Mesh,
     SRGBColorSpace,
     SphereGeometry,
@@ -31,6 +24,7 @@ import {
     initOrbitControls,
     resize,
     initOrthographicCamera,
+    initScene
 } from '../lib/tools/index.js';
 import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
 
