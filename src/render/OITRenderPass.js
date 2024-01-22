@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 13:45:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 13:40:59
+ * @LastEditTime: 2024-01-22 14:04:22
  * @FilePath: /threejs-demo/src/render/OITRenderPass.js
  */
 import { FullScreenQuad, Pass } from '../lib/three/Pass.js';
@@ -117,11 +117,9 @@ class OITRenderPass extends Pass {
 
             this.quad.material.needsUpdate = true;
             this.quad.render(renderer);
-
-            const result = catchTexture(layer.texture, renderer, layer);
-            printfImage('result' + i, result)
         })
-        console.log(77);
+        const result = catchRenderTarget(renderer, readBuffer);
+        printfImage('result', result)
 
         renderer.setRenderTarget(oldTarget);
         renderer.setClearColor(_oldColor);
@@ -198,7 +196,6 @@ function onBeforeCompile(shader, renderer) {
     shader.uniforms.uPrevDepthTexture = this.globalUniforms.uPrevDepthTexture;
 
     console.log(shader, this);
-
 
 
     shader.fragmentShader = /* glsl */ `

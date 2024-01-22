@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 17:43:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 10:55:33
+ * @LastEditTime: 2024-01-22 13:59:35
  * @FilePath: /threejs-demo/src/lib/util/catch.js
  */
 import { Vector2, WebGLRenderTarget, WebGLRenderer, ShaderMaterial } from "../three/three.module.js";
@@ -76,6 +76,7 @@ function catchTexture(texture, renderer, target) {
 
     return ((texture, renderer, target) => {
         quad.material.uniforms.tDiffuse.value = texture;
+        quad.material.needsUpdate = true;
 
         const originTarget = renderer.getRenderTarget();
 
@@ -83,10 +84,11 @@ function catchTexture(texture, renderer, target) {
 
         quad.render(renderer);
 
+        const result =  catchRenderTarget(renderer, target);
+
         renderer.setRenderTarget(originTarget);
 
-        return catchRenderTarget(renderer, target);
-
+        return result;
     })(texture, renderer, target);
 
 }
