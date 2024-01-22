@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 14:59:22
+ * @LastEditTime: 2024-01-22 15:22:19
  * @FilePath: /threejs-demo/src/render/useOITRenderPass.js
  */
 
@@ -47,6 +47,7 @@ async function init() {
         layers: 3,
         showNormal: true,
         showOIT: false,
+        log: false,
     }
     const dom = document.getElementById('webgl-output');
     const size = new Vector2(window.innerWidth, window.innerHeight);
@@ -56,7 +57,7 @@ async function init() {
 
     const helperScene = initScene();
     initCustomGrid(helperScene);
-    helperScene.add( initCoordinates(5));
+    helperScene.add(initCoordinates(5));
 
     const scene = initScene();
 
@@ -173,7 +174,7 @@ async function init() {
         }
 
     }
-    
+
     resize();
 
     render();
@@ -193,4 +194,8 @@ async function init() {
     const gui = initGUI();
     gui.add(params, 'showNormal').onChange(render);
     gui.add(params, 'showOIT').onChange(render);
+    gui.add(params, 'log').onChange(() => {
+        oitRenderPass.debuggerMode();
+        console.log(oitRenderPass);
+    }).name('debug OIT (Press F12 to Check)');
 }

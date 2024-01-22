@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 13:45:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 14:04:22
+ * @LastEditTime: 2024-01-22 15:15:21
  * @FilePath: /threejs-demo/src/render/OITRenderPass.js
  */
 import { FullScreenQuad, Pass } from '../lib/three/Pass.js';
@@ -61,6 +61,7 @@ class OITRenderPass extends Pass {
         this.quad = new FullScreenQuad(renderMaterial);
         this.clearDepth = false;
 
+        this.debug = false
     }
 
     setSize(width, height) {
@@ -83,22 +84,25 @@ class OITRenderPass extends Pass {
         const oldTarget = renderer.getRenderTarget();
         renderer.getClearColor(_oldColor);
 
-        console.log(66);
         this.replaceMaterials();
         renderer.autoClear = false;
 
         this.layers.reduceRight((prevDepthTexture, layer, i) => {
             this.uniforms.uPrevDepthTexture.value = prevDepthTexture;
 
-            const textureURL = catchTexture(prevDepthTexture, renderer, layer);
-            printfImage('prevDepthTexture' + i, textureURL)
+            if(this.debug){
+                const textureURL = catchTexture(prevDepthTexture, renderer, layer);
+                printfImage('prevDepthTexture' + i, textureURL)  
+            }
 
             renderer.setRenderTarget(layer);
             renderer.clear();
             renderer.render(this.scene, this.camera);
 
-            const targetURL = catchRenderTarget(renderer, layer);
-            printfImage('layer' + i, targetURL)
+            if(this.debug){
+                const targetURL = catchRenderTarget(renderer, layer);
+                printfImage('layer' + i, targetURL)    
+            }
 
             return layer.depthTexture;
 
@@ -118,8 +122,11 @@ class OITRenderPass extends Pass {
             this.quad.material.needsUpdate = true;
             this.quad.render(renderer);
         })
-        const result = catchRenderTarget(renderer, readBuffer);
-        printfImage('result', result)
+
+        if(this.debug){
+            const result = catchRenderTarget(renderer, readBuffer);
+            printfImage('result', result)
+        }
 
         renderer.setRenderTarget(oldTarget);
         renderer.setClearColor(_oldColor);
@@ -180,6 +187,10 @@ class OITRenderPass extends Pass {
                 }
             }
         })
+    }
+
+    debuggerMode(){
+        this.debug = !this.debug
     }
 }
 
