@@ -1,13 +1,12 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-19 17:41:30
+ * @LastEditTime: 2024-01-22 10:32:23
  * @FilePath: /threejs-demo/src/render/useOITRenderPass.js
  */
 
 import {
     Mesh,
-    AmbientLight,
     BoxGeometry,
     WebGLRenderer,
     PerspectiveCamera,
@@ -62,7 +61,7 @@ async function init() {
     const scene = initScene();
 
     const camera = new PerspectiveCamera(75, size.x / size.y, 0.1, 1000);
-    camera.position.set(0, 6, 0);
+    camera.position.set(0, 6, 1);
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 

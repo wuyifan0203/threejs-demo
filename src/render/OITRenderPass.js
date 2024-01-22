@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 13:45:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-19 17:30:31
+ * @LastEditTime: 2024-01-22 13:40:59
  * @FilePath: /threejs-demo/src/render/OITRenderPass.js
  */
 import { FullScreenQuad, Pass } from '../lib/three/Pass.js';
@@ -14,6 +14,7 @@ import {
     NoBlending,
     ShaderMaterial
 } from '../lib/three/three.module.js';
+import { catchRenderTarget, catchTexture, printfImage } from '../lib/util/catch.js'
 
 const _oldColor = new Color();
 
@@ -23,19 +24,19 @@ const renderMaterial = new ShaderMaterial({
         opacity: { value: 1.0 },
     },
     vertexShader: /*glsl*/ `
-          varying vec2 vUv;
-              void main() {
-                  vUv = uv;
-                  gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-              }`,
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+        }`,
     fragmentShader: /*glsl*/ `
-          uniform float opacity;
-          uniform sampler2D tDiffuse;
-          varying vec2 vUv;
-          void main() {
-              gl_FragColor = texture2D( tDiffuse, vUv );
-              gl_FragColor.a *= opacity;
-          }`,
+        uniform float opacity;
+        uniform sampler2D tDiffuse;
+        varying vec2 vUv;
+        void main() {
+            gl_FragColor = texture2D( tDiffuse, vUv );
+            gl_FragColor.a *= opacity;
+        }`,
     transparent: true,
     depthTest: true,
     depthWrite: true,
@@ -58,6 +59,8 @@ class OITRenderPass extends Pass {
 
         this.dataTexture = new DataTexture([1, 1, 1, 1], 1, 1);
         this.quad = new FullScreenQuad(renderMaterial);
+        this.clearDepth = false;
+
     }
 
     setSize(width, height) {
@@ -68,7 +71,10 @@ class OITRenderPass extends Pass {
             target.setSize(width, height);
             target.depthTexture.dispose();
             target.depthTexture = new DepthTexture(width, height);
-        })
+        });
+
+        this.dataTexture.dispose();
+        this.dataTexture = new DataTexture(new Uint8Array(width * height * 4), width, height)
     }
 
     render(renderer, writeBuffer, readBuffer/*, deltaTime, maskActive */) {
@@ -77,15 +83,22 @@ class OITRenderPass extends Pass {
         const oldTarget = renderer.getRenderTarget();
         renderer.getClearColor(_oldColor);
 
+        console.log(66);
         this.replaceMaterials();
         renderer.autoClear = false;
 
-        this.layers.reduceRight((prevDepthTexture, layer) => {
+        this.layers.reduceRight((prevDepthTexture, layer, i) => {
             this.uniforms.uPrevDepthTexture.value = prevDepthTexture;
+
+            const textureURL = catchTexture(prevDepthTexture, renderer, layer);
+            printfImage('prevDepthTexture' + i, textureURL)
 
             renderer.setRenderTarget(layer);
             renderer.clear();
             renderer.render(this.scene, this.camera);
+
+            const targetURL = catchRenderTarget(renderer, layer);
+            printfImage('layer' + i, targetURL)
 
             return layer.depthTexture;
 
@@ -94,17 +107,21 @@ class OITRenderPass extends Pass {
         if (this.clearDepth) {
 
             renderer.clearDepth();
-            
+
         }
 
         renderer.setRenderTarget(this.renderToScreen ? null : readBuffer);
 
-        this.layers.forEach((layer) => {
+        this.layers.forEach((layer, i) => {
             this.quad.material.uniforms.tDiffuse.value = layer.texture;
-            
+
             this.quad.material.needsUpdate = true;
             this.quad.render(renderer);
+
+            const result = catchTexture(layer.texture, renderer, layer);
+            printfImage('result' + i, result)
         })
+        console.log(77);
 
         renderer.setRenderTarget(oldTarget);
         renderer.setClearColor(_oldColor);
@@ -152,6 +169,8 @@ class OITRenderPass extends Pass {
                     if (object.material.userData?.isOITMaterial) {
                         const oitMaterial = object.material.clone();
 
+                        console.log('material', object.material);
+
                         oitMaterial.blending = NoBlending;
                         oitMaterial.userData.isOITMaterial = true;
                         oitMaterial.userData.originalMaterial = object.material;
@@ -167,22 +186,29 @@ class OITRenderPass extends Pass {
 }
 
 const replaceShader = /*glsl*/ `
-      vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
-      float prevDepth = texture2D(uPrevDepthTexture, screenPos).x;
-      if (prevDepth >= gl_FragCoord.z)
-          discard;
+        vec2 screenPos = gl_FragCoord.xy * uReciprocalScreenSize;
+        float prevDepth = texture2D(uPrevDepthTexture, screenPos).x;
+        if (prevDepth >= gl_FragCoord.z){
+            discard;
+        }
     }`;
 
 function onBeforeCompile(shader, renderer) {
     shader.uniforms.uReciprocalScreenSize = this.globalUniforms.uReciprocalScreenSize;
     shader.uniforms.uPrevDepthTexture = this.globalUniforms.uPrevDepthTexture;
 
+    console.log(shader, this);
+
+
+
     shader.fragmentShader = /* glsl */ `
-      uniform vec2 uReciprocalScreenSize;
-      uniform sampler2D uPrevDepthTexture;
-      ${shader.fragmentShader}`;
+    uniform vec2 uReciprocalScreenSize;
+    uniform sampler2D uPrevDepthTexture;
+    ${shader.fragmentShader}`;
 
     shader.fragmentShader = shader.fragmentShader.replace(/}$/gm, replaceShader);
+
+    console.log(shader);
 }
 
 export { OITRenderPass };

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 17:43:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-19 18:07:42
+ * @LastEditTime: 2024-01-22 10:55:33
  * @FilePath: /threejs-demo/src/lib/util/catch.js
  */
 import { Vector2, WebGLRenderTarget, WebGLRenderer, ShaderMaterial } from "../three/three.module.js";
@@ -17,6 +17,7 @@ function catchRenderTarget(renderer, target) {
 
     const size = new Vector2();
     const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
 
     return ((renderer, target) => {
         size.set(target.width, target.height);
@@ -27,14 +28,14 @@ function catchRenderTarget(renderer, target) {
 
         const pixels = new Uint8Array(width * height * 4);
         renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
-        const ctx = canvas.getContext('2d');
+    
         const imageData = ctx.createImageData(width, height);
 
         imageData.data.set(pixels);
         ctx.putImageData(imageData, 0, 0);
 
         ctx.translate(0, height);
-        ctx.scale(1, -1);
+        // ctx.scale(1, -1);
         ctx.drawImage(canvas, 0, 0, width, height, 0, 0, width, height);
 
         const dataURL = canvas.toDataURL('image/png');
@@ -84,7 +85,7 @@ function catchTexture(texture, renderer, target) {
 
         renderer.setRenderTarget(originTarget);
 
-        return catchTarget(renderer, target);
+        return catchRenderTarget(renderer, target);
 
     })(texture, renderer, target);
 
