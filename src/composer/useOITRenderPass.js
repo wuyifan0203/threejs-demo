@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 15:22:19
- * @FilePath: /threejs-demo/src/render/useOITRenderPass.js
+ * @LastEditTime: 2024-01-23 16:32:30
+ * @FilePath: /threejs-demo/src/composer/useOITRenderPass.js
  */
 
 import {
@@ -16,6 +16,7 @@ import {
     TextureLoader,
     PlaneGeometry,
     Vector2,
+    GridHelper,
 } from '../lib/three/three.module.js';
 
 import {
@@ -25,7 +26,6 @@ import {
     initDirectionLight,
     createBackgroundTexture,
     initAmbientLight,
-    initCustomGrid,
     initCoordinates
 } from '../lib/tools/index.js';
 
@@ -46,7 +46,7 @@ async function init() {
     const params = {
         layers: 3,
         showNormal: true,
-        showOIT: false,
+        showOIT: true,
         log: false,
     }
     const dom = document.getElementById('webgl-output');
@@ -56,7 +56,9 @@ async function init() {
     background.background = createBackgroundTexture('#1d8dd3', '#ffffff');
 
     const helperScene = initScene();
-    initCustomGrid(helperScene);
+    const grid = new GridHelper(50,100);
+    grid.rotateX(Math.PI/2);
+    helperScene.add(grid);
     helperScene.add(initCoordinates(5));
 
     const scene = initScene();
@@ -151,19 +153,13 @@ async function init() {
         renderer.clear();
 
         if (params.showNormal && params.showOIT) {
-
             const halfWidth = window.innerWidth / 2;
-
             renderer.setScissorTest(true);
-
             renderer.setScissor(0, 0, halfWidth - 1, window.innerHeight);
             leftComposer.render();
-
             renderer.setScissor(halfWidth, 0, halfWidth, window.innerHeight);
             rightComposer.render();
-
             renderer.setScissorTest(false);
-
             return
         } else if (params.showNormal) {
             leftComposer.render();
@@ -172,7 +168,6 @@ async function init() {
             rightComposer.render();
             return
         }
-
     }
 
     resize();

@@ -1,3 +1,9 @@
+/*
+ * @Date: 2023-11-21 16:26:11
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-01-23 14:42:48
+ * @FilePath: /threejs-demo/src/lib/three/customGrid.js
+ */
 
 import {
   LineSegments,
@@ -47,7 +53,13 @@ class CustomGrid extends LineSegments {
 
     super(geometry, material);
 
-    this.type = 'customGrid';
+    this.type = 'CustomGrid';
+  }
+
+  copy(source){
+    super.copy(source);
+    console.log(source);
+    
   }
 }
 

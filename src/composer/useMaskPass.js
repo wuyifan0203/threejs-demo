@@ -1,17 +1,15 @@
 /*
  * @Date: 2023-08-19 14:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-19 16:06:41
- * @FilePath: /threejs-demo/examples/src/composer/useMaskPass.js
+ * @LastEditTime: 2024-01-23 16:35:20
+ * @FilePath: /threejs-demo/src/composer/useMaskPass.js
  */
 import {
     Vector3,
-    Scene,
     Mesh,
     SRGBColorSpace,
     SphereGeometry,
     Vector2,
-    MeshBasicMaterial,
     MeshNormalMaterial,
 } from '../lib/three/three.module.js';
 

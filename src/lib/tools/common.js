@@ -17,7 +17,7 @@ import {
   ClampToEdgeWrapping,
   DirectionalLight
 } from '../three/three.module.js';
-import { CustomGrid } from '../three/customGrid.js';
+import { CustomGrid } from '../three/CustomGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
 import { GUI } from '../util/lil-gui.module.min.js'
 import { CoordinateHelper } from '../three/CoordinateHelper.js';

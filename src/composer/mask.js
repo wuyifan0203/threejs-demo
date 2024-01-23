@@ -6,7 +6,6 @@
  */
 import {
     Vector3,
-    Scene,
     Mesh,
     MeshPhongMaterial,
     SphereGeometry,
