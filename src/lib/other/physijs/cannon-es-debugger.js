@@ -1,5 +1,5 @@
 import { Vec3, Quaternion, Shape } from './cannon.js';
-import { MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute } from '../../three/three.module.js';
+import { MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils } from '../../three/three.module.js';
 
 function CannonDebugger(scene, world, _temp) {
   let {
@@ -9,6 +9,10 @@ function CannonDebugger(scene, world, _temp) {
     onUpdate
   } = _temp === void 0 ? {} : _temp;
   const _meshes = [];
+
+  const Shape2Body = {};
+
+  const _object = new Object3D()
 
   const _material = new MeshBasicMaterial({
     color: color != null ? color : 0x00ff00,
@@ -29,6 +33,7 @@ function CannonDebugger(scene, world, _temp) {
 
   const _planeGeometry = new PlaneGeometry(10, 10, 10, 10); // Move the planeGeometry forward a little bit to prevent z-fighting
 
+  scene.add(_object);
 
   _planeGeometry.translate(0, 0, 0.0001);
 
@@ -170,7 +175,7 @@ function CannonDebugger(scene, world, _temp) {
         }
     }
 
-    scene.add(mesh);
+    _object.add(mesh);
     return mesh;
   }
 
@@ -246,7 +251,7 @@ function CannonDebugger(scene, world, _temp) {
     let didCreateNewMesh = false;
 
     if (!typeMatch(mesh, shape)) {
-      if (mesh) scene.remove(mesh);
+      if (mesh) _object.remove(mesh);
       _meshes[index] = mesh = createMesh(shape);
       didCreateNewMesh = true;
     }
@@ -286,14 +291,18 @@ function CannonDebugger(scene, world, _temp) {
 
     for (let i = meshIndex; i < meshes.length; i++) {
       const mesh = meshes[i];
-      if (mesh) scene.remove(mesh);
+      if (mesh) {
+        _object.remove(mesh);
+
+      }
     }
 
     meshes.length = meshIndex;
   }
 
   return {
-    update
+    update,
+    _object
   };
 }
 

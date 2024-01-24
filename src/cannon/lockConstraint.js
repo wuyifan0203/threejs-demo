@@ -1,23 +1,21 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-23 20:57:31
+ * @LastEditTime: 2024-01-24 14:25:21
  * @FilePath: /threejs-demo/src/cannon/lockConstraint.js
  */
 import {
     Mesh,
     Clock,
-    SphereGeometry,
     Vector3,
     MeshPhongMaterial,
     PlaneGeometry,
     MeshStandardMaterial,
-    BoxGeometry
+    BoxGeometry,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
     initOrthographicCamera,
-    initSpotLight,
     initOrbitControls,
     initGUI,
     initScene,
@@ -26,7 +24,15 @@ import {
     initCoordinates
 } from '../lib/tools/index.js';
 import {
-    World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Box as BoxShape, Vec3
+    World,
+    Body,
+    Material,
+    Plane,
+    NaiveBroadphase,
+    Box as BoxShape,
+    Vec3,
+    LockConstraint,
+    PointToPointConstraint,
 } from '../lib/other/physijs/cannon.js';
 
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
@@ -54,37 +60,33 @@ function init() {
 
     const light = initDirectionLight();
     light.position.set(40, 40, 70);
-    light.shadow.camera.left = -50
-    light.shadow.camera.right = 50
-    light.shadow.camera.top = 50 * aspect
-    light.shadow.camera.bottom = -50 * aspect
+    light.shadow.camera.left = -100
+    light.shadow.camera.right = 100
+    light.shadow.camera.top = 100 * aspect
+    light.shadow.camera.bottom = -100 * aspect
     light.shadow.camera.near = camera.near
     light.shadow.camera.far = camera.far
     scene.add(light);
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
-
     // constant
 
     const standerMaterial = new MeshStandardMaterial({ color: 'gray' });
     const standerGeometry = new BoxGeometry(40, 20, 20);
     const standerMesh1 = new Mesh(standerGeometry, standerMaterial);
     standerMesh1.castShadow = true;
-    standerMesh1.rotateY(-Math.PI / 6)
-    standerMesh1.position.set(-40, 0, 0);
+    standerMesh1.position.set(-44, 0, 0);
     scene.add(standerMesh1);
 
     const standerMesh2 = new Mesh(standerGeometry, standerMaterial);
     standerMesh2.castShadow = true;
-    standerMesh2.position.set(40, 0, 0);
-    standerMesh2.rotateY(Math.PI / 6)
+    standerMesh2.position.set(44, 0, 0);
     scene.add(standerMesh2);
 
     const planeMesh = new Mesh(new PlaneGeometry(500, 500), new MeshPhongMaterial({ color: 'gray', side: 0 }));
     planeMesh.receiveShadow = true;
     planeMesh.rotateZ(Math.PI / 2);;
     scene.add(planeMesh);
-
 
 
     // cannon
@@ -97,12 +99,10 @@ function init() {
     const standerBoxShape = new BoxShape(new Vec3(20, 10, 10));
     const standerBody1 = new Body({ mass: 0, shape: standerBoxShape });
     standerBody1.position.copy(standerMesh1.position);
-    standerBody1.quaternion.copy(standerMesh1.quaternion);
     world.addBody(standerBody1);
 
     const standerBody2 = new Body({ mass: 0, shape: standerBoxShape });
     standerBody2.position.copy(standerMesh2.position);
-    standerBody2.quaternion.copy(standerMesh2.quaternion);
     world.addBody(standerBody2);
 
     const planeShape = new Plane();
@@ -112,23 +112,61 @@ function init() {
     world.addBody(planeBody);
 
     const bridgeGeometry = new BoxGeometry(2, 20, 1);
-    const bridgeMAterial = new MeshStandardMaterial({ color: 'white' });
+    const bridgeMaterial = new MeshStandardMaterial({ color: 'white' });
 
     const bridgeShape = new BoxShape(new Vec3(1, 10, 0.5));
-   
-    const bridgeBlocks = []
 
-    for (let j = 0; j < 27; j++) {
-        const bridgeBlock = new Mesh(bridgeGeometry, bridgeMAterial);
-        bridgeBlock.position.set(53 - j * 2 - 27, 0, 18);
+    const bridgeBlocks = [];
+    const blockBodies = [];
+    const space = 0.5
+
+    let previous;
+    for (let j = 0; j < 14; j++) {
+        const bridgeBlock = new Mesh(bridgeGeometry, bridgeMaterial);
+        bridgeBlock.castShadow = bridgeBlock.receiveShadow = true;
+        const width = space * 2 + 2
+        bridgeBlock.position.set(40 - j * width - 20, 0, 10);
         scene.add(bridgeBlock);
-        const bridgeBody = new Body({ mass: 2, shape: bridgeShape });
-        bridgeBody.position.copy(bridgeBlock.position);
         bridgeBlocks.push(bridgeBlock);
+
+        const bridgeBody = new Body({ mass: 2, shape: bridgeShape });
+        bridgeBlock.userData.body = bridgeBody;
+        bridgeBody.position.copy(bridgeBlock.position);
+        world.addBody(bridgeBody);
+        blockBodies.push(bridgeBody);
+        if (previous) {
+            const lockConstraint = new LockConstraint(bridgeBody, previous)
+            world.addConstraint(lockConstraint)
+        }
+
+        previous = bridgeBody
     }
 
+    // 基于Body的相对位置
+    const pointLeft1 = new PointToPointConstraint(
+        standerBody1, new Vec3(20, 8, 10),
+        blockBodies[0], new Vec3(1, 8, -0.5)
+    );
+    const pointLeft2 = new PointToPointConstraint(
+        standerBody1, new Vec3(20, -8, 10),
+        blockBodies[0], new Vec3(1, -8, -0.5)
+    );
+    const pointRight1 = new PointToPointConstraint(
+        standerBody2, new Vec3(-20, 8, 10),
+        previous, new Vec3(-1, 8, -0.5)
+    );
+    const pointRight2 = new PointToPointConstraint(
+        standerBody2, new Vec3(-20, -8, 10),
+        previous, new Vec3(-1, -8, -0.5)
+    );
 
-    const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 })
+
+    world.addConstraint(pointLeft1);
+    world.addConstraint(pointLeft2);
+    world.addConstraint(pointRight1);
+    world.addConstraint(pointRight2);
+
+    const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
 
     const clock = new Clock();
     function render() {
@@ -138,15 +176,16 @@ function init() {
 
         orbitControl.update();
         renderer.render(scene, camera);
+        blockBodies.forEach((body, i) => {
+            bridgeBlocks[i].position.copy(body.position);
+            bridgeBlocks[i].quaternion.copy(body.quaternion);
+        })
     }
 
     renderer.setAnimationLoop(render);
 
     const gui = initGUI();
-
-    const control = {
-
-    };
+    gui.add(cannonDebugger._object, 'visible').name('debugger')
 
     window.world = world;
 }
