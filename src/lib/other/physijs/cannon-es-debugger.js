@@ -1,4 +1,4 @@
-import { Vec3, Quaternion, Shape } from './cannon.js';
+import { Vec3, Quaternion, Shape, PointToPointConstraint } from './cannon.js';
 import { MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils } from '../../three/three.module.js';
 
 function CannonDebugger(scene, world, _temp) {
@@ -126,19 +126,19 @@ function CannonDebugger(scene, world, _temp) {
     switch (shape.type) {
       case SPHERE:
         {
-          mesh = new Mesh(_sphereGeometry, _material);
+          mesh = new Mesh(_sphereGeometry.clone(), _material);
           break;
         }
 
       case BOX:
         {
-          mesh = new Mesh(_boxGeometry, _material);
+          mesh = new Mesh(_boxGeometry.clone(), _material);
           break;
         }
 
       case PLANE:
         {
-          mesh = new Mesh(_planeGeometry, _material);
+          mesh = new Mesh(_planeGeometry.clone(), _material);
           break;
         }
 
@@ -267,12 +267,15 @@ function CannonDebugger(scene, world, _temp) {
     let meshIndex = 0;
 
     for (const body of world.bodies) {
+      body.debugMesh = [];
       for (let i = 0; i !== body.shapes.length; i++) {
         const shape = body.shapes[i];
         const didCreateNewMesh = updateMesh(meshIndex, shape);
         const mesh = meshes[meshIndex];
 
+
         if (mesh) {
+          body.debugMesh[i] = mesh;
           // Get world position
           body.quaternion.vmult(body.shapeOffsets[i], shapeWorldPosition);
           body.position.vadd(shapeWorldPosition, shapeWorldPosition); // Get world quaternion
@@ -293,6 +296,7 @@ function CannonDebugger(scene, world, _temp) {
       const mesh = meshes[i];
       if (mesh) {
         _object.remove(mesh);
+        mesh.geometry.dispose();
 
       }
     }

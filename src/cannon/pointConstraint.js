@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-24 21:00:32
+ * @LastEditTime: 2024-01-25 21:00:46
  * @FilePath: /threejs-demo/src/cannon/pointConstraint.js
  */
 import {
@@ -10,9 +10,7 @@ import {
     Vector3,
     MeshPhongMaterial,
     PlaneGeometry,
-    MeshStandardMaterial,
     BoxGeometry,
-    BufferGeometry,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -32,7 +30,6 @@ import {
     NaiveBroadphase,
     Box as BoxShape,
     Vec3,
-    LockConstraint,
     PointToPointConstraint,
 } from '../lib/other/physijs/cannon.js';
 
@@ -81,7 +78,7 @@ function init() {
 
     // cannon
     const world = new World();
-    world.gravity.set(0, 0, -9.8);
+    world.gravity.set(0, 0, -20.8);
     world.broadphase = new NaiveBroadphase();
     world.defaultContactMaterial.contactEquationRelaxation = 5;
     world.defaultContactMaterial.contactEquationStiffness = 1e7;
@@ -108,6 +105,7 @@ function init() {
 
     const blocksLink = [];
     const blocksBody = [];
+    let mass = 0;
 
     let previousBlock = null;
     for (let j = 0, halfDepth = depth / 2, halfWidth = width / 2; j < blockNumber; j++) {
@@ -115,29 +113,42 @@ function init() {
         const blockMesh = new Mesh(blockGeometry, blockMaterial);
         blockMesh.castShadow = true;
         blockMesh.position.set(0, 0, maxHeight - j * (space * 2 + depth));
-        blocksLink.push(blockMesh)
+        blocksLink.push(blockMesh);
+        blockMesh.name = `blockMesh-${j}`;
 
-        const blockBody = new Body({ mass: 1, shape: blockShape });
+        const blockBody = new Body({ mass, shape: blockShape });
         blockBody.position.copy(blockMesh.position);
         blocksBody.push(blockBody);
+        blockBody.name = `blocksBody-${j}`;
+
+        blockBody.linearDamping = 0.01; // Damping makes the movement slow down with time
+        blockBody.angularDamping = 0.01;
+
+        // 遇到的问题，mass 在构造好时为0，
+        // 需要通过代码动态修改 重新赋值
+        // 修改Body.type后 为 Body.DYNAMIC 后依然不会生效
         if (j === 0) {
-            // 第一个固定不动
-            blockBody.type = Body.STATIC;
+            // 第一个固   blockBody.type = Body.STATIC;定不动
+            mass = 0.3
         } else {
             const p2pConstraintLeft = new PointToPointConstraint(
+                blockBody, new Vec3(-halfWidth, 0, halfDepth + space),
                 previousBlock, new Vec3(-halfWidth, 0, -halfDepth - space),
-                blockBody, new Vec3(-halfWidth, 0, halfDepth + space)
             );
 
             const p2pConstraintRight = new PointToPointConstraint(
-                previousBlock, new Vec3(halfWidth, 0, -halfDepth + space),
-                blockBody, new Vec3(halfWidth, 0, halfDepth + space)
+                blockBody, new Vec3(halfWidth, 0, halfDepth + space),
+                previousBlock, new Vec3(halfWidth, 0, -halfDepth - space),
+           
             )
+
+            const previousBlockMesh = blocksLink[j - 1].localToWorld(new Vector3().copy(p2pConstraintLeft.pivotA));
+            const blockMesh = blocksLink[j].localToWorld(new Vector3().copy(p2pConstraintLeft.pivotB));
+
 
             world.addConstraint(p2pConstraintLeft);
             world.addConstraint(p2pConstraintRight);
 
-            blockBody.mass = 0.1 * (blockNumber - j);
         }
         previousBlock = blockBody
 

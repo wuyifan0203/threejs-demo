@@ -10,18 +10,18 @@ import { ClearMaskPass } from './MaskPass.js';
 
 class EffectComposer {
 
-	constructor( renderer, renderTarget ) {
+	constructor(renderer, renderTarget) {
 
 		this.renderer = renderer;
 
-		if ( renderTarget === undefined ) {
+		if (renderTarget === undefined) {
 
-			const size = renderer.getSize( new Vector2() );
+			const size = renderer.getSize(new Vector2());
 			this._pixelRatio = renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
 
-			renderTarget = new WebGLRenderTarget( this._width * this._pixelRatio, this._height * this._pixelRatio );
+			renderTarget = new WebGLRenderTarget(this._width * this._pixelRatio, this._height * this._pixelRatio);
 			renderTarget.texture.name = 'EffectComposer.rt1';
 
 		} else {
@@ -43,9 +43,12 @@ class EffectComposer {
 
 		this.passes = [];
 
-		this.copyPass = new ShaderPass( CopyShader );
+		this.copyPass = new ShaderPass(CopyShader);
 
 		this.clock = new Clock();
+
+		this.onBeforeRender = (renderer, write, read, pass, index) => { };
+		this.onAfterRender = (renderer, write, read, pass, index) => { };
 
 	}
 
@@ -57,37 +60,37 @@ class EffectComposer {
 
 	}
 
-	addPass( pass ) {
+	addPass(pass) {
 
-		this.passes.push( pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
-
-	}
-
-	insertPass( pass, index ) {
-
-		this.passes.splice( index, 0, pass );
-		pass.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+		this.passes.push(pass);
+		pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
 
 	}
 
-	removePass( pass ) {
+	insertPass(pass, index) {
 
-		const index = this.passes.indexOf( pass );
+		this.passes.splice(index, 0, pass);
+		pass.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
 
-		if ( index !== - 1 ) {
+	}
 
-			this.passes.splice( index, 1 );
+	removePass(pass) {
+
+		const index = this.passes.indexOf(pass);
+
+		if (index !== - 1) {
+
+			this.passes.splice(index, 1);
 
 		}
 
 	}
 
-	isLastEnabledPass( passIndex ) {
+	isLastEnabledPass(passIndex) {
 
-		for ( let i = passIndex + 1; i < this.passes.length; i ++ ) {
+		for (let i = passIndex + 1; i < this.passes.length; i++) {
 
-			if ( this.passes[ i ].enabled ) {
+			if (this.passes[i].enabled) {
 
 				return false;
 
@@ -99,11 +102,11 @@ class EffectComposer {
 
 	}
 
-	render( deltaTime ) {
+	render(deltaTime) {
 
 		// deltaTime value is in seconds
 
-		if ( deltaTime === undefined ) {
+		if (deltaTime === undefined) {
 
 			deltaTime = this.clock.getDelta();
 
@@ -113,29 +116,31 @@ class EffectComposer {
 
 		let maskActive = false;
 
-		for ( let i = 0, il = this.passes.length; i < il; i ++ ) {
+		for (let i = 0, il = this.passes.length; i < il; i++) {
 
-			const pass = this.passes[ i ];
+			const pass = this.passes[i];
 
-			if ( pass.enabled === false ) continue;
+			if (pass.enabled === false) continue;
 
-			pass.renderToScreen = ( this.renderToScreen && this.isLastEnabledPass( i ) );
-			pass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive );
+			this.onBeforeRender(this.renderer, this.writeBuffer, this.readBuffer, pass, i)
 
-			if ( pass.needsSwap ) {
+			pass.renderToScreen = (this.renderToScreen && this.isLastEnabledPass(i));
+			pass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime, maskActive);
 
-				if ( maskActive ) {
+			if (pass.needsSwap) {
+
+				if (maskActive) {
 
 					const context = this.renderer.getContext();
 					const stencil = this.renderer.state.buffers.stencil;
 
 					//context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.NOTEQUAL, 1, 0xffffffff );
+					stencil.setFunc(context.NOTEQUAL, 1, 0xffffffff);
 
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, deltaTime );
+					this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, deltaTime);
 
 					//context.stencilFunc( context.EQUAL, 1, 0xffffffff );
-					stencil.setFunc( context.EQUAL, 1, 0xffffffff );
+					stencil.setFunc(context.EQUAL, 1, 0xffffffff);
 
 				}
 
@@ -143,13 +148,13 @@ class EffectComposer {
 
 			}
 
-			if ( MaskPass !== undefined ) {
+			if (MaskPass !== undefined) {
 
-				if ( pass instanceof MaskPass ) {
+				if (pass instanceof MaskPass) {
 
 					maskActive = true;
 
-				} else if ( pass instanceof ClearMaskPass ) {
+				} else if (pass instanceof ClearMaskPass) {
 
 					maskActive = false;
 
@@ -157,23 +162,25 @@ class EffectComposer {
 
 			}
 
+			this.onAfterRender(this.renderer, this.writeBuffer, this.readBuffer, pass, i)
+
 		}
 
-		this.renderer.setRenderTarget( currentRenderTarget );
+		this.renderer.setRenderTarget(currentRenderTarget);
 
 	}
 
-	reset( renderTarget ) {
+	reset(renderTarget) {
 
-		if ( renderTarget === undefined ) {
+		if (renderTarget === undefined) {
 
-			const size = this.renderer.getSize( new Vector2() );
+			const size = this.renderer.getSize(new Vector2());
 			this._pixelRatio = this.renderer.getPixelRatio();
 			this._width = size.width;
 			this._height = size.height;
 
 			renderTarget = this.renderTarget1.clone();
-			renderTarget.setSize( this._width * this._pixelRatio, this._height * this._pixelRatio );
+			renderTarget.setSize(this._width * this._pixelRatio, this._height * this._pixelRatio);
 
 		}
 
@@ -187,7 +194,7 @@ class EffectComposer {
 
 	}
 
-	setSize( width, height ) {
+	setSize(width, height) {
 
 		this._width = width;
 		this._height = height;
@@ -195,22 +202,22 @@ class EffectComposer {
 		const effectiveWidth = this._width * this._pixelRatio;
 		const effectiveHeight = this._height * this._pixelRatio;
 
-		this.renderTarget1.setSize( effectiveWidth, effectiveHeight );
-		this.renderTarget2.setSize( effectiveWidth, effectiveHeight );
+		this.renderTarget1.setSize(effectiveWidth, effectiveHeight);
+		this.renderTarget2.setSize(effectiveWidth, effectiveHeight);
 
-		for ( let i = 0; i < this.passes.length; i ++ ) {
+		for (let i = 0; i < this.passes.length; i++) {
 
-			this.passes[ i ].setSize( effectiveWidth, effectiveHeight );
+			this.passes[i].setSize(effectiveWidth, effectiveHeight);
 
 		}
 
 	}
 
-	setPixelRatio( pixelRatio ) {
+	setPixelRatio(pixelRatio) {
 
 		this._pixelRatio = pixelRatio;
 
-		this.setSize( this._width, this._height );
+		this.setSize(this._width, this._height);
 
 	}
 

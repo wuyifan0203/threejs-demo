@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:34:14
+ * @LastEditTime: 2024-01-25 19:58:44
  * @FilePath: /threejs-demo/src/intersection/boxSelection.js
  */
 import {
@@ -13,7 +13,9 @@ import {
     initScene,
     initCoordinates,
     initCustomGrid,
-    initGUI, initOrbitControls, initOrthographicCamera, initRenderer, initScene
+    initOrbitControls, 
+    initOrthographicCamera, 
+    initRenderer, 
 } from '../lib/tools/common.js';
 import { CustomViewHelper } from './CustomViewHelper.js'
 
@@ -23,7 +25,6 @@ window.onload = () => {
 
 function init() {
     const renderer = initRenderer();
-    const gui = initGUI();
     const scene = initScene();
     const camera = initOrthographicCamera(new Vector3(0, -30, 30));
     renderer.setClearColor(0xffffff, 1);
