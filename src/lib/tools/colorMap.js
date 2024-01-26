@@ -258,6 +258,15 @@ const colorMap = [
   [127.5, 0, 0]
 ];
 
+const rainbowColors = [
+  "#FF0000", // 红色
+  "#FF7F00", // 橙色
+  "#FFFF00", // 黄色
+  "#00FF00", // 绿色
+  "#00FFFF", // 青色
+  "#0000FF", // 蓝色
+  "#8B00FF"  // 紫色
+];
 
 const getColor = (index) => {
   let color = colorMap[index % 256];
@@ -268,5 +277,6 @@ const getColor = (index) => {
 };
 
 export {
-  getColor
+  getColor,
+  rainbowColors
 };
