@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-26 17:14:52
+ * @LastEditTime: 2024-01-26 17:48:34
  * @FilePath: /threejs-demo/src/cannon/pointConstraint.js
  */
 import {
@@ -171,24 +171,29 @@ function init() {
     // shoot ball
     const sphereArray = [];
     const velocity = new Vector3();
-    const speed = -200;
     const sphereGeometry = new SphereGeometry(2, 32, 32);
     const materialPool = rainbowColors.map((color) => new MeshStandardMaterial({ color }));
 
     const sphereShape = new Sphere(2);
     const sphereBodyMaterial = new Material({ restitution: 0.8 });
 
+    const control = {
+        speed: 100
+    }
+
 
     renderer.domElement.addEventListener('click', (evt) => {
         const sphereMesh = new Mesh(sphereGeometry, materialPool[sphereArray.length % materialPool.length]);
         sphereMesh.receiveShadow = sphereMesh.castShadow = true;
-        sphereMesh.position.copy(cameraDirection).multiplyScalar(100).add(orbitControl.target);
+        sphereMesh.position.copy(camera.position);
+        sphereMesh.position.z = 100;
         scene.add(sphereMesh);
         sphereArray.push(sphereMesh);
 
         const body = new Body({ mass: 1, shape: sphereShape, material: sphereBodyMaterial });
         body.position.copy(sphereMesh.position);
-        velocity.copy(cameraDirection).multiplyScalar(speed);
+        velocity.copy(cameraDirection.negate()).multiplyScalar(control.speed);
+        velocity.z = 0;
         body.velocity.copy(velocity);
         world.addBody(body);
 
@@ -250,7 +255,10 @@ function init() {
     renderer.setAnimationLoop(render);
     cannonDebugger._object.visible = false;
     const gui = initGUI();
-    gui.add(cannonDebugger._object, 'visible').name('debugger')
+    gui.add(cannonDebugger._object, 'visible').name('debugger');
+    gui.add(control, 'speed', 10, 1000, 10);
+    gui.add(groundSphereContactMaterial, 'friction', 0, 1, 0.01).name('ground friction');
+    gui.add(groundSphereContactMaterial, 'restitution', 0, 1, 0.01).name('ground restitution');
 
     window.world = world;
 }
