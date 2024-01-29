@@ -32,8 +32,8 @@ function init() {
     const scene = initScene();
     renderer.setClearColor(0xffffff);
     renderer.autoClear = false;
-    camera.up.set(0, 0, 1);
-    resize(renderer, camera);
+    orthographic.up.set(0, 0, 1);
+    resize(renderer, orthographic);
     initCustomGrid(scene);
     initAxesHelper(scene);
 
