@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-25 10:46:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-29 20:58:13
+ * @LastEditTime: 2024-01-30 13:46:00
  * @FilePath: /threejs-demo/src/controls/usePointerLockControls.js
  */
 import {
@@ -10,7 +10,8 @@ import {
     MeshNormalMaterial,
     BoxGeometry,
     Raycaster,
-    SphereGeometry
+    SphereGeometry,
+    MeshBasicMaterial
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -19,7 +20,8 @@ import {
     resize,
     initScene,
     initGUI,
-    initPerspectiveCamera
+    initPerspectiveCamera,
+    rainbowColors
 } from '../lib/tools/index.js';
 // import { PointerLockControls } from '../lib/three/PointerLockControls.js';
 import { PointerLockControls } from './PointerLockControls.js';
@@ -40,18 +42,27 @@ function init() {
     initCustomGrid(scene);
     initAxesHelper(scene);
 
+    const geometry = new BoxGeometry(4, 4, 4);
+
+    const materialPool = rainbowColors.map(c=>new MeshBasicMaterial({color: c}))
+
+    const meshes = [];
+    for (let j = 0; j < 30; j++) {
+        const mesh = new Mesh(geometry, materialPool[j % materialPool.length]);
+        mesh.position.set(0, j * 2, j * 2);
+        meshes.push(mesh);
+        scene.add(mesh);
+    }
     const controls = new PointerLockControls(camera, document.body);
 
     controls.addEventListener('lock', () => {
         introductionDOM.style.display = 'none';
-        controls.connect()
         console.log('controls was locked');
         console.log('controls.isLocked:', controls.isLocked);
     });
 
     controls.addEventListener('unlock', () => {
         introductionDOM.style.display = 'block';
-        controls.disconnect()
         console.log('controls was unlock');
         console.log('controls.isLocked:', controls.isLocked);
     })
@@ -59,7 +70,7 @@ function init() {
 
     window.addEventListener('keydown', (e) => {
         switch (e.code) {
-            case 'KeyP':
+            case 'KeyB':
                 controls.lock();
                 break;
             case 'Escape':
@@ -86,6 +97,7 @@ function init() {
             default:
                 break;
         }
+
     });
 
     window.addEventListener('keyup', (e) => {
@@ -105,15 +117,12 @@ function init() {
             default:
                 break;
         }
+
     })
 
     scene.add(camera); // scene.add(controls.getObject())
 
     const velocity = new Vector3(0, 0, 0);
-    let debug = true;
-    const debugCamera = initPerspectiveCamera();
-    debugCamera.up.set(0, 0, 1);
-    const debugLookAt = new Vector3();
 
     let lastTime = 0;
     renderer.setAnimationLoop(render);
@@ -121,16 +130,24 @@ function init() {
         const deltaTime = (dt - lastTime) / 1000;
         lastTime = dt;
         renderer.clear();
-        updateCameraPosition(deltaTime);
-        renderer.render(scene, debug ? debugCamera : camera);
+        if (controls.isLocked) {
+            updateCameraPosition(deltaTime);
+
+        }
+        renderer.render(scene, camera);
     }
 
     const raycast = new Raycaster(camera.position, new Vector3(0, 0, -1));
-    raycast.intersectObject()
+
+    const intersects = []
+
 
     function updateCameraPosition(dt) {
         controls.moveForward(dt * velocity.y);
         controls.moveRight(dt * velocity.x);
+
+        intersects.length = 0;
+        raycast.intersectObjects(meshes, false, intersects)
 
         if (jumping) {
             // nv = V0 -g * t;
@@ -139,34 +156,50 @@ function init() {
             const dz = dt * (velocity.z + nv) / 2;
             velocity.z = nv;
             camera.position.z += dz;
-            if (camera.position.z < 1) {
+            if (camera.position.z < 1 && !intersects.length) {
                 camera.position.z = 1;
                 velocity.z = 0;
                 jumping = false;
+            } else if (intersects.length) {
+                const object = intersects[0].object;
+                const currentMaxHeight = object.position.z + object.geometry.parameters.height / 2 + 1;
+                if (camera.position.z < currentMaxHeight) {
+                    camera.position.z = currentMaxHeight;
+                    velocity.z = 0;
+                    jumping = false;
+                }
+            }
+        } else {
+            if (camera.position.z > 1 && !intersects.length) {
+                const nv = velocity.z - 9.8 * dt;
+                const dz = dt * (velocity.z + nv) / 2;
+                velocity.z = nv;
+                camera.position.z += dz;
+                if (camera.position.z < 1) {
+                    camera.position.z = 1;
+                    velocity.z = 0;
+                }
+            }else if(intersects.length){
+                const object = intersects[0].object;
+                const currentMaxHeight = object.position.z + object.geometry.parameters.height / 2 + 1;
+                const nv = velocity.z - 9.8 * dt;
+                const dz = dt * (velocity.z + nv) / 2;
+                velocity.z = nv;
+                camera.position.z += dz;
+                if (camera.position.z < currentMaxHeight) {
+                    camera.position.z = currentMaxHeight;
+                    velocity.z = 0;
+                    jumping = false;
+                }
             }
         }
 
-        if (debug) {
-            debugLookAt.setFromMatrixPosition(camera.matrixWorldInverse)
-            debugCamera.position.copy(camera.position).sub(new Vector3(0, 5, 0));
-            debugCamera.lookAt(debugLookAt);
-            debugCamera.updateProjectionMatrix();
-            debugCamera.updateMatrixWorld();
-        }
     }
 
     const sphereMesh = new Mesh(new SphereGeometry(1, 32, 32), new MeshNormalMaterial());
     camera.add(sphereMesh);
 
-    const geometry = new BoxGeometry(4, 4, 4);
-    const material = new MeshNormalMaterial({});
 
-    const mesh = new Mesh(geometry, material);
-
-    const mesh1 = new Mesh(geometry, material);
-    mesh1.position.set(2, 2, 0)
-
-    scene.add(mesh, mesh1);
 
     const gui = initGUI();
 
