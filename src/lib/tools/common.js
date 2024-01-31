@@ -22,7 +22,7 @@ import { OrbitControls } from '../three/OrbitControls.js';
 import { GUI } from '../util/lil-gui.module.min.js'
 import { CoordinateHelper } from '../three/CoordinateHelper.js';
 import { Stats } from '../util/Stats.js';
-import { ViewHelper } from '../three/viewHelper.js'
+import { ViewHelper } from '../three/viewHelper.js';
 
 /**
  * @description: 初始化渲染器

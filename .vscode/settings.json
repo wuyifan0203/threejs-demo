@@ -1,34 +1,36 @@
 {
-    "liveServer.settings.port": 5500,
-    "editor.fontSize": 14,
-    "files.autoSave": "onFocusChange",
-    "fileheader.customMade": {
-      "Date": "Do not edit", // 文件创建时间(不变)
-      "LastEditors": "Yifan Wu 1208097313@qq.com",  // 文件最后编辑者
-      "LastEditTime": "Do not edit", // 文件最后编辑时间
-      "FilePath": "Do not edit" // 文件在项目中的相对路径 自动更新
-    },
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit",
-      "source.fixAll.stylelint": "explicit"
-    },
-    "cSpell.words": [
-      "broadphase",
-      "contactmaterials",
-      "FXAA",
-      "GLTF",
-      "iconfont",
-      "importmap",
-      "Phong",
-      "physijs",
-      "plusplus",
-      "raycaster",
-      "slerp",
-      "threejs",
-      "unproject",
-      "wireframe",
-      "XYZE",
-      "Yifan"
-    ]
-  }
-  
+  "liveServer.settings.port": 5500,
+  "editor.fontSize": 14,
+  "files.autoSave": "onFocusChange",
+  "fileheader.customMade": {
+    "Date": "Do not edit", // 文件创建时间(不变)
+    "LastEditors": "Yifan Wu 1208097313@qq.com", // 文件最后编辑者
+    "LastEditTime": "Do not edit", // 文件最后编辑时间
+    "FilePath": "Do not edit" // 文件在项目中的相对路径 自动更新
+  },
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "cSpell.words": [
+    "broadphase",
+    "contactmaterials",
+    "FXAA",
+    "GLTF",
+    "iconfont",
+    "importmap",
+    "Phong",
+    "physijs",
+    "plusplus",
+    "raycaster",
+    "slerp",
+    "threejs",
+    "unproject",
+    "wireframe",
+    "XYZE",
+    "Yifan",
+    "TRIMESH",
+    "HEIGHTFIELD",
+    "CONVEXPOLYHEDRON"
+  ]
+}
