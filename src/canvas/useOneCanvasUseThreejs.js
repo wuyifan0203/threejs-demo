@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-04 13:54:25
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 18:02:58
+ * @LastEditTime: 2024-02-01 16:06:40
  * @FilePath: /threejs-demo/src/canvas/useOneCanvasUseThreejs.js
  */
 import {
@@ -12,7 +12,6 @@ import {
   initOrbitControls,
   initOrthographicCamera,
   initScene,
-  initOrbitControls,
   initCustomGrid
 } from '../lib/tools/common.js';
 

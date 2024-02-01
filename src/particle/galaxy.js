@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-24 01:07:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:28:46
+ * @LastEditTime: 2024-02-01 16:06:57
  * @FilePath: /threejs-demo/src/particle/galaxy.js
  */
 import {
@@ -20,7 +20,6 @@ import {
     initOrbitControls,
     initPerspectiveCamera,
     initCoordinates,
-    initScene
 } from '../lib/tools/index.js';
 
 
