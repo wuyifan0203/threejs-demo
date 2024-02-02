@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-02 15:25:16
+ * @LastEditTime: 2024-02-02 15:47:22
  * @FilePath: /threejs-demo/src/texture/useTexture.js
  */
 import {
@@ -56,6 +56,7 @@ async function init() {
     renderer.setAnimationLoop(render);
 
     console.log(texture);
+    console.log(2);
 
     function update() {
         texture.needsUpdate = true;
