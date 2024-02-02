@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-19 10:03:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-25 19:26:21
+ * @LastEditTime: 2024-02-02 15:08:21
  * @FilePath: /threejs-demo/src/composer/useBackgroundPass.js
  */
 import {
@@ -10,10 +10,9 @@ import {
     Mesh,
     BoxGeometry,
     MeshBasicMaterial,
-    Float32BufferAttribute,
+    Vector4
 } from '../lib/three/three.module.js';
 
-import { ShaderPass } from '../lib/three/ShaderPass.js'
 import { EffectComposer } from '../lib/three/EffectComposer.js'
 import {
     initRenderer,
@@ -23,8 +22,6 @@ import {
     initOrbitControls,
 } from '../lib/tools/index.js';
 import { BackgroundPass } from './BackgroundPass.js';
-import { RenderPass } from '../lib/three/RenderPass.js';
-import { CopyShader } from '../lib/three/CopyShader.js';
 
 window.onload = () => {
     init();
@@ -53,19 +50,24 @@ function init() {
 
     scene.add(box);
 
+    const rainbowColors = [
+        [255, 0, 0],    // 红色 [R, G, B, A]
+        [255, 165, 1],  // 橙色
+        [255, 255, 0],  // 黄色
+        [0, 255, 0],    // 绿色
+        [0, 255, 255],  // 青色
+        [0, 0, 255],    // 蓝色
+        [128, 0, 128]   // 紫色
+      ].map((item, i) => {
+        return new Vector4(...item, i / 6)
+      });
+
     const composer = new EffectComposer(renderer);
 
     const backgroundPass = new BackgroundPass();
-    backgroundPass.clearDepth = true;
-
-    const renderPass = new RenderPass(scene, camera);
-    renderPass.clearDepth = true;
-    renderPass.clear = false;
+    backgroundPass.setColors(rainbowColors);
 
     composer.addPass(backgroundPass);
-    composer.addPass(renderPass);
-
-    composer.addPass(new ShaderPass(CopyShader));
 
     function render() {
         renderer.clear()
