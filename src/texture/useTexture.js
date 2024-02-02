@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-01 18:09:20
+ * @LastEditTime: 2024-02-02 15:25:16
  * @FilePath: /threejs-demo/src/texture/useTexture.js
  */
 import {
@@ -59,6 +59,7 @@ async function init() {
 
     function update() {
         texture.needsUpdate = true;
+        material.needsUpdate = true;
     }
 
 
