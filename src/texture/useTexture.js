@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-02 18:02:05
+ * @LastEditTime: 2024-02-04 14:17:27
  * @FilePath: /threejs-demo/src/texture/useTexture.js
  */
 import {
@@ -13,6 +13,7 @@ import {
     PlaneGeometry,
     BoxGeometry,
     SphereGeometry,
+    Vector2,
     // -> mapping
     // UVMapping, // 300
     // CubeReflectionMapping, // 301
@@ -114,6 +115,10 @@ async function init() {
         magFilter: 6,
         minFilter: 8,
         formate: 23,
+        offset: new Vector2(),
+        repeat: new Vector2(1, 1),
+        center: new Vector2(),
+        rotation: 0,
     }
 
 
@@ -122,7 +127,7 @@ async function init() {
     gui.add(operation, 'currentTextureIndex', {
         plane: 0,
         sphere: 1,
-    }).name('Switch Texture').onFinishChange(update);
+    }).name('Switch Texture').onChange(update);
 
     gui.add(operation, 'mapping', {
         'UV(default)': 0,
@@ -130,24 +135,24 @@ async function init() {
         'CubeRefraction(立方体折射)': 2,
         'EquirectangularReflection(等距反射)': 3,
         'EquirectangularRefraction(等距折射)': 4,
-    }).name('mapping(映射方式)').onFinishChange(update);
+    }).name('mapping(映射方式)').onChange(update);
 
     gui.add(operation, 'wrapS', {
         'Repeat(重复包裹)': 0,
         'ClampToEdge(限制边缘包裹 default)': 1,
         'MirroredRepeat(镜像重复包裹)': 2,
-    }).name('wrapS(U方向包裹方式)').onFinishChange(update);
+    }).name('wrapS(U方向包裹方式)').onChange(update);
 
     gui.add(operation, 'wrapT', {
         'Repeat(重复包裹)': 0,
         'ClampToEdge(限制边缘包裹 default)': 1,
         'MirroredRepeat(镜像重复包裹)': 2,
-    }).name('wrapT(V方向包裹方式)').onFinishChange(update);
+    }).name('wrapT(V方向包裹方式)').onChange(update);
 
     gui.add(operation, 'magFilter', {
         'Nearest(最近过滤)': 3,
         'Linear(线性过滤)': 6,
-    }).name('magFilter(放大过滤)').onFinishChange(update);
+    }).name('magFilter(放大过滤)').onChange(update);
 
     gui.add(operation, 'minFilter', {
         'Nearest(最近过滤)': 3,
@@ -156,7 +161,7 @@ async function init() {
         'Linear(线性过滤)': 6,
         'LinearMipMapNearest(线性MipMap最近过滤)': 7,
         'LinearMipMapLinear(线性MipMap线性过滤)': 8,
-    }).name('minFilter(缩小过滤)').onFinishChange(update);
+    }).name('minFilter(缩小过滤)').onChange(update);
 
     gui.add(operation, 'formate', {
         'Alpha(仅透明度)': 21,
@@ -170,10 +175,34 @@ async function init() {
         'LuminanceAlpha(包含亮度和透明度)': 25,
         'Depth': 26,
         'DepthStencil': 27,
-    }).name('formate(纹理格式)').onFinishChange(update);
+    }).name('formate(纹理格式)').onChange(update);
+
+    gui.add(operation.offset, 'x', -1, 1, 0.01).name('x(纹理X方向偏移量)').onChange(update);
+    gui.add(operation.offset, 'y', -1, 1, 0.01).name('y(纹理Y方向偏移量)').onChange(update);
+
+    const repeatX = gui.add(operation.repeat, 'x', 1, 10, 1).name('repeatX(纹理X方向重复次数)').onChange(update);
+    const repeatY = gui.add(operation.repeat, 'y', 1, 10, 1).name('repeatY(纹理Y方向重复次数)').onChange(update);
+
+    gui.add(operation.center, 'x', -1, 1, 0.01).name('centerX(纹理X方向中心点)').onChange(update);
+    gui.add(operation.center, 'y', -1, 1, 0.01).name('centerY(纹理Y方向中心点)').onChange(update);
+
+    gui.add(operation, 'rotation', -2 * Math.PI, 2 * Math.PI, 0.01).name('rotation(逆时针方向旋转角度)').onChange(update);
 
 
     function update() {
+        if (operation.wrapS === 1) {
+            operation.repeat.x = 1;
+            repeatX.hide();
+        } else {
+            repeatX.show();
+        }
+
+        if (operation.wrapT === 1) {
+            operation.repeat.y = 1;
+            repeatY.hide();
+        } else {
+            repeatY.show();
+        }
         material.map = textures[operation.currentTextureIndex];
         material.map.mapping = Number(operation.mapping) + 300;
         material.map.wrapS = Number(operation.wrapS) + 1000;
@@ -181,9 +210,14 @@ async function init() {
         material.map.magFilter = Number(operation.magFilter) + 1000;
         material.map.minFilter = Number(operation.minFilter) + 1000;
         material.map.format = Number(operation.formate) + 1000;
+        material.map.offset.set(operation.offset.x, operation.offset.y);
+        material.map.repeat.set(operation.repeat.x, operation.repeat.y);
+        material.map.center.set(operation.center.x, operation.center.y);
+        material.map.rotation = operation.rotation;
 
         material.map.needsUpdate = true;
         material.needsUpdate = true;
     }
 
+    update();
 }
