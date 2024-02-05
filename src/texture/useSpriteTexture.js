@@ -2,29 +2,30 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-04 18:05:17
+ * @LastEditTime: 2024-02-05 15:57:17
  * @FilePath: /threejs-demo/src/texture/useSpriteTexture.js
  */
 import {
     TextureLoader,
     Mesh,
-    MeshBasicMaterial,
+    MeshStandardMaterial,
     Vector3,
     PlaneGeometry,
-    BoxGeometry,
     SRGBColorSpace,
     NearestFilter,
     BufferGeometry,
     Float32BufferAttribute,
-    BufferAttribute
+    CameraHelper
 } from '../lib/three/three.module.js';
 import {
     initOrbitControls,
     initRenderer,
     initScene,
     initOrthographicCamera,
-    initGUI,
-    initCustomGrid
+    initGroundPlane,
+    initDirectionLight,
+    initAmbientLight,
+    resize
 } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/minecraft/';
@@ -109,21 +110,27 @@ function createCubeGeometry() {
 
 const locationMap = {
     TOP: 0,
-    BOTTOM: 7,
-    FRONT: 13,
-    BACK: 19,
-    LEFT: 25,
-    RIGHT: 31
+    BOTTOM: 6,
+    FRONT: 12,
+    BACK: 18,
+    LEFT: 24,
+    RIGHT: 30
 }
 
 function updateUV(geometry, location, row, column, x, y) {
     const uv = geometry.getAttribute('uv');
-    const v = new BufferAttribute();
     const index = locationMap[location];
-    for (let j = 0; j < 6; j++) {
-        const k = index + j;
-        uv.setXY(k, uv.getX(k) / row + 1, uv.getY(k) / column + 1);
-    }
+    const originX = (x - 1) / row;
+    const originY = (y - 1) / column;
+    const targetX = x / row;
+    const targetY = y / column;
+
+    uv.setXY(index, originX, originY);
+    uv.setXY(index + 1, targetX, originY);
+    uv.setXY(index + 2, targetX, targetY);
+    uv.setXY(index + 3, targetX, targetY);
+    uv.setXY(index + 4, originX, targetY);
+    uv.setXY(index + 5, originX, originY);
     uv.needsUpdate = true;
 }
 
@@ -135,19 +142,31 @@ window.onload = async () => {
 async function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
-    const camera = initOrthographicCamera(new Vector3(0, -20, 2));
+    renderer.setClearColor(0xcccccc);
+    const camera = initOrthographicCamera(new Vector3(0, -800, 2));
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
     camera.zoom = 1;
 
     const scene = initScene();
-    renderer.setClearColor(0xffffff);
     const controls = initOrbitControls(camera, renderer.domElement);
-
     const loader = new TextureLoader();
 
-    initCustomGrid(scene)
+    const asp = window.innerWidth / window.innerHeight;
+    const light = initDirectionLight();
+    light.position.set(30, -40, 80);
+    light.shadow.mapSize.width = 8192;
+    light.shadow.mapSize.height = 8192;
+    light.shadow.camera.near = 60;
+    light.shadow.camera.far = 110;
+    light.shadow.camera.left = -30;
+    light.shadow.camera.right = 30;
+    light.shadow.camera.top = 30 * asp;
+    light.shadow.camera.bottom = -30 * asp;
+    scene.add(light);
 
+    initAmbientLight(scene);
+    initGroundPlane(scene);
 
     const textures = [];
     for (let i = 0; i < paths.length; i++) {
@@ -157,19 +176,72 @@ async function init() {
         textures.push(texture);
     }
 
-    const grassPlane = new Mesh(new PlaneGeometry(4, 8), new MeshBasicMaterial({ map: textures[1], side: 2 }));
-    scene.add(grassPlane);
-    grassPlane.position.set(0, 4, 4);
+    const planeGeometry = new PlaneGeometry(1, 1);
+    const grassPlane = new Mesh(planeGeometry, new MeshStandardMaterial({ map: textures[1] }));
+    grassPlane.scale.set(2, 4, 1);
     grassPlane.rotateX(Math.PI / 2);
+    grassPlane.position.set(-10, 4, 4);
+    grassPlane.castShadow = true;
+    scene.add(grassPlane);
 
 
+    const grassCube = new Mesh(createCubeGeometry(), grassPlane.material);
+    grassCube.position.set(-10, 0, 1);
+    grassCube.receiveShadow = grassCube.castShadow = true;
+    scene.add(grassCube);
+    updateUV(grassCube.geometry, 'TOP', 1, 2, 1, 2);
+    updateUV(grassCube.geometry, 'FRONT', 1, 2, 1, 1);
+    updateUV(grassCube.geometry, 'BACK', 1, 2, 1, 1);
+    updateUV(grassCube.geometry, 'LEFT', 1, 2, 1, 1);
+    updateUV(grassCube.geometry, 'RIGHT', 1, 2, 1, 1);
+    updateUV(grassCube.geometry, 'BOTTOM', 2, 4, 1, 1);
 
-    const material = new MeshBasicMaterial({ map: textures[1], wireframe: false })
-    const cube = new Mesh(createCubeGeometry(), material);
-    cube.scale.set(2, 2, 2);
-    cube.position.set(0, 0, 0);
+    const allMaterialPlane = new Mesh(planeGeometry, new MeshStandardMaterial({ map: textures[0] }));
+    allMaterialPlane.scale.set(32, 16, 1);
+    allMaterialPlane.rotateX(Math.PI / 2);
+    allMaterialPlane.position.set(10, 4.5, 8);
+    allMaterialPlane.receiveShadow = allMaterialPlane.castShadow = true;
+    scene.add(allMaterialPlane);
 
-    // cube.geometry.attributes.uv
+    const keyMap = ['TOP', 'BOTTOM', 'FRONT', 'BACK', 'LEFT', 'RIGHT'];
+    const objectMap = {
+        // name:[top,bottom,front,back,left,right]
+        wood: [[30, 14], [30, 14], [29, 14], [29, 14], [29, 14], [29, 14]],
+        maple: [[2, 13], [2, 13], [1, 13], [1, 13], [1, 13], [1, 13]],
+        bedrock: [[1, 15], [1, 15], [1, 15], [1, 15], [1, 15], [1, 15]],
+        tnt: [[25, 15], [26, 15], [24, 15], [24, 15], [24, 15], [24, 15]],
+        watermelon: [[27, 10], [27, 10], [26, 10], [26, 10], [26, 10], [26, 10]],
+        pumpkin: [[10, 10], [10, 10], [12, 10], [11, 10], [11, 10], [11, 10]],
+        box: [[23, 7], [23, 7], [25, 7], [24, 7], [24, 7], [24, 7]],
+        mica: [[32, 13], [32, 13], [32, 13], [32, 13], [32, 13], [32, 13]],
+        stone: [[27, 16], [27, 16], [27, 16], [27, 16], [27, 16], [27, 16]],
+        copperOre: [[31, 13], [31, 13], [31, 13], [31, 13], [31, 13], [31, 13]],
+        redOre: [[30, 13], [30, 13], [30, 13], [30, 13], [30, 13], [30, 13]],
+        diamondOre: [[29, 13], [29, 13], [29, 13], [29, 13], [29, 13], [29, 13]],
+        chloriteOre: [[28, 13], [28, 13], [28, 13], [28, 13], [28, 13], [28, 13]],
+        coalOre: [[27, 13], [27, 13], [27, 13], [27, 13], [27, 13], [27, 13]],
+        ironOre: [[26, 13], [26, 13], [26, 13], [26, 13], [26, 13], [26, 13]],
+        goldOre: [[25, 13], [25, 13], [25, 13], [25, 13], [25, 13], [25, 13]],
+        workbench: [[6, 12], [8, 13], [7, 12], [8, 12], [7, 12], [8, 12]],
+        furnace: [[12, 12], [12, 12], [10, 12], [11, 12], [11, 12], [11, 12]]
+    }
+
+    let num = 0;
+    for (const key in objectMap) {
+        const location = objectMap[key];
+        const mesh = new Mesh(createCubeGeometry(), allMaterialPlane.material);
+        mesh.name = key;
+        mesh.position.set((num % 8) * 4 - 5, -(Math.floor(num / 8)) * 4, 1);
+        mesh.castShadow = mesh.receiveShadow = true;
+        scene.add(mesh);
+
+        for (let j = 0; j < location.length; j++) {
+            const key = keyMap[j];
+            const [x, y] = location[j]
+            updateUV(mesh.geometry, key, 32, 16, x, y);
+        }
+        num++;
+    }
 
     function render() {
         renderer.clear();
@@ -179,5 +251,5 @@ async function init() {
 
     renderer.setAnimationLoop(render);
 
-    const gui = initGUI();
+    resize(renderer,camera);
 }
