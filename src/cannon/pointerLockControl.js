@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-01 17:49:29
+ * @LastEditTime: 2024-02-08 02:53:34
  * @FilePath: /threejs-demo/src/cannon/pointerLockControl.js
  */
 import {
@@ -12,7 +12,9 @@ import {
     Group,
     TextureLoader,
     SRGBColorSpace,
-    NearestFilter
+    NearestFilter,
+    MeshBasicMaterial,
+    Float32BufferAttribute
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -23,15 +25,17 @@ import {
     initAmbientLight,
     initDirectionLight,
     initCoordinates,
-    initStats
+    initStats,
 } from '../lib/tools/index.js';
 import {
     World,
     Body,
     Vec3,
     Box,
+    Heightfield
 } from '../lib/other/physijs/cannon.js';
 import { SimplexNoise } from '../lib/three/SimplexNoise.js';
+import cannonDebugger from '../lib/other/physijs/cannon-es-debugger.js';
 
 const simplex = new SimplexNoise(4);
 function map(val, smin, smax, emin, emax) {
@@ -87,39 +91,51 @@ function init() {
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
-    const world = new World({
-        gravity: new Vec3(0, -9.8, 0)
-    });
+    const world = new World({ gravity: new Vec3(0, -9.8, 0) });
 
-    const texture = new TextureLoader().load('../../public/images/others/atlas.png');
+    const texture = new TextureLoader().load('../../public/images/minecraft/atlas.png');
     texture.colorSpace = SRGBColorSpace;
     texture.magFilter = NearestFilter;
 
     const boxSize = 2;
+    const fieldSize = 60;
     const geometry = new BoxGeometry(boxSize, boxSize, boxSize);
     const material = new MeshStandardMaterial({ map: texture });
     const terrainMesh = new Group();
+    terrainMesh.position.set(-fieldSize, 0, -fieldSize);
     scene.add(terrainMesh);
 
-    const terrainBody = new Body({ mass: 0 });
-    const boxShape = new Box(new Vec3(boxSize / 2, boxSize / 2, boxSize / 2));
-    world.addBody(terrainBody);
+    geometry.deleteAttribute('uv');
+    geometry.setAttribute('uv', new Float32BufferAttribute([
+        0, 0.5, 1, 0.5, 0, 0, 1, 0,
+        0, 0.5, 1, 0.5, 0, 0, 1, 0,
+        0, 0.5, 0, 1, 1, 0.5, 1, 1,
+        0, 0.5, 0, 1, 1, 0.5, 1, 1,
+        0, 0.5, 1, 0.5, 0, 0, 1, 0,
+        0, 0.5, 1, 0.5, 0, 0, 1, 0,
+    ], 2));
+
+  
+    const terrainBody = new Body({ mass: 0});
+    const boxShape = new Box(new Vec3(boxSize/2, boxSize/2, boxSize/2));
+    terrainBody.position.set(-fieldSize, 0, -fieldSize);
 
     let height = 0;
-    for (let j = 0; j < 100; j++) {
-        for (let k = 0; k < 100; k++) {
-            height = octave(j / 100, k / 100, 16) * 40 - 20;
+    for (let j = 0; j < fieldSize; j++) {
+        for (let k = 0; k < fieldSize; k++) {
+            height = octave(j / fieldSize, k / fieldSize, 16) * 40 - 20;
             height = Math.floor(height)
             const mesh = new Mesh(geometry, material);
 
-            console.log(height);
             mesh.position.set(j * boxSize, height, k * boxSize);
             terrainMesh.add(mesh);
+
+            terrainBody.addShape(boxShape, new Vec3(j * boxSize, height, k * boxSize));
         }
     }
 
 
-
+    world.addBody(terrainBody);
 
     const clock = new Clock();
     function render() {

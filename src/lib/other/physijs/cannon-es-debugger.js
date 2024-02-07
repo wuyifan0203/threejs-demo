@@ -1,5 +1,9 @@
-import { Vec3, Quaternion, Shape, PointToPointConstraint } from './cannon.js';
-import { MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils } from '../../three/three.module.js';
+import {
+ Vec3, Quaternion, Shape, PointToPointConstraint 
+} from './cannon.js';
+import {
+ MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils 
+} from '../../three/three.module.js';
 
 function CannonDebugger(scene, world, _temp) {
   let {
@@ -173,6 +177,8 @@ function CannonDebugger(scene, world, _temp) {
           shape.geometryId = geometry.id;
           break;
         }
+
+      default:
     }
 
     _object.add(mesh);
@@ -193,9 +199,7 @@ function CannonDebugger(scene, world, _temp) {
     switch (shape.type) {
       case SPHERE:
         {
-          const {
-            radius
-          } = shape;
+          const {radius} = shape;
           mesh.scale.set(radius * scale, radius * scale, radius * scale);
           break;
         }
@@ -235,14 +239,13 @@ function CannonDebugger(scene, world, _temp) {
           mesh.scale.set(1 * scale, 1 * scale, 1 * scale);
           break;
         }
+        default:
     }
   }
 
   function typeMatch(mesh, shape) {
     if (!mesh) return false;
-    const {
-      geometry
-    } = mesh;
+    const {geometry} = mesh;
     return geometry instanceof SphereGeometry && shape.type === Shape.types.SPHERE || geometry instanceof BoxGeometry && shape.type === Shape.types.BOX || geometry instanceof PlaneGeometry && shape.type === Shape.types.PLANE || geometry.id === shape.geometryId && shape.type === Shape.types.CYLINDER || geometry.id === shape.geometryId && shape.type === Shape.types.CONVEXPOLYHEDRON || geometry.id === shape.geometryId && shape.type === Shape.types.TRIMESH || geometry.id === shape.geometryId && shape.type === Shape.types.HEIGHTFIELD;
   }
 
