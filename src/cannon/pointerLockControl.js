@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-08 02:53:34
+ * @LastEditTime: 2024-02-09 23:25:04
  * @FilePath: /threejs-demo/src/cannon/pointerLockControl.js
  */
 import {
@@ -13,14 +13,12 @@ import {
     TextureLoader,
     SRGBColorSpace,
     NearestFilter,
-    MeshBasicMaterial,
     Float32BufferAttribute
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
     initOrthographicCamera,
     initOrbitControls,
-    initGUI,
     initScene,
     initAmbientLight,
     initDirectionLight,
@@ -32,10 +30,11 @@ import {
     Body,
     Vec3,
     Box,
-    Heightfield
+    Sphere,
+    Material,
 } from '../lib/other/physijs/cannon.js';
+import { PointerLockControlsCannon } from '../lib/other/physijs/PointerLockControlsCannon.js'
 import { SimplexNoise } from '../lib/three/SimplexNoise.js';
-import cannonDebugger from '../lib/other/physijs/cannon-es-debugger.js';
 
 const simplex = new SimplexNoise(4);
 function map(val, smin, smax, emin, emax) {
@@ -71,6 +70,8 @@ function init() {
     camera.zoom = 0.25;
     camera.updateProjectionMatrix();
 
+    const instructions = document.getElementById('instructions');
+
     const scene = initScene();
 
     initAmbientLight(scene);
@@ -89,9 +90,18 @@ function init() {
     light.shadow.camera.far = camera.far
     scene.add(light);
 
-    const orbitControl = initOrbitControls(camera, renderer.domElement);
+    // const orbitControl = initOrbitControls(camera, renderer.domElement);
+
+
 
     const world = new World({ gravity: new Vec3(0, -9.8, 0) });
+
+    const sphereShape = new Sphere(1);
+
+    const sphereBody = new Body({ mass: 5, shape: sphereShape, material: new Material() });
+    world.addBody(sphereBody);
+
+    const controls = new PointerLockControlsCannon(camera, sphereBody);
 
     const texture = new TextureLoader().load('../../public/images/minecraft/atlas.png');
     texture.colorSpace = SRGBColorSpace;
@@ -115,9 +125,9 @@ function init() {
         0, 0.5, 1, 0.5, 0, 0, 1, 0,
     ], 2));
 
-  
-    const terrainBody = new Body({ mass: 0});
-    const boxShape = new Box(new Vec3(boxSize/2, boxSize/2, boxSize/2));
+
+    const terrainBody = new Body({ mass: 0 });
+    const boxShape = new Box(new Vec3(boxSize / 2, boxSize / 2, boxSize / 2));
     terrainBody.position.set(-fieldSize, 0, -fieldSize);
 
     let height = 0;
@@ -126,6 +136,7 @@ function init() {
             height = octave(j / fieldSize, k / fieldSize, 16) * 40 - 20;
             height = Math.floor(height)
             const mesh = new Mesh(geometry, material);
+            mesh.receiveShadow = mesh.castShadow = true;
 
             mesh.position.set(j * boxSize, height, k * boxSize);
             terrainMesh.add(mesh);
@@ -134,20 +145,39 @@ function init() {
         }
     }
 
+    scene.add(controls.getObject());
+
+
+    instructions.addEventListener('click', () => {
+        controls.lock()
+    })
+
+    controls.addEventListener('lock', () => {
+        console.log(66);
+        controls.enabled = true
+        instructions.style.display = 'none'
+    })
+
+    controls.addEventListener('unlock', () => {
+        controls.enabled = false
+        instructions.style.display = 'block';
+    })
+
 
     world.addBody(terrainBody);
 
     const clock = new Clock();
     function render() {
-        world.step(1 / 120, clock.getDelta());
-        orbitControl.update();
+        const dt = clock.getDelta();
+        world.step(1 / 120, dt);
+        // orbitControl.update();
         renderer.render(scene, camera);
+        controls.update(dt);
         stats.update();
     }
 
     renderer.setAnimationLoop(render);
 
-    const gui = initGUI();
 }
 
 
