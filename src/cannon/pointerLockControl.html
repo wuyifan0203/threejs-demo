@@ -1,22 +1,48 @@
 <!--
  * @Date: 2024-02-01 16:33:34
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-09 22:37:43
+ * @LastEditTime: 2024-02-18 17:09:57
  * @FilePath: /threejs-demo/src/cannon/pointerLockControl.html
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Point Lock Controls</title>
     <style>
-        body{
+        body {
             margin: 0;
+        }
+
+        #instructions {
+            position: fixed;
+            left: 0;
+            top: 0;
+
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #ffffff;
+            text-align: center;
+
+            cursor: pointer;
+        }
+
+        #instructions span {
+            font-size: 2em;
         }
     </style>
 </head>
+
 <body>
     <div id="webgl-output"></div>
     <script src="./pointerLockControl.js" type="module"></script>
@@ -24,6 +50,7 @@
 <div id="instructions">
     <span>Click to play</span>
     <br />
-    (W,A,S,D = Move, SPACE = Jump, MOUSE = Look, CLICK = Shoot)
-  </div>
+    (W,A,S,D = Move, SPACE = Jump, MOUSE = Look, CLICK = Shoot,R = Reset)
+</div>
+
 </html>

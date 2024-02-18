@@ -112,7 +112,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
   }
 
   onMouseMove = (event) => {
-    console.log(event,'mouseMove');
     if (!this.enabled) {
       return
     }
@@ -126,7 +125,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
   }
 
   onKeyDown = (event) => {
-    console.log(event,'keyDown');
     switch (event.code) {
       case 'KeyW':
       case 'ArrowUp':
@@ -159,7 +157,6 @@ class PointerLockControlsCannon extends THREE.EventDispatcher {
   }
 
   onKeyUp = (event) => {
-    console.log(event,'keyUp');
     switch (event.code) {
       case 'KeyW':
       case 'ArrowUp':
