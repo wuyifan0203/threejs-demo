@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-25 19:58:44
+ * @LastEditTime: 2024-02-19 16:10:06
  * @FilePath: /threejs-demo/src/intersection/boxSelection.js
  */
 import {
@@ -29,7 +29,7 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, -30, 30));
     renderer.setClearColor(0xffffff, 1);
     renderer.autoClear = false;
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, -10, 10);
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
     console.log(camera);
@@ -58,35 +58,17 @@ function init() {
         renderer.clear();
         renderer.render(scene, camera);
         viewHelper.render(renderer);
-
     }
 
+
+    console.log(camera.position);
+    console.log(camera.matrixWorldInverse.elements);
 
     orbitControls.addEventListener('change', () => {
       
         render()
 
     })
-
-    const box = new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0x0f00f5 })
-    )
-
-    box.add(initCoordinates(2))
-
-    const box2 = new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial({ color: 0x0f00f5 })
-    )
-
-    box2.add(initCoordinates(2))
-
-    box2.position.set(0, 5, 0);
-
-    box2.applyQuaternion(new Quaternion().setFromEuler(new Euler(Math.PI, 0, Math.PI)));
-
-
-    scene.add(box2);
-
-
-    scene.add(box)
 
 
     const cursor = new Vector2()
@@ -107,7 +89,7 @@ function init() {
         }
     });
 
-    render();
-    viewHelper.render(renderer);
+    // render();
+    // viewHelper.render(renderer);
 
 }

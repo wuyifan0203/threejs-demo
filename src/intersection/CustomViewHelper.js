@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-10-26 14:19:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-10-27 18:00:22
- * @FilePath: /threejs-demo/examples/src/intersection/CustomViewHelper.js
+ * @LastEditTime: 2024-02-19 17:05:15
+ * @FilePath: /threejs-demo/src/intersection/CustomViewHelper.js
  */
 import {
     Mesh,
@@ -177,10 +177,18 @@ class CustomViewHelper extends Object3D {
             console.error('ViewHelper: Invalid axis.');
         }
 
-        targetQuaternion.setFromEuler(euler)
+        targetQuaternion.setFromEuler(euler);
+
+        this.target.setFromMatrixPosition(this.camera.matrixWorldInverse);
+
+        this.target.subVectors(this.camera.position, this.target);
+
+        console.log(this.target);
 
         // 球半径
         radius = this.camera.position.distanceTo(this.target);
+
+        console.log(radius);
 
         // 相机最后的位置
         targetPosition.multiplyScalar(radius).add(this.target);
