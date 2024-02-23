@@ -1,12 +1,12 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-19 18:03:50
+ * @LastEditTime: 2024-02-22 10:41:47
  * @FilePath: /threejs-demo/src/intersection/boxSelection2.js
  */
 import {
     BoxGeometry,
-    Mesh, Vector2, Vector3, MeshBasicMaterial, Quaternion, Euler, Clock, Object3D, Vector4, CanvasTexture, Color, OrthographicCamera, Raycaster
+    Mesh, Vector2, Vector3, MeshBasicMaterial, Quaternion, Euler, Clock, Object3D, Vector4, CanvasTexture, Color, OrthographicCamera, Raycaster, AxesHelper
 } from '../lib/three/three.module.js'
 import {
     initAxesHelper,
@@ -33,24 +33,36 @@ function init() {
     camera.matrixWorldNeedsUpdate = true;
     camera.updateProjectionMatrix();
 
-    const coord = initCoordinates(50);
+    const coord = initCoordinates(3);
     scene.add(coord);
     initAxesHelper(scene);
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
+
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    function reader() {
-        controls.update();
+    function render() {
+        renderer.clear();
         renderer.render(scene, camera);
-
         viewHelper.render(renderer);
     }
 
-    renderer.setAnimationLoop(reader);
+    controls.addEventListener('change', () => {
+        render();
+    })
 
+    const clock = new Clock();
+    renderer.setAnimationLoop(() => {
+        if (viewHelper.animating) {
+            const dt = clock.getDelta();
+            viewHelper.update(dt);
+            render()
+        }
+    });
+
+    render()
 
 
     const cursor = new Vector2();
@@ -67,8 +79,12 @@ function init() {
             cursor.y = clientY;
             viewHelper.target.copy(controls.target);
             viewHelper.handelClick(cursor);
+
         }
     })
+
+    // const axis = new AxesHelper(10);
+    // scene.add(axis)
 
 }
 
@@ -101,6 +117,26 @@ posYM.map.needsUpdate = true;
 
 const geometry = new BoxGeometry(2, 2, 2);
 
+const posX = new Vector3(1, 0, 0);
+const negX = new Vector3(-1, 0, 0);
+const posY = new Vector3(0, 1, 0);
+const negY = new Vector3(0, -1, 0);
+const posZ = new Vector3(0, 0, 1);
+const negZ = new Vector3(0, 0, -1);
+
+const targetPosition = new Vector3();
+const targetQuaternion = new Quaternion();
+const targetUp = new Vector3();
+
+const animatePosition = new Vector3();
+
+const speed = Math.PI; //Angular velocity
+
+const q1 = new Quaternion();
+const q2 = new Quaternion();
+
+let radius = 0;
+
 class ViewHelper extends Object3D {
     constructor(camera, dom) {
         super();
@@ -126,6 +162,8 @@ class ViewHelper extends Object3D {
 
         this.dim = 128;
 
+        this.dummy = new AxesHelper(4);
+
     }
 
     render(renderer) {
@@ -142,10 +180,12 @@ class ViewHelper extends Object3D {
         renderer.render(this, this._camera);
 
         renderer.setViewport(vpTemp.x, vpTemp.y, vpTemp.z, vpTemp.w);
+
+        renderer.render(this.dummy, this.camera)
     }
 
     handelClick(cursor) {
-        // if (this.animating === true) return false;
+        if (this.animating === true) return false;
 
         const rect = this.dom.getBoundingClientRect();
         const offsetX = rect.left + (this.dom.offsetWidth - this.dim);
@@ -157,37 +197,74 @@ class ViewHelper extends Object3D {
 
         const intersects = raycaster.intersectObjects(this.children, false);
 
-        if(intersects.length){
+        if (intersects.length) {
             const intersection = intersects[0];
             const normal = intersection.normal;
 
             this.prepareAnimationData(normal)
 
-            // this.animating = true;
+            this.animating = true;
         }
     }
 
-    prepareAnimationData(normal){
+    prepareAnimationData(normal) {
 
-        console.log(normal);
+        console.log('Ypu click', normal);
 
-        if (posX.equals(direction)) {
-           
-        } else if (negX.equals(direction)) {
-   
-        } else if (posY.equals(direction)) {
-       
-        } else if (negY.equals(direction)) {
-     
-        } else if (posZ.equals(direction)) {
-      
-        } else if (negZ.equals(direction)) {
- 
+        if (posX.equals(normal)) {
+            targetPosition.copy(posX);
+            targetUp.set(0, 0, 1);
+        } else if (negX.equals(normal)) {
+            targetPosition.copy(negX);
+            targetUp.set(0, 0, 1);
+        } else if (posY.equals(normal)) {
+            targetPosition.copy(posY);
+            targetUp.set(0, 0, 1);
+        } else if (negY.equals(normal)) {
+            targetPosition.copy(negY);
+            targetUp.set(0, 0, 1);
+        } else if (posZ.equals(normal)) {
+            targetPosition.copy(posZ);
+            targetUp.set(0, 1, 0);
+        } else if (negZ.equals(normal)) {
+            targetPosition.copy(negZ);
+            targetUp.set(0, -1, 0);
         } else {
             console.error('ViewHelper: Invalid axis.');
         }
 
 
+        radius = this.camera.position.distanceTo(this.target);
+
+        targetPosition.multiplyScalar(radius).add(this.target);
+
+        this.dummy.position.copy(this.target);
+        this.dummy.up.copy(this.camera.up);
+        this.dummy.lookAt(this.camera.position);
+        q1.copy(this.dummy.quaternion);
+
+        this.dummy.up.copy(targetUp);
+        this.dummy.lookAt(targetPosition);
+        q2.copy(this.dummy.quaternion);
+
+
+    }
+
+    update(dt) {
+        const step = dt * speed;
+        q1.rotateTowards(q2, step);
+
+        animatePosition.set(0, 0, 1);
+        animatePosition.applyQuaternion(q1);
+        animatePosition.multiplyScalar(radius);
+        animatePosition.add(this.target);
+        this.camera.position.copy(animatePosition);
+
+        this.camera.quaternion.rotateTowards(q2, step);
+
+        if (q1.angleTo(q2) === 0) {
+            this.animating = false;
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-10-26 14:19:16
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-19 17:05:15
+ * @LastEditTime: 2024-02-22 10:34:35
  * @FilePath: /threejs-demo/src/intersection/CustomViewHelper.js
  */
 import {
@@ -178,12 +178,6 @@ class CustomViewHelper extends Object3D {
         }
 
         targetQuaternion.setFromEuler(euler);
-
-        this.target.setFromMatrixPosition(this.camera.matrixWorldInverse);
-
-        this.target.subVectors(this.camera.position, this.target);
-
-        console.log(this.target);
 
         // 球半径
         radius = this.camera.position.distanceTo(this.target);
