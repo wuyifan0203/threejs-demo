@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:21:58
+ * @LastEditTime: 2024-03-12 10:58:32
  * @FilePath: /threejs-demo/src/material/transparentTest.js
  */
 import {
@@ -12,6 +12,7 @@ import {
   LineSegments,
   Mesh,
   MeshLambertMaterial,
+  MeshStandardMaterial,
   PointLight,
   Vector3,
 } from '../lib/three/three.module.js';
@@ -20,7 +21,8 @@ import {
   initOrthographicCamera,
   resize,
   initScene,
-  initOrbitControls
+  initOrbitControls,
+  initDirectionLight
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -35,19 +37,21 @@ function init() {
 
   const scene = initScene();
   scene.add(new AmbientLight());
-  camera.add(new PointLight());
+  const light = initDirectionLight();
+  camera.add(light)
   scene.add(camera);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-  const transparentMaterial = new MeshLambertMaterial({
-    color: 'blue',
+  const transparentMaterial = new MeshStandardMaterial({
+    color: 'white',
     transparent: true,
-    opacity: 0.1,
+    opacity: 0.3,
     depthTest: true,
+    side:2
   });
 
-  const commonMaterial = new MeshLambertMaterial({
+  const commonMaterial = new MeshStandardMaterial({
     color: 'green',
   });
 
@@ -56,7 +60,7 @@ function init() {
   const geometry = new BoxGeometry(10, 10, 10);
 
   const mesh = new Mesh(geometry, commonMaterial);
-  mesh.scale.set(0.5, 0.2, 0.3);
+  mesh.scale.set(0.5, 1.2, 0.3);
   const mesh1 = new Mesh(geometry, transparentMaterial);
   mesh1.add(new LineSegments(new EdgesGeometry(geometry), lineMaterial));
 

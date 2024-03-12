@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:20:51
+ * @LastEditTime: 2024-03-12 18:05:23
  * @FilePath: /threejs-demo/src/material/clipping.js
  */
 import {
@@ -10,7 +10,6 @@ import {
   MeshPhongMaterial,
   Mesh,
   AmbientLight,
-  SpotLight,
   Plane,
   PlaneHelper,
   Clock,
@@ -22,7 +21,8 @@ import {
   initGroundPlane,
   initOrbitControls,
   initScene,
-  initGUI
+  initGUI,
+  initDirectionLight
 } from '../lib/tools/index.js';
 
 
@@ -42,17 +42,18 @@ function init() {
 
   scene.add(new AmbientLight());
 
-  const spotLight = new SpotLight(0xffffff);
-  spotLight.angle = Math.PI / 4;
-  spotLight.position.set(40, 40, 80);
-  spotLight.castShadow = true;
-  spotLight.shadow.mapSize.width = 2048;
-  spotLight.shadow.mapSize.height = 2048;
-  spotLight.shadow.camera.near = 0.1;
-  spotLight.shadow.camera.far = 1000;
-  spotLight.intensity = 0.8;
-
-  scene.add(spotLight);
+  const light = initDirectionLight(0xffffff,5);
+  light.position.set(40, 40, 80);
+  light.castShadow = true;
+  light.shadow.mapSize.width = 2048;
+  light.shadow.mapSize.height = 2048;
+  light.shadow.camera.near = 0.1;
+  light.shadow.camera.far = 200;
+  light.shadow.camera.left = -50;
+  light.shadow.camera.right = 50;
+  light.shadow.camera.top = 50;
+  light.shadow.camera.bottom = -50;
+  scene.add(light);
 
   const localPlane = new Plane(new Vector3(0, 0, -1), 18);
   const planeHelper1 = new PlaneHelper(localPlane, 50);
@@ -98,7 +99,7 @@ function init() {
   }
 
   renderer.setAnimationLoop(render);
-
+  
 
   resize(renderer, camera);
 
