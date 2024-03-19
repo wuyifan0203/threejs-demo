@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-17 14:41:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:43:48
+ * @LastEditTime: 2024-03-19 17:20:28
  * @FilePath: /threejs-demo/src/camera/orthographic.js
  */
 import {
@@ -15,11 +15,12 @@ import {
     AmbientLight
 } from '../lib/three/three.module.js';
 import {
-    initRenderer, 
-    initOrthographicCamera, 
-    initScene, 
-    initOrbitControls, 
-    initGUI
+    initRenderer,
+    initOrthographicCamera,
+    initScene,
+    initOrbitControls,
+    initGUI,
+    initDirectionLight
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -45,7 +46,7 @@ function init() {
 
     window.target = orthographicCamera
 
-    const light = new PointLight(0xffffff, 3,0,0);
+    const light = initDirectionLight();
     light.position.copy(orthographicCamera);
     scene.add(light);
     scene.add(new AmbientLight());
@@ -97,13 +98,13 @@ function init() {
 
 
     function animate() {
+        light.position.copy(camera.position);
         const [width, height] = [renderer.domElement.clientWidth, renderer.domElement.clientHeight];
         renderer.setClearColor(0xebebeb, 1);
         renderer.setViewport(0, 0, width, height);
         renderer.setScissor(0, 0, width, height);
         cameraHelper.visible = true;
         renderer.render(scene, camera);
-
 
         renderer.setClearColor(0xffffff, 1);
         renderer.clearDepth();

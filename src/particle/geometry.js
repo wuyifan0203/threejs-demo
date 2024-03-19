@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-13 15:38:40
+ * @LastEditTime: 2024-03-19 17:39:48
  * @FilePath: /threejs-demo/src/particle/geometry.js
  */
 import {
@@ -9,12 +9,16 @@ import {
   PerspectiveCamera,
   PointsMaterial,
   AdditiveBlending,
+  NoBlending,
+  NormalBlending,
+  MultiplyBlending,
+  SubtractiveBlending,
   Points,
   Texture,
 } from '../lib/three/three.module.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
-  initRenderer, resize, angle2Radians, initGUI, initStats
+  initRenderer, resize, angle2Radians, initGUI, initStats, initScene, initOrbitControls
 } from '../lib/tools/index.js';
 
 
@@ -45,12 +49,10 @@ function init() {
   const scene = initScene();
   renderer.setClearColor(0x000000);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
-  const { mesh } = draw(scene, renderer);
   resize(renderer, camera);
 
-  render();
   function render() {
     stats.begin();
     controls.update();
@@ -67,9 +69,6 @@ function init() {
 
   renderer.setAnimationLoop(render);
 
-}
-
-function draw(scene, renderer) {
   const canvas = createCanvasTexture();
 
   const material = new PointsMaterial({
@@ -85,7 +84,7 @@ function draw(scene, renderer) {
   const mesh = new Points(geometry, material);
   scene.add(mesh);
 
-  const controls = {
+  const control = {
     radius: 16,
     widthSegments: 16,
     heightSegments: 16,
@@ -116,31 +115,35 @@ function draw(scene, renderer) {
   const gui = initGUI();
   const geometryFolder = gui.addFolder('Geometry');
   geometryFolder.open();
-  geometryFolder.add(controls, 'radius', 1, 64, 0.1).onChange(() => {
+  geometryFolder.add(control, 'radius', 1, 64, 0.1).onChange(() => {
     updateGeometry();
   });
-  geometryFolder.add(controls, 'widthSegments', 1, 64, 1).onChange(() => {
+  geometryFolder.add(control, 'widthSegments', 1, 64, 1).onChange(() => {
     updateGeometry();
   });
-  geometryFolder.add(controls, 'heightSegments', 1, 64, 1).onChange(() => {
+  geometryFolder.add(control, 'heightSegments', 1, 64, 1).onChange(() => {
     updateGeometry();
   });
   const materialFolder = gui.addFolder('Material');
   materialFolder.open();
-  materialFolder.add(controls, 'size', 1, 30, 0.1).onChange((e) => {
+  materialFolder.add(control, 'size', 1, 30, 0.1).onChange((e) => {
     material.size = e;
   });
-  gui.addColor(controls, 'background').onChange((e) => {
+  gui.addColor(control, 'background').onChange((e) => {
     renderer.setClearColor(e);
   });
-  gui.add(controls, 'autoScale').onChange((e) => {
+  gui.add(control, 'autoScale').onChange((e) => {
     autoScale = e;
   });
 
+  gui.add(material, 'blending', { AdditiveBlending, NoBlending, NormalBlending, MultiplyBlending, SubtractiveBlending }).onChange((e) => {
+    material.blending = e;
+    material.needsUpdate = true;
+  })
+
   function updateGeometry() {
     mesh.geometry.dispose();
-    mesh.geometry = new SphereGeometry(controls.radius, controls.widthSegments, controls.heightSegments);
+    mesh.geometry = new SphereGeometry(control.radius, control.widthSegments, control.heightSegments);
   }
 
-  return { mesh };
 }

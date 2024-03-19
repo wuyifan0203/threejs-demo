@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:15:34
+ * @LastEditTime: 2024-03-19 17:42:06
  * @FilePath: /threejs-demo/src/particle/GRAVITY.js
  */
 import {
@@ -37,13 +37,13 @@ function init() {
   const scene = initScene();
   renderer.setClearColor(0x000000);
 
-  const light1 = new PointLight(0xffffff, 0.5);
+  const light1 = new PointLight(0xffffff, 300);
   light1.position.set(-50, -50, 75);
 
-  const light2 = new PointLight(0xffffff, 0.5);
+  const light2 = new PointLight(0xffffff, 300);
   light2.position.set(50, 50, 75);
 
-  const light3 = new PointLight(0xffffff, 0.3);
+  const light3 = new PointLight(0xffffff, 300);
   light3.position.set(25, 50, 200);
 
   const ambientLight = new AmbientLight(0xffffff, 0.02);
@@ -116,8 +116,6 @@ function draw(scene, camera) {
 
   const updateParticles = (camera) => {
     particleSystem.rotation.z += 0.015;
-    // camera.lookAt(particleSystem.position);
-    // camera.updateProjectionMatrix();
     const vertex = particleGeometry.getAttribute('position').array;
     for (let i = 0; i < vertex.length; i++) {
       if ((i + 1) % 3 === 0) {
