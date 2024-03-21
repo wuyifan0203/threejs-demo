@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:09:58
+ * @LastEditTime: 2024-03-20 14:23:00
  * @FilePath: /threejs-demo/src/light/shadow.js
  */
 
@@ -13,14 +13,14 @@ import {
   resize,
   initScene,
   initOrbitControls,
-  initAmbientLight
+  initAmbientLight,
+  initGUI
 } from '../lib/tools/index.js';
 import {
   Vector3,
   Mesh,
   MeshLambertMaterial,
   SpotLight,
-  AmbientLight,
   SpotLightHelper,
   BoxGeometry,
   Color,
@@ -44,7 +44,7 @@ const init = () => {
   initAxesHelper(scene);
   initAmbientLight(scene, 0x3c3c3c)
 
-  const spotLight = new SpotLight(0xffffff, 1, 180, 0.5);
+  const spotLight = new SpotLight(0xffffff, 3000, 180, 0.5);
   spotLight.shadow.mapSize.height = 2048;
   spotLight.shadow.mapSize.width = 2048;
   spotLight.position.set(-40, 30, 30);
@@ -97,7 +97,7 @@ function draw(scene, light, helper) {
   mesh2.renderOrder = 2;
   scene.add(mesh2);
 
-  const gui = new GUI();
+  const gui = initGUI();
 
   light.target = mesh;
 
