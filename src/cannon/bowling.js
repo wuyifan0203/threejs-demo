@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-21 11:09:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-22 16:27:56
+ * @LastEditTime: 2024-03-22 17:59:25
  * @FilePath: /threejs-demo/src/cannon/bowling.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -44,10 +44,13 @@ window.onload = () => {
     init();
 };
 
+const groundHalfSize = new Vector2(100, 15);
+const groundSize = groundHalfSize.clone().multiplyScalar(2);
+
 function init() {
     const renderer = initRenderer();
 
-    const camera = initPerspectiveCamera(new Vector3(-60, 20, 0));
+    const camera = initPerspectiveCamera(new Vector3(-80, 20, 0));
     camera.updateProjectionMatrix();
 
     const scene = initScene();
@@ -64,19 +67,23 @@ function init() {
     const light = initDirectionLight();
     light.shadow.camera.near = 5;
     light.shadow.camera.far = 200;
-    light.shadow.camera.left = -40;
-    light.shadow.camera.right = 40;
-    light.shadow.camera.top = 100;
+    light.shadow.camera.left = -groundSize.y;
+    light.shadow.camera.right = groundSize.y;
+    light.shadow.camera.top = 80;
     light.shadow.camera.bottom = -40;
     light.position.set(-40, 40, 0);
     scene.add(light);
 
-    const shadowCamera = new CameraHelper(light.shadow.camera)
+    const shadowCamera = new CameraHelper(light.shadow.camera);
+    shadowCamera.visible = false;
     scene.add(shadowCamera);
 
-    // scene.add(new DirectionalLightHelper(light, 10));
+    const directionalLightHelper = new DirectionalLightHelper(light, 10);
+    directionalLightHelper.visible = false;
+    scene.add(directionalLightHelper);
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
+    orbitControl.saveState();
 
     scene.add(initCoordinates(16));
 
@@ -90,12 +97,13 @@ function init() {
     world.addContactMaterial(new ContactMaterial(bottleMaterial, ballMaterial, { friction: 0.1, restitution: 0.7 }));
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
+    cannonDebugger.visible = false;
 
     const clock = new Clock();
     function update() {
         world.step(1 / 60, clock.getDelta());
         orbitControl.update();
-        // cannonDebugger.update();
+        cannonDebugger.update();
         updateBottles();
         updateBall();
         renderer.render(scene, camera);
@@ -109,7 +117,14 @@ function init() {
         pushBall,
     }
 
-    gui.add(operation, 'pushBall')
+    gui.add(operation, 'pushBall');
+    const debuggerFolder = gui.addFolder('debugger');
+
+    debuggerFolder.add(cannonDebugger, 'visible').name('Cannon helper');
+    debuggerFolder.add(shadowCamera, 'visible').name('Shadow camera helper');
+    debuggerFolder.add(directionalLightHelper, 'visible').name('Light helper');
+    debuggerFolder.add(orbitControl, 'enabled').onChange((e) => !e && orbitControl.reset()).name('God Mode')
+
 }
 
 function initPosition(radius, offset = new Vector3(0, 0, 0)) {
@@ -179,6 +194,8 @@ function createBottles(scene, world) {
 
     const positions = initPosition(2.5, new Vector3(60, 7, 0));
 
+    // choose 1,使用ConvexPolyhedron来模拟。会非常的卡顿
+
     // const vertices = [];
     // const faces = [];
     // const positionBuffer = geometry.getAttribute('position').array;
@@ -200,6 +217,7 @@ function createBottles(scene, world) {
 
     // const shape = new ConvexPolyhedron({ vertices, faces });
 
+    // choose 2,使用圆柱代替
     const shape = new Cylinder(2.5, 2.5, 14)
 
     const physicsMaterial = new Material('bottle');
@@ -233,7 +251,7 @@ function createBottles(scene, world) {
 }
 
 function createPlane(scene, world) {
-    const groundMesh = new Mesh(new PlaneGeometry(200, 200), new MeshPhysicalMaterial({ color: '#eeeeee' }));
+    const groundMesh = new Mesh(new PlaneGeometry(groundSize.x, groundSize.y), new MeshPhysicalMaterial({ color: '#eeeeee' }));
     groundMesh.receiveShadow = groundMesh.castShadow = true;
     groundMesh.rotation.x = -Math.PI / 2;
     groundMesh.matrixAutoUpdate = false;
@@ -243,7 +261,7 @@ function createPlane(scene, world) {
 
     const planeBody = new Body({
         mass: 0,
-        shape: new BoxShape(new Vec3(100, 1, 100)),
+        shape: new BoxShape(new Vec3(groundHalfSize.x, 1, groundHalfSize.y)),
         material: new Material('ground')
     });
     planeBody.position.y = -0.5;
@@ -321,6 +339,9 @@ function createBall(scene, world) {
         pushBall() {
             console.log('push');
             body.applyLocalForce(new Vec3(50000, 0, 0), new Vec3());
+        },
+        controlBall(e) {
+
         }
     }
 }

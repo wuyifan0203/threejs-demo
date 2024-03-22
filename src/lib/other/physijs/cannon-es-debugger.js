@@ -1,8 +1,8 @@
 import {
- Vec3, Quaternion, Shape, PointToPointConstraint 
+  Vec3, Quaternion, Shape, PointToPointConstraint
 } from './cannon.js';
 import {
- MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils 
+  MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils
 } from '../../three/three.module.js';
 
 function CannonDebugger(scene, world, _temp) {
@@ -199,7 +199,7 @@ function CannonDebugger(scene, world, _temp) {
     switch (shape.type) {
       case SPHERE:
         {
-          const {radius} = shape;
+          const { radius } = shape;
           mesh.scale.set(radius * scale, radius * scale, radius * scale);
           break;
         }
@@ -239,13 +239,13 @@ function CannonDebugger(scene, world, _temp) {
           mesh.scale.set(1 * scale, 1 * scale, 1 * scale);
           break;
         }
-        default:
+      default:
     }
   }
 
   function typeMatch(mesh, shape) {
     if (!mesh) return false;
-    const {geometry} = mesh;
+    const { geometry } = mesh;
     return geometry instanceof SphereGeometry && shape.type === Shape.types.SPHERE || geometry instanceof BoxGeometry && shape.type === Shape.types.BOX || geometry instanceof PlaneGeometry && shape.type === Shape.types.PLANE || geometry.id === shape.geometryId && shape.type === Shape.types.CYLINDER || geometry.id === shape.geometryId && shape.type === Shape.types.CONVEXPOLYHEDRON || geometry.id === shape.geometryId && shape.type === Shape.types.TRIMESH || geometry.id === shape.geometryId && shape.type === Shape.types.HEIGHTFIELD;
   }
 
@@ -264,6 +264,7 @@ function CannonDebugger(scene, world, _temp) {
   }
 
   function update() {
+    if (_object.visible === false) return;
     const meshes = _meshes;
     const shapeWorldPosition = _tempVec0;
     const shapeWorldQuaternion = _tempQuat0;
@@ -309,7 +310,13 @@ function CannonDebugger(scene, world, _temp) {
 
   return {
     update,
-    _object
+    _object,
+    get visible() {
+      return _object.visible;
+    },
+    set visible(value) {
+      _object.visible = value;
+    }
   };
 }
 
