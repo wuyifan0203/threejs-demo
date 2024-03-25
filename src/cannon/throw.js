@@ -1,8 +1,7 @@
-/* eslint-disable camelcase */
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-18 20:38:55
+ * @LastEditTime: 2024-03-25 18:09:11
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -14,7 +13,8 @@ import {
     Group,
     CylinderGeometry,
     MeshStandardMaterial,
-    BoxGeometry
+    BoxGeometry,
+    MeshBasicMaterial,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -27,9 +27,10 @@ import {
     initGroundPlane
 } from '../lib/tools/index.js';
 import {
-    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh, Quaternion, Box
+    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh, Quaternion, Box, ConvexPolyhedron
 } from '../lib/other/physijs/cannon.js';
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
+import { CannonUtils } from '../lib/other/physijs/cannon-utils.js';
 
 window.onload = () => {
     init();
@@ -39,9 +40,6 @@ function init() {
     const renderer = initRenderer({});
 
     const camera = initOrthographicCamera(new Vector3(100, 100, 100));
-    camera.lookAt(0, 0, 0);
-    camera.up.set(0, 0, 1);
-    camera.updateProjectionMatrix();
 
     const scene = initScene();
 
@@ -94,7 +92,7 @@ function init() {
     scene.add(testBox)
 
     // 小环
-    const circle = new TorusGeometry(2, 0.1, 16, 16);
+    const circle = new TorusGeometry(2, 0.1, 6, 16);
     const circleMaterial = new MeshStandardMaterial({ color: 0xff0000 });
     const circleMesh = new Mesh(circle, circleMaterial);
 
@@ -131,14 +129,10 @@ function init() {
         bottomBody.addShape(columnShape, tempV)
     }
 
-    const circleShape = Trimesh.createTorus(2, 0.1, 16, 16);
-    const circleBody = new Body({ mass: 1, shape: circleShape });
-    circleBody.material = new Material({ friction: 0.1, restitution: 0.8 });
-    circleBody.position.copy(circleMesh.position)
-    world.addBody(circleBody);
+    const { updateTorus, torusMaterial } = createTorus(scene, world);
 
-    const groundCircle = new ContactMaterial(circleBody.material, groundBody.material, { friction: 0.1, restitution: 0.8 });
-    const bottomCircle = new ContactMaterial(circleBody.material, bottomBody.material, { friction: 0.1, restitution: 0.5 })
+    const groundCircle = new ContactMaterial(torusMaterial, groundBody.material, { friction: 0.1, restitution: 0.8 });
+    const bottomCircle = new ContactMaterial(torusMaterial, bottomBody.material, { friction: 0.1, restitution: 0.5 })
     world.addContactMaterial(groundCircle);
     world.addContactMaterial(bottomCircle);
 
@@ -160,8 +154,7 @@ function init() {
         group.quaternion.copy(bottomBody.quaternion.mult(new Quaternion().setFromEuler(-Math.PI / 2, 0, group.rotation.z + deltaTime, 'ZYX')));
         group.position.copy(bottomBody.position);
         group.position.z = group.position.z - 0.5;
-        circleMesh.position.copy(circleBody.position);
-        circleMesh.quaternion.copy(circleBody.quaternion);
+        updateTorus();
 
         testBox.position.copy(testBody.position);
         testBox.quaternion.copy(testBody.quaternion);
@@ -172,8 +165,6 @@ function init() {
     renderer.setAnimationLoop(render);
 
     const gui = initGUI();
-
-
 
     const offset = new Vec3(0, 0, 0);
 
@@ -193,6 +184,25 @@ function init() {
     gui.add(operation, 'dropTest');
 
     console.log(world);
+}
 
+function createTorus(scene, world) {
+    const geometry = new TorusGeometry(2, 0.1, 6, 16);
+    const mesh = new Mesh(geometry, new MeshBasicMaterial({ color: '#00ffff' }));
+    mesh.position.y = 1;
 
+    scene.add(mesh);
+
+    const shape = CannonUtils.geometry2Shape(2, 0.1, 16, 16);
+    const body = new Body({ mass: 1, shape, material: new Material('Torus') });
+    body.position.copy(mesh.position)
+    world.addBody(body);
+
+    return {
+        torusMaterial: body.material,
+        updateTorus() {
+            mesh.position.copy(body.position);
+            mesh.quaternion.copy(body.quaternion);
+        }
+    }
 }

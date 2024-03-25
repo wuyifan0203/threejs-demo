@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-21 11:09:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-22 17:59:25
+ * @LastEditTime: 2024-03-25 16:30:32
  * @FilePath: /threejs-demo/src/cannon/bowling.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -23,6 +23,7 @@ import {
     SphereGeometry,
     MeshStandardMaterial,
     Matrix4,
+    Frustum
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -35,7 +36,7 @@ import {
     initCoordinates
 } from '../lib/tools/index.js';
 import {
-    World, Vec3, Body, Material, ContactMaterial, Plane, NaiveBroadphase, ConvexPolyhedron, Box as BoxShape, Sphere, Cylinder,
+    World, Vec3, Body, Material, ContactMaterial, NaiveBroadphase, Box as BoxShape, Sphere, Cylinder,
 } from '../lib/other/physijs/cannon.js';
 
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
@@ -44,8 +45,9 @@ window.onload = () => {
     init();
 };
 
-const groundHalfSize = new Vector2(100, 15);
+const groundHalfSize = new Vector2(100, 20);
 const groundSize = groundHalfSize.clone().multiplyScalar(2);
+const ballSize = 3;
 
 function init() {
     const renderer = initRenderer();
@@ -59,7 +61,7 @@ function init() {
 
     // cannon
     const world = new World();
-    world.gravity.set(0, -9.82, 0);
+    world.gravity.set(0, -10, 0);
     world.broadphase = new NaiveBroadphase();
     world.defaultContactMaterial.contactEquationRelaxation = 5;
     world.defaultContactMaterial.contactEquationStiffness = 1e7;
@@ -87,14 +89,18 @@ function init() {
 
     scene.add(initCoordinates(16));
 
+    const frustum = new Frustum();
+    frustum.setFromProjectionMatrix(light.shadow.camera);
 
     const { bottleMaterial, updateBottles } = createBottles(scene, world);
     createBaffles(scene, world)
     createPlane(scene, world);
 
-    const { updateBall, ballMaterial, pushBall } = createBall(scene, world);
+    const { updateBall, ballMaterial, pushBall, controlBall } = createBall(scene, world);
 
     world.addContactMaterial(new ContactMaterial(bottleMaterial, ballMaterial, { friction: 0.1, restitution: 0.7 }));
+
+    window.addEventListener('keypress', controlBall)
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
     cannonDebugger.visible = false;
@@ -192,7 +198,7 @@ function createBottles(scene, world) {
     `,
     });
 
-    const positions = initPosition(2.5, new Vector3(60, 7, 0));
+    const positions = initPosition(4.5, new Vector3(60, 7, 0));
 
     // choose 1,使用ConvexPolyhedron来模拟。会非常的卡顿
 
@@ -281,8 +287,8 @@ function createBaffles(scene, world) {
     rightBaffles.matrixWorldAutoUpdate = false;
     leftBaffles.castShadow = rightBaffles.castShadow = true;
 
-    leftBaffles.position.z = -12;
-    rightBaffles.position.z = 12;
+    leftBaffles.position.z = -groundHalfSize.y;
+    rightBaffles.position.z = groundHalfSize.y;
 
     leftBaffles.updateMatrix();
     rightBaffles.updateMatrix();
@@ -309,16 +315,14 @@ function createBaffles(scene, world) {
 }
 
 function createBall(scene, world) {
-    const mesh = new Mesh(new SphereGeometry(5, 32, 32), new MeshStandardMaterial({ color: '#000000', roughness: 0.2 }));
+    const mesh = new Mesh(new SphereGeometry(ballSize, 32, 32), new MeshStandardMaterial({ color: '#000000', roughness: 0.2 }));
     mesh.castShadow = true;
     mesh.receiveShadow = true;
     mesh.position.y = 5;
     mesh.position.x = -50;
     scene.add(mesh);
 
-    console.log(mesh.material);
-
-    const shape = new Sphere(5);
+    const shape = new Sphere(ballSize);
     const body = new Body({
         shape,
         mass: 10,
@@ -341,6 +345,16 @@ function createBall(scene, world) {
             body.applyLocalForce(new Vec3(50000, 0, 0), new Vec3());
         },
         controlBall(e) {
+            const maxDistance = Math.abs(groundHalfSize.y);
+            const distance = Math.abs(body.position.z);
+
+            if (e.key === 'a' && distance < maxDistance) {
+                body.position.z -= 0.1;
+                return;
+            } else if (e.key === 'd' && distance < maxDistance) {
+                body.position.z += 0.1;
+                return;
+            }
 
         }
     }

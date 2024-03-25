@@ -15,8 +15,10 @@
   "cSpell.words": [
     "broadphase",
     "contactmaterials",
+    "CONVEXPOLYHEDRON",
     "FXAA",
     "GLTF",
+    "HEIGHTFIELD",
     "iconfont",
     "importmap",
     "Phong",
@@ -25,13 +27,12 @@
     "raycaster",
     "slerp",
     "threejs",
+    "TRIMESH",
     "unproject",
+    "vitepress",
+    "WBOIT",
     "wireframe",
     "XYZE",
-    "Yifan",
-    "TRIMESH",
-    "HEIGHTFIELD",
-    "CONVEXPOLYHEDRON",
-    "vitepress"
+    "Yifan"
   ]
 }

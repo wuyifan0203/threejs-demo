@@ -1,8 +1,10 @@
 /*
- * @Date: 2023-12-18 16:50:56
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2023-12-25 09:42:14
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 14:56:45
+ * @LastEditTime: 2024-03-25 10:37:10
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
 import {

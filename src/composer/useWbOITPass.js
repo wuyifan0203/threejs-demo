@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-23 14:55:15
+ * @LastEditTime: 2024-03-25 14:21:10
  * @FilePath: /threejs-demo/src/composer/useWbOITPass.js
  */
 
@@ -32,7 +32,7 @@ import {
 import { EffectComposer } from '../lib/three/EffectComposer.js';
 import { RenderPass } from '../lib/three/RenderPass.js';
 import { ShaderPass } from '../lib/three/ShaderPass.js';
-import { WboitPass, WboitUtils } from '../lib/other/three-wboit.module.js';
+import { WboitPass, WboitUtils, MeshWboitMaterial } from '../lib/other/three-wboit.module.js';
 import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
 
 
@@ -144,18 +144,30 @@ async function init() {
     const rightComposer = new EffectComposer(renderer);
     rightComposer.addPass(bgPass);
     rightComposer.addPass(wbOITPass);
-    rightComposer.addPass(helperPass);
+    // rightComposer.addPass(helperPass);
     rightComposer.addPass(effectCopy);
 
     scene2.traverse((obj) => {
         if (obj?.isMesh) {
             if (obj.material !== undefined) {
-                WboitUtils.patch(obj.material);
+                const { transparent, opacity, color, side } = obj.material;
+                obj.material.dispose();
+
+                obj.material = new MeshWboitMaterial({
+                    transparent,
+                    opacity,
+                    color,
+                    side,
+                    // weight: 0.5
+                });
+
+
+
             }
         }
     })
 
-    console.log(scene2,scene);
+    console.log(scene2, scene);
 
 
     function render() {

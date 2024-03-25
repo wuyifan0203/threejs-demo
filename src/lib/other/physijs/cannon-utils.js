@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-31 13:20:59
+ * @LastEditTime: 2024-03-25 17:56:53
  * @FilePath: /threejs-demo/src/lib/other/physijs/cannon-utils.js
  */
 import {
@@ -14,7 +14,7 @@ import {
     Float32BufferAttribute,
     PlaneGeometry
 } from '../../three/three.module.js';
-import { Shape } from './cannon.js'
+import { ConvexPolyhedron, Shape } from './cannon.js'
 
 class CannonUtils {
     constructor(world, scene) {
@@ -141,6 +141,34 @@ class CannonUtils {
                 break;
         }
 
+    }
+
+    static geometry2Shape(geometry) {
+        const vertices = [];
+        const faces = [];
+        switch (geometry.type) {
+            case 'TorusGeometry':
+                const positionBuffer = geometry.getAttribute('position').array;
+                const indexBuffer = geometry.getIndex().array;
+
+                for (let j = 0, k = positionBuffer.length; j < k; j += 3) {
+                    const x = positionBuffer[j];
+                    const y = positionBuffer[j + 1];
+                    const z = positionBuffer[j + 2];
+                    vertices.push(new Vec3(x, y, z));
+                }
+
+                for (let j = 0, k = indexBuffer.length; j < k; j += 3) {
+                    const x = indexBuffer[j];
+                    const y = indexBuffer[j + 1];
+                    const z = indexBuffer[j + 2];
+                    faces.push([x, y, z]);
+                }
+
+                return new ConvexPolyhedron({ vertices, faces });
+            default:
+                break;
+        }
     }
 }
 
