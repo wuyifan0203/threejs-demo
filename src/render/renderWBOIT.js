@@ -1,3 +1,11 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-03-25 10:30:05
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-03-26 09:38:55
+ * @FilePath: /threejs-demo/src/render/renderWBOIT.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 import {
     SphereGeometry,
     MeshStandardMaterial,
@@ -72,7 +80,7 @@ async function init() {
     planeMesh2.position.set(-1.2, 0, -1.5);
     scene.add(planeMesh2);
 
-    const 
+    // const 
 
 
     function render() {

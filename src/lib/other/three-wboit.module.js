@@ -1169,6 +1169,7 @@ class WboitUtils {
 			const existingOnBeforeCompile = material.onBeforeCompile;
 
 			material.onBeforeCompile = function (shader, renderer) {
+				console.log('three-wboit: patching material onBeforeCompile', shader);
 
 				if (material.wboitEnabled === true) return;
 				material.wboitEnabled = true;

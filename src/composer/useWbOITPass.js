@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-25 14:21:10
+ * @LastEditTime: 2024-03-26 15:11:14
  * @FilePath: /threejs-demo/src/composer/useWbOITPass.js
  */
 
@@ -16,6 +16,7 @@ import {
     TextureLoader,
     PlaneGeometry,
     Vector2,
+    Float32BufferAttribute,
 } from '../lib/three/three.module.js';
 
 import {
@@ -45,9 +46,10 @@ async function init() {
 
     const params = {
         layers: 3,
-        showNormal: true,
-        showOIT: false,
+        showNormal: false,
+        showOIT: true,
         log: false,
+        weight: 1
     }
     const dom = document.getElementById('webgl-output');
     const size = new Vector2(window.innerWidth, window.innerHeight);
@@ -78,16 +80,20 @@ async function init() {
     initAmbientLight(scene)
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
-    orbitControl.addEventListener('change', render);
 
-    const sphereMesh = new Mesh(new SphereGeometry(), new MeshStandardMaterial());
+    const sphereMesh = new Mesh(new SphereGeometry(), new MeshStandardMaterial({
+        // vertexColors: true,
+    }));
+    // const sphereColors = new Float32Array(4 * sphereMesh.geometry.attributes.position.count);
+    // for (let i = 0, l = sphereMesh.geometry.attributes.position.count; i < l; i++) sphereColors.set([1, 1, 1, 1], i * 4)
+    // sphereMesh.geometry.setAttribute('color', new Float32BufferAttribute(sphereColors, 4));
     sphereMesh.position.set(1.5, 0, 3);
     sphereMesh.castShadow = true;
     scene.add(sphereMesh);
 
     const knotMesh = new Mesh(
         new TorusKnotGeometry(1, 0.4, 128, 32),
-        new MeshStandardMaterial({ transparent: true, opacity: 0.5, side: 2 })
+        new MeshStandardMaterial({ transparent: true, opacity: 0.2, side: 2 })
     );
     knotMesh.rotateX(Math.PI / 2)
     knotMesh.receiveShadow = true;
@@ -106,7 +112,7 @@ async function init() {
     planeMesh1.position.set(-1.6, 0, 1.5);
     scene.add(planeMesh1);
 
-    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture1, transparent: true }));
+    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture1, transparent: true, opacity: 1}));
     planeMesh2.rotation.x = Math.PI / 2;
     planeMesh2.rotation.y = Math.PI * -0.2;
     planeMesh2.position.set(-1.2, 0, -1.5);
@@ -127,10 +133,12 @@ async function init() {
     scenePass.clear = false;
     scenePass.clearDepth = true;
 
+    const GammaCorrectionPass = new ShaderPass(GammaCorrectionShader);
+
     const leftComposer = new EffectComposer(renderer);
     leftComposer.addPass(bgPass);
     leftComposer.addPass(scenePass);
-    leftComposer.addPass(helperPass);
+    leftComposer.addPass(GammaCorrectionPass);
     leftComposer.addPass(effectCopy);
 
     // right OIT Render 
@@ -150,28 +158,50 @@ async function init() {
     scene2.traverse((obj) => {
         if (obj?.isMesh) {
             if (obj.material !== undefined) {
-                const { transparent, opacity, color, side } = obj.material;
-                obj.material.dispose();
+                // const { transparent, opacity, color, side, map } = obj.material;
+                // obj.material.dispose();
 
-                obj.material = new MeshWboitMaterial({
-                    transparent,
-                    opacity,
-                    color,
-                    side,
-                    // weight: 0.5
-                });
+                // console.log(transparent, opacity, color, side, map);
 
+                // obj.material = new MeshWboitMaterial({
+                //     transparent,
+                //     opacity,
+                //     color,
+                //     side,
+                //     map
+                //     // weight: 0.5
+                // });
 
+                // console.log(obj.material);
+                WboitUtils.patch(obj.material);
+
+                // if (obj.material.isMeshStandardMaterial) {
+                //     obj.material.opacity = params.opacity;
+                // } else if (obj.material.isShaderMaterial) {
+                //     obj.material.uniforms.opacity.value = params.opacity;
+                // }
+
+                if ('wboitEnabled' in obj.material) {
+                    obj.material.wboitEnabled = params.showOIT;
+                }
+                if (obj.material.wboitEnabled === true) {
+                    obj.material.weight = params.weight;
+                }
 
             }
+        }else if (obj.isDirectionalLight) {
+            // obj.visible = false;
         }
     })
 
     console.log(scene2, scene);
 
+    console.log(scene2.children);
+
 
     function render() {
         renderer.clear();
+        orbitControl.update();
 
         if (params.showNormal && params.showOIT) {
 
@@ -200,7 +230,7 @@ async function init() {
 
     resize();
 
-    render();
+    renderer.setAnimationLoop(render)
 
 
     function resize() {
