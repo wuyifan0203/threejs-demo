@@ -20,6 +20,7 @@ function CannonDebugger(scene, world, _temp) {
 
   const _material = new MeshBasicMaterial({
     color: color != null ? color : 0x00ff00,
+    depthTest: true,
     wireframe: true
   });
 

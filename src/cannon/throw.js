@@ -1,16 +1,14 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-26 18:03:52
+ * @LastEditTime: 2024-03-27 18:06:42
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
     Mesh,
     Clock,
-    Euler,
     Vector3,
     TorusGeometry,
-    Group,
     CylinderGeometry,
     MeshStandardMaterial,
     BoxGeometry,
@@ -24,18 +22,29 @@ import {
     initScene,
     initAmbientLight,
     initDirectionLight,
-    initGroundPlane,
     initCoordinates
 } from '../lib/tools/index.js';
 import {
-    World, Body, Material, ContactMaterial, Plane, NaiveBroadphase, Cylinder, Vec3, Trimesh, Quaternion, Box as BoxShape, ConvexPolyhedron
+    World, 
+    Body, 
+    Material, 
+    ContactMaterial, 
+    Sphere, 
+    NaiveBroadphase, 
+    Cylinder, 
+    Vec3, 
+    Box as BoxShape,
+    DistanceConstraint
 } from '../lib/other/physijs/cannon.js';
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
 import { CannonUtils } from '../lib/other/physijs/cannon-utils.js';
+import g from '../lib/util/lil-gui.module.min.js';
 
 window.onload = () => {
     init();
 };
+
+const tempV3 = new Vector3();
 
 function init() {
     const renderer = initRenderer({});
@@ -48,7 +57,7 @@ function init() {
 
     initAmbientLight(scene);
 
-    const world = new World({ gravity: new Vec3(0, 0, -9.82) });
+    const world = new World({ gravity: new Vec3(0, -9.82, 0) });
     world.broadphase = new NaiveBroadphase();
     world.defaultContactMaterial.contactEquationRelaxation = 5;
     world.defaultContactMaterial.contactEquationStiffness = 1e7;
@@ -63,66 +72,17 @@ function init() {
     light.position.set(-40, 40, 0);
     scene.add(light);
 
-    const orbitControl = initOrbitControls(camera, renderer.domElement);
-
-    createGround(scene, world)
-    createColumn(scene, world)
-
-    // 圆台
-
-    // const columnMaterial = new MeshStandardMaterial({ color: 0x0000ff });
-    // const columnNumber = 5;
-    // const pice = Math.PI * 2 / columnNumber;
-    // const columnGeometry = new CylinderGeometry(0.5, 0.5, 3, 32);
-    // const columns = []
-    // for (let index = 0; index < columnNumber; index++) {
-    //     const column = new Mesh(columnGeometry, columnMaterial);
-    //     column.rotateX(Math.PI / 2);
-    //     column.position.x = 4 * Math.cos(pice * index);
-    //     column.position.y = 4 * Math.sin(pice * index);
-    //     column.position.z = 2.5;
-    //     column.castShadow = true;
-
-    //     columns.push(column)
-    //     group.add(column);
-    // }
-
-    // scene.add(group);
-
     const coord = initCoordinates(5);
     scene.add(coord);
 
-    // cannon
+    const orbitControl = initOrbitControls(camera, renderer.domElement);
+    const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
 
-
-    const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 })
-
-    // const bottomShape = new Cylinder(5, 5, 1, 32);
-    // const bottomBody = new Body({ mass: 1, shape: bottomShape });
-    // bottomBody.material = new Material({ friction: 0.5, restitution: 0.8 });
-    // bottomBody.quaternion.setFromEuler(Math.PI / 2, 0, 0, 'ZYX');
-    // bottomBody.position.set(0, 0, 0.5);
-    // world.addBody(bottomBody);
-
-    // const columnShape = new Cylinder(0.5, 0.5, 3, 32);
-    // const tempV = new Vector3()
-    // for (let index = 0; index < columnNumber; index++) {
-    //     tempV.copy(columns[index].position);
-    //     tempV.z = 2
-    //     tempV.applyEuler(new Euler(-Math.PI / 2, 0, 0, 'ZYX'));
-    //     bottomBody.addShape(columnShape, tempV)
-    // }
-
+    createGround(scene, world)
+    // const { updateColumn } = createColumn(scene, world)
     const { updateTorus, torusMaterial } = createTorus(scene, world);
 
-    // const bottomCircle = new ContactMaterial(torusMaterial, bottomBody.material, { friction: 0.1, restitution: 0.5 })
-    // world.addContactMaterial(bottomCircle);
-
-
-
     const timeStep = 1.0 / 60.0;
-
-
     const clock = new Clock();
 
     function render() {
@@ -131,11 +91,8 @@ function init() {
         cannonDebugger.update();
 
         world.step(timeStep, deltaTime, 3);
-        // group.quaternion.copy(bottomBody.quaternion.mult(new Quaternion().setFromEuler(-Math.PI / 2, 0, group.rotation.z + deltaTime, 'ZYX')));
-        // group.position.copy(bottomBody.position);
-        // group.position.z = group.position.z - 0.5;
-        updateTorus();
-
+        // updateTorus();
+        // updateColumn();
 
         renderer.render(scene, camera);
     }
@@ -143,18 +100,6 @@ function init() {
     renderer.setAnimationLoop(render);
 
     const gui = initGUI();
-
-    const offset = new Vec3(0, 0, 0);
-
-    const operation = {
-        throw() {
-            const force = new Vec3(0, 50, 1000);
-            const impulse = force.scale(timeStep); // 将力转换为冲量
-            circleBody.applyImpulse(impulse, offset)
-        },
-    }
-
-    gui.add(operation, 'throw');
 
     console.log(world);
 }
@@ -180,36 +125,82 @@ function createGround(scene, world) {
 function createTorus(scene, world) {
     const geometry = new TorusGeometry(2, 0.1, 6, 16);
     const mesh = new Mesh(geometry, new MeshBasicMaterial({ color: '#00ffff' }));
-    mesh.position.y = 1;
+    mesh.position.y = 5;
 
-    scene.add(mesh);
+    // scene.add(mesh);
 
-    const shape = CannonUtils.geometry2Shape(2, 0.1, 16, 16);
-    const body = new Body({ mass: 1, shape, material: new Material('Torus') });
-    body.position.copy(mesh.position)
+
+
+    const body = CannonUtils.mesh2Body(mesh);
+
+    console.log(body);
+
+    body.position.copy(mesh.position);
     world.addBody(body);
 
+    // const shape = CannonUtils.geometry2Shape(geometry);
+    // const body = new Body({ mass: 0, shape, material: new Material('Torus') });
+    // body.position.copy(mesh.position)
+    // world.addBody(body);
+
     return {
-        torusMaterial: body.material,
+        // torusMaterial: body.material,
         updateTorus() {
-            mesh.position.copy(body.position);
-            mesh.quaternion.copy(body.quaternion);
+            // mesh.position.copy(body.position);
+            // mesh.quaternion.copy(body.quaternion);
         }
     }
 }
 
 function createColumn(scene, world) {
-    const group = new Group();
-    const cylinder = new CylinderGeometry(5, 5, 1, 32);
+    // create Bottom Mesh
+    const cylinder = new CylinderGeometry(5, 5, 1, 16);
     const bottom = new Mesh(cylinder, new MeshStandardMaterial({ color: 0x00ff00 }));
-    bottom.position.set(0, 0, 0.5);
     bottom.castShadow = bottom.receiveShadow = true;
-    group.add(bottom);
+    bottom.position.y = 0.5;
 
-    group.position.y = 0.5
+    scene.add(bottom);
 
+    // create Bottom Body
+    const body = new Body({
+        type: Body.KINEMATIC,
+        mass: 5,
+    });
+    body.angularVelocity.set(0, 1, 0);
+    body.angularDamping = 0;
 
-    scene.add(group);
+    const bottomShape = new Cylinder(5, 5, 1, 16);
+    body.addShape(bottomShape, new Vec3(0, 0.5, 0));
+
+    world.addBody(body);
+
+    // create columns Mesh and Body
+    const columnNumber = 5;
+    const columnGeometry = new CylinderGeometry(0.5, 0.5, 3, 16)
+    const columnMaterial = new MeshStandardMaterial({ color: '#ff0000' });
+
+    const columnShape = new Cylinder(0.5, 0.5, 3, 16);
+
+    for (let i = 0, pice = Math.PI * 2 / columnNumber; i < columnNumber; i++) {
+        // create column Mesh
+        const column = new Mesh(columnGeometry, columnMaterial);
+        const angle = i * pice;
+        column.position.x = 4 * Math.cos(angle);
+        column.position.z = 4 * Math.sin(angle);
+        column.position.y = 2;
+        column.castShadow = column.receiveShadow = true;
+        bottom.add(column);
+
+        // create column Body
+        column.getWorldPosition(tempV3);
+        body.addShape(columnShape, new Vec3().copy(tempV3));
+    }
+
+    return {
+        updateColumn() {
+            bottom.quaternion.copy(body.quaternion);
+        }
+    }
 
 }
 
