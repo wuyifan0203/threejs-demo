@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-27 18:08:42
+ * @LastEditTime: 2024-03-28 18:00:19
  * @FilePath: /threejs-demo/src/lib/other/physijs/cannon-utils.js
  */
 import {
@@ -161,22 +161,22 @@ class CannonUtils {
 function createTorusBody(geometry) {
     const body = new Body();
     const { radialSegments, radius, tube, tubularSegments, arc } = geometry.parameters;
-    const pice = arc / radialSegments;
-    const D = radius * Math.sin(arc / radialSegments / 2);
-    const d = (D * (radius * Math.cos(arc / radialSegments / 2) - tube)) / radius;
+    const pice = arc / tubularSegments;
+    const halfPice = pice / 2;
+    const D = radius * Math.sin(halfPice);
+    const H = radius * Math.cos(halfPice)
+    const d = (D * (H - tube)) / H;
 
-    console.log(d, D);
+    const columnShape = new Cylinder(tube, tube, d * 2, radialSegments);
 
-    const columnShape = new Cylinder(tube, tube, d, tubularSegments);
-
-    for (let j = 0; j < radialSegments; j++) {
+    for (let j = 0, k = 0; j < tubularSegments; j++, k = j * pice + halfPice) {
         const offset = new Vec3(
-            radius * Math.cos(j * pice),
-            0,
-            radius * Math.sin(j * pice)
+            radius * Math.cos(k),
+            radius * Math.sin(k),
+            0
         );
-        const quaternion = new Quaternion().setFromEuler()
-        body.addShape(columnShape, offset)
+        const quaternion = new Quaternion().setFromEuler(0, 0, k, 'YXZ')
+        body.addShape(columnShape, offset, quaternion)
 
     }
 

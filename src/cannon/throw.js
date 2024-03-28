@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-27 18:06:42
+ * @LastEditTime: 2024-03-28 18:01:41
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -123,11 +123,11 @@ function createGround(scene, world) {
 }
 
 function createTorus(scene, world) {
-    const geometry = new TorusGeometry(2, 0.1, 6, 16);
+    const geometry = new TorusGeometry(2, 0.1, 16, 6);
     const mesh = new Mesh(geometry, new MeshBasicMaterial({ color: '#00ffff' }));
     mesh.position.y = 5;
 
-    // scene.add(mesh);
+    scene.add(mesh);
 
 
 
