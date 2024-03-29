@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-07-20 10:41:08
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:11:21
+ * @LastEditTime: 2024-03-29 13:43:27
  * @FilePath: /threejs-demo/src/geometry/preview.js
  */
 import {
@@ -14,12 +14,13 @@ import {
 } from '../lib/three/three.module.js';
 import {
   initRenderer,
-  initPerspectiveCamera,
   initAxesHelper,
   initCustomGrid,
   resize,
   initGUI,
-  initOrbitControls
+  initOrbitControls,
+  initScene,
+  initOrthographicCamera
 } from '../lib/tools/index.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { data } from './previewData.js';
@@ -30,7 +31,7 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
+  const camera = initOrthographicCamera(new Vector3(14, -16, 13));
   const scene = initScene();
   renderer.setClearColor(0xffffff);
   renderer.autoClear = false;

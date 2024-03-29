@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-28 18:00:19
+ * @LastEditTime: 2024-03-29 13:52:11
  * @FilePath: /threejs-demo/src/lib/other/physijs/cannon-utils.js
  */
 import {
@@ -14,7 +14,7 @@ import {
     Float32BufferAttribute,
     PlaneGeometry
 } from '../../three/three.module.js';
-import { Body, ConvexPolyhedron, Cylinder, Quaternion, Shape, Vec3 } from './cannon.js'
+import { Body, Material, Cylinder, Quaternion, Shape, Vec3 } from './cannon.js'
 
 class CannonUtils {
     constructor(world, scene) {
@@ -153,13 +153,8 @@ class CannonUtils {
     }
 }
 
-// arc :6.283185307179586
-// radialSegments :6
-// radius :2
-// tube: 0.1
-// tubularSegments:6
 function createTorusBody(geometry) {
-    const body = new Body();
+    const body = new Body({ material: new Material() });
     const { radialSegments, radius, tube, tubularSegments, arc } = geometry.parameters;
     const pice = arc / tubularSegments;
     const halfPice = pice / 2;
@@ -169,10 +164,10 @@ function createTorusBody(geometry) {
 
     const columnShape = new Cylinder(tube, tube, d * 2, radialSegments);
 
-    for (let j = 0, k = 0; j < tubularSegments; j++, k = j * pice + halfPice) {
+    for (let j = 0, k = halfPice; j < tubularSegments; j++, k = j * pice + halfPice) {
         const offset = new Vec3(
-            radius * Math.cos(k),
-            radius * Math.sin(k),
+            H * Math.cos(k),
+            H * Math.sin(k),
             0
         );
         const quaternion = new Quaternion().setFromEuler(0, 0, k, 'YXZ')
