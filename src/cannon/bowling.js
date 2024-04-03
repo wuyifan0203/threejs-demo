@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-21 11:09:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-25 16:30:32
+ * @LastEditTime: 2024-04-03 17:09:15
  * @FilePath: /threejs-demo/src/cannon/bowling.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -47,7 +47,7 @@ window.onload = () => {
 
 const groundHalfSize = new Vector2(100, 20);
 const groundSize = groundHalfSize.clone().multiplyScalar(2);
-const ballSize = 3;
+
 
 function init() {
     const renderer = initRenderer();
@@ -87,20 +87,22 @@ function init() {
     const orbitControl = initOrbitControls(camera, renderer.domElement);
     orbitControl.saveState();
 
-    scene.add(initCoordinates(16));
+    const coord = initCoordinates(16);
+    coord.visible = false;
+    scene.add(coord);
 
     const frustum = new Frustum();
-    frustum.setFromProjectionMatrix(light.shadow.camera);
+    frustum.setFromProjectionMatrix(light.shadow.camera.projectionMatrix);
 
     const { bottleMaterial, updateBottles } = createBottles(scene, world);
     createBaffles(scene, world)
     createPlane(scene, world);
 
-    const { updateBall, ballMaterial, pushBall, controlBall } = createBall(scene, world);
+    const { updateBall, ballBody, pushBall, controlBall, checkBall, resetBall } = createBall(scene, world);
 
-    world.addContactMaterial(new ContactMaterial(bottleMaterial, ballMaterial, { friction: 0.1, restitution: 0.7 }));
+    world.addContactMaterial(new ContactMaterial(bottleMaterial, ballBody.material, { friction: 0.1, restitution: 0.7 }));
 
-    window.addEventListener('keypress', controlBall)
+    window.addEventListener('keypress', controlBall.bind({ pushBall }))
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
     cannonDebugger.visible = false;
@@ -113,6 +115,10 @@ function init() {
         updateBottles();
         updateBall();
         renderer.render(scene, camera);
+
+        if (checkBall && ballBody.velocity.y < -10) {
+            resetBall();
+        }
     }
 
     renderer.setAnimationLoop(update);
@@ -129,6 +135,7 @@ function init() {
     debuggerFolder.add(cannonDebugger, 'visible').name('Cannon helper');
     debuggerFolder.add(shadowCamera, 'visible').name('Shadow camera helper');
     debuggerFolder.add(directionalLightHelper, 'visible').name('Light helper');
+    debuggerFolder.add(coord, 'visible').name('Coord helper');
     debuggerFolder.add(orbitControl, 'enabled').onChange((e) => !e && orbitControl.reset()).name('God Mode')
 
 }
@@ -251,7 +258,14 @@ function createBottles(scene, world) {
                 mesh.position.copy(bottleBodies[i].position);
                 mesh.quaternion.copy(bottleBodies[i].quaternion);
             });
-        }
+        },
+        resetBottles() {
+            positions.forEach((pos, i) => {
+                bottleBodies[i].position.copy(pos);
+                bottleBodies[i].velocity.set(0, 0, 0);
+                bottleBodies[i].angularVelocity.set(0, 0, 0);
+            })
+        },
     };
 
 }
@@ -267,7 +281,7 @@ function createPlane(scene, world) {
 
     const planeBody = new Body({
         mass: 0,
-        shape: new BoxShape(new Vec3(groundHalfSize.x, 1, groundHalfSize.y)),
+        shape: new BoxShape(new Vec3(groundHalfSize.x, 0.5, groundHalfSize.y)),
         material: new Material('ground')
     });
     planeBody.position.y = -0.5;
@@ -309,17 +323,19 @@ function createBaffles(scene, world) {
         mass: 0
     });
 
-    leftBafflesBody.position.z = -12;
-    rightBafflesBody.position.z = 12;
-    world.addBody(leftBafflesBody, rightBafflesBody);
+    leftBafflesBody.position.z = -groundHalfSize.y;
+    rightBafflesBody.position.z = groundHalfSize.y;
+    world.addBody(leftBafflesBody);
+    world.addBody(rightBafflesBody);
 }
 
 function createBall(scene, world) {
+    const ballSize = 3;
+    const defaultPosition = new Vec3(-50, 3, 0);
+
     const mesh = new Mesh(new SphereGeometry(ballSize, 32, 32), new MeshStandardMaterial({ color: '#000000', roughness: 0.2 }));
     mesh.castShadow = true;
     mesh.receiveShadow = true;
-    mesh.position.y = 5;
-    mesh.position.x = -50;
     scene.add(mesh);
 
     const shape = new Sphere(ballSize);
@@ -328,34 +344,50 @@ function createBall(scene, world) {
         mass: 10,
         material: new Material('ball')
     });
-    body.position.copy(mesh.position);
+    body.position.copy(defaultPosition);
 
     world.addBody(body);
 
-    window.ball = body
+    window.ball = body;
 
-    return {
-        ballMaterial: body.material,
+    let pushFlag = false;
+
+    const ballObject = {
+        ballBody: body,
         updateBall() {
             mesh.position.copy(body.position);
             mesh.quaternion.copy(body.quaternion);
         },
         pushBall() {
-            console.log('push');
             body.applyLocalForce(new Vec3(50000, 0, 0), new Vec3());
+            pushFlag = true;
         },
         controlBall(e) {
             const maxDistance = Math.abs(groundHalfSize.y);
             const distance = Math.abs(body.position.z);
 
             if (e.key === 'a' && distance < maxDistance) {
-                body.position.z -= 0.1;
+                body.position.z -= 0.2;
                 return;
             } else if (e.key === 'd' && distance < maxDistance) {
-                body.position.z += 0.1;
+                body.position.z += 0.2;
                 return;
+            } else if (e.key === 'w' && pushFlag === false) {
+                console.log(this);
+                this.pushBall();
             }
+        },
 
+        resetBall() {
+            body.position.copy(defaultPosition);
+            body.velocity.set(0, 0, 0);
+            body.angularVelocity.set(0, 0, 0);
+            pushFlag = false;
+        },
+        checkBall() {
+            return pushFlag;
         }
     }
+
+    return ballObject;
 }
