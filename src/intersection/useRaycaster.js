@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-11 14:39:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-12 10:21:50
+ * @LastEditTime: 2024-04-25 17:27:29
  * @FilePath: /threejs-demo/src/intersection/useRaycaster.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -27,6 +27,8 @@ import {
     initRenderer,
     initScene
 } from '../lib/tools/common.js';
+
+import { Octree } from '../lib/three/Octree.js'
 
 window.onload = function () {
     init();
@@ -74,7 +76,6 @@ function init() {
 
     getInsertIndex(sphere, torusKnot)
 
-
 }
 
 function createSphere(radius) {
@@ -102,105 +103,13 @@ function createTorusKnot() {
     return mesh;
 }
 
-const _edge1 = new Vector3();
-const _edge2 = new Vector3();
-const _normal = new Vector3();
-const _diff = new Vector3();
 
-Ray.prototype.intersectsTriangle = function (triangle) {
-    _edge1.subVectors(triangle.b, triangle.a);
-    _edge2.subVectors(triangle.c, triangle.a);
-    _normal.crossVectors(_edge1, _edge2);
+function getInsertIndex(sphere, torusKnot) {
+    const sphereGeometry = sphere.geometry.clone();
+    const torusKnotGeometry = torusKnot.geometry.clone();
 
-    // Solve Q + t*D = b1*E1 + b2*E2 (Q = kDiff, D = ray direction,
-    // E1 = kEdge1, E2 = kEdge2, N = Cross(E1,E2)) by
-    //   |Dot(D,N)|*b1 = sign(Dot(D,N))*Dot(D,Cross(Q,E2))
-    //   |Dot(D,N)|*b2 = sign(Dot(D,N))*Dot(D,Cross(E1,Q))
-    //   |Dot(D,N)|*t = -sign(Dot(D,N))*Dot(Q,N)
-
-    let DdN = this.direction.dot(_normal);
-    let sign;
-
-    if (DdN > 0) {
-        sign = 1;
-    } else if (DdN < 0) {
-        sign = -1;
-        DdN = -DdN;
-    } else {
-        return false;
-    }
-
-    _diff.subVectors(this.origin, triangle.a);
-    const DdQxE2 = sign * this.direction.dot(_edge2.crossVectors(_diff, _edge2));
-
-    // b1 < 0, no intersection
-    if (DdQxE2 < 0) {
-        return false;
-    }
-
-    const DdE1xQ = sign * this.direction.dot(_edge1.cross(_diff));
-
-    // b2 < 0, no intersection
-    if (DdE1xQ < 0) {
-        return false;
-    }
-
-    // b1+b2 > 1, no intersection
-    if (DdQxE2 + DdE1xQ > DdN) {
-        return false;
-    }
-
-    // Line intersects triangle, check if ray does.
-    const QdN = -sign * _diff.dot(_normal);
-
-    // t < 0, no intersection
-    if (QdN < 0) {
-        return false;
-    }
-
-    return true;
-}
-
-const ray = new Ray();
-const _triangle = new Triangle();
-
-const _boxA = new Box3();
-const _boxB = new Box3();
-const center = new Vector3(1 / 3, 1 / 3, 1 / 3);
-
-function getInsertIndex(objectA, objectB) {
-    let geometryA = objectA.geometry.clone();
-    let geometryB = objectB.geometry.clone();
-
-    geometryA.applyMatrix4(objectA.matrixWorld);
-    geometryB.applyMatrix4(objectB.matrixWorld);
-
-    console.log(geometryA);
-
-    const positionA = geometryA.getAttribute('position');
-    const positionB = geometryB.getAttribute('position');
-
-    const indexA = geometryA.getIndex();
-    const indexB = geometryB.getIndex();
-
-    console.log(indexA.count);
-
-    for (let j = 0; j < indexA.count; j = j + 3) {
-        _triangle.setFromAttributeAndIndices(positionA, j, j + 1, j + 2);
-        _boxA.setFromPoints([_triangle.a, _triangle.b, _triangle.c]);
-
-        // for (let k = 0; k < indexB.count; k = k + 3) {
-            //     _triangle.setFromAttributeAndIndices(positionB, k, k + 1, k + 2);
-            //     _boxB.setFromPoints([_triangle.a, _triangle.b, _triangle.c]);
-
-            //     if(_boxA.intersectsBox(_boxB)){
-
-            //         // console.log('intersects',j , k );
-            //     }
-            // console.log(j + k);
-        // }
-    }
+    sphereGeometry.applyMatrix4(sphere.matrixWorld);
+    torusKnotGeometry.applyMatrix4(torusKnot.matrixWorld);
 
 
 }
-
