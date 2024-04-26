@@ -201,7 +201,7 @@ function initScene() {
 }
 
 function initCoordinates(axesLength) {
-  return new CoordinateHelper(axesLength)
+  return new CoordinateHelper(axesLength);
 }
 
 function initDirectionLight(color = 0xffffff, intensity = 3) {

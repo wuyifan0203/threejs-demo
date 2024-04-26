@@ -1,0 +1,148 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-04-26 13:06:02
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-04-26 18:01:15
+ * @FilePath: /threejs-demo/src/booleanOperation/intersection.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
+import {
+    Mesh,
+    Vector3,
+    MeshStandardMaterial,
+    BoxGeometry,
+    SphereGeometry,
+    TorusKnotGeometry,
+    BufferGeometry,
+    MeshBasicMaterial
+} from "../lib/three/three.module.js";
+import {
+    initAmbientLight,
+    initCoordinates,
+    initCustomGrid,
+    initDirectionLight,
+    initGUI,
+    initOrbitControls,
+    initOrthographicCamera,
+    initRenderer,
+    initScene
+} from "../lib/tools/common.js";
+import {
+    INTERSECTION,
+    SUBTRACTION,
+    ADDITION,
+    Brush,
+    Evaluator,
+    HOLLOW_INTERSECTION,
+    HOLLOW_SUBTRACTION
+} from '../lib/other/three-bvh-csg.js';
+
+window.onload = function () {
+    init()
+}
+
+function init() {
+    const scene = initScene();
+    const renderer = initRenderer();
+    const camera = initOrthographicCamera(new Vector3(0, 0, 20));
+    camera.up.set(0, 0, 1);
+    camera.lookAt(0, 0, 0);
+    initAmbientLight(scene);
+    const light = initDirectionLight();
+    light.position.set(20, -20, 20);
+    scene.add(light);
+    initCustomGrid(scene, 20, 20);
+    const coord = initCoordinates(5);
+    scene.add(coord);
+    const orbitControls = initOrbitControls(camera, renderer.domElement);
+
+    const box1Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0x999999 }));
+    const box2Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0xcccccc }));
+    box2Mesh.position.set(2, 2, 2);
+
+    const sphereMesh = new Mesh(new SphereGeometry(3, 32, 32), new MeshStandardMaterial({ color: 0xffff00 }));
+    sphereMesh.position.set(-2, -2, 2);
+
+    const tourKnotMesh = new Mesh(new TorusKnotGeometry(3, 1, 128, 32), new MeshStandardMaterial({ color: 0xff0000 }));
+    tourKnotMesh.position.set(0, 0, -2);
+
+
+    const meshes = [box1Mesh, box2Mesh, sphereMesh, tourKnotMesh];
+
+    const resultMesh = new Mesh(new BufferGeometry(), new MeshStandardMaterial({
+        roughness: 0.1,
+        flatShading: false,
+        polygonOffset: true,
+        polygonOffsetUnits: 1,
+        polygonOffsetFactor: 1,
+    }));
+
+    const wireframe = new Mesh(new BufferGeometry(), new MeshBasicMaterial({
+        color: 0x000000,
+        wireframe: true,
+        polygonOffset: true,
+        polygonOffsetUnits: 1,
+        polygonOffsetFactor: 1,
+    }));
+
+    scene.add(resultMesh);
+    scene.add(wireframe);
+
+    const controls = {
+        operation: INTERSECTION,
+        target: box1Mesh,
+        compare: box2Mesh
+    }
+
+    const gui = initGUI();
+    gui.add(controls, 'operation', {
+        INTERSECTION,
+        SUBTRACTION,
+        ADDITION,
+        HOLLOW_INTERSECTION,
+        HOLLOW_SUBTRACTION
+    }).onChange(updateCSG);
+
+    gui.add(controls, 'target', {
+        ...meshes
+    }).onChange(updateCSG);
+
+    gui.add(controls, 'compare', {
+        ...meshes
+    }).onChange(updateCSG);
+
+    gui.add(wireframe, 'visible').name('wireframe')
+
+    let evaluator = new Evaluator();
+    evaluator.attributes = ['position', 'normal', 'uv'];
+    evaluator.useGroups = false;
+
+    function updateCSG() {
+        meshes.forEach(mesh => scene.remove(mesh));
+
+        scene.add(controls.target);
+        scene.add(controls.compare);
+
+        const targetGeometry = controls.target.geometry.clone();
+        const compareGeometry = controls.compare.geometry.clone();
+        targetGeometry.applyMatrix4(controls.target.matrixWorld);
+        compareGeometry.applyMatrix4(controls.compare.matrixWorld);
+        const targetBrush = new Brush(targetGeometry);
+        const compareBrush = new Brush(compareGeometry);
+        evaluator.evaluate(targetBrush, compareBrush, controls.operation, resultMesh);
+
+        if (wireframe.visible) {
+            wireframe.geometry.dispose();
+            wireframe.geometry = resultMesh.geometry.clone();
+        }
+    }
+
+    function render() {
+        orbitControls.update();
+        renderer.render(scene, camera);
+    }
+
+    renderer.setAnimationLoop(render);
+
+    updateCSG();
+}
