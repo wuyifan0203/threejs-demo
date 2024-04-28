@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-26 13:06:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-26 18:01:15
+ * @LastEditTime: 2024-04-28 11:07:10
  * @FilePath: /threejs-demo/src/booleanOperation/intersection.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -36,6 +36,7 @@ import {
     HOLLOW_INTERSECTION,
     HOLLOW_SUBTRACTION
 } from '../lib/other/three-bvh-csg.js';
+import { TransformControls } from '../lib/three/TransformControls.js';
 
 window.onload = function () {
     init()
@@ -56,26 +57,40 @@ function init() {
     scene.add(coord);
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-    const box1Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0x999999 }));
-    const box2Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0xcccccc }));
+    const transformControls = new TransformControls(camera, renderer.domElement);
+    scene.add(transformControls);
+
+    const box1Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0x999999, }));
+    const box2Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0xcccccc, }));
     box2Mesh.position.set(2, 2, 2);
 
-    const sphereMesh = new Mesh(new SphereGeometry(3, 32, 32), new MeshStandardMaterial({ color: 0xffff00 }));
+    const sphereMesh = new Mesh(new SphereGeometry(3, 32, 32), new MeshStandardMaterial({ color: 0xffff00, }));
     sphereMesh.position.set(-2, -2, 2);
 
-    const tourKnotMesh = new Mesh(new TorusKnotGeometry(3, 1, 128, 32), new MeshStandardMaterial({ color: 0xff0000 }));
+    const tourKnotMesh = new Mesh(new TorusKnotGeometry(3, 1, 128, 32), new MeshStandardMaterial({ color: 0xff0000, }));
     tourKnotMesh.position.set(0, 0, -2);
+
+    transformControls.addEventListener('mouseDown', () => {
+        orbitControls.enabled = false;
+    });
+
+    transformControls.addEventListener('mouseUp', () => {
+        orbitControls.enabled = true;
+    })
+
 
 
     const meshes = [box1Mesh, box2Mesh, sphereMesh, tourKnotMesh];
 
-    const resultMesh = new Mesh(new BufferGeometry(), new MeshStandardMaterial({
+    const resultMeshMaterial = new MeshStandardMaterial({
         roughness: 0.1,
-        flatShading: false,
+        metalness: 0,
+        color: '#049ef4',
         polygonOffset: true,
-        polygonOffsetUnits: 1,
-        polygonOffsetFactor: 1,
-    }));
+        polygonOffsetUnits: 2,
+        polygonOffsetFactor: -100,
+    })
+    const resultMesh = new Mesh(new BufferGeometry(), resultMeshMaterial);
 
     const wireframe = new Mesh(new BufferGeometry(), new MeshBasicMaterial({
         color: 0x000000,
@@ -83,16 +98,21 @@ function init() {
         polygonOffset: true,
         polygonOffsetUnits: 1,
         polygonOffsetFactor: 1,
+        depthTest: false,
+        side: 2
     }));
+    wireframe.visible = false;
 
     scene.add(resultMesh);
     scene.add(wireframe);
 
     const controls = {
-        operation: INTERSECTION,
+        operation: SUBTRACTION,
         target: box1Mesh,
         compare: box2Mesh
     }
+
+    transformControls.attach(controls.compare);
 
     const gui = initGUI();
     gui.add(controls, 'operation', {
@@ -104,14 +124,18 @@ function init() {
     }).onChange(updateCSG);
 
     gui.add(controls, 'target', {
-        ...meshes
+        box1Mesh, box2Mesh, sphereMesh, tourKnotMesh
     }).onChange(updateCSG);
 
     gui.add(controls, 'compare', {
-        ...meshes
+        box1Mesh, box2Mesh, sphereMesh, tourKnotMesh
     }).onChange(updateCSG);
 
-    gui.add(wireframe, 'visible').name('wireframe')
+    gui.add(wireframe, 'visible').name('wireframe');
+    gui.add(resultMesh, 'visible').name('Show ResultMesh').onChange(() => {
+        controls.target.visible = !resultMesh.visible;
+        controls.compare.visible = !resultMesh.visible;
+    });
 
     let evaluator = new Evaluator();
     evaluator.attributes = ['position', 'normal', 'uv'];
@@ -120,8 +144,13 @@ function init() {
     function updateCSG() {
         meshes.forEach(mesh => scene.remove(mesh));
 
+        controls.target.updateMatrixWorld(true);
+        controls.compare.updateMatrixWorld(true);
+
         scene.add(controls.target);
         scene.add(controls.compare);
+
+        transformControls.attach(controls.compare);
 
         const targetGeometry = controls.target.geometry.clone();
         const compareGeometry = controls.compare.geometry.clone();
@@ -130,13 +159,18 @@ function init() {
         const targetBrush = new Brush(targetGeometry);
         const compareBrush = new Brush(compareGeometry);
         evaluator.evaluate(targetBrush, compareBrush, controls.operation, resultMesh);
+        resultMesh.material = resultMeshMaterial;
 
         if (wireframe.visible) {
             wireframe.geometry.dispose();
             wireframe.geometry = resultMesh.geometry.clone();
         }
+
+        targetBrush.disposeCacheData();
+        compareBrush.disposeCacheData();
     }
 
+    transformControls.addEventListener('change', updateCSG)
     function render() {
         orbitControls.update();
         renderer.render(scene, camera);

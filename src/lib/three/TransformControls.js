@@ -87,7 +87,6 @@ class TransformControls extends Object3D {
 						_gizmo[ propName ] = value;
 
 						scope.dispatchEvent( { type: propName + '-changed', value: value } );
-						console.log(propName,value);
 						scope.dispatchEvent( _changeEvent );
 
 					}
