@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-30 14:42:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-30 18:02:15
+ * @LastEditTime: 2024-05-08 10:48:34
  * @FilePath: /threejs-demo/src/object/instanceMesh.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -11,7 +11,7 @@ import {
     Vector3,
     InstancedMesh,
     ConeGeometry,
-    CameraHelper,
+    Group,
     Mesh,
     MeshStandardMaterial,
     Matrix4,
@@ -24,7 +24,6 @@ import {
     initOrbitControls,
     initAmbientLight,
     initDirectionLight,
-    initCoordinates,
     initGUI
 } from '../lib/tools/index.js';
 
@@ -53,8 +52,6 @@ function init() {
     scene.add(light);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    const coord = initCoordinates();
-    scene.add(coord);
 
     const geometry = new ConeGeometry(1.5, 4, 12, 1);
     geometry.applyMatrix4(new Matrix4().makeRotationX(Math.PI / 2));
@@ -66,11 +63,14 @@ function init() {
     instancedMesh.receiveShadow = instancedMesh.castShadow = true;
     scene.add(instancedMesh);
 
+    const operation = {
+        useInstanceMesh: true
+    }
+
     const gui = initGUI();
     const drawCallGUI = gui.add(renderer.info.render, 'calls').name('Draw Call Times:');
     drawCallGUI.disable();
 
-    // scene.add(new CameraHelper(light.shadow.camera));
 
     const dummy = new Object3D();
     for (let j = 0, k = instancedMesh.count, q = Math.floor(Math.sqrt(k)), p = q / 2; j < k; j++) {
@@ -83,10 +83,28 @@ function init() {
         instancedMesh.setMatrixAt(j, dummy.matrix);
     }
 
-    const mesh = new Mesh(geometry, meshMaterial);
-    scene.add(mesh);
+    const meshGroup = new Group();
+    for (let j = 0, q = Math.floor(Math.sqrt(10000)),p = q / 2; j < 10000; j++) {
+        const mesh = new Mesh(geometry, meshMaterial);
+        const x = j % q;
+        const y = Math.floor(j / q);
 
+        mesh.position.set((x - p) * 4, (y - p) * 4, 0);
+        mesh.rotation.set(x * 0.1, y * 0.1, 0);
+        mesh.updateMatrix();
+        mesh.frustumCulled = false;
+        meshGroup.add(mesh);
+    }
 
+    gui.add(operation, 'useInstanceMesh').name('Use Instance Mesh').onChange((value) => {
+        if (value) {
+            scene.add(instancedMesh);
+            scene.remove(meshGroup);
+        } else {
+            scene.add(meshGroup);
+            scene.remove(instancedMesh);
+        }
+    });
 
     function render() {
         renderer.render(scene, camera);
