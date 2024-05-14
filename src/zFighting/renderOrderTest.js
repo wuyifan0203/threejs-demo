@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 13:14:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 20:25:39
+ * @LastEditTime: 2024-05-13 14:44:18
  * @FilePath: /threejs-demo/src/zFighting/renderOrderTest.js
  */
 import {
@@ -15,9 +15,9 @@ import {
 } from '../lib/three/three.module.js';
 import {
     initCustomGrid,
-    initRenderer, 
-    initScene, 
-    resize, 
+    initRenderer,
+    initScene,
+    resize,
     initGUI,
     initDirectionLight,
     initOrbitControls
@@ -80,30 +80,35 @@ function init() {
     const mesh = new Mesh(geometry, redMaterial);
     mesh.scale.set(10, 5, 2);
     mesh.name = 'mesh-red';
+    mesh.renderOrder = 5;
     scene.add(mesh);
 
     const mesh2 = new Mesh(geometry, blueMaterial);
     mesh2.scale.set(10, 10, 0.2);
     mesh2.position.set(0, 0, 0);
     mesh2.name = 'mesh-blue';
+    mesh2.renderOrder = 2;
     scene.add(mesh2);
 
     const mesh3 = new Mesh(geometry, greenMaterial);
     mesh3.scale.set(3, 3, 1);
     mesh3.position.set(0, 0, 0.5);
     mesh3.name = 'mesh-green';
+    mesh3.renderOrder = 3;
     scene.add(mesh3);
 
     const mesh4 = new Mesh(geometry, yellowMaterial);
     mesh4.scale.set(5, 2, 1);
     mesh4.position.set(0, 0, 0.5);
     mesh4.name = 'mesh-yellow';
+    mesh4.renderOrder = 4;
     scene.add(mesh4);
 
     const mesh5 = new Mesh(geometry, skyBlueMaterial);
     mesh5.scale.set(2, 5, 1);
     mesh5.position.set(0, 3, 0.5);
     mesh5.name = 'mesh-skyBlue';
+    mesh5.renderOrder = 1;
     scene.add(mesh5);
 
     const objects = [mesh, mesh2, mesh3, mesh4, mesh5];
@@ -117,13 +122,20 @@ function init() {
         objectMaterial[obj.name]['Factor'] = obj.material.polygonOffsetFactor
     })
 
-    console.log(objectMaterial);
 
     const gui = initGUI();
-    const o = { usePolygonOffset: true }
+    const o = { usePolygonOffset: true, transparent: false }
     gui.add(o, 'usePolygonOffset').onChange((e) => {
         objects.forEach((o) => {
             o.material.polygonOffset = e;
+            o.material.needsUpdate = true;
+        })
+    })
+
+    gui.add(o, 'transparent').onChange((e) => {
+        objects.forEach((o) => {
+            o.material.transparent = e;
+            o.material.opacity = e ? 0.5 : 1;
             o.material.needsUpdate = true;
         })
     })

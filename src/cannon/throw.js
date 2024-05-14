@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-29 15:40:18
+ * @LastEditTime: 2024-05-14 17:53:57
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {

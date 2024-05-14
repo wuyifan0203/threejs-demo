@@ -87,9 +87,7 @@ class TextTerrain extends Object3D {
         const textTextureCanvas = createTextureCanvas(content);
         const canvasTexture = new CanvasTexture(textTextureCanvas);
         canvasTexture.anisotropy = anisotropy;
-        
-
-
+    
     }
 }
 
