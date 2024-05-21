@@ -1,0 +1,77 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-21 11:04:47
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-21 13:47:17
+ * @FilePath: /threejs-demo/src/canvas/learn/04.canvas案例一机器人.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+
+    function render(params) {
+        // 绘制机器人
+        // head
+        ctx.strokeStyle = '#000000';
+
+        ctx.lineWidth = 40;
+        ctx.fillRect(50, 250, 400, 200);
+        ctx.strokeRect(50, 250, 400, 200);
+        ctx.clearRect(50, 300, 400, 60);
+
+        // mouse
+        ctx.beginPath();
+        ctx.moveTo(150, 400);
+        ctx.lineTo(350, 400);
+        ctx.stroke();
+
+        // eye
+        ctx.beginPath();
+        ctx.arc(150, 330, 20, 0, Math.PI * 2);
+
+        ctx.moveTo(330, 340);
+
+        ctx.arc(330, 340, 20, 0, Math.PI, true);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(50, 50);
+        ctx.bezierCurveTo(150, 50, 150, 250, 250, 250);
+
+        ctx.moveTo(450, 50);
+        ctx.bezierCurveTo(350, 50, 350, 250, 250, 250);
+        ctx.stroke();
+    }
+
+
+    canvas.addEventListener('mousemove', function ({ clientX, clientY }) {
+        if (clientX > 30 && clientX < 470 && clientY < 470 && clientY > 230) {
+            ctx.fillStyle = '#ff0000'
+        } else {
+            ctx.fillStyle = '#000000'
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        render()
+    })
+
+
+</script>
+
+</html>

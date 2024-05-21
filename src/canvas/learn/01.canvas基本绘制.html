@@ -1,0 +1,34 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-20 14:43:39
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-20 16:04:09
+ * @FilePath: /threejs-demo/src/canvas/learn/01.canvas基本绘制.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     // canvas 有默认尺寸的 300 * 150
+    
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    // 设置画笔颜色 
+    ctx.fillStyle = 'rgb(255,0,0)';
+    // ctx.fillRect(左上角点位置x, 左上角点位置y, 宽度, 高度)
+    ctx.fillRect(10,10,55,55);
+    
+    
+</script>
+</html>

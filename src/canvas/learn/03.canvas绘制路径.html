@@ -1,0 +1,130 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-20 16:33:27
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-21 10:59:48
+ * @FilePath: /threejs-demo/src/canvas/learn/03.canvas绘制路径.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    // 新建ctx的时候会自动添加路径集合
+    const ctx = canvas.getContext('2d');
+
+    // 绘制路径
+    //1.开始建立路径 ctx.beginPath();
+    //2.移动到起始点 ctx.moveTo(x,y);
+    //3.绘制路径 ctx.lineTo(x,y);
+    //4.闭合路径 ctx.closePath();
+
+    //描边路径 ctx.stroke();
+    //填充路径 ctx.fill();
+    ctx.fillStyle = '#00acec';
+    ctx.strokeStyle = '#ff0000';
+
+    // 能绘制哪些
+    // 1.直线 lineTo(x,y)
+    ctx.beginPath();
+    ctx.moveTo(100, 100);
+    ctx.lineTo(100, 200);
+    ctx.lineTo(300, 200);
+    ctx.closePath();
+    // 改变线宽
+    ctx.lineWidth = 5;
+    // 绘制边缘
+    ctx.stroke();
+    ctx.fill();
+
+    // 2.圆 arc(x, y, radius, startAngle(Rad), endAngle(Rad), anticlockwise(boolean));
+    ctx.fillStyle = '#ff0000';
+    ctx.strokeStyle = '#00acec';
+    ctx.beginPath();
+    ctx.moveTo(500, 200);
+    ctx.arc(500, 200, 100, 0, Math.PI * 3 / 2, false);
+    ctx.closePath();
+    ctx.moveTo(700, 200);
+    ctx.arc(700, 200, 100, 0, Math.PI * 3 / 2, true);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+
+    // 3.切线圆弧 arcTo(x1, y1, x2, y2, radius);
+    // 黑色辅助线
+    ctx.strokeStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(100, 400);
+    ctx.lineTo(300, 400);
+    ctx.lineTo(300, 500);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#00ff0c';
+    ctx.beginPath();
+    ctx.moveTo(100, 400);
+    ctx.arcTo(300, 400, 300, 500, 100);
+    ctx.stroke();
+
+
+    // 4.二次贝塞尔曲线 quadraticCurveTo(cp1x, cp1y, x, y);
+    // 黑色辅助线
+    ctx.strokeStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(400, 400);
+    ctx.lineTo(700, 400);
+    ctx.lineTo(800, 500);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#00ffff';
+    ctx.beginPath();
+    ctx.moveTo(400, 400);
+    ctx.quadraticCurveTo(700, 400, 800, 500);
+    ctx.stroke();
+
+
+    // 5.三次贝塞尔曲线 bezierCurveTo(cp1x, cp1y, cp2x, cp2y, x, y);
+    // 黑色辅助线
+    ctx.strokeStyle = '#000000';
+    ctx.beginPath();
+    ctx.moveTo(100, 600);
+    ctx.lineTo(300, 600);
+    ctx.lineTo(300, 700);
+    ctx.lineTo(500, 700);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#ffff00';
+    ctx.beginPath();
+    // 起始点
+    ctx.moveTo(100, 600);
+    // 控制点1，控制点2，结束点
+    ctx.bezierCurveTo(300, 600, 300, 700, 500, 700);
+    ctx.stroke();
+
+
+    // 6.矩形 rect(x, y, width, height);
+    ctx.fillStyle = '#0000ff';
+    ctx.strokeStyle = '#ff0000';
+    ctx.beginPath();
+    // 内置 moveTo 方法
+    ctx.rect(100, 800, 100, 100);
+    // ctx.moveTo(700, 600);
+    ctx.rect(700, 600, 100, 100);
+    // ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+</script>
+
+</html>

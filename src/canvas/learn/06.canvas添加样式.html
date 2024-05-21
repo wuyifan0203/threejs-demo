@@ -1,0 +1,138 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-21 14:04:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-21 17:09:43
+ * @FilePath: /threejs-demo/src/canvas/learn/06.canvas添加样式.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    /**
+     * 图形着色区域
+     * 1.描边区域
+     *  strokeStyle:设置颜色
+     *  stroke():描边路径
+     *  strokeRect(x, y, width, height):描边矩形
+     *  strokeText(text, x, y, maxWidth):描边文本;
+     * 2.填充区域
+     *  fillStyle:设置颜色
+     *  fill():填充路径
+     *  fillRect(x, y, width, height):填充矩形
+     *  fillText(text, x, y, maxWidth):填充文本;
+    */
+
+    /**
+     * 图形着色方式
+     * 纯色，渐变，纹理
+     * 
+     * 1.纯色
+     * 1.1书写方式
+     * 支持颜色名称 如 “red”
+     * 支持16位颜色值 如 “#ff0000”
+     * 支持rgb()函数 如 “rgb(255, 0, 0)”
+     * 支持rgba()函数 如 “rgba(255, 0, 0, 0.5)”
+     * 1.2使用方式
+     * 1.2.1strokeStyle = 设置颜色
+     * 1.2.2fillStyle = 设置颜色
+     * 
+     * 2.渐变
+     * 2.1渐变方式
+     * 2.1.1线性渐变
+     * gradient = ctx.createLinearGradient(x0, y0, x1, y1);
+     * x0,y0:起点坐标
+     * x1,y1:终点坐标
+     * 2.1.2径向渐变
+     * gradient = ctx.createRadialGradient(x0, y0, r0, x1, y1, r1);
+     * 
+     * 2.2渐变节点
+     * gradient.addColorStop(position, color);
+     * position:以百分比为值
+     * 
+     * 2.3使用方式
+     * 2.3.1
+     * ctx.strokeStyle = gradient
+     * 2.3.2
+     * ctx.fillStyle = gradient
+     * 
+     * 3.纹理
+     * 3.1创建纹理对象
+     * texture = ctx.createPattern(image, repetition);
+     * image:图像对象
+     * repetition:平铺方式(repeat|repeat-x|repeat-y|no-repeat)
+    */
+
+    ctx.fillStyle = 'red';
+    ctx.fillStyle = '#ffff00';
+    ctx.fillStyle = 'rgb(0, 0, 255)';
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+
+
+    ctx.beginPath();
+    ctx.arc(200, 200, 100, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(200, 300, 100, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.strokeStyle = 'green';
+    ctx.beginPath();
+    ctx.arc(200, 400, 100, 0, Math.PI * 2);
+    ctx.lineWidth = 40;
+    ctx.stroke();
+
+
+    const linearGradient = ctx.createLinearGradient(500, 200, 700, 400);
+    linearGradient.addColorStop(0, 'red');
+    linearGradient.addColorStop(0.5, 'green');
+    linearGradient.addColorStop(1, 'blue');
+    ctx.fillStyle = linearGradient;
+
+    ctx.beginPath();
+    ctx.rect(500, 200, 200, 200);
+    ctx.fill();
+
+    const radialGradient = ctx.createRadialGradient(600, 700, 50, 600, 700, 100);
+    radialGradient.addColorStop(0, 'red');
+    radialGradient.addColorStop(0.5, 'yellow');
+    radialGradient.addColorStop(1, 'blue');
+    ctx.fillStyle = radialGradient;
+
+    ctx.beginPath();
+    ctx.rect(500, 600, 200, 200);
+    ctx.fill();
+
+
+
+    const img = new Image();
+    img.src = '../../../public/images/block/rock_wall_diff.jpg';
+    img.onload = function () {
+        const texture = ctx.createPattern(img, 'repeat');
+        ctx.fillStyle = texture;
+        ctx.beginPath();
+        ctx.rect(100, 600, 250, 250);
+        ctx.fill();
+    }
+
+
+
+</script>
+
+</html>

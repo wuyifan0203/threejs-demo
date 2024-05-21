@@ -1,0 +1,47 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-21 13:49:35
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-21 13:54:15
+ * @FilePath: /threejs-demo/src/canvas/learn/05.canvas案例二水滴.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const context = canvas.getContext('2d');
+
+    context.translate(canvas.width / 2, canvas.height / 2);
+
+
+    context.fillStyle='#00ecec';
+    
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.quadraticCurveTo(50, -50, 50, -100);
+    context.arc(0, -100, 50, 0, Math.PI, true);
+    context.quadraticCurveTo(-50, -50, 0, 0);
+    context.fill();
+    context.stroke();
+
+
+
+
+
+
+</script>
+
+</html>

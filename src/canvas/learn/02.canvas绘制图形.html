@@ -1,0 +1,52 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-20 16:04:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-20 16:29:17
+ * @FilePath: /threejs-demo/src/canvas/learn/02.canvas绘制图形.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+    // canvas 坐标系
+    // -----------> X
+    // |
+    // |
+    // |
+    //  Y 
+
+    ctx.fillStyle = '#ff0000';
+
+    // 填充矩形
+    ctx.fillRect(100, 100, 100, 100);
+    // 填充基点在左上角
+
+
+    // 描边矩形
+    /// 填充线颜色
+    ctx.lineWidth = "#000000";
+    ctx.strokeRect(250, 100, 100, 100);
+
+
+    // 清除矩形
+    ctx.clearRect(125, 125, 50, 50);
+
+
+</script>
+
+</html>
