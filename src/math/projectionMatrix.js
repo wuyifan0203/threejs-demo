@@ -1,0 +1,123 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-21 17:18:04
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-22 17:59:10
+ * @FilePath: /threejs-demo/src/math/projectionMatrix.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
+
+
+import {
+    BoxGeometry,
+    CameraHelper,
+    Mesh,
+    MeshBasicMaterial,
+    OrthographicCamera,
+    Vector3,
+    Frustum,
+    Box3
+} from '../lib/three/three.module.js';
+import {
+    initOrbitControls,
+    initOrthographicCamera,
+    initRenderer,
+    initScene
+} from '../lib/tools/common.js'
+
+window.onload = function () {
+    init();
+}
+
+function init() {
+    const renderer = initRenderer();
+    const scene = initScene();
+
+    const aspect = window.innerWidth / window.innerHeight;
+    const camera = new OrthographicCamera(-5, 5, 5 / aspect, -5 / aspect, 1, 20);
+    camera.up.set(0, 0, 1);
+    camera.position.set(0, 10, 0);
+    camera.lookAt(0, 0, 0);
+
+
+    const mesh = new Mesh(
+        new BoxGeometry(12, 2, 1),
+        new MeshBasicMaterial({ color: 'red' })
+    );
+
+    const helper = new CameraHelper(camera);
+    scene.add(helper);
+
+    const renderCamera = initOrthographicCamera(new Vector3(0, 20, 0));
+    renderCamera.up.set(0, 0, 1);
+
+    const orbitControls = initOrbitControls(renderCamera, renderer.domElement);
+
+    function render() {
+
+        const [width, height] = [window.innerWidth, window.innerHeight];
+        orbitControls.update();
+
+        renderer.setClearColor(0xffffff);
+        renderer.setViewport(0, 0, width, height);
+        renderer.setScissor(0, 0, width, height);
+        helper.visible = true;
+        renderer.render(scene, renderCamera);
+
+        renderer.setClearColor(0xeeeeee);
+        renderer.clearDepth();
+
+        renderer.setScissorTest(true);
+        renderer.setViewport(0, 0, width * 0.3, height * 0.3);
+        renderer.setScissor(0, 0, width * 0.3, height * 0.3);
+        helper.visible = false;
+        renderer.render(scene, camera);
+
+        renderer.setScissorTest(false);
+
+    }
+
+    function addObject(mesh) {
+        mesh.geometry.boundingBox === null && mesh.geometry.computeBoundingBox();
+        if (testOverFrustum(camera, mesh)) {
+            updateCameraFrustum(camera, mesh);
+        }
+        scene.add(mesh);
+    }
+    addObject(mesh);
+
+    renderer.setAnimationLoop(render);
+}
+const v1 = new Vector3();
+const v2 = new Vector3();
+const _cameraBox = new Box3();
+
+const _box = new Box3();
+
+function testOverFrustum({ left, right, top, bottom, near, far }, mesh) {
+    v1.set(right, top, far);
+    v2.set(left, bottom, near);
+    _cameraBox.set(v1, v2);
+
+    _box.copy(mesh.geometry.boundingBox);
+    _box.applyMatrix4(mesh.matrixWorld);
+
+    return _cameraBox.containsBox(mesh.geometry.boundingBox)
+}
+
+
+function updateCameraFrustum(camera, mesh) {
+    const rangeX = camera.right - camera.left;
+    const rangeY = camera.top - camera.bottom;
+    const rangeZ = camera.far - camera.near;
+
+    const currentX = _box.max.x - _box.min.x;
+    const currentY = _box.max.y - _box.min.y;
+    const currentZ = _box.max.z - _box.min.z;
+
+    const [xRes, yRes, zRes] = [currentX / rangeX, currentY / rangeY, currentZ / rangeZ];
+
+    if () {
+
+    }
+}
