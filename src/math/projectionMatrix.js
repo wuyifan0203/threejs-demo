@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-21 17:18:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-22 17:59:10
+ * @LastEditTime: 2024-05-23 16:39:19
  * @FilePath: /threejs-demo/src/math/projectionMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -77,9 +77,11 @@ function init() {
 
     }
 
+    console.log(camera.clone());
+
     function addObject(mesh) {
         mesh.geometry.boundingBox === null && mesh.geometry.computeBoundingBox();
-        if (testOverFrustum(camera, mesh)) {
+        if (!testOverFrustum(camera, mesh)) {
             updateCameraFrustum(camera, mesh);
         }
         scene.add(mesh);
@@ -117,7 +119,15 @@ function updateCameraFrustum(camera, mesh) {
 
     const [xRes, yRes, zRes] = [currentX / rangeX, currentY / rangeY, currentZ / rangeZ];
 
-    if () {
+    const scale = Math.max(xRes, yRes, zRes)
 
+    if (scale > 1) {
+        v1.set(rangeX, rangeY, rangeZ).addScalar(scale);
+        camera.near = 1;
+        camera.far = v1.z - 1;
+        camera.left = -v1.x / 2;
+        camera.right = v1.x / 2;
+        camera.top = v1.y / 2;
+        camera.bottom = -v1.y / 2;
     }
 }
