@@ -1,0 +1,79 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-27 14:06:25
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-27 16:55:21
+ * @FilePath: /threejs-demo/src/canvas/learn/10.canvas案例霓虹灯光晕.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    const colors = ['red', 'yellow'];
+    ctx.lineWidth = 10;
+
+    function draw() {
+        ctx.save();
+        ctx.translate(300, 400);
+
+        ctx.beginPath();
+
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(-200, -50, -180, -300, 0, -200);
+        ctx.bezierCurveTo(180, -300, 200, -50, 0, 0);
+
+        // 先画原始的红线
+        ctx.strokeStyle = colors[0];
+        ctx.setLineDash([30]);
+        ctx.stroke();
+
+        // 然后画偏移的黄线
+        ctx.strokeStyle = colors[1];
+        ctx.setLineDash([30]);
+        ctx.lineDashOffset = 30;
+        ctx.shadowColor = 'orange';
+        ctx.shadowBlur = 50;
+
+
+        for (let i = 50; i > 0; i = i - 5) {
+            ctx.shadowBlur = i;
+            ctx.stroke();
+        }
+        ctx.restore();
+
+    }
+
+
+    let t1 = 0;
+    function animate(t = 0) {
+        const t2 = t % 200;
+        if (t1 > t2) {
+            colors.reverse();
+            // 需要清空之前的绘制的霓虹效果
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            draw();
+        }
+        t1 = t2;
+        requestAnimationFrame(animate)
+    }
+    animate();
+
+
+</script>
+
+</html>

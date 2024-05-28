@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-21 17:18:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-23 16:39:19
+ * @LastEditTime: 2024-05-28 11:17:59
  * @FilePath: /threejs-demo/src/math/projectionMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -15,7 +15,7 @@ import {
     MeshBasicMaterial,
     OrthographicCamera,
     Vector3,
-    Frustum,
+    Matrix4,
     Box3
 } from '../lib/three/three.module.js';
 import {
@@ -77,7 +77,18 @@ function init() {
 
     }
 
-    console.log(camera.clone());
+    const { left, right, top, bottom, near, far, zoom, projectionMatrix } = camera.clone()
+
+    console.log({
+        left,
+        right,
+        top,
+        bottom,
+        near,
+        far,
+        zoom,
+        projectionMatrix
+    });
 
     function addObject(mesh) {
         mesh.geometry.boundingBox === null && mesh.geometry.computeBoundingBox();
@@ -121,6 +132,8 @@ function updateCameraFrustum(camera, mesh) {
 
     const scale = Math.max(xRes, yRes, zRes)
 
+    console.log(scale);
+
     if (scale > 1) {
         v1.set(rangeX, rangeY, rangeZ).addScalar(scale);
         camera.near = 1;
@@ -129,5 +142,22 @@ function updateCameraFrustum(camera, mesh) {
         camera.right = v1.x / 2;
         camera.top = v1.y / 2;
         camera.bottom = -v1.y / 2;
+
+        camera.zoom = v1.x * camera.zoom / rangeX;
+
+        camera.updateProjectionMatrix();
+
+        const { left, right, top, bottom, near, far, zoom, projectionMatrix } = camera.clone();
+
+        console.log({
+            left,
+            right,
+            top,
+            bottom,
+            near,
+            far,
+            zoom,
+            projectionMatrix
+        });
     }
 }

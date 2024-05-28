@@ -1,0 +1,42 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-27 16:04:22
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-27 16:24:36
+ * @FilePath: /threejs-demo/src/canvas/learn/09.canvas投影.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    // 需要在绘制前设置阴影属性
+    ctx.shadowColor = '#000';
+    ctx.shadowOffsetX = 30;
+    ctx.shadowOffsetY = 30;
+    ctx.shadowBlur = 30;
+
+
+    ctx.beginPath();
+    ctx.arc(200, 200, 100, 0, Math.PI * 2, false);
+    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+    ctx.fill();
+
+
+</script>
+
+</html>

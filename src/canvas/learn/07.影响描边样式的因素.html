@@ -1,0 +1,126 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-05-27 10:31:31
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-27 14:05:12
+ * @FilePath: /threejs-demo/src/canvas/learn/07.影响描边样式的因素.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="canvas"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext('2d');
+
+    //  描边样式 strokeStyle='color';
+    ctx.strokeStyle = '#00ac36';
+
+    // 描边宽度 lineWidth=width;
+    ctx.lineWidth = 40;
+
+    // 描边样式 lineCap='butt | round | square'; (默认值为butt)
+    ctx.save();
+    ctx.lineCap = 'butt';
+    ctx.beginPath();
+    ctx.moveTo(50, 100);
+    ctx.lineTo(350, 100);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(50, 200);
+    ctx.lineTo(350, 200);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.lineCap = 'square';
+    ctx.beginPath();
+    ctx.moveTo(50, 300);
+    ctx.lineTo(350, 300);
+    ctx.stroke();
+    ctx.restore();
+
+    // 极角类型 lineJoin='miter | round | bevel'; (默认值为miter)
+
+    // 什么是斜接（Miter）？
+    // 当两条线段在一个尖锐的角度相交时，斜接会延伸线条的外边缘，形成一个尖角。这种连接方式称为斜接。默认情况下，Canvas 使用斜接连接来处理线条连接处。
+
+    ctx.save();
+    ctx.lineJoin = 'miter';
+    // miterLimit 的作用？
+    // miterLimit 是一个正数值，表示斜接长度与线条宽度的最大比率,属性用于控制斜接的长度。当斜接长度超过 miterLimit 指定的值时，Canvas 会自动将斜接转换为圆角。
+    ctx.miterLimit = 3;
+    ctx.beginPath();
+    ctx.moveTo(450, 100);
+    ctx.lineTo(650, 100);
+    ctx.lineTo(500, 200);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineJoin = 'round';
+    ctx.moveTo(450, 300);
+    ctx.lineTo(650, 300);
+    ctx.lineTo(500, 400);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineJoin = 'bevel';
+    ctx.moveTo(450, 500);
+    ctx.lineTo(650, 500);
+    ctx.lineTo(500, 600);
+    ctx.stroke();
+    ctx.restore();
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.moveTo(50, 700);
+    ctx.lineTo(650, 700);
+    ctx.stroke();
+    ctx.restore();
+
+    // 设置虚线间隔 setLineDash(Array<number>)
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.setLineDash([30, 5, 100, 5]);
+    ctx.moveTo(50, 750);
+    ctx.lineTo(650, 750);
+    ctx.stroke();
+    ctx.restore();
+
+    // 设置虚线偏移量 lineDashOffset=number;
+    ctx.save();
+    ctx.beginPath();
+    ctx.lineWidth = 3;
+    ctx.setLineDash([30, 5, 100, 5]);
+    ctx.lineDashOffset = 35;
+    ctx.moveTo(50, 800);
+    ctx.lineTo(650, 800);
+    ctx.stroke();
+    ctx.restore();
+
+
+
+</script>
+
+</html>

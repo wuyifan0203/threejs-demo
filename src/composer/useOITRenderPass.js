@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-23 16:32:30
+ * @LastEditTime: 2024-05-27 17:35:35
  * @FilePath: /threejs-demo/src/composer/useOITRenderPass.js
  */
 
@@ -172,7 +172,7 @@ async function init() {
 
     resize();
 
-    render();
+    renderer.setAnimationLoop(render)
 
 
     function resize() {
