@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-21 17:18:04
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-28 11:17:59
+ * @LastEditTime: 2024-05-29 10:51:44
  * @FilePath: /threejs-demo/src/math/projectionMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -15,7 +15,6 @@ import {
     MeshBasicMaterial,
     OrthographicCamera,
     Vector3,
-    Matrix4,
     Box3
 } from '../lib/three/three.module.js';
 import {
@@ -41,39 +40,45 @@ function init() {
 
 
     const mesh = new Mesh(
-        new BoxGeometry(12, 2, 1),
+        new BoxGeometry(120, 2, 1),
         new MeshBasicMaterial({ color: 'red' })
     );
 
+    mesh.frustumCulled = false
+
     const helper = new CameraHelper(camera);
-    scene.add(helper);
+    mesh.add(helper);
 
     const renderCamera = initOrthographicCamera(new Vector3(0, 20, 0));
     renderCamera.up.set(0, 0, 1);
 
-    const orbitControls = initOrbitControls(renderCamera, renderer.domElement);
+    const orbitControls = initOrbitControls(camera, renderer.domElement);
 
     function render() {
 
         const [width, height] = [window.innerWidth, window.innerHeight];
         orbitControls.update();
 
-        renderer.setClearColor(0xffffff);
-        renderer.setViewport(0, 0, width, height);
-        renderer.setScissor(0, 0, width, height);
-        helper.visible = true;
-        renderer.render(scene, renderCamera);
+        // renderer.setClearColor(0xffffff);
+        // renderer.setViewport(0, 0, width, height);
+        // renderer.setScissor(0, 0, width, height);
+        // helper.visible = true;
+        // renderer.render(scene, renderCamera);
 
-        renderer.setClearColor(0xeeeeee);
-        renderer.clearDepth();
+        // renderer.setClearColor(0xeeeeee);
+        // renderer.clearDepth();
 
-        renderer.setScissorTest(true);
-        renderer.setViewport(0, 0, width * 0.3, height * 0.3);
-        renderer.setScissor(0, 0, width * 0.3, height * 0.3);
-        helper.visible = false;
+        // renderer.setScissorTest(true);
+        // renderer.setViewport(0, 0, width * 0.3, height * 0.3);
+        // renderer.setScissor(0, 0, width * 0.3, height * 0.3);
+        // helper.visible = false;
+        // renderer.render(scene, camera);
+
+        // renderer.setScissorTest(false);
+
+        // case 2
         renderer.render(scene, camera);
-
-        renderer.setScissorTest(false);
+        // helper.update();
 
     }
 
@@ -90,14 +95,18 @@ function init() {
         projectionMatrix
     });
 
-    function addObject(mesh) {
-        mesh.geometry.boundingBox === null && mesh.geometry.computeBoundingBox();
-        if (!testOverFrustum(camera, mesh)) {
-            updateCameraFrustum(camera, mesh);
-        }
-        scene.add(mesh);
-    }
-    addObject(mesh);
+    // function addObject(mesh) {
+    //     mesh.geometry.boundingBox === null && mesh.geometry.computeBoundingBox();
+    //     if (!testOverFrustum(camera, mesh)) {
+    //         updateCameraFrustum(camera, mesh);
+    //         helper.update();
+    //     }
+    //     scene.add(mesh);
+    // }
+    // addObject(new Mesh(new BoxGeometry(2, 2, 2), new MeshBasicMaterial({ color: "yellow" })))
+    // addObject(mesh);
+
+    scene.add(mesh);
 
     renderer.setAnimationLoop(render);
 }
@@ -138,12 +147,12 @@ function updateCameraFrustum(camera, mesh) {
         v1.set(rangeX, rangeY, rangeZ).addScalar(scale);
         camera.near = 1;
         camera.far = v1.z - 1;
-        camera.left = -v1.x / 2;
-        camera.right = v1.x / 2;
-        camera.top = v1.y / 2;
-        camera.bottom = -v1.y / 2;
+        camera.left *= scale;
+        camera.right *= scale;
+        camera.top *= scale;
+        camera.bottom *= scale;
 
-        camera.zoom = v1.x * camera.zoom / rangeX;
+        camera.zoom = camera.zoom * scale;
 
         camera.updateProjectionMatrix();
 

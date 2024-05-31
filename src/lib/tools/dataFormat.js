@@ -1,10 +1,11 @@
 /*
+ * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-06-19 14:33:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-07-19 13:18:31
- * @FilePath: /threejs-demo/packages/lib/tools/dataFormat.js
+ * @LastEditTime: 2024-05-31 16:37:41
+ * @FilePath: /threejs-demo/src/lib/tools/dataFormat.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-
 import { Vector2, Vector3 } from "../three/three.module.js";
 function vec2ToVec3Vertex(pointList, h = 0) {
   const vertices = [];

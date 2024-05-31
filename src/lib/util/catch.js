@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-19 17:43:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-22 13:59:35
+ * @LastEditTime: 2024-05-31 16:39:49
  * @FilePath: /threejs-demo/src/lib/util/catch.js
  */
 import { Vector2, WebGLRenderTarget, WebGLRenderer, ShaderMaterial } from "../three/three.module.js";
@@ -28,7 +28,7 @@ function catchRenderTarget(renderer, target) {
 
         const pixels = new Uint8Array(width * height * 4);
         renderer.readRenderTargetPixels(target, 0, 0, width, height, pixels);
-    
+
         const imageData = ctx.createImageData(width, height);
 
         imageData.data.set(pixels);
@@ -84,7 +84,7 @@ function catchTexture(texture, renderer, target) {
 
         quad.render(renderer);
 
-        const result =  catchRenderTarget(renderer, target);
+        const result = catchRenderTarget(renderer, target);
 
         renderer.setRenderTarget(originTarget);
 

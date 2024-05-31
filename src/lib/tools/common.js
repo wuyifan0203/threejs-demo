@@ -1,3 +1,11 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2023-11-21 16:26:11
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-31 16:36:38
+ * @FilePath: /threejs-demo/src/lib/tools/common.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 import {
   WebGLRenderer,
   PCFSoftShadowMap,
@@ -191,8 +199,8 @@ function initOrbitControls(camera, container) {
   return controls;
 }
 
-function initGUI() {
-  return new GUI()
+function initGUI(params) {
+  return new GUI(params)
 }
 function initScene() {
   const scene = new Scene();
@@ -287,7 +295,7 @@ function createBackgroundTexture(color, color2) {
 function initStats(showPanel = 0) {
   const stats = new Stats();
   stats.showPanel(showPanel);
-  document.getElementById('webgl-output')?.appendChild(stats.dom);
+  window.document.body.appendChild(stats.dom);
   return stats;
 }
 

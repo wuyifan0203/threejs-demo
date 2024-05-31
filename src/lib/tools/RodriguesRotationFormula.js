@@ -1,4 +1,12 @@
 /*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2022-11-10 15:36:44
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-31 16:39:11
+ * @FilePath: /threejs-demo/src/lib/tools/RodriguesRotationFormula.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
+/*
  * _______________#########_______________________
  * ______________############_____________________
  * ______________#############____________________
@@ -25,12 +33,6 @@
  *              神兽保佑            永无BUG
  */
 
-/*
- * @Date: 2022-11-10 15:36:44
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2022-11-11 17:08:42
- * @FilePath: /aquaman/example/RodriguesRotationFormula.js
- */
 /* eslint-disable no-unused-vars */
 
 import { Vector3, Matrix4 } from '../three/three.module.js';

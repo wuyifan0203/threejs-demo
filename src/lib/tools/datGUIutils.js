@@ -1,8 +1,10 @@
 /*
+ * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-01-10 18:16:13
- * @LastEditors: wuyifan wuyifan@max-optics.com
- * @LastEditTime: 2023-01-11 13:41:41
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-31 16:38:14
  * @FilePath: /threejs-demo/src/lib/tools/datGUIutils.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 export function addMaterialGUI(gui,controls,material,name) {
     const folderName = name !== undefined ? name : 'Material';

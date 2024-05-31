@@ -1,3 +1,11 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2023-11-21 16:26:11
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-05-31 16:37:15
+ * @FilePath: /threejs-demo/src/lib/tools/colorMap.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 
 const colorMap = [
   [0, 0, 131.484375],
