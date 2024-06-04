@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-31 16:08:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-31 18:02:28
+ * @LastEditTime: 2024-06-04 20:59:01
  * @FilePath: /threejs-demo/src/animate/loadBot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -10,12 +10,12 @@ import {
     Vector2,
     Vector3,
     SkeletonHelper,
-    AnimationMixer
+    AnimationMixer,
+    Clock
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
     initOrthographicCamera,
-    initSpotLight,
     initGroundPlane,
     initOrbitControls,
     initScene,
@@ -23,13 +23,35 @@ import {
     initAmbientLight,
     initStats,
     initDirectionLight,
-    initCustomGrid
+    initCustomGrid,
+    resize
 } from '../lib/tools/index.js';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { AnimationUtils } from '../lib/three/AnimationUtils.js';
 
 window.onload = () => {
     init();
 };
+
+const baseActions = {
+    idle: { weight: 1 },
+    walk: { weight: 0 },
+    run: { weight: 0 }
+};
+
+const additiveActions = {
+    sneak_pose: { weight: 0 },
+    sad_pose: { weight: 0 },
+    agree: { weight: 0 },
+    headShake: { weight: 0 }
+};
+
+const panelSetting = {
+    timeScale: 1,
+    currentBaseAction: 'idle',
+}
+
+const crossFadeControls = [];
 
 async function init() {
     const renderer = initRenderer({});
@@ -54,11 +76,16 @@ async function init() {
 
     initGUIPanel(botInfo)
 
+    const clock = new Clock()
+
     function render() {
         orbitControl.update();
         renderer.render(scene, camera);
+        botInfo.mixer.update(clock.getDelta())
     }
-    renderer.setAnimationLoop(render)
+    renderer.setAnimationLoop(render);
+
+    resize(renderer, camera)
 }
 
 async function loadBot(scene) {
@@ -77,30 +104,104 @@ async function loadBot(scene) {
     const actionsMap = {};
     const mixer = new AnimationMixer(mesh);
     animations.forEach(clip => {
-        const action = mixer.clipAction(clip);
-        actionsMap[clip.name] = {};
-        actionsMap[clip.name]['action'] = action;
-        actionsMap[clip.name]['weight'] = 0;
-        allActions.push(action);
+        const name = clip.name;
+        if (baseActions[name]) {
+            const action = mixer.clipAction(clip);
+            baseActions[name]['action'] = action;
+            activeAction(action);
+            allActions.push(action);
+        } else if (additiveActions[name]) {
+            AnimationUtils.makeClipAdditive(clip);
+            if (clip.name.endsWith('_pose')) {
+                clip = AnimationUtils.subclip(clip, clip.name, 2, 3, 30)
+            }
+            const action = mixer.clipAction(clip);
+            additiveActions[name]['action'] = action;
+            activeAction(action);
+            allActions.push(action);
+        }
+
     });
 
     return {
         helper,
         mesh,
         actionsMap,
-        allActions
+        allActions,
+        mixer
     }
 }
 
-function initGUIPanel({ helper, actionsMap }) {
+function initGUIPanel({ helper, mixer }) {
     const gui = initGUI({ width: 310 });
     const meshFolder = gui.addFolder('Mesh');
     meshFolder.add(helper, 'visible').name('skeletonHelper visible');
 
-    const animateFolder = gui.addFolder('Animate');
-    Object.keys(actionsMap).forEach((name) => {
-        const folder = animateFolder.addFolder(name.toUpperCase());
+    const baseActionsFolder = gui.addFolder('Base Action');
+    const additiveActionsFolder = gui.addFolder('Additive Actions Weights');
+    const speedFolder = gui.addFolder('General Speed');
+
+    const baseNames = ['None', ...Object.keys(baseActions)];
+
+    baseNames.forEach((name) => {
+        const actionSetting = baseActions[name];
+
+        panelSetting[name] = function () {
+            const currentSettings = baseActions[panelSetting.currentBaseAction];
+            const currentAction = currentSettings?.action ?? null;
+            const action = actionSetting?.action ?? null;
+
+            if (currentAction !== action) {
+                prepareCrossFade(currentAction, action, 0.35);
+            }
+        }
+
+        crossFadeControls.push(baseActionsFolder.add(panelSetting, name))
     })
 
+    for (const name of Object.keys(additiveActions)) {
+        const settings = additiveActions[name];
+        panelSetting[name] = settings.weight;
+        additiveActionsFolder.add(panelSetting, name, 0, 1, 0.01).listen().onChange((weight) => {
+            setWeight(settings.action, weight);
+            settings.weight = weight;
+        })
+    }
+
+    speedFolder.add(panelSetting, 'timeScale', 0.0, 1.5, 0.1).name('modify time scale').onChange(() => {
+        mixer.timeScale = speed;
+    });
+
+    crossFadeControls.forEach((control) => {
+        control.setInactive = () => {
+            control.domElement.classList.add('control-inactive');
+        }
+
+        control.setActive = () => {
+            control.domElement.classList.remove('control-inactive');
+        }
+
+        const settings = baseActions[control.property];
+        if (!settings || settings.weight === 0) {
+            control.setInactive();
+        }
+    })
+}
+
+function activeAction(action) {
+    const clip = action.getClip();
+    const settings = baseActions[clip.name] || additiveActions[clip.name];
+    setWeight(action, settings.weight)
+    action.play();
+}
+
+function setWeight(action, weight) {
+    action.enable = true;
+    action.setEffectiveTimeScale(1);
+    action.setEffectiveWeight(weight);
+}
+
+function prepareCrossFade(currentAction, action, wight) {
+    
 
 }
