@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-31 16:36:38
+ * @LastEditTime: 2024-06-07 15:40:08
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -292,6 +292,20 @@ function createBackgroundTexture(color, color2) {
   })();
 }
 
+/**
+ * @description: 用来展示FPS，内存等信息
+ * @param {number} showPanel
+ * @return {Stats}
+ * 
+ * @example
+ * 
+ * const status = initStats();
+ * 
+ * function render() {
+ *    // other code for render
+ *    status.update();
+ * }
+ */
 function initStats(showPanel = 0) {
   const stats = new Stats();
   stats.showPanel(showPanel);
