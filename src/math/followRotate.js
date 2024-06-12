@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-11 20:23:11
+ * @LastEditTime: 2024-06-12 21:00:28
  * @FilePath: /threejs-demo/src/math/followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -28,8 +28,16 @@ window.onload = () => {
     init();
 };
 
+const directionMap = {
+    POS_X: {
+        up: new Vector3(),
+        target: new Vector3(1, 0, 0)
+    }
+}
+
 function init() {
     const renderer = initRenderer({});
+    renderer.autoClear = false;
     const camera = initOrthographicCamera(new Vector3(0, 0, 500));
     camera.up.set(0, 0, 1)
     camera.zoom = 1;
@@ -45,13 +53,17 @@ function init() {
 
     initCustomGrid(scene);
 
+    const targetCoord = initCoordinates(2);
+    scene.add(targetCoord)
+
     const viewHelper = initViewHelper(camera, renderer.domElement);
     viewHelper.center.copy(orbitControl.target)
 
-    const coord = initCoordinates(5);
+    const coord = initCoordinates(10);
     scene.add(coord)
 
     function render() {
+        renderer.clear()
         orbitControl.update();
         renderer.render(scene, camera);
         coord.quaternion.copy(camera.quaternion)
@@ -60,5 +72,9 @@ function init() {
     }
     renderer.setAnimationLoop(render);
 
-    resize(renderer, camera)
+    resize(renderer, camera);
+
+    const gui = initGUI();
+
+    gui.add(coord, 'visible')
 }

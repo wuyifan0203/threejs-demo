@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-07 15:40:08
+ * @LastEditTime: 2024-06-12 20:45:58
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -38,6 +38,9 @@ import { ViewHelper } from '../three/viewHelper.js';
  * @return {WebGLRenderer}
  */
 function initRenderer(props = {}) {
+  const dom = document.getElementById('webgl-output');
+  
+
   const renderer = new WebGLRenderer({ antialias: true, ...props });
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
@@ -45,9 +48,9 @@ function initRenderer(props = {}) {
   renderer.setPixelRatio(devicePixelRatio);
 
   renderer.setClearColor(new Color(0xffffff));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.getElementById('webgl-output').appendChild(renderer.domElement);
+  renderer.setSize(dom.offsetWidth, dom.offsetHeight);
 
+  dom.appendChild(renderer.domElement);
   window.renderer = renderer;
 
   return renderer;
@@ -309,7 +312,8 @@ function createBackgroundTexture(color, color2) {
 function initStats(showPanel = 0) {
   const stats = new Stats();
   stats.showPanel(showPanel);
-  window.document.body.appendChild(stats.dom);
+  const dom = document.querySelector('#webgl-output')
+  dom.appendChild(stats.dom);
   return stats;
 }
 

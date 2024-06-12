@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-22 10:41:47
+ * @LastEditTime: 2024-06-12 20:22:38
  * @FilePath: /threejs-demo/src/intersection/boxSelection2.js
  */
 import {
@@ -33,8 +33,8 @@ function init() {
     camera.matrixWorldNeedsUpdate = true;
     camera.updateProjectionMatrix();
 
-    const coord = initCoordinates(3);
-    scene.add(coord);
+    // const coord = initCoordinates(3);
+    // scene.add(coord);
     initAxesHelper(scene);
     initCustomGrid(scene);
 
@@ -42,6 +42,9 @@ function init() {
 
 
     const viewHelper = new ViewHelper(camera, renderer.domElement);
+
+    const dummyCoord = initCoordinates(5);
+    viewHelper.dummy.add(dummyCoord);
 
     function render() {
         renderer.clear();
@@ -200,6 +203,7 @@ class ViewHelper extends Object3D {
         if (intersects.length) {
             const intersection = intersects[0];
             const normal = intersection.normal;
+            console.log(normal);
 
             this.prepareAnimationData(normal)
 
@@ -235,6 +239,8 @@ class ViewHelper extends Object3D {
 
 
         radius = this.camera.position.distanceTo(this.target);
+
+        console.log({ radius });
 
         targetPosition.multiplyScalar(radius).add(this.target);
 
