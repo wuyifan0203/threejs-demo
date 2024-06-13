@@ -2,11 +2,13 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-12 21:00:28
+ * @LastEditTime: 2024-06-13 20:59:24
  * @FilePath: /threejs-demo/src/math/followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
+    Matrix4,
+    Quaternion,
     Vector3,
 } from '../lib/three/three.module.js';
 import {
@@ -30,8 +32,12 @@ window.onload = () => {
 
 const directionMap = {
     POS_X: {
-        up: new Vector3(),
+        up: new Vector3(0,0,1),
         target: new Vector3(1, 0, 0)
+    },
+    NEG_X: {
+        up: new Vector3(0,0,1),
+        target: new Vector3(-1, 0, 0)
     }
 }
 
@@ -54,13 +60,21 @@ function init() {
     initCustomGrid(scene);
 
     const targetCoord = initCoordinates(2);
-    scene.add(targetCoord)
+    scene.add(targetCoord);
+    targetCoord.applyRotateDirection = function (direction) {
+        const directionInfo = directionMap[direction]
+        const matrix = new Matrix4().lookAt(new Vector3(0, 0, 0), directionInfo.target, directionInfo.up);
+        const quaternion = new Quaternion().setFromRotationMatrix(matrix);
+        targetCoord.quaternion.copy(quaternion);
+        targetCoord.updateMatrix();
+    }
 
     const viewHelper = initViewHelper(camera, renderer.domElement);
     viewHelper.center.copy(orbitControl.target)
 
     const coord = initCoordinates(10);
-    scene.add(coord)
+    scene.add(coord);
+    coord.visible = false
 
     function render() {
         renderer.clear()
@@ -76,5 +90,14 @@ function init() {
 
     const gui = initGUI();
 
-    gui.add(coord, 'visible')
+    const o = {
+        rotateDirection: 'POS_X'
+    }
+
+    gui.add(coord, 'visible');
+
+    gui.add(o, 'rotateDirection', ['POS_X', 'NEG_X']).onChange((e) => { 
+        console.log(e);
+        targetCoord.applyRotateDirection(e)
+    })
 }
