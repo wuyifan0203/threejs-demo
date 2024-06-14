@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-13 20:59:24
+ * @LastEditTime: 2024-06-14 18:01:07
  * @FilePath: /threejs-demo/src/math/followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -10,6 +10,7 @@ import {
     Matrix4,
     Quaternion,
     Vector3,
+    Clock
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -32,14 +33,34 @@ window.onload = () => {
 
 const directionMap = {
     POS_X: {
-        up: new Vector3(0,0,1),
-        target: new Vector3(1, 0, 0)
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(-1, 0, 0)
     },
     NEG_X: {
-        up: new Vector3(0,0,1),
-        target: new Vector3(-1, 0, 0)
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(1, 0, 0)
+    },
+    POS_Y: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(0, -1, 0)
+    },
+    NEG_Y: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(0, 1, 0)
+    },
+    POS_Z: {
+        up: new Vector3(0, 1, 0),
+        target: new Vector3(0, 0, -1)
+    },
+    NEG_Z: {
+        up: new Vector3(0, -1, 0),
+        target: new Vector3(0, 0, 1)
     }
 }
+
+const currentQuaternion = new Quaternion();
+const targetQuaternion = new Quaternion();
+const rotateMatrix = new Matrix4();
 
 function init() {
     const renderer = initRenderer({});
@@ -63,9 +84,9 @@ function init() {
     scene.add(targetCoord);
     targetCoord.applyRotateDirection = function (direction) {
         const directionInfo = directionMap[direction]
-        const matrix = new Matrix4().lookAt(new Vector3(0, 0, 0), directionInfo.target, directionInfo.up);
-        const quaternion = new Quaternion().setFromRotationMatrix(matrix);
-        targetCoord.quaternion.copy(quaternion);
+        rotateMatrix.lookAt(new Vector3(0, 0, 0), directionInfo.target, directionInfo.up);
+        targetQuaternion.setFromRotationMatrix(rotateMatrix);
+        targetCoord.quaternion.copy(targetQuaternion);
         targetCoord.updateMatrix();
     }
 
@@ -76,13 +97,33 @@ function init() {
     scene.add(coord);
     coord.visible = false
 
+    const o = {
+        rotateDirection: 'POS_Z',
+        isFollow: true,
+        animate: false,
+        rotate(){
+            currentQuaternion.q
+            
+        }
+    }
+
+    const clock = new Clock();
+
     function render() {
         renderer.clear()
         orbitControl.update();
         renderer.render(scene, camera);
-        coord.quaternion.copy(camera.quaternion)
+        if (o.isFollow) {
+            currentQuaternion.copy(camera.quaternion);
+            coord.quaternion.copy(currentQuaternion);
+        }
+
         stats.update()
-        viewHelper.render(renderer)
+        viewHelper.render(renderer);
+
+        if(o.animate){
+            
+        }
     }
     renderer.setAnimationLoop(render);
 
@@ -90,14 +131,12 @@ function init() {
 
     const gui = initGUI();
 
-    const o = {
-        rotateDirection: 'POS_X'
-    }
+
 
     gui.add(coord, 'visible');
-
-    gui.add(o, 'rotateDirection', ['POS_X', 'NEG_X']).onChange((e) => { 
+    gui.add(o, 'rotateDirection', ['POS_X', 'NEG_X', 'POS_Y', 'NEG_Y', 'POS_Z', 'NEG_Z']).onChange((e) => {
         console.log(e);
         targetCoord.applyRotateDirection(e)
-    })
+    });
+    gui.add(o, 'isFollow')
 }
