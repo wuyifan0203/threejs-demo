@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-14 18:01:07
+ * @LastEditTime: 2024-06-17 20:51:20
  * @FilePath: /threejs-demo/src/math/followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -90,22 +90,38 @@ function init() {
         targetCoord.updateMatrix();
     }
 
+
     const viewHelper = initViewHelper(camera, renderer.domElement);
     viewHelper.center.copy(orbitControl.target)
-
-    const coord = initCoordinates(10);
-    scene.add(coord);
-    coord.visible = false
 
     const o = {
         rotateDirection: 'POS_Z',
         isFollow: true,
         animate: false,
-        rotate(){
-            currentQuaternion.q
-            
+        apply() {
+            o.animate = true;
+            console.log('apply',o);
         }
     }
+
+    const coord = initCoordinates(10);
+    scene.add(coord);
+    coord.matrixWorldAutoUpdate = false;
+    coord.matrixAutoUpdate = false;
+
+    coord.update = function (dt) {
+        const step = dt * Math.PI * 0.1;
+        currentQuaternion.rotateTowards(targetQuaternion, step);
+        if (currentQuaternion.angleTo(targetQuaternion) === 0) {
+            o.animate = false;
+        }
+
+        coord.quaternion.copy(currentQuaternion);
+        coord.updateMatrix();
+    }
+    // coord.visible = false
+
+
 
     const clock = new Clock();
 
@@ -116,13 +132,14 @@ function init() {
         if (o.isFollow) {
             currentQuaternion.copy(camera.quaternion);
             coord.quaternion.copy(currentQuaternion);
+            coord.updateMatrix();
         }
 
         stats.update()
         viewHelper.render(renderer);
 
-        if(o.animate){
-            
+        if (o.animate) {
+            coord.update(clock.getDelta());
         }
     }
     renderer.setAnimationLoop(render);
@@ -132,11 +149,11 @@ function init() {
     const gui = initGUI();
 
 
-
     gui.add(coord, 'visible');
     gui.add(o, 'rotateDirection', ['POS_X', 'NEG_X', 'POS_Y', 'NEG_Y', 'POS_Z', 'NEG_Z']).onChange((e) => {
         console.log(e);
-        targetCoord.applyRotateDirection(e)
+        targetCoord.applyRotateDirection(e);
     });
-    gui.add(o, 'isFollow')
+    gui.add(o, 'isFollow');
+    gui.add(o, 'apply');
 }
