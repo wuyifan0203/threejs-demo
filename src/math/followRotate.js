@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-17 20:51:20
+ * @LastEditTime: 2024-06-19 20:30:25
  * @FilePath: /threejs-demo/src/math/followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -100,7 +100,7 @@ function init() {
         animate: false,
         apply() {
             o.animate = true;
-            console.log('apply',o);
+            console.log('apply', o);
         }
     }
 
@@ -110,12 +110,12 @@ function init() {
     coord.matrixAutoUpdate = false;
 
     coord.update = function (dt) {
-        const step = dt * Math.PI * 0.1;
+        const step = dt * Math.PI;
+        currentQuaternion.normalize();
         currentQuaternion.rotateTowards(targetQuaternion, step);
         if (currentQuaternion.angleTo(targetQuaternion) === 0) {
             o.animate = false;
         }
-
         coord.quaternion.copy(currentQuaternion);
         coord.updateMatrix();
     }
@@ -128,10 +128,11 @@ function init() {
     function render() {
         renderer.clear()
         orbitControl.update();
+        const dt = clock.getDelta()
         renderer.render(scene, camera);
         if (o.isFollow) {
             currentQuaternion.copy(camera.quaternion);
-            coord.quaternion.copy(currentQuaternion);
+            coord.quaternion.copy(camera.quaternion);
             coord.updateMatrix();
         }
 
@@ -139,7 +140,7 @@ function init() {
         viewHelper.render(renderer);
 
         if (o.animate) {
-            coord.update(clock.getDelta());
+            coord.update(dt);
         }
     }
     renderer.setAnimationLoop(render);

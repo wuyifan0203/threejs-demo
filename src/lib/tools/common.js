@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-12 20:45:58
+ * @LastEditTime: 2024-06-19 20:24:49
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -39,8 +39,9 @@ import { ViewHelper } from '../three/viewHelper.js';
  */
 function initRenderer(props = {}) {
   const dom = document.getElementById('webgl-output');
+  dom.style.width = '100vw';
+  dom.style.height = '100vh';
   
-
   const renderer = new WebGLRenderer({ antialias: true, ...props });
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;

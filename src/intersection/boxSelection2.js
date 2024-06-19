@@ -1,12 +1,26 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-12 20:22:38
+ * @LastEditTime: 2024-06-19 20:58:19
  * @FilePath: /threejs-demo/src/intersection/boxSelection2.js
  */
 import {
     BoxGeometry,
-    Mesh, Vector2, Vector3, MeshBasicMaterial, Quaternion, Euler, Clock, Object3D, Vector4, CanvasTexture, Color, OrthographicCamera, Raycaster, AxesHelper
+    Mesh,
+    Vector2,
+    Vector3,
+    MeshBasicMaterial,
+    Quaternion,
+    Euler,
+    Clock,
+    Object3D,
+    Vector4,
+    CanvasTexture,
+    Color,
+    OrthographicCamera,
+    Raycaster,
+    AxesHelper,
+    Matrix4
 } from '../lib/three/three.module.js'
 import {
     initAxesHelper,
@@ -58,8 +72,8 @@ function init() {
 
     const clock = new Clock();
     renderer.setAnimationLoop(() => {
+        const dt = clock.getDelta();
         if (viewHelper.animating) {
-            const dt = clock.getDelta();
             viewHelper.update(dt);
             render()
         }
@@ -207,7 +221,7 @@ class ViewHelper extends Object3D {
 
             this.prepareAnimationData(normal)
 
-            this.animating = true;
+            // this.animating = true;
         }
     }
 
@@ -216,23 +230,29 @@ class ViewHelper extends Object3D {
         console.log('Ypu click', normal);
 
         if (posX.equals(normal)) {
-            targetPosition.copy(posX);
-            targetUp.set(0, 0, 1);
-        } else if (negX.equals(normal)) {
             targetPosition.copy(negX);
             targetUp.set(0, 0, 1);
-        } else if (posY.equals(normal)) {
-            targetPosition.copy(posY);
+            console.log('posX');
+        } else if (negX.equals(normal)) {
+            targetPosition.copy(posX);
             targetUp.set(0, 0, 1);
-        } else if (negY.equals(normal)) {
+            console.log('negX');
+        } else if (posY.equals(normal)) {
             targetPosition.copy(negY);
             targetUp.set(0, 0, 1);
+            console.log('posY');
+        } else if (negY.equals(normal)) {
+            targetPosition.copy(posY);
+            targetUp.set(0, 0, 1);
+            console.log('negY');
         } else if (posZ.equals(normal)) {
-            targetPosition.copy(posZ);
-            targetUp.set(0, 1, 0);
-        } else if (negZ.equals(normal)) {
             targetPosition.copy(negZ);
+            targetUp.set(0, 1, 0);
+            console.log('posZ');
+        } else if (negZ.equals(normal)) {
+            targetPosition.copy(posZ);
             targetUp.set(0, -1, 0);
+            console.log('negZ');
         } else {
             console.error('ViewHelper: Invalid axis.');
         }
@@ -240,18 +260,16 @@ class ViewHelper extends Object3D {
 
         radius = this.camera.position.distanceTo(this.target);
 
-        console.log({ radius });
 
         targetPosition.multiplyScalar(radius).add(this.target);
 
         this.dummy.position.copy(this.target);
-        this.dummy.up.copy(this.camera.up);
         this.dummy.lookAt(this.camera.position);
-        q1.copy(this.dummy.quaternion);
+        q1.copy(this.camera.quaternion);
 
-        this.dummy.up.copy(targetUp);
-        this.dummy.lookAt(targetPosition);
-        q2.copy(this.dummy.quaternion);
+        const matrix = new Matrix4().lookAt(new Vector3(), targetPosition, targetUp)
+
+        q2.setFromRotationMatrix(matrix);
 
 
     }
