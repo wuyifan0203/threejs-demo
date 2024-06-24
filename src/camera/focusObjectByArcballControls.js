@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 14:05:59
+ * @LastEditTime: 2024-06-24 19:59:46
  * @FilePath: /threejs-demo/src/camera/focusObjectByArcballControls.js
  */
 
@@ -53,8 +53,6 @@ function init() {
     window.controls = controls;
     // controls.setGizmosVisible(false)
     controls.addEventListener('change', () => {
-        console.log(controls.target);
-        console.log(controls._gizmos.position);
         render()
     })
 
@@ -64,7 +62,6 @@ function init() {
     const coord = initCoordinates();
 
     function render() {
-        console.log('times');
         renderer.clear();
 
         light.position.copy(camera.position);

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-19 20:58:19
+ * @LastEditTime: 2024-06-24 20:47:52
  * @FilePath: /threejs-demo/src/intersection/boxSelection2.js
  */
 import {
@@ -11,7 +11,6 @@ import {
     Vector3,
     MeshBasicMaterial,
     Quaternion,
-    Euler,
     Clock,
     Object3D,
     Vector4,
@@ -42,24 +41,18 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, 0, 100));
     renderer.setClearColor(0xffffff, 1);
     renderer.autoClear = false;
-    camera.lookAt(0, 0, 10);
     camera.up.set(0, 0, 1);
-    camera.matrixWorldNeedsUpdate = true;
-    camera.updateProjectionMatrix();
+    camera.lookAt(0, 0, 0);
 
-    // const coord = initCoordinates(3);
-    // scene.add(coord);
+
+
     initAxesHelper(scene);
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-
-
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    const dummyCoord = initCoordinates(5);
-    viewHelper.dummy.add(dummyCoord);
-
+    scene.add(viewHelper.coord);
     function render() {
         renderer.clear();
         renderer.render(scene, camera);
@@ -77,6 +70,7 @@ function init() {
             viewHelper.update(dt);
             render()
         }
+        viewHelper.dummy.quaternion.copy(camera.quaternion);
     });
 
     render()
@@ -96,12 +90,9 @@ function init() {
             cursor.y = clientY;
             viewHelper.target.copy(controls.target);
             viewHelper.handelClick(cursor);
-
+            render()
         }
     })
-
-    // const axis = new AxesHelper(10);
-    // scene.add(axis)
 
 }
 
@@ -142,8 +133,37 @@ const posZ = new Vector3(0, 0, 1);
 const negZ = new Vector3(0, 0, -1);
 
 const targetPosition = new Vector3();
-const targetQuaternion = new Quaternion();
-const targetUp = new Vector3();
+const rotateMatrix = new Matrix4();
+const quaternion = new Quaternion();
+
+const eye = new Vector3(0, 0, 0);
+
+const rotateMap = {
+    POS_X: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(-1, 0, 0)
+    },
+    NEG_X: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(1, 0, 0)
+    },
+    POS_Y: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(0, -1, 0)
+    },
+    NEG_Y: {
+        up: new Vector3(0, 0, 1),
+        target: new Vector3(0, 1, 0)
+    },
+    POS_Z: {
+        up: new Vector3(0, 1, 0),
+        target: new Vector3(0, 0, -1)
+    },
+    NEG_Z: {
+        up: new Vector3(0, 1, 0),
+        target: new Vector3(0, 0, 1)
+    }
+}
 
 const animatePosition = new Vector3();
 
@@ -181,6 +201,10 @@ class ViewHelper extends Object3D {
 
         this.dummy = new AxesHelper(4);
 
+        this.coord = initCoordinates(3);
+
+
+
     }
 
     render(renderer) {
@@ -217,61 +241,45 @@ class ViewHelper extends Object3D {
         if (intersects.length) {
             const intersection = intersects[0];
             const normal = intersection.normal;
-            console.log(normal);
 
             this.prepareAnimationData(normal)
 
-            // this.animating = true;
+            this.animating = true;
         }
     }
 
     prepareAnimationData(normal) {
 
-        console.log('Ypu click', normal);
+        console.log('You click', normal);
 
+        let direction = ''
         if (posX.equals(normal)) {
-            targetPosition.copy(negX);
-            targetUp.set(0, 0, 1);
-            console.log('posX');
+            direction = "POS_X";
         } else if (negX.equals(normal)) {
-            targetPosition.copy(posX);
-            targetUp.set(0, 0, 1);
-            console.log('negX');
+            direction = "NEG_X";
         } else if (posY.equals(normal)) {
-            targetPosition.copy(negY);
-            targetUp.set(0, 0, 1);
-            console.log('posY');
+            direction = "POS_Y";
         } else if (negY.equals(normal)) {
-            targetPosition.copy(posY);
-            targetUp.set(0, 0, 1);
-            console.log('negY');
+            direction = "NEG_Y";
         } else if (posZ.equals(normal)) {
-            targetPosition.copy(negZ);
-            targetUp.set(0, 1, 0);
-            console.log('posZ');
+            direction = "POS_Z";
         } else if (negZ.equals(normal)) {
-            targetPosition.copy(posZ);
-            targetUp.set(0, -1, 0);
-            console.log('negZ');
+            direction = "NEG_Z";
         } else {
             console.error('ViewHelper: Invalid axis.');
         }
+        const { target, up } = rotateMap[direction];
+        rotateMatrix.lookAt(eye, target, up);
+        quaternion.setFromRotationMatrix(rotateMatrix);
 
-
+        this.coord.quaternion.copy(quaternion);
         radius = this.camera.position.distanceTo(this.target);
 
 
         targetPosition.multiplyScalar(radius).add(this.target);
 
-        this.dummy.position.copy(this.target);
-        this.dummy.lookAt(this.camera.position);
         q1.copy(this.camera.quaternion);
-
-        const matrix = new Matrix4().lookAt(new Vector3(), targetPosition, targetUp)
-
-        q2.setFromRotationMatrix(matrix);
-
-
+        q2.setFromRotationMatrix(rotateMatrix);
     }
 
     update(dt) {
