@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:16:42
+ * @LastEditTime: 2024-06-27 20:20:26
  * @FilePath: /threejs-demo/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
@@ -73,9 +73,11 @@ function init() {
     const modelMatrix = new Matrix4().makeTranslation(new Vector3(0, 1, 2));
     console.log({ modelMatrix });
 
+    const ndcMatrix =createNDCMatrix(1000, 800);
+    console.log({ ndcMatrix });
 
     // 立方体左下角坐标
-    const point = new Vector3(-2, -2, -2);
+    const point = new Vector3(2,-2,2);
 
     // 转换到实际坐标
 
@@ -95,7 +97,7 @@ function init() {
 
 
     // 投影坐标转屏幕坐标
-    const point4 = point3.clone().applyMatrix4(createNDCMatrix(1000, 800));
+    const point4 = point3.clone().applyMatrix4(ndcMatrix);
     console.log('屏幕坐标:', point4);
 
     function createNDCMatrix(width, height) {
@@ -103,7 +105,7 @@ function init() {
         const H = height / 2;
         return new Matrix4().set(
             W, 0, 0, W,
-            0, H, 0, H,
+            0, -H, 0, H,
             0, 0, 1, 0,
             0, 0, 0, 1
         )

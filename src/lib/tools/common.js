@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-19 20:24:49
+ * @LastEditTime: 2024-06-27 20:53:41
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -31,6 +31,7 @@ import { GUI } from '../util/lil-gui.module.min.js'
 import { CoordinateHelper } from '../three/CoordinateHelper.js';
 import { Stats } from '../util/Stats.js';
 import { ViewHelper } from '../three/viewHelper.js';
+import { TransformControls } from '../three/TransformControls.js';
 
 /**
  * @description: 初始化渲染器
@@ -41,7 +42,7 @@ function initRenderer(props = {}) {
   const dom = document.getElementById('webgl-output');
   dom.style.width = '100vw';
   dom.style.height = '100vh';
-  
+
   const renderer = new WebGLRenderer({ antialias: true, ...props });
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
@@ -323,6 +324,10 @@ function initViewHelper(camera, document) {
   return viewHelper;
 }
 
+function initTransformControls(camera, domElement) {
+  return new TransformControls(camera, domElement);
+}
+
 export {
   initAxesHelper,
   initSpotLight,
@@ -341,5 +346,6 @@ export {
   initDirectionLight,
   initAmbientLight,
   initStats,
-  initViewHelper
+  initViewHelper,
+  initTransformControls
 };
