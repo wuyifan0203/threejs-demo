@@ -21,7 +21,7 @@ const planeFunctionParams = (normal, origin) => {
  * @param {number} d
  * @return {Matrix4} matrix
  */
-const generateMirrorModalMatrix = (normalVec3, d) => {
+const generateMirrorModalMatrix = (normalVec3, d,target = new Matrix4()) => {
   const { x, y, z } = normalVec3;
   const Nx2 = 2 * x * x;
   const Ny2 = 2 * y * y;
@@ -29,7 +29,7 @@ const generateMirrorModalMatrix = (normalVec3, d) => {
   const NyNz = 2 * y * z;
   const NxNy = 2 * x * y;
   const NxNz = 2 * x * z;
-  return new Matrix4().set(
+  return target.set(
     1 - Nx2, -NxNy, -NxNz, -2 * d * x,
     -NxNy, 1 - Ny2, -NyNz, -2 * d * y,
     -NxNz, -NyNz, 1 - Nz2, -2 * d * z,
