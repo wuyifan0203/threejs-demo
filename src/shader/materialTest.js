@@ -1,8 +1,10 @@
 /*
- * @Date: 2023-05-10 18:26:20
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date:  2023-05-10 18:26:20
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:10:13
+ * @LastEditTime: 2024-07-05 17:24:22
  * @FilePath: /threejs-demo/src/shader/materialTest.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
     Vector3,
