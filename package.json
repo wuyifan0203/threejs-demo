@@ -3,17 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "demo":"node bin/demo.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "wuyifan",
   "dependencies": {
-    "three": "^0.161.0"
+    "puppeteer": "^22.12.1",
+    "three": "^0.166.1"
   },
   "license": "MIT",
   "devDependencies": {
-    "vite": "^5.0.12"
+    "vite": "^5.3.3"
   }
 }

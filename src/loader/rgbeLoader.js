@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:53:53
+ * @LastEditTime: 2024-07-12 16:00:21
  * @FilePath: /threejs-demo/src/loader/rgbeLoader.js
  */
 import {
@@ -15,7 +15,7 @@ import {
   BoxGeometry,
   AmbientLight,
   ACESFilmicToneMapping,
-  sRGBEncoding,
+  SRGBColorSpace,
   TorusKnotGeometry,
   EquirectangularReflectionMapping,
 } from '../lib/three/three.module.js';
@@ -37,7 +37,7 @@ window.onload = () => {
 let stop = false;
 function init() {
   const renderer = initRenderer();
-  renderer.outputEncoding = sRGBEncoding;
+  renderer.outputEncoding = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.setAnimationLoop(animation);
 

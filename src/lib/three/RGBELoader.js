@@ -3,7 +3,7 @@ import {
 	DataUtils,
 	FloatType,
 	HalfFloatType,
-	LinearEncoding,
+	LinearSRGBColorSpace,
 	LinearFilter
 } from './three.module.js';
 
@@ -445,7 +445,7 @@ class RGBELoader extends DataTextureLoader {
 				case FloatType:
 				case HalfFloatType:
 
-					texture.encoding = LinearEncoding;
+					texture.encoding = LinearSRGBColorSpace;
 					texture.minFilter = LinearFilter;
 					texture.magFilter = LinearFilter;
 					texture.generateMipmaps = false;
