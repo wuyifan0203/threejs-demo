@@ -7,11 +7,12 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "demo":"node bin/demo.js"
+    "demo": "node bin/demo.js"
   },
   "keywords": [],
   "author": "wuyifan",
   "dependencies": {
+    "chalk": "^5.3.0",
     "puppeteer": "^22.12.1",
     "three": "^0.166.1"
   },
