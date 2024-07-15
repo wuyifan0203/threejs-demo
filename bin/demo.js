@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-13 21:39:28
+ * @LastEditTime: 2024-07-15 21:40:02
  * @FilePath: /threejs-demo/bin/demo.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -11,6 +11,7 @@ import * as fs from 'fs/promises';
 import chalk from 'chalk';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import jimp from 'jimp';
 
 
 console.red = msg => console.log(chalk.red(msg));
@@ -24,9 +25,11 @@ const idleTime = 9; // 9 seconds - for how long there should be no network reque
 const networkTimeout = 5; // 5 minutes, set to 0 to disable
 const parseTime = 6; // 1 MB / 6 seconds = 166 KB/s
 const renderTimeout = 5; // 5 seconds, set to 0 to disable
+
+const viewScale = 2;
+const jpgQuality = 95;
+
 (async () => {
-
-
   // 获取清页脚本代码
   const cleanPageScript = await fs.readFile(path.join(__dirname, '/cleanPage.js'), 'utf8');
   // 获取注入脚本代码
@@ -54,6 +57,7 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
     await preparePage();
     await loadPage();
     await renderPage();
+    await screenShot();
   } catch (error) {
 
   }
@@ -137,14 +141,19 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 
   async function renderPage() {
     try {
+      console.yellow('inject cleanPageScript');
       // 注入清理脚本 remove Status.js and GUI
       page.evaluate(cleanPageScript);
+      console.green('cleanPageScript success');
       // 等待页面的网络空闲状态
+      console.yellow('wait waitForNetworkIdle');
       await page.waitForNetworkIdle({
         timeout: networkTimeout * 60000,
         idleTime: idleTime * 1000
       });
-
+      console.green('waitForNetworkIdle success');
+      console.log(page.pageSize);
+      console.yellow('wait render process');
       await page.evaluate(async (renderTimeout, parseTime) => {
         // 等待 parseTime 后 resolve
         await new Promise(resolve => setTimeout(resolve, parseTime));
@@ -166,14 +175,16 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
           }, 10);
         });
       }, renderTimeout, page.pageSize / 1024 / 1024 / parseTime);
+      console.green('render process success');
     } catch (error) {
       throw new Error(`Error happened while rendering file: ${error}`);
     }
   }
 
   async function screenShot() {
-    
-
+    const image = (await jimp.read(await page.screenshot())).scale(1 / viewScale).quality(jpgQuality);
+    image.writeAsync(path.join(__dirname, 'screenshots/test.jpg'));
+    console.green('screenShot success')
   }
 
 
