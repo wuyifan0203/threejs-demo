@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:45:11
+ * @LastEditTime: 2024-07-16 13:21:38
  * @FilePath: /threejs-demo/src/animate/useAnimation.js
  */
 import {
@@ -99,13 +99,14 @@ function init() {
     gui.add(o, 'stop');
     gui.add(o, 'reset');
 
+    render();
 
     function render() {
         orbitControl.update();
         renderer.render(scene, camera);
         mixer.update(clock.getDelta());
+        requestAnimationFrame(render)
     }
 
-    renderer.setAnimationLoop(render)
 
 }

@@ -2,12 +2,13 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-13 19:19:20
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-13 19:21:22
+ * @LastEditTime: 2024-07-16 19:31:07
  * @FilePath: /threejs-demo/bin/injection.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 (function () {
 
+    // 代理random
     /* Deterministic random */
     window.Math._random = window.Math.random;
     let seed = Math.PI / 4;
@@ -17,9 +18,11 @@
         return x - Math.floor(x);
     };
 
+  
     /* Deterministic timer */
     window.performance._now = performance.now;
 
+      //代理performance
     let frameId = 0;
     const now = () => frameId * 16;
     window.Date.now = now;
