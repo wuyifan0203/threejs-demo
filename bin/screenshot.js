@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-16 21:07:57
- * @FilePath: /threejs-demo/bin/demo.js
+ * @LastEditTime: 2024-07-18 17:06:55
+ * @FilePath: /threejs-demo/bin/screenShot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import * as puppeteer from 'puppeteer';
@@ -28,17 +28,16 @@ class PromiseQueue {
   }
 
   async waitForAll() {
-    console.log('begin', this.promises);
     while (this.promises.length > 0) {
-
       await Promise.all(this.promises);
     }
   }
 }
 
-console.red = msg => console.log(chalk.red(msg));
+console.red = (...arg) => console.log(chalk.red(...arg));
 console.yellow = (...arg) => console.log(chalk.yellow(...arg));
-console.green = msg => console.log(chalk.green(msg));
+console.green = (...arg) => console.log(chalk.green(...arg));
+console.blue = (...arg) => console.log(chalk.blue(...arg));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -57,7 +56,7 @@ const pageNum = 8;
 const viewport = { width: width * viewScale, height: height * viewScale };
 const browser = await puppeteer.launch({
   headless: false, // 设置为 false 以启用可视模式
-  args: ['--disable-web-security', '--allow-file-access-from-files'],
+  args: ['--disable-web-security', '--allow-file-access-from-files', '--hide-scrollbars', '--enable-gpu'],
   defaultViewport: viewport,
 });
 
@@ -76,19 +75,18 @@ const server = app.listen(port, main);
 const errorPages = [];
 
 async function main() {
-  const errorCache = []
   // 获取所有标签的href
-  const urls = await getAnchorsHref();
+  let urls = [];
+  // urls = await getAnchorsHref();
 
+  urls = ['http://localhost:6600/threejs-demo/src/canvas/canvasGradient.html'];
 
-  urls.length = 1
   const pages = await browser.pages();
 
   console.yellow('initialize pages');
   // 同时开启8个浏览器页面
   while (pages.length < pageNum && pages.length < urls.length) pages.push(await browser.newPage());
   console.green('initialize pages success');
-
 
   console.yellow('prepare pages');
   // 初始化页面
@@ -101,9 +99,13 @@ async function main() {
 
   await queue.waitForAll();
 
-  console.yellow('errorPages')
 
-  // close();
+  if (errorPages.length > 0) {
+    console.yellow('errorPages', errorPages)
+  }
+
+
+  close();
 };
 
 
@@ -111,17 +113,18 @@ async function getAnchorsHref() {
   // open a new blank page
   const page = await browser.newPage();
   // await page.setViewport({ width: 1080, height: 1024 });
-  await page.goto(`http://localhost:${port}${baseURL}/index.html`,{
+  await page.goto(`http://localhost:${port}${baseURL}/index.html`, {
     waitUntil: ['networkidle0', 'load'],
     timeout: networkTimeout * 60000
   });
 
-  return await page.$$eval('a', (anchors) => anchors.map(anchor => anchor.href)).then(() => page.close());
+  const urls = await page.$$eval('a', (anchors) => anchors.map(anchor => anchor.href));
+  await page.close();
+  return urls;
 }
 
 async function preparePage(page) {
   await page.evaluateOnNewDocument(injectionScript);
-  page.pageSize = 0;
 
   // 代理页面报错信息
   page.on('console', async (msg) => {
@@ -164,6 +167,8 @@ async function preparePage(page) {
 
   page.url = undefined;
 
+  console.green('prepare page success');
+
 }
 
 async function renderPage(page) {
@@ -175,6 +180,9 @@ async function renderPage(page) {
       timeout: networkTimeout * 60000,
       idleTime: idleTime * 1000
     });
+
+    const isWebGLContext = await page.$$eval('#webgl-output', elements => elements.length) > 0;
+    if (!isWebGLContext) return
     await page.evaluate(async (renderTimeout, parseTime) => {
       // 等待 parseTime 后 resolve
       await new Promise(resolve => setTimeout(resolve, parseTime));
@@ -219,8 +227,6 @@ async function pageCapture(pages, url) {
     }, 100);
   });
 
-  console.log(page);
-
   try {
     // 初始化页面信息
     page.pageSize = 0;
@@ -230,15 +236,17 @@ async function pageCapture(pages, url) {
     //  加载页面
     try {
       await page.goto(url, {
-        waitUntil: ['networkidle0', 'load'],
+        waitUntil: ['networkidle0'],
         timeout: networkTimeout * 60000
       });
     } catch (error) {
       throw new Error(`Failed to navigate to URL: ${error}`);
     }
 
-    console.log(`Navigated to ${url}`);
+    console.blue(`Navigated to ${url}`, 'pageSize:', page.pageSize);
     // 渲染页面
+
+
     await renderPage(page);
 
     // 出错提前结束
@@ -247,7 +255,7 @@ async function pageCapture(pages, url) {
     const image = (await jimp.read(await page.screenshot())).scale(1 / viewScale).quality(jpgQuality);
     const fileName = url.match(/(\w+)\.html/)[1];
     image.writeAsync(path.join(__dirname, `../screenshots/${fileName}.jpg`));
-    console.green(`screenShot success! : ${page.url}`)
+    console.green(`screenShot ${fileName} success! : ${page.url}`)
   } catch (error) {
     console.red(`Error happened while capturing ${page.url}: ${error}`);
     errorPages.push(page.url)

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-17 19:41:13
+ * @LastEditTime: 2024-07-18 17:10:53
  * @FilePath: /threejs-demo/src/algorithms/quadTreeDemo.js
  */
 import { Box2, BoxGeometry, Vector2, Vector3, Mesh, MeshBasicMaterial, Color } from '../lib/three/three.module.js';
@@ -31,6 +31,7 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, 0, 100));
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
+    camera.zoom = 0.2;
     const scene = initScene();
     renderer.setClearColor(0xffffff);
 
@@ -47,7 +48,7 @@ function init() {
 
 
     const meshes = [];
- 
+
 
 
     function render() {
@@ -56,9 +57,10 @@ function init() {
         renderer.clear();
         renderer.render(scene, camera);
         stats.end();
+        requestAnimationFrame(render)
     }
 
-    renderer.setAnimationLoop(render);
+    render();
 
     const helper = new QuadTreeHelper(quadTree);
     scene.add(helper);
@@ -66,35 +68,35 @@ function init() {
 
     let i = 0;
     const operation = {
-        num:20,
-        addMesh(){
-            meshes.forEach((m)=>{
+        num: 80,
+        addMesh() {
+            meshes.forEach((m) => {
                 m.geometry.dispose();
                 m.material.dispose();
                 m.removeFromParent();
             })
             meshes.length = 0;
             quadTree.reset()
-        
+
             for (let j = 0; j < this.num; j++) {
                 const size = Math.random() * 1 + 2;
                 const mesh = new Mesh(new BoxGeometry(size, size, size), new MeshBasicMaterial({ color: new Color().setHSL(Math.random(), 0.7, 0.5) }));
                 meshes.push(mesh);
                 scene.add(mesh);
-        
+
                 mesh.position.set(Math.random() * 60 - 30, Math.random() * 60 - 30, 0);
-        
+
                 !mesh.geometry.boundingBox && mesh.geometry.computeBoundingBox();
-        
+
                 const { min, max } = mesh.geometry.boundingBox
                 const box = new Box2(new Vector2(min.x, min.y), new Vector2(max.x, max.y));
                 const center = new Vector2(mesh.position.x, mesh.position.y);
                 box.min.add(center);
                 box.max.add(center);
-        
+
                 mesh.box = box;
                 box.mesh = mesh;
-        
+
                 quadTree.insertBox(box);
             }
             helper.update();
@@ -129,19 +131,19 @@ function init() {
                 if (node.lu.boundBox.intersectsBox(box) || node.lu.boundBox.containsBox(box)) {
                     i++
                     insetTest(node.lu, box)
-                } 
+                }
                 if (node.ld.boundBox.intersectsBox(box) || node.ld.boundBox.containsBox(box)) {
                     i++
                     insetTest(node.ld, box)
-                } 
-                 if (node.ru.boundBox.intersectsBox(box) || node.ru.boundBox.containsBox(box)) {
+                }
+                if (node.ru.boundBox.intersectsBox(box) || node.ru.boundBox.containsBox(box)) {
                     i++
                     insetTest(node.ru, box)
-                } 
+                }
                 if (node.rd.boundBox.intersectsBox(box) || node.rd.boundBox.containsBox(box)) {
                     i++
                     insetTest(node.rd, box)
-                } 
+                }
             }
         }
 
@@ -149,9 +151,12 @@ function init() {
     }
 
     const gui = initGUI();
-    gui.add(operation, 'num',3,3000,1);
+    gui.add(operation, 'num', 3, 3000, 1);
     gui.add(operation, 'addMesh');
 
     gui.add(operation, 'log');
     gui.add(operation, 'intersectsTest');
+
+    operation.addMesh();
+    operation.intersectsTest();
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:33:05
+ * @LastEditTime: 2024-07-18 19:50:31
  * @FilePath: /threejs-demo/src/booleanOperation/3d.js
  */
 import {
@@ -44,50 +44,42 @@ function init() {
   const orbitControl = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-  function render() {
+  (function render() {
     renderer.clear();
     orbitControl.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    
+    requestAnimationFrame(render)
+  })()
 
-  renderer.setAnimationLoop(render);
 
-  const sphere1 = new SphereGeometry(5, 20, 16);
-  const sphere2 = new SphereGeometry(3, 20, 16);
+  const sphere = new SphereGeometry(3, 20, 16);
   const box = new BoxGeometry(4, 4, 4);
 
   const material = new MeshNormalMaterial({ wireframe: true });
   const resultMaterial = new MeshNormalMaterial();
 
-  const sphere1Mesh = new Mesh(sphere1, material);
-  const sphere2Mesh = new Mesh(sphere2, material);
+  const sphereMesh = new Mesh(sphere, material);
+  sphereMesh.position.set(0, 0, 0);
   const boxMesh = new Mesh(box, material);
 
-  sphere1Mesh.position.set(-6, 0, 0);
-  sphere2Mesh.position.set(4, 0, 0);
-  scene.add(sphere1Mesh, sphere2Mesh, boxMesh);
+
+  scene.add(sphereMesh, boxMesh);
 
   /// / GUI
 
   const controls = {
     material,
     resultMaterial,
-    sphere1Mesh,
-    sphere2Mesh,
+    sphereMesh,
     boxMesh,
 
-    sphere1: {
-      positionX: sphere1Mesh.position.x,
-      positionY: sphere1Mesh.position.y,
-      positionZ: sphere1Mesh.position.z,
-      operationWithBox: 'none',
-    },
-    sphere2: {
-      positionX: sphere2Mesh.position.x,
-      positionY: sphere2Mesh.position.y,
-      positionZ: sphere2Mesh.position.z,
-      operationWithBox: 'none',
+    sphere: {
+      positionX: sphereMesh.position.x,
+      positionY: sphereMesh.position.y,
+      positionZ: sphereMesh.position.z,
+      operationWithBox: 'intersect',
     },
     box: {
       positionX: boxMesh.position.x,
@@ -96,15 +88,11 @@ function init() {
     },
     // function
     redraw() {
-      sphere1Mesh.position.set(this.sphere1.positionX, this.sphere1.positionY, this.sphere1.positionZ);
-      sphere2Mesh.position.set(this.sphere2.positionX, this.sphere2.positionY, this.sphere2.positionZ);
+      sphereMesh.position.set(this.sphere.positionX, this.sphere.positionY, this.sphere.positionZ);
       boxMesh.position.set(this.box.positionX, this.box.positionY, this.box.positionZ);
-      const func1 = this.sphere1.operationWithBox;
-      const func2 = this.sphere2.operationWithBox;
-      // eslint-disable-next-line no-unused-expressions
-      func1 !== 'none' && this[func1]('sphere1');
-      // eslint-disable-next-line no-unused-expressions
-      func2 !== 'none' && this[func2]('sphere2');
+      const func = this.sphere.operationWithBox;
+
+      func !== 'none' && this[func]();
     },
 
     showResult() {
@@ -116,70 +104,40 @@ function init() {
       scene.add(mesh);
     },
 
-    none(target) {
+    none() {
       let func = '';
-      if (target === 'sphere1') {
-        func = this.sphere2.operationWithBox;
-        this[func]('sphere2');
-      } else {
-        func = this.sphere1.operationWithBox;
-        this[func]('sphere1');
-      }
+        func = this.sphere.operationWithBox;
+        this[func]();
     },
 
-    subtract(target) {
-      const key = `${target}Mesh`;
-      const csg = CSG.fromMesh(this[key]);
-      const boxCSG = CSG.fromMesh(this.boxMesh);
-      let finalCSG = boxCSG.subtract(csg);
-      if (this.finalCSG) {
-        finalCSG = finalCSG.subtract(this.finalCSG);
-      }
-      this.finalCSG = finalCSG;
+    subtract() {
+      const csg = CSG.fromMesh(sphereMesh);
+      const boxCSG = CSG.fromMesh(boxMesh);
+      this.finalCSG = boxCSG.subtract(csg);
     },
 
-    union(target) {
-      const key = `${target}Mesh`;
-      const csg = CSG.fromMesh(this[key]);
-      const boxCSG = CSG.fromMesh(this.boxMesh);
-      let finalCSG = boxCSG.union(csg);
-      if (this.finalCSG) {
-        finalCSG = finalCSG.union(this.finalCSG);
-      }
-      this.finalCSG = finalCSG;
+    union() {
+      const csg = CSG.fromMesh(sphereMesh);
+      const boxCSG = CSG.fromMesh(boxMesh);
+      this.finalCSG = boxCSG.union(csg);
     },
 
-    intersect(target) {
-      const key = `${target}Mesh`;
-      const csg = CSG.fromMesh(this[key]);
-      const boxCSG = CSG.fromMesh(this.boxMesh);
-      let finalCSG = boxCSG.intersect(csg);
-      if (this.finalCSG) {
-        finalCSG = finalCSG.intersect(this.finalCSG);
-      }
-      this.finalCSG = finalCSG;
+    intersect() {
+      const csg = CSG.fromMesh(sphereMesh);
+      const boxCSG = CSG.fromMesh(boxMesh);
+      this.finalCSG = boxCSG.intersect(csg);
     },
   };
 
   const gui = initGUI();
 
-  console.log('有时候选none会栈溢出。是正常现象，因为我没有修');
-  const sphere1Folder = gui.addFolder('sphere1');
-  sphere1Folder.open();
-  sphere1Folder.add(controls.sphere1, 'positionX', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere1Folder.add(controls.sphere1, 'positionY', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere1Folder.add(controls.sphere1, 'positionZ', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere1Folder.add(controls.sphere1, 'operationWithBox', ['none', 'subtract', 'union', 'intersect']).onChange((e) => {
-    controls[e]('sphere1');
-  });
-
-  const sphere2Folder = gui.addFolder('sphere2');
-  sphere2Folder.open();
-  sphere2Folder.add(controls.sphere2, 'positionX', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere2Folder.add(controls.sphere2, 'positionY', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere2Folder.add(controls.sphere2, 'positionZ', -20, 20, 0.01).onChange(() => { controls.redraw(); });
-  sphere2Folder.add(controls.sphere2, 'operationWithBox', ['none', 'subtract', 'union', 'intersect']).onChange((e) => {
-    controls[e]('sphere2');
+  const sphereFolder = gui.addFolder('sphere');
+  sphereFolder.open();
+  sphereFolder.add(controls.sphere, 'positionX', -20, 20, 0.01).onChange(() => { controls.redraw(); });
+  sphereFolder.add(controls.sphere, 'positionY', -20, 20, 0.01).onChange(() => { controls.redraw(); });
+  sphereFolder.add(controls.sphere, 'positionZ', -20, 20, 0.01).onChange(() => { controls.redraw(); });
+  sphereFolder.add(controls.sphere, 'operationWithBox', ['none', 'subtract', 'union', 'intersect']).onChange((e) => {
+    controls[e]();
   });
 
   const boxFolder = gui.addFolder('box');
@@ -199,4 +157,7 @@ function init() {
   resultMaterialFolder.open();
   resultMaterialFolder.add(controls.resultMaterial, 'wireframe');
   resultMaterialFolder.add(controls.resultMaterial, 'visible');
+  
+  controls.redraw();
+  controls.showResult()
 }

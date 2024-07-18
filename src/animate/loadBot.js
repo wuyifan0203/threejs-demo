@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-31 16:08:18
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-04 20:59:01
+ * @LastEditTime: 2024-07-18 17:19:38
  * @FilePath: /threejs-demo/src/animate/loadBot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -56,12 +56,14 @@ const crossFadeControls = [];
 async function init() {
     const renderer = initRenderer({});
     const camera = initOrthographicCamera(new Vector3(50, 50, 50));
-    camera.zoom = 10;
+    camera.zoom = 6;
     const scene = initScene();
 
     initStats()
     initAmbientLight(scene);
     const orbitControl = initOrbitControls(camera, renderer.domElement);
+    orbitControl.target.set(0, 0.5, 0);
+    orbitControl.update();
 
     const light = initDirectionLight();
     light.position.set(40, 40, 70);
@@ -202,6 +204,6 @@ function setWeight(action, weight) {
 }
 
 function prepareCrossFade(currentAction, action, wight) {
-    
+
 
 }

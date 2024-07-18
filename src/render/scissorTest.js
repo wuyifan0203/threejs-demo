@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-09 13:04:44
- * @FilePath: /threejs-demo/examples/src/render/scissorTest.js
+ * @LastEditTime: 2024-07-18 15:32:15
+ * @FilePath: /threejs-demo/src/render/scissorTest.js
  */
 import {
     Mesh,
@@ -33,7 +33,6 @@ function init() {
     const loader = new TextureLoader()
     const renderer = initRenderer({ logarithmicDepthBuffer: true });
     renderer.shadowMap.enabled = true;
-    renderer.setAnimationLoop(animate);
     renderer.autoClear = false;
 
 
@@ -112,7 +111,10 @@ function init() {
         if (needUpdate) {
             render();
         }
+
+        requestAnimationFrame(animate);
     }
+    animate();
 
     resize(renderer, camera);
 }

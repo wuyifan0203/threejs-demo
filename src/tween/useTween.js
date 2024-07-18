@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:58:25
+ * @LastEditTime: 2024-07-18 16:29:58
  * @FilePath: /threejs-demo/src/tween/useTween.js
  */
 import {
@@ -62,9 +62,11 @@ function init() {
     orbitControls.update();
     update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render)
   }
 
-  renderer.setAnimationLoop(render);
+  render();
+  // renderer.setAnimationLoop(render);
 }
 
 function useTo(mesh) {

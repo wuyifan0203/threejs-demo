@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:08:33
+ * @LastEditTime: 2024-07-18 16:43:30
  * @FilePath: /threejs-demo/src/tween/portal.js
  */
 import {
@@ -94,18 +94,11 @@ async function init() {
         }
     };
 
-
     tween.onUpdate((e) => {
         texture.repeat.y = e.repeatY;
         texture.needsUpdate = true;
         o.speed = e.speed;
     })
-
-
-
-
-
-
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
@@ -121,13 +114,7 @@ async function init() {
 
     parent.rotateZ(-range);
 
-
-
     gui.add(o, 'addSpeed')
-
-
-
-
 
     const clock = new Clock();
     function render() {

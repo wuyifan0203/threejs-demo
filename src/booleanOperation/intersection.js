@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-26 13:06:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-28 11:07:10
+ * @LastEditTime: 2024-07-18 20:05:44
  * @FilePath: /threejs-demo/src/booleanOperation/intersection.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -45,7 +45,7 @@ window.onload = function () {
 function init() {
     const scene = initScene();
     const renderer = initRenderer();
-    const camera = initOrthographicCamera(new Vector3(0, 0, 20));
+    const camera = initOrthographicCamera(new Vector3(20, 20, 20));
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
     initAmbientLight(scene);
@@ -54,21 +54,23 @@ function init() {
     scene.add(light);
     initCustomGrid(scene, 20, 20);
     const coord = initCoordinates(5);
-    scene.add(coord);
+    // scene.add(coord);
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
     const transformControls = new TransformControls(camera, renderer.domElement);
     scene.add(transformControls);
 
-    const box1Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0x999999, }));
-    const box2Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0xcccccc, }));
+    const params = { transparent: true, opacity: 0.5 };
+
+    const box1Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0x999999, ...params }));
+    const box2Mesh = new Mesh(new BoxGeometry(3, 3, 3, 10, 10, 10), new MeshStandardMaterial({ color: 0xcccccc, ...params }));
     box2Mesh.position.set(2, 2, 2);
 
-    const sphereMesh = new Mesh(new SphereGeometry(3, 32, 32), new MeshStandardMaterial({ color: 0xffff00, }));
-    sphereMesh.position.set(-2, -2, 2);
+    const sphereMesh = new Mesh(new SphereGeometry(3, 32, 32), new MeshStandardMaterial({ color: 0xffff00, ...params }));
+    sphereMesh.position.set(0, 0, 0);
 
-    const tourKnotMesh = new Mesh(new TorusKnotGeometry(3, 1, 128, 32), new MeshStandardMaterial({ color: 0xff0000, }));
-    tourKnotMesh.position.set(0, 0, -2);
+    const tourKnotMesh = new Mesh(new TorusKnotGeometry(3, 1, 128, 32), new MeshStandardMaterial({ color: 0xff0000, ...params }));
+    tourKnotMesh.position.set(0, 0, 0);
 
     transformControls.addEventListener('mouseDown', () => {
         orbitControls.enabled = false;
@@ -86,9 +88,9 @@ function init() {
         roughness: 0.1,
         metalness: 0,
         color: '#049ef4',
-        polygonOffset: true,
-        polygonOffsetUnits: 2,
-        polygonOffsetFactor: -100,
+        // polygonOffset: true,
+        // polygonOffsetUnits: 2,
+        // polygonOffsetFactor: -100,
     })
     const resultMesh = new Mesh(new BufferGeometry(), resultMeshMaterial);
 
@@ -108,8 +110,8 @@ function init() {
 
     const controls = {
         operation: SUBTRACTION,
-        target: box1Mesh,
-        compare: box2Mesh
+        target: sphereMesh,
+        compare: tourKnotMesh
     }
 
     transformControls.attach(controls.compare);
@@ -132,10 +134,12 @@ function init() {
     }).onChange(updateCSG);
 
     gui.add(wireframe, 'visible').name('wireframe');
-    gui.add(resultMesh, 'visible').name('Show ResultMesh').onChange(() => {
+
+    const showResultMesh = () => {
         controls.target.visible = !resultMesh.visible;
         controls.compare.visible = !resultMesh.visible;
-    });
+    }
+    gui.add(resultMesh, 'visible').name('Show ResultMesh').onChange(showResultMesh);
 
     let evaluator = new Evaluator();
     evaluator.attributes = ['position', 'normal', 'uv'];
@@ -171,12 +175,13 @@ function init() {
     }
 
     transformControls.addEventListener('change', updateCSG)
-    function render() {
-        orbitControls.update();
-        renderer.render(scene, camera);
-    }
-
-    renderer.setAnimationLoop(render);
+        (function render() {
+            orbitControls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(render);
+        })()
 
     updateCSG();
+
+    showResultMesh()
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:45:18
+ * @LastEditTime: 2024-07-18 17:21:04
  * @FilePath: /threejs-demo/src/animate/loadModalWithAnimation.js
  */
 import {
@@ -15,11 +15,11 @@ import {
     Quaternion,
 } from '../lib/three/three.module.js';
 import {
-    initRenderer, 
-    initOrthographicCamera, 
-    initGroundPlane, 
-    initScene, 
-    initOrbitControls, 
+    initRenderer,
+    initOrthographicCamera,
+    initGroundPlane,
+    initScene,
+    initOrbitControls,
     initAmbientLight,
     initGUI,
     initDirectionLight
@@ -148,14 +148,13 @@ async function init() {
     gui.add(o, 'reset');
 
 
-    function render() {
+    (function render() {
         orbitControl.update();
         renderer.render(scene, camera);
         const delta = clock.getDelta();
         parrotMixer.update(delta);
         flamingoMixer.update(delta);
         storkMixer.update(delta);
-    }
-    renderer.setAnimationLoop(render)
-
+        requestAnimationFrame(render)
+    })()
 }
