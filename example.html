@@ -1,0 +1,809 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-07-19 10:12:45
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-07-19 17:55:36
+ * @FilePath: /threejs-demo/example.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio</title>
+    <style>
+        :root {
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --header-background: #333;
+            --header-color: #fff;
+            --card-background: #fff;
+            --card-hover: #ddd;
+            --footer-background: #333;
+            --footer-color: #fff;
+            --button-background: #444;
+            --button-color: #fff;
+        }
+
+        :root.dark {
+            --background-color: #1e1e1e;
+            --text-color: #f4f4f4;
+            --header-background: #111;
+            --header-color: #f4f4f4;
+            --card-background: #333;
+            --card-hover: #444;
+            --footer-background: #111;
+            --footer-color: #f4f4f4;
+            --button-background: #555;
+            --button-color: #f4f4f4;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 100px;
+            /* Make space for the footer */
+        }
+
+        header {
+            background-color: var(--header-background);
+            color: var(--header-color);
+            padding: 1rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            color: var(--header-color);
+            text-decoration: none;
+        }
+
+        .github-icon {
+            display: block;
+            width: 24px;
+            height: 24px;
+        }
+
+        .github-icon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .theme-toggle {
+            border: none;
+            background-color: var(--button-background);
+            color: var(--button-color);
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 1rem;
+        }
+
+        main {
+            padding: 2rem 0.5rem;
+            /* Reduce side margins */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        #intro h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        #projects {
+            margin-top: 2rem;
+        }
+
+        #projects h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .project-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s;
+            text-decoration: none;
+            color: inherit;
+            margin: 0.5rem;
+            /* Add margin to avoid touching edges */
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            background-color: var(--card-hover);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        .project-card h3 {
+            padding: 1rem;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background-color: var(--footer-background);
+            color: var(--footer-color);
+            text-align: center;
+            padding: 1rem 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        footer .github-icon {
+            margin-left: 1rem;
+        }
+
+        #back-to-top {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 2rem;
+            display: none;
+            background-color: var(--button-background);
+            color: var(--button-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        #back-to-top:hover {
+            background-color: var(--card-hover);
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 480px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .project-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .project-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .project-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                display: none;
+                width: 100%;
+                background-color: var(--header-background);
+                position: absolute;
+                top: 60px;
+                left: 0;
+            }
+
+            nav ul.show {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 0;
+                border-top: 1px solid #444;
+            }
+
+            nav ul li a {
+                padding: 1rem;
+                display: block;
+            }
+
+            .menu-toggle {
+                display: block;
+                cursor: pointer;
+                font-size: 1.5rem;
+            }
+
+            .menu-toggle:hover {
+                color: #aaa;
+            }
+        }
+
+        /* Hide menu toggle on web */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        /* Footer fix for long content */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+      <style>
+        :root {
+            --background-color: #f4f4f4;
+            --text-color: #333;
+            --header-background: #333;
+            --header-color: #fff;
+            --card-background: #fff;
+            --card-hover: #ddd;
+            --footer-background: #333;
+            --footer-color: #fff;
+            --button-background: #444;
+            --button-color: #fff;
+        }
+
+        :root.dark {
+            --background-color: #1e1e1e;
+            --text-color: #f4f4f4;
+            --header-background: #111;
+            --header-color: #f4f4f4;
+            --card-background: #333;
+            --card-hover: #444;
+            --footer-background: #111;
+            --footer-color: #f4f4f4;
+            --button-background: #555;
+            --button-color: #f4f4f4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 100px; /* Make space for the footer */
+        }
+
+        header {
+            background-color: var(--header-background);
+            color: var(--header-color);
+            padding: 1rem 0;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin: 0 1rem;
+        }
+
+        nav ul li a {
+            color: var(--header-color);
+            text-decoration: none;
+        }
+
+        .github-icon {
+            display: block;
+            width: 24px;
+            height: 24px;
+        }
+
+        .github-icon img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .theme-toggle {
+            background-color: var(--button-background);
+            color: var(--button-color);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-left: 1rem;
+        }
+
+        main {
+            padding: 2rem 1rem; /* Reduce side margins */
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        #intro {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        #intro h1 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        #projects {
+            margin-top: 2rem;
+        }
+
+        #projects h2 {
+            font-size: 1.5rem;
+            margin-top: 2rem;
+            text-align: left;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .project-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .project-card {
+            background: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            transition: transform 0.3s, background-color 0.3s;
+            text-decoration: none;
+            color: inherit;
+            margin: 0.5rem; /* Add margin to avoid touching edges */
+        }
+
+        .project-card:hover {
+            transform: translateY(-10px);
+            background-color: var(--card-hover);
+        }
+
+        .project-card img {
+            width: 100%;
+            height: auto;
+        }
+
+        .project-card h3 {
+            padding: 1rem;
+            font-size: 1.2rem;
+        }
+
+        footer {
+            background-color: var(--footer-background);
+            color: var(--footer-color);
+            text-align: center;
+            padding: 1rem 0;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        footer .github-icon {
+            margin-left: 1rem;
+        }
+
+        #back-to-top {
+            position: fixed;
+            right: 1.5rem;
+            bottom: 2rem;
+            display: none;
+            background-color: var(--button-background);
+            color: var(--button-color);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+
+        #back-to-top:hover {
+            background-color: var(--card-hover);
+        }
+
+        /* Responsive Grid */
+        @media (max-width: 480px) {
+            .project-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .project-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .project-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .project-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                display: none;
+                width: 100%;
+                background-color: var(--header-background);
+                position: absolute;
+                top: 60px;
+                left: 0;
+            }
+
+            nav ul.show {
+                display: flex;
+            }
+
+            nav ul li {
+                margin: 0;
+                border-top: 1px solid #444;
+            }
+
+            nav ul li a {
+                padding: 1rem;
+                display: block;
+            }
+
+            .menu-toggle {
+                display: block;
+                cursor: pointer;
+                font-size: 1.5rem;
+            }
+
+            .menu-toggle:hover {
+                color: #aaa;
+            }
+        }
+
+        /* Hide menu toggle on web */
+        @media (min-width: 769px) {
+            .menu-toggle {
+                display: none;
+            }
+        }
+
+        /* Footer fix for long content */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        main {
+            flex: 1;
+        }
+    </style>
+
+</head>
+
+<body>
+    <header>
+        <nav>
+            <div class="logo">Three.js Portfolio</div>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+            <ul id="nav-menu">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+            <button class="theme-toggle" onclick="toggleTheme()">Toggle Theme</button>
+            <a href="https://github.com/yourusername" class="github-icon" target="_blank">
+                <img src="/public/images/github.png" alt="GitHub">
+            </a>
+        </nav>
+    </header>
+    <main>
+        <section id="intro">
+            <h1>Welcome to My Portfolio</h1>
+            <p>Here are some of the projects I've worked on using Three.js.</p>
+        </section>
+        <section id="projects">
+            <h2>Mathematics Projects</h2>
+            <div class="project-grid">
+                <a href="project1.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 1">
+                    <h3>Project 1</h3>
+                </a>
+                <a href="project2.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 2">
+                    <h3>Project 2</h3>
+                </a>
+                <a href="project1.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 1">
+                    <h3>Project 1</h3>
+                </a>
+                <a href="project2.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 2">
+                    <h3>Project 2</h3>
+                </a>
+                <a href="project1.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 1">
+                    <h3>Project 1</h3>
+                </a>
+                <a href="project2.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 2">
+                    <h3>Project 2</h3>
+                </a>
+                <a href="project1.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 1">
+                    <h3>Project 1</h3>
+                </a>
+                <a href="project2.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 2">
+                    <h3>Project 2</h3>
+                </a>
+            </div>
+
+            <h2>Animation Projects</h2>
+            <div class="project-grid">
+                <a href="project3.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 3">
+                    <h3>Project 3</h3>
+                </a>
+                <a href="project4.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 4">
+                    <h3>Project 4</h3>
+                </a>
+            </div>
+
+            <h2>Canvas Projects</h2>
+            <div class="project-grid">
+                <a href="project5.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 5">
+                    <h3>Project 5</h3>
+                </a>
+                <a href="project6.html" class="project-card">
+                    <img src="screenshots/bowling.jpg" alt="Project 6">
+                    <h3>Project 6</h3>
+                </a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 wuyifan0203. All rights reserved.</p>
+        <a href="https://github.com/yourusername" class="github-icon" target="_blank">
+            <img src="/public/images/github.png" alt="GitHub">
+        </a>
+    </footer>
+
+    <button id="back-to-top" onclick="scrollToTop()">↑</button>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('nav-menu');
+            menu.classList.toggle('show');
+        }
+
+        function toggleTheme() {
+            const root = document.documentElement;
+            if (root.classList.contains('dark')) {
+                root.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                root.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            if (savedTheme === 'dark') {
+                document.documentElement.classList.add('dark');
+            }
+
+            const backToTopButton = document.getElementById('back-to-top');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 200) {
+                    backToTopButton.style.display = 'block';
+                } else {
+                    backToTopButton.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+</body>
+
+<script type="module">
+    class ProjectCard extends HTMLElement {
+        constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('project-card');
+
+            const img = document.createElement('img');
+            img.src = this.getAttribute('image');
+            img.alt = this.getAttribute('title');
+            wrapper.appendChild(img);
+
+            const title = document.createElement('h3');
+            title.textContent = this.getAttribute('title');
+            wrapper.appendChild(title);
+
+            shadow.appendChild(wrapper);
+        }
+    }
+
+    customElements.define('project-card', ProjectCard);
+</script>
+
+<script type="module">
+    class ProjectGrid extends HTMLElement {
+        constructor() {
+            super();
+            const shadow = this.attachShadow({ mode: 'open' });
+
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('project-grid');
+
+            shadow.appendChild(wrapper);
+        }
+    }
+
+    customElements.define('project-grid', ProjectGrid);
+
+</script>
+
+<!-- <script type="module">
+    const projects = [
+        { id: 1, category: "Mathematics", title: "Project 1", image: "screenshots/bowling.jpg", link: "project1.html" },
+        { id: 2, category: "Mathematics", title: "Project 2", image: "screenshots/bowling.jpg", link: "project2.html" },
+        { id: 3, category: "Animation", title: "Project 3", image: "screenshots/bowling.jpg", link: "project3.html" },
+        { id: 4, category: "Animation", title: "Project 4", image: "screenshots/bowling.jpg", link: "project4.html" },
+        { id: 5, category: "Canvas", title: "Project 5", image: "screenshots/bowling.jpg", link: "project5.html" },
+        { id: 6, category: "Canvas", title: "Project 6", image: "screenshots/bowling.jpg", link: "project6.html" }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const projectsContainer = document.getElementById('projects');
+
+        const categories = [...new Set(projects.map(project => project.category))];
+
+        categories.forEach(category => {
+            const categoryTitle = document.createElement('h2');
+            categoryTitle.textContent = `${category} Projects`;
+            projectsContainer.appendChild(categoryTitle);
+
+            const projectGrid = document.createElement('project-grid');
+
+            console.log(projectGrid);
+            projectsContainer.appendChild(projectGrid);
+
+            projects.filter(project => project.category === category).forEach(project => {
+                const projectCard = document.createElement('project-card');
+                console.log(project);
+                projectCard.setAttribute('title', project.title);
+                projectCard.setAttribute('image', project.image);
+                projectCard.setAttribute('link', project.link);
+                projectGrid.shadowRoot.appendChild(projectCard);
+            });
+        });
+    });
+
+    function toggleTheme() {
+        const root = document.documentElement;
+        if (root.classList.contains('dark')) {
+            root.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+        } else {
+            root.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+        }
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        const backToTopButton = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 200) {
+                backToTopButton.style.display = 'block';
+            } else {
+                backToTopButton.style.display = 'none';
+            }
+        });
+    });
+</script> -->
+
+</html>
