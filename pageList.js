@@ -1,9 +1,7 @@
-import path from "path"
-
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 01:26:41
+ * @LastEditTime: 2024-07-22 01:31:15
  * @FilePath: /threejs-demo/pageList.js
  */
 const list = [
