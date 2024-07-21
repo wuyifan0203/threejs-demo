@@ -2,5 +2,3 @@ node_modules
 *.code-workspace
 dist
 .Ds_Store
-docs/.vitepress/cache
-docs/.vitepress/dist
