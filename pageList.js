@@ -1,7 +1,9 @@
+import path from "path"
+
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-21 18:38:02
+ * @LastEditTime: 2024-07-22 01:26:41
  * @FilePath: /threejs-demo/pageList.js
  */
 const list = [
@@ -97,6 +99,84 @@ const list = [
                 path: '/camera/layer.html',
                 title: 'Layer'
             },
+            {
+                path: '/camera/layer2.html',
+                title: 'Use Layer 2'
+            },
+            {
+                path: '/camera/focusObject.html',
+                title: 'Focus Object'
+            },
+            {
+                path: '/camera/dynamicGrid.html',
+                title: 'Dynamic Grid'
+            },
+            {
+                path: '/camera/saveState.html',
+                title: 'Save State'
+            }
+        ]
+    },
+    {
+        category: 'light',
+        title: 'Light',
+        pages: [
+            {
+                path: '/light/shadow.html',
+                title: 'Shadow'
+            },
+        ]
+    },
+    {
+        category: 'geometry',
+        title: 'Geometry',
+        pages: [
+            {
+                path: '/geometry/ParametricGeometry.html',
+                title: 'Parametric Geometry'
+            },
+            {
+                path: '/geometry/ring.html',
+                title: 'Ring'
+            },
+            {
+                path: '/geometry/ExtrudeGeometry.html',
+                title: 'Extrude Geometry'
+            },
+            {
+                path: '/geometry/isSamplePolygon.html',
+                title: 'Judge Sample Polygon'
+            },
+            {
+                path: '/geometry/splitMesh.html',
+                title: 'Split Mesh'
+            },
+            {
+                path: '/geometry/formulaPolygon.html',
+                title: 'Formula Polygon'
+            },
+            {
+                path: '/geometry/lathePolygon.html',
+                title: 'Lathe Polygon'
+            },
+            {
+                path: '/geometry/shapeGeometry.html',
+                title: 'Shape Geometry'
+            }
+        ]
+    },
+    {
+        category: 'material',
+        title: 'Material',
+        pages: [
+            {
+                path: '/material/clipping.html',
+                title: 'Clipping'
+            },
+            {
+                path:'/material/stencil.html',
+                title: 'Stencil'
+            }
         ]
     }
 ]
