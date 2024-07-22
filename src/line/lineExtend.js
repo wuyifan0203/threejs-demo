@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:04:12
+ * @LastEditTime: 2024-07-22 17:01:44
  * @FilePath: /threejs-demo/src/line/lineExtend.js
  */
 
@@ -23,7 +23,8 @@ import {
   initCustomGrid,
   initAxesHelper,
   initOrbitControls,
-  initScene
+  initScene,
+  resize
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -45,9 +46,11 @@ function init() {
   function render() {
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
+  resize(renderer,camera);
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

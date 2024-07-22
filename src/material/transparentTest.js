@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-08 17:17:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-12 10:58:32
+ * @LastEditTime: 2024-07-22 17:09:39
  * @FilePath: /threejs-demo/src/material/transparentTest.js
  */
 import {
@@ -72,7 +72,8 @@ function init() {
   function render() {
     orbitControls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 }

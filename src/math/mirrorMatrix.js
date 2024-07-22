@@ -28,7 +28,8 @@ import {
   initAmbientLight,
   initDirectionLight,
   initTransformControls,
-  initGUI
+  initGUI,
+  resize
 } from '../lib/tools/index.js';
 import { generateMirrorModalMatrix } from '../lib/tools/func.js'
 
@@ -95,9 +96,11 @@ async function init() {
     controls.update();
     light.position.copy(camera.position);
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
+  resize(renderer, camera);
 
-  renderer.setAnimationLoop(render);
 
   const planeFolder = gui.addFolder('Ax + By + Cz + D = 0');
   planeFolder.add(options.plane, 'a', -10, 10, 0.1).name('A').onChange(updatePlane);

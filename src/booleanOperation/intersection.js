@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-26 13:06:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 20:05:44
+ * @LastEditTime: 2024-07-22 11:23:24
  * @FilePath: /threejs-demo/src/booleanOperation/intersection.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -114,7 +114,6 @@ function init() {
         compare: tourKnotMesh
     }
 
-    transformControls.attach(controls.compare);
 
     const gui = initGUI();
     gui.add(controls, 'operation', {
@@ -174,12 +173,12 @@ function init() {
         compareBrush.disposeCacheData();
     }
 
-    transformControls.addEventListener('change', updateCSG)
-        (function render() {
-            orbitControls.update();
-            renderer.render(scene, camera);
-            requestAnimationFrame(render);
-        })()
+    transformControls.addEventListener('change', updateCSG);
+    (function render() {
+        orbitControls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    })()
 
     updateCSG();
 

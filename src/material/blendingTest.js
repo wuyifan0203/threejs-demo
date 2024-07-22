@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-07-25 16:53:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-11-01 17:29:00
- * @FilePath: /threejs-demo/examples/src/material/blendingTest.js
+ * @LastEditTime: 2024-07-22 17:07:31
+ * @FilePath: /threejs-demo/src/material/blendingTest.js
  */
 import {
   Vector3,
@@ -35,7 +35,6 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
   renderer.setClearColor(0xefefef);
-  renderer.setAnimationLoop(render);
 
   const camera = initOrthographicCamera(new Vector3(100, 100, 100));
   camera.lookAt(0, 0, 0);
@@ -78,7 +77,9 @@ function init() {
     renderer.clear();
     renderer.render(scene, camera);
     orbitControls.update();
+    requestAnimationFrame(render);
   }
+  render();
 
   resize(renderer, camera);
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-26 17:48:34
+ * @LastEditTime: 2024-07-22 14:35:00
  * @FilePath: /threejs-demo/src/cannon/pointConstraint.js
  */
 import {
@@ -23,7 +23,8 @@ import {
     initAmbientLight,
     initDirectionLight,
     initCoordinates,
-    rainbowColors
+    rainbowColors,
+    resize
 } from '../lib/tools/index.js';
 import {
     World,
@@ -49,7 +50,7 @@ function init() {
     const renderer = initRenderer({});
 
     const camera = initOrthographicCamera(new Vector3(0, -300, 300));
-    camera.zoom = 0.5;
+    camera.zoom = 0.1;
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
@@ -218,7 +219,7 @@ function init() {
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
 
-    function render() {
+    (function render() {
         world.step(1 / 120, clock.getDelta());
         cannonDebugger.update();
         renderer.render(scene, camera);
@@ -250,9 +251,10 @@ function init() {
             world.removeBody(mesh.userData.body);
             sphereArray.splice(index, 1);
         })
-    }
 
-    renderer.setAnimationLoop(render);
+        requestAnimationFrame(render);
+    })()
+
     cannonDebugger._object.visible = false;
     const gui = initGUI();
     gui.add(cannonDebugger._object, 'visible').name('debugger');
@@ -261,4 +263,6 @@ function init() {
     gui.add(groundSphereContactMaterial, 'restitution', 0, 1, 0.01).name('ground restitution');
 
     window.world = world;
+
+    resize(renderer, camera);
 }

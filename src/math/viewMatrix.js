@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-08 10:54:14
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-08 17:33:50
+ * @LastEditTime: 2024-07-22 17:41:09
  * @FilePath: /threejs-demo/src/math/viewMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -26,6 +26,7 @@ import {
     initOrbitControls,
     initAmbientLight,
     initDirectionLight,
+    resize,
 } from '../lib/tools/index.js';
 
 window.onload = function () {
@@ -37,6 +38,7 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
+    camera.zoom = 0.25;
     const scene = initScene();
     initAmbientLight(scene);
     const light = initDirectionLight();
@@ -79,9 +81,12 @@ function init() {
         updateFixedInstanceMesh()
         updateMovedInstanceMesh(time)
         mesh.lookAt(sphereMesh.position);
-    }
 
-    renderer.setAnimationLoop(render);
+        requestAnimationFrame(render);
+    }
+    render();
+    resize(renderer, camera);
+
 
     function updateFixedInstanceMesh() {
         for (let i = 0, offset = Math.PI * 2 / fixedRadius; i < fixedRadius; i++) {

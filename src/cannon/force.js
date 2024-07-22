@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-18 20:47:45
+ * @LastEditTime: 2024-07-22 14:25:00
  * @FilePath: /threejs-demo/src/cannon/force.js
  */
 import {
@@ -109,6 +109,7 @@ function init() {
     });
 
     const sphere = new Mesh(new SphereGeometry(2, 64, 64), sphereMaterial);
+    sphere.position.set(0, 0, 3);
     sphere.castShadow = true;
 
     scene.add(sphere);
@@ -126,11 +127,11 @@ function init() {
     const vertex = sphere.geometry.getAttribute('position').array;
     const indices = sphere.geometry.getIndex().array;
 
-    console.log(vertex,indices);
+    console.log(vertex, indices);
     const sphereShape = new Trimesh(vertex, indices);
-    const sphereBody = new Body({ mass: 2, shape: sphereShape});
-    sphereBody.material = new Material({ friction: 100 });
-    sphereBody.position.set(0, 0, 2);
+    const sphereBody = new Body({ mass: 2, shape: sphereShape });
+    sphereBody.material = new Material({ friction: 100, restitution: 0.1 });
+    sphereBody.position.copy(sphere.position);
     sphereBody.linearDamping = 0;
 
     console.log(sphere);
@@ -172,10 +173,10 @@ function init() {
 
     resize(renderer, camera);
 
-
     const clock = new Clock();
-    const timeStep = 1 / 60
-    function render() {
+    const timeStep = 1 / 60;
+
+    (function render() {
         const deltaTime = clock.getDelta();
         orbitControl.update();
         operation.debug && cannonDebugger.update();
@@ -183,9 +184,9 @@ function init() {
         sphere.position.copy(sphereBody.position);
         sphere.quaternion.copy(sphereBody.quaternion);
         renderer.render(scene, camera);
-        // console.log(sphereBody.velocity.x);
-    }
 
-    renderer.setAnimationLoop(render);
+        requestAnimationFrame(render);
+    })()
+
 
 }

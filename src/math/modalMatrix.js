@@ -34,9 +34,10 @@ window.onload = function () {
 
 function init() {
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
-  const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
+  const camera = initOrthographicCamera(new Vector3(1000, 1000, 300));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
+  camera.zoom = 0.2;
   const scene = initScene();
 
   renderer.setClearColor(0xffffff);
@@ -166,9 +167,6 @@ function init() {
     animatePosition();
     requestAnimationFrame(render);
   }
-
-  window.camera = camera;
-  window.scene = scene;
 
   function circlingMotion(r, w, t, x, y) {
     return { x: x + r * Math.cos(w * t), y: y + r * Math.sin(w * t) };

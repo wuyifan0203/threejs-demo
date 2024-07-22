@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-18 20:54:10
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-27 20:20:26
+ * @LastEditTime: 2024-07-22 17:33:17
  * @FilePath: /threejs-demo/src/math/mvp.js
  */
 /* eslint-disable no-unused-vars */
@@ -57,9 +57,11 @@ function init() {
 
     renderer.setClearColor(0xffffff);
 
-    renderer.setAnimationLoop(() => {
-        renderer.render(scene, camera)
-    })
+    function render() {
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
+    }
+    render();
 
     const projectionMatrix = new Matrix4().makeOrthographic(-15, 15, -15, 15, 1, 100);
 
@@ -73,11 +75,11 @@ function init() {
     const modelMatrix = new Matrix4().makeTranslation(new Vector3(0, 1, 2));
     console.log({ modelMatrix });
 
-    const ndcMatrix =createNDCMatrix(1000, 800);
+    const ndcMatrix = createNDCMatrix(1000, 800);
     console.log({ ndcMatrix });
 
     // 立方体左下角坐标
-    const point = new Vector3(2,-2,2);
+    const point = new Vector3(2, -2, 2);
 
     // 转换到实际坐标
 

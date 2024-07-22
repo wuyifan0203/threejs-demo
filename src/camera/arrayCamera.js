@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-26 17:49:52
+ * @LastEditTime: 2024-07-22 11:24:07
  * @FilePath: /threejs-demo/src/camera/arrayCamera.js
  */
 import {
@@ -60,11 +60,10 @@ function init() {
 
   window.addEventListener('resize', updateCamera);
 
-  render();
-  function render() {
-    requestAnimationFrame(render);
+  (function render() {
     renderer.render(scene, arrayCamera);
-  }
+    requestAnimationFrame(render);
+  })()
 
   const sphere1 = new SphereGeometry(5, 20, 16);
   const sphere2 = new SphereGeometry(3, 20, 16);

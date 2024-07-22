@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-17 19:27:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:33:09
+ * @LastEditTime: 2024-07-22 15:36:11
  * @FilePath: /threejs-demo/src/controls/useOrbitControls.js
  */
 import {
@@ -38,23 +38,25 @@ function init() {
     initAxesHelper(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    controls.addEventListener('change',render)
     controls.zoomToCursor = true;
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    function render() {
+    function update() {
         renderer.clear();
         renderer.render(scene, camera);
         viewHelper.render(renderer);
     }
 
-    renderer.setAnimationLoop(()=>{
-        if(controls.autoRotate || controls.enableDamping){
+    function render() {
+        if (controls.autoRotate || controls.enableDamping) {
             controls.update();
-            render()
         }
-    });
-    
+        update()
+        requestAnimationFrame(render);
+    }
+    render();
+
+
 
     const geometry = new BoxGeometry(4, 4, 4);
     const material = new MeshNormalMaterial({});
@@ -66,7 +68,6 @@ function init() {
 
     scene.add(mesh, mesh1);
 
-    render()
 
     const gui = initGUI();
     const folderOptions = gui.addFolder('OrbitControls parameters');
@@ -86,13 +87,13 @@ function init() {
     folderOptions.add(controls, 'saveState').name('Save State');
     folderOptions.add(controls, 'reset').name('Reset');
 
-    const folderAnimations = folderOptions.addFolder( 'Animations' );
+    const folderAnimations = folderOptions.addFolder('Animations');
     folderAnimations.add(controls, 'autoRotate').name('Auto Rotate');
     folderAnimations.add(controls, 'autoRotateSpeed', 0, 100, 1).name('autoRotateSpeed');
     folderAnimations.add(controls, 'enableDamping').name('Enable Damping');
     folderAnimations.add(controls, 'dampingFactor', 0.01, 1, 0.01).name('Damping');
 
 
-    
+
 
 }

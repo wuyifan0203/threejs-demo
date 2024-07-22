@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-26 15:11:14
+ * @LastEditTime: 2024-07-22 15:30:29
  * @FilePath: /threejs-demo/src/composer/useWbOITPass.js
  */
 
@@ -45,8 +45,7 @@ window.onload = () => {
 async function init() {
 
     const params = {
-        layers: 3,
-        showNormal: false,
+        showNormal: true,
         showOIT: true,
         log: false,
         weight: 1
@@ -112,7 +111,7 @@ async function init() {
     planeMesh1.position.set(-1.6, 0, 1.5);
     scene.add(planeMesh1);
 
-    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture1, transparent: true, opacity: 1}));
+    const planeMesh2 = new Mesh(planeGeometry, new MeshStandardMaterial({ side: 2, map: texture1, transparent: true, opacity: 1 }));
     planeMesh2.rotation.x = Math.PI / 2;
     planeMesh2.rotation.y = Math.PI * -0.2;
     planeMesh2.position.set(-1.2, 0, -1.5);
@@ -189,7 +188,7 @@ async function init() {
                 }
 
             }
-        }else if (obj.isDirectionalLight) {
+        } else if (obj.isDirectionalLight) {
             // obj.visible = false;
         }
     })
@@ -199,7 +198,7 @@ async function init() {
     console.log(scene2.children);
 
 
-    function render() {
+    (function render() {
         renderer.clear();
         orbitControl.update();
 
@@ -216,21 +215,16 @@ async function init() {
             rightComposer.render();
 
             renderer.setScissorTest(false);
-
-            return
         } else if (params.showNormal) {
             leftComposer.render();
-            return
         } else if (params.showOIT) {
             rightComposer.render();
-            return
         }
-
-    }
+        requestAnimationFrame(render);
+    })()
 
     resize();
 
-    renderer.setAnimationLoop(render)
 
 
     function resize() {
@@ -245,6 +239,6 @@ async function init() {
     window.addEventListener('resize', resize);
 
     const gui = initGUI();
-    gui.add(params, 'showNormal').onChange(render);
-    gui.add(params, 'showOIT').onChange(render);
+    gui.add(params, 'showNormal');
+    gui.add(params, 'showOIT');
 }

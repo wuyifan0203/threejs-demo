@@ -18,7 +18,8 @@ import {
   initAxesHelper,
   angle2Radians,
   initGUI,
-  initScene
+  initScene,
+  resize
 } from '../lib/tools/index.js';
 
 
@@ -258,11 +259,13 @@ function init() {
   const controls = new OrbitControls(camera, renderer.domElement);
   draw(scene);
 
-  function render() {
+  (function render() {
     controls.update();
     renderer.render(scene, camera);
-  }
-  renderer.setAnimationLoop(render);
+    requestAnimationFrame(render);
+  })()
+
+  resize(renderer, camera);
 }
 
 function draw(scene) {

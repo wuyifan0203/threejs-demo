@@ -1,10 +1,18 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2023-11-21 16:26:11
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-07-22 13:24:24
+ * @FilePath: /threejs-demo/src/camera/dynamicGrid.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 import {
   Mesh,
   Color,
   BoxGeometry,
   Vector3,
-  WebGLRenderer,
   MeshNormalMaterial,
+  RingGeometry,
 } from '../lib/three/three.module.js';
 import { DynamicGrid } from '../lib/three/GridHelper2.js';
 import {
@@ -13,7 +21,9 @@ import {
   initOrthographicCamera,
   initScene,
   initOrbitControls,
-  initStats
+  initStats,
+  initGUI,
+  initCustomGrid
 } from '../lib/tools/index.js';
 
 
@@ -39,25 +49,27 @@ function init() {
   customGrid.rotateX(Math.PI / 2);
   scene.add(customGrid);
 
-  const customCamera = initOrthographicCamera(new Vector3(0, 0, 100));
-  const customRenderer = new WebGLRenderer({ antialias: true });
 
-  const boxMesh = new Mesh(new BoxGeometry(4, 4, 3), new MeshNormalMaterial());
+  const defaultGrid = initCustomGrid(scene, 100, 100);
+  defaultGrid.visible = false;
+
+  const material = new MeshNormalMaterial();
+
+  const boxMesh = new Mesh(new BoxGeometry(4, 4, 1), material);
   scene.add(boxMesh);
+  boxMesh.position.set(-3, -3, 0);
 
-  customRenderer.setSize(300, 200);
-  const dom2 = document.querySelector('#webgl-output2');
-  dom2.append(customRenderer.domElement);
+  const ringMesh = new Mesh(new RingGeometry(2, 4, 64), material);
+  scene.add(ringMesh);
+  ringMesh.position.set(3, 3, 0);
 
-  function render() {
+  (function render() {
     stats.begin();
     orbitControls.update();
     renderer.render(scene, camera);
-    customRenderer.render(scene, customCamera);
     stats.end();
     requestAnimationFrame(render);
-  }
-  render();
+  })();
 
 
   const dom = document.querySelector('#webgl-output');
@@ -70,95 +82,37 @@ function init() {
   dom.append(canvas);
   ctx.font = '15px serif';
 
-  function updateUnit(unit, gridUnit) {
-    // eslint-disable-next-line operator-assignment
-    unit = unit * gridUnit;
-    // console.log(unit, gridUnit);
-    ctx.clearRect(0, 0, 300, 100);
-    ctx.beginPath();
-    ctx.moveTo(20, 20);
-    ctx.lineTo(20 + unit, 20);
-    ctx.lineTo(20 + unit, 30);
-    ctx.lineTo(20, 30);
-    ctx.lineTo(20, 20);
-    ctx.fillStyle = '#808080';
-    ctx.fill();
-    ctx.strokeRect(20 + unit, 21, unit, 8);
-    ctx.strokeStyle = '#808080';
-    ctx.closePath();
-    gridUnit = parseFloat(gridUnit > 1 ? gridUnit.toFixed(1) : gridUnit.toFixed(10));
-    ctx.fillText(`${gridUnit} um`, 20, 10);
-  }
-
-  function getInterval(camera) {
-    const { width, height } = dom.getBoundingClientRect();
-    const cpi = camera.projectionMatrixInverse.elements;
-    const MP0 = cpi[0];
-    const MP5 = cpi[5];
-    const [divisionX, divisionY] = [width / MP0 / 2, height / MP5 / 2];
-    return {
-      x: divisionX,
-      y: divisionY,
-    };
-  }
-
   orbitControls.addEventListener('change', () => {
-    const { x: unitX } = getInterval(camera);
-
-    const { x, y } = getY(unitX);
-
-    // console.log('unitX', unitX, 'Y', x * y, 'x', x, 'y', y);
-
-    let gridUnit = 5;
-    if (y === 1) {
-      gridUnit = 1 * x;
-    } else if (y === 2) {
-      gridUnit = 2 * x;
-    } else if (y === 5) {
-      gridUnit = 4 * x;
-    }
-
-    gridUnit = Number(gridUnit.toFixed(14));
-
-    // console.log('gridUnit', gridUnit);
-    customGrid.updateInterval(gridUnit);
-    // 保证一直为虚线
-    customGrid.material.gapSize = gridUnit / 20;
-    customGrid.material.dashSize = gridUnit / 20;
-    customGrid.computeLineDistances();
-
-
-    const { x: cx, y: cy } = orbitControls.target;
-    const dx = cx % gridUnit;
-    const dy = cy % gridUnit;
-    const dz = cy % gridUnit;
-    const pos = new Vector3().subVectors(orbitControls.target, new Vector3(dx, dy, dz));
-    customGrid.position.copy(pos);
-    updateUnit(unitX, gridUnit);
+    customGrid.update(orbitControls.target, camera, dom);
+    updateUnit(ctx, customGrid.unit, customGrid.gridUnit);
   });
+
+  const options = {
+    disabled: false
+  }
+
+  const gui = initGUI();
+  gui.add(options, 'disabled').onChange(() => {
+    customGrid.visible = !options.disabled;
+    defaultGrid.visible = options.disabled;
+  })
 }
 
-function getY(x) {
-  let scaledX = x;
-  while (scaledX < 10) {
-    scaledX *= 10;
-  }
-
-  while (scaledX >= 100) {
-    scaledX /= 10;
-  }
-
-  let scaledY;
-  if (scaledX < 25) {
-    scaledY = 5;
-  } else if (scaledX < 50) {
-    scaledY = 2;
-  } else {
-    scaledY = 1;
-  }
-
-  return {
-    y: scaledY,
-    x: scaledX / x,
-  };
+function updateUnit(ctx, unit, gridUnit) {
+  unit = unit * gridUnit;
+  ctx.clearRect(0, 0, 300, 100);
+  ctx.beginPath();
+  ctx.moveTo(20, 20);
+  ctx.lineTo(20 + unit, 20);
+  ctx.lineTo(20 + unit, 30);
+  ctx.lineTo(20, 30);
+  ctx.lineTo(20, 20);
+  ctx.fillStyle = '#808080';
+  ctx.fill();
+  ctx.strokeRect(20 + unit, 21, unit, 8);
+  ctx.strokeStyle = '#808080';
+  ctx.closePath();
+  gridUnit = parseFloat(gridUnit > 1 ? gridUnit.toFixed(1) : gridUnit.toFixed(10));
+  ctx.fillText(`${gridUnit} um`, 20, 10);
 }
+

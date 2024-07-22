@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 17:21:04
+ * @LastEditTime: 2024-07-22 13:29:08
  * @FilePath: /threejs-demo/src/animate/loadModalWithAnimation.js
  */
 import {
@@ -22,7 +22,8 @@ import {
     initOrbitControls,
     initAmbientLight,
     initGUI,
-    initDirectionLight
+    initDirectionLight,
+    resize
 } from '../lib/tools/index.js';
 
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
@@ -156,5 +157,7 @@ async function init() {
         flamingoMixer.update(delta);
         storkMixer.update(delta);
         requestAnimationFrame(render)
-    })()
+    })();
+
+    resize(renderer, camera)
 }

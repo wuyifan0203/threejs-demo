@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-17 20:30:46
+ * @LastEditTime: 2024-07-22 13:27:20
  * @FilePath: /threejs-demo/src/camera/focusObject.js
  */
 
@@ -59,20 +59,13 @@ function init() {
 
     const coord = initCoordinates();
 
-    orbitControls.addEventListener('change', () => {
-        render()
-    })
-
-    function render() {
+    (function render() {
         renderer.clear();
-
         light.position.copy(camera.position);
-
         renderer.render(scene, camera);
-        renderer.render(coord, camera)
-    }
-
-
+        renderer.render(coord, camera);
+        requestAnimationFrame(render);
+    })()
 
     const redMaterial = new MeshLambertMaterial({ color: 'red' });
     const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -100,12 +93,11 @@ function init() {
     const meshes = [meshRed, meshGreen, meshBlue, meshYellow];
 
     scene.add(...meshes)
-    render();
+
     const o = {
         target: -1,
         focus() {
             focusObject(this.target === -1 ? meshes : [meshes[this.target]]);
-            render();
         },
         useTween: false
     }
@@ -132,7 +124,6 @@ function init() {
     window.addEventListener('resize', () => {
         createNDCMatrix(window.innerWidth, window.innerHeight, ndcMatrix)
     });
-
 
     let tween = null;
 
@@ -190,7 +181,6 @@ function init() {
             objectsBox2.min.y = Math.min(objectsBox2.min.y, v.y);
         })
 
-
         const { innerWidth: width, innerHeight: height } = window;
 
         const [boxWidth, boxHeight] = [
@@ -210,11 +200,9 @@ function init() {
 
         const radius = camera.position.distanceTo(orbitControls.target);
 
-
         const direction = new Vector3().subVectors(camera.position, orbitControls.target).normalize();
 
         const position = direction.multiplyScalar(radius).add(center);
-
 
         // tween.
         if (o.useTween) {
@@ -252,14 +240,5 @@ function init() {
             orbitControls.target.copy(center);
             orbitControls.update();
         }
-
-
-
     }
-
 }
-
-
-
-
-

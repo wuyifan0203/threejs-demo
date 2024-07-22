@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-18 17:39:42
+ * @LastEditTime: 2024-07-22 15:02:42
  * @FilePath: /threejs-demo/src/cannon/pointerLockControl.js
  */
 import {
@@ -28,6 +28,7 @@ import {
     initCoordinates,
     initStats,
     rainbowColors,
+    resize,
 } from '../lib/tools/index.js';
 import {
     World,
@@ -105,9 +106,12 @@ function init() {
 
     const playerShape = new Sphere(2);
 
-    const playerBody = new Body({ mass: 5, shape: playerShape, material: new Material({ friction: 1 }) });
+    const playerBody = new Body({ mass: 100000, shape: playerShape, material: new Material({ friction: 1 }) });
     playerBody.position.copy(playerInitPosition);
+    playerBody.linearDamping = 0.8
     world.addBody(playerBody);
+
+
 
     const playerControl = new PointerLockControlsCannon(playEye, playerBody);
     playerControl.jumpVelocity = 10;
@@ -160,25 +164,30 @@ function init() {
         }
     }
 
+    const playContactMaterial = new ContactMaterial(playerBody.material, terrainBody.material, { friction: 1, restitution: 0 });
+    world.addContactMaterial(playContactMaterial);
+
     // init PointerLockControls
     const player = playerControl.getObject();
     player.name = 'player';
+    player.visible = false;
     scene.add(player);
 
     instructions.addEventListener('click', () => {
         playerControl.lock()
     })
 
+    let animate = undefined;
     playerControl.addEventListener('lock', () => {
         playerControl.enabled = true;
         instructions.style.display = 'none';
-        renderer.setAnimationLoop(playRender);
+        playRender();
     })
 
     playerControl.addEventListener('unlock', () => {
         playerControl.enabled = false;
         instructions.style.display = 'flex';
-        renderer.setAnimationLoop(null);
+        animate !== undefined && cancelAnimationFrame(animate);
     })
 
 
@@ -252,7 +261,7 @@ function init() {
 
     const clock = new Clock();
 
-    function playRender() {
+    function update() {
         const dt = clock.getDelta();
         world.step(1 / 120, dt);
         renderer.render(scene, playEye);
@@ -266,18 +275,22 @@ function init() {
         })
     }
 
+    function playRender() {
+        update()
+        animate = requestAnimationFrame(playRender);
+    }
+
+    update();
+
     window.addEventListener('keypress', (evt) => {
-        if (evt.key == 'r') {
+        if (evt.key == 'R') {
             playerBody.position.copy(playerInitPosition);
             playerBody.quaternion.set(0, 0, 0, 1);
             playerBody.velocity.set(0, 0, 0);
         }
     })
 
-    const gui = initGUI();
-    gui.add(contactMaterial, 'friction', 0, 1, 0.1);
-    gui.add(contactMaterial, 'restitution', 0, 1, 0.1);
-
+    resize(renderer, playEye, update)
 }
 
 

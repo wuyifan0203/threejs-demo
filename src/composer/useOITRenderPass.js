@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 16:50:56
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-27 17:35:35
+ * @LastEditTime: 2024-07-22 15:28:04
  * @FilePath: /threejs-demo/src/composer/useOITRenderPass.js
  */
 
@@ -80,7 +80,7 @@ async function init() {
     initAmbientLight(scene)
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
-    orbitControl.addEventListener('change', render);
+    // orbitControl.addEventListener('change', render);
 
     const sphereMesh = new Mesh(new SphereGeometry(), new MeshStandardMaterial());
     sphereMesh.position.set(1.5, 0, 3);
@@ -149,7 +149,7 @@ async function init() {
     rightComposer.addPass(effectCopy);
 
 
-    function render() {
+    (function render() {
         renderer.clear();
 
         if (params.showNormal && params.showOIT) {
@@ -160,19 +160,16 @@ async function init() {
             renderer.setScissor(halfWidth, 0, halfWidth, window.innerHeight);
             rightComposer.render();
             renderer.setScissorTest(false);
-            return
         } else if (params.showNormal) {
             leftComposer.render();
-            return
         } else if (params.showOIT) {
             rightComposer.render();
-            return
         }
-    }
+        requestAnimationFrame(render)
+    })()
 
     resize();
 
-    renderer.setAnimationLoop(render)
 
 
     function resize() {
@@ -187,8 +184,8 @@ async function init() {
     window.addEventListener('resize', resize);
 
     const gui = initGUI();
-    gui.add(params, 'showNormal').onChange(render);
-    gui.add(params, 'showOIT').onChange(render);
+    gui.add(params, 'showNormal');
+    gui.add(params, 'showOIT');
     gui.add(params, 'log').onChange(() => {
         oitRenderPass.debuggerMode();
         console.log(oitRenderPass);

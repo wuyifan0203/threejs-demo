@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:14:58
+ * @LastEditTime: 2024-07-22 16:24:49
  * @FilePath: /threejs-demo/src/geometry/ParametricGeometry.js
  */
 import {
@@ -42,14 +42,14 @@ function init() {
 
   draw(scene);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })()
 
-  renderer.setAnimationLoop(render);
 
 }
 
@@ -187,12 +187,11 @@ function draw(scene) {
   const material = new MeshNormalMaterial({
     depthTest: true,
     side: 2,
-    // wireframe:true
   });
 
   const controls = {
     material,
-    drawFunc: list[0],
+    drawFunc: list[6],
   };
   const parametric = new ParametricGeometry(funcList[controls.drawFunc], 50, 50);
 

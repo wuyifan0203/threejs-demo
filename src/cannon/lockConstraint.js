@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-24 14:25:21
+ * @LastEditTime: 2024-07-22 14:30:41
  * @FilePath: /threejs-demo/src/cannon/lockConstraint.js
  */
 import {
@@ -21,7 +21,8 @@ import {
     initScene,
     initAmbientLight,
     initDirectionLight,
-    initCoordinates
+    initCoordinates,
+    resize
 } from '../lib/tools/index.js';
 import {
     World,
@@ -54,7 +55,7 @@ function init() {
 
     initAmbientLight(scene);
 
-    scene.add(initCoordinates(50))
+    // scene.add(initCoordinates(50))
 
     const aspect = window.innerWidth / window.innerHeight;
 
@@ -168,8 +169,14 @@ function init() {
 
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
 
+    cannonDebugger._object.visible = false;
+    const gui = initGUI();
+    gui.add(cannonDebugger._object, 'visible').name('debugger')
+
+    window.world = world;
+
     const clock = new Clock();
-    function render() {
+    (function render() {
         world.step(1 / 120, clock.getDelta());
 
         cannonDebugger.update();
@@ -180,12 +187,9 @@ function init() {
             bridgeBlocks[i].position.copy(body.position);
             bridgeBlocks[i].quaternion.copy(body.quaternion);
         })
-    }
 
-    renderer.setAnimationLoop(render);
+        requestAnimationFrame(render);
+    })();
 
-    const gui = initGUI();
-    gui.add(cannonDebugger._object, 'visible').name('debugger')
-
-    window.world = world;
+    resize(renderer, camera);
 }

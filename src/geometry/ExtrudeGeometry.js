@@ -39,14 +39,14 @@ function init() {
 
   draw(scene);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 }
 
 const funcList = {
@@ -102,12 +102,12 @@ function draw(scene) {
     side: 2,
   });
 
-  const controls = { drawFunc: list[0] };
+  const controls = { drawFunc: list[2] };
 
   const extrudeSettings = {
     steps: 2,
     depth: 3,
-    bevelEnabled: true,
+    bevelEnabled: false,
     bevelThickness: 1,
     bevelSize: 1,
     bevelOffset: 0,

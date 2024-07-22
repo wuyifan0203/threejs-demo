@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-19 10:03:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-19 16:48:21
+ * @LastEditTime: 2024-07-22 15:15:52
  * @FilePath: /threejs-demo/src/composer/useCopyShader.js
  */
 import {
@@ -10,7 +10,7 @@ import {
     SRGBColorSpace,
     SphereGeometry,
     TextureLoader,
-    MeshBasicMaterial,
+    MeshStandardMaterial,
     GridHelper,
 } from '../lib/three/three.module.js';
 
@@ -18,13 +18,14 @@ import { RenderPass } from '../lib/three/RenderPass.js'
 import { ShaderPass } from '../lib/three/ShaderPass.js'
 import { CopyShader } from '../lib/three/CopyShader.js'
 import { EffectComposer } from '../lib/three/EffectComposer.js'
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import {
     initRenderer,
     initOrbitControls,
     resize,
     initOrthographicCamera,
-    initScene
+    initScene,
+    initGUI,
+    initDirectionLight
 } from '../lib/tools/index.js';
 import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
 
@@ -46,10 +47,13 @@ function init() {
     resize(renderer, camera);
 
     initOrbitControls(camera, renderer.domElement);
-    renderer.setAnimationLoop(render);
 
     const scene = initScene();
-    const sphere = new Mesh(new SphereGeometry(5, 32, 32), new MeshBasicMaterial({ color: 'green' }));
+    const light = initDirectionLight();
+    scene.add(light)
+
+  
+    const sphere = new Mesh(new SphereGeometry(5, 32, 32), new MeshStandardMaterial({ color: '#90ff79' }));
     scene.add(sphere)
 
     const composer = new EffectComposer(renderer);
@@ -77,14 +81,21 @@ function init() {
     effectCopy.renderToScreen = true;
     composer.addPass(effectCopy);
 
-    function render() {
+    function update() {
         renderer.clear()
         renderer.setRenderTarget(null);
+        light.position.copy(camera.position)
         composer.render();
     }
 
+    function render() {
+        update();
+        requestAnimationFrame(render);
+    }
+    render();
 
-    const gui = new GUI();
+
+    const gui = initGUI();
 
 
     const o = {
@@ -102,7 +113,7 @@ function init() {
                  background-repeat: no-repeat;
                  padding: 200px;
                 `,
-              );
+            );
         }
     }
 

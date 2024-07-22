@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-27 20:53:41
+ * @LastEditTime: 2024-07-22 15:04:38
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -168,17 +168,21 @@ function initAxesHelper(scene) {
  * @param {Camera} camera
  * @return {void}
  */
-function resize(render, camera) {
+function resize(render, cameras, callback) {
+  cameras = Array.isArray(cameras) ? cameras : [cameras];
   window.addEventListener('resize', () => {
     const [w, h] = [window.innerWidth, window.innerHeight];
     render.setSize(window.innerWidth, window.innerHeight);
-    if (camera.type === 'OrthographicCamera') {
-      camera.top = 15 * (h / w);
-      camera.bottom = -15 * (h / w);
-    } else if (camera.type === 'PerspectiveCamera') {
-      camera.aspect = window.innerWidth / window.innerHeight;
-    }
-    camera.updateProjectionMatrix();
+    cameras.forEach((camera) => {
+      if (camera.type === 'OrthographicCamera') {
+        camera.top = 15 * (h / w);
+        camera.bottom = -15 * (h / w);
+      } else if (camera.type === 'PerspectiveCamera') {
+        camera.aspect = window.innerWidth / window.innerHeight;
+      }
+      camera.updateProjectionMatrix();
+    })
+    callback && callback()
   });
 }
 
@@ -214,7 +218,8 @@ function initScene() {
 }
 
 function initCoordinates(axesLength) {
-  return new CoordinateHelper(axesLength);
+  window.coordinateHelper = new CoordinateHelper(axesLength)
+  return window.coordinateHelper;
 }
 
 function initDirectionLight(color = 0xffffff, intensity = 3) {

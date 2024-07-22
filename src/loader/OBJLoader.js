@@ -75,9 +75,11 @@ const init = () => {
   function render() {
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
+  
 
-  renderer.setAnimationLoop(render);
 };
 
 

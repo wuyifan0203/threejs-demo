@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-12 16:00:21
+ * @LastEditTime: 2024-07-22 17:07:00
  * @FilePath: /threejs-demo/src/loader/rgbeLoader.js
  */
 import {
@@ -39,7 +39,6 @@ function init() {
   const renderer = initRenderer();
   renderer.outputEncoding = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
-  renderer.setAnimationLoop(animation);
 
   const camera = initPerspectiveCamera(new Vector3(0, -2, 33));
   camera.lookAt(0, 0, 0);
@@ -54,7 +53,7 @@ function init() {
   const { cubeCamera, cube, torus } = draw(scene, renderer, controls);
   resize(renderer, camera);
 
-  function animation(msTime) {
+  function render(msTime) {
     if (!stop) {
       const time = msTime / 1000;
       cube.position.x = Math.cos(time) * 30;
@@ -72,7 +71,11 @@ function init() {
     cubeCamera.update(renderer, scene);
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
+  
+  
 
 }
 

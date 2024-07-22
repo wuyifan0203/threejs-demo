@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-30 14:42:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-08 10:48:34
+ * @LastEditTime: 2024-07-22 17:42:46
  * @FilePath: /threejs-demo/src/object/instanceMesh.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -24,7 +24,8 @@ import {
     initOrbitControls,
     initAmbientLight,
     initDirectionLight,
-    initGUI
+    initGUI,
+    resize
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -36,6 +37,7 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, -3, 10).setLength(1000));
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
+    camera.zoom = 0.09;
     const scene = initScene();
 
     initAmbientLight(scene);
@@ -84,7 +86,7 @@ function init() {
     }
 
     const meshGroup = new Group();
-    for (let j = 0, q = Math.floor(Math.sqrt(10000)),p = q / 2; j < 10000; j++) {
+    for (let j = 0, q = Math.floor(Math.sqrt(10000)), p = q / 2; j < 10000; j++) {
         const mesh = new Mesh(geometry, meshMaterial);
         const x = j % q;
         const y = Math.floor(j / q);
@@ -110,7 +112,9 @@ function init() {
         renderer.render(scene, camera);
         controls.update();
         drawCallGUI.setValue(renderer.info.render.calls);
+        requestAnimationFrame(render);
     }
+    render();
+    resize(renderer, camera);
 
-    renderer.setAnimationLoop(render)
 }

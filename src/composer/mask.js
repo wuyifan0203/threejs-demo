@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-08-18 21:00:56
- * @FilePath: /threejs-demo/examples/src/composer/mask.js
+ * @LastEditTime: 2024-07-22 15:08:52
+ * @FilePath: /threejs-demo/src/composer/mask.js
  */
 import {
     Vector3,
@@ -19,12 +19,12 @@ import { ClearMaskPass, MaskPass } from '../lib/three/MaskPass.js'
 import { ShaderPass } from '../lib/three/ShaderPass.js'
 import { SepiaShader } from '../lib/three/SepiaShader.js'
 import { ColorifyShader } from '../lib/three/ColorifyShader.js'
-import { GUI } from '../lib/util/lil-gui.module.min.js';
 import {
     initRenderer,
     initOrbitControls,
     resize,
     initOrthographicCamera,
+    initGUI
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -33,7 +33,6 @@ window.onload = () => {
 
 function init() {
     const renderer = initRenderer();
-    renderer.setAnimationLoop(render)
     const camera = initOrthographicCamera(new Vector3(14, -16, 13));
 
     renderer.setClearColor(0xff0000);
@@ -82,7 +81,9 @@ function init() {
         renderer.clear();
         controls.update();
         renderer.render(sceneA, camera);
+        requestAnimationFrame(render);
     }
+    render();
 }
 
 function initLight(object3D) {

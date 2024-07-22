@@ -2,7 +2,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:46:55
+ * @LastEditTime: 2024-07-22 17:05:24
  * @FilePath: /threejs-demo/src/loader/cubeTextureLoader.js
  */
 import {
@@ -40,9 +40,10 @@ function init() {
     controls.update();
     renderer.clear();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

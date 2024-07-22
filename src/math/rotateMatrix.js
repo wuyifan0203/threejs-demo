@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-03 17:14:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-22 11:12:31
+ * @LastEditTime: 2024-07-22 17:37:12
  * @FilePath: /threejs-demo/src/math/rotateMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -46,9 +46,10 @@ function init() {
     function render() {
         renderer.render(scene, camera);
         control.update();
+        requestAnimationFrame(render);
     }
+    render();
 
-    renderer.setAnimationLoop(render);
 
 
     const gui = initGUI();

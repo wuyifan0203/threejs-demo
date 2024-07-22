@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:05:29
+ * @LastEditTime: 2024-07-22 17:03:23
  * @FilePath: /threejs-demo/src/line/shape.js
  */
 import {
@@ -16,7 +16,8 @@ import {
   initAxesHelper,
   initCustomGrid,
   initScene,
-  initOrbitControls
+  initOrbitControls,
+  resize
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -38,9 +39,11 @@ function init() {
   function render() {
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
+  resize(renderer, camera);
 
   const x = 4 / 2;
   const y = 4 / 2;

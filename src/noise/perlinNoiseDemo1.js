@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-28 15:25:38
+ * @LastEditTime: 2024-07-22 17:41:51
  * @FilePath: /threejs-demo/src/noise/perlinNoiseDemo1.js
  */
 
@@ -62,7 +62,8 @@ function init() {
   function render() {
     orbitControl.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 }

@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 17:06:55
- * @FilePath: /threejs-demo/bin/screenShot.js
+ * @LastEditTime: 2024-07-22 15:43:43
+ * @FilePath: /threejs-demo/bin/screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import * as puppeteer from 'puppeteer';
@@ -55,7 +55,7 @@ const jpgQuality = 95;
 const pageNum = 8;
 const viewport = { width: width * viewScale, height: height * viewScale };
 const browser = await puppeteer.launch({
-  headless: false, // 设置为 false 以启用可视模式
+  // headless: false, // 设置为 false 以启用可视模式
   args: ['--disable-web-security', '--allow-file-access-from-files', '--hide-scrollbars', '--enable-gpu'],
   defaultViewport: viewport,
 });
@@ -77,9 +77,8 @@ const errorPages = [];
 async function main() {
   // 获取所有标签的href
   let urls = [];
-  // urls = await getAnchorsHref();
+  urls = await getAnchorsHref();
 
-  urls = ['http://localhost:6600/threejs-demo/src/canvas/canvasGradient.html'];
 
   const pages = await browser.pages();
 
@@ -113,7 +112,7 @@ async function getAnchorsHref() {
   // open a new blank page
   const page = await browser.newPage();
   // await page.setViewport({ width: 1080, height: 1024 });
-  await page.goto(`http://localhost:${port}${baseURL}/index.html`, {
+  await page.goto(`http://localhost:${port}${baseURL}/index2.html`, {
     waitUntil: ['networkidle0', 'load'],
     timeout: networkTimeout * 60000
   });

@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-23 16:05:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:16:50
+ * @LastEditTime: 2024-07-22 16:18:26
  * @FilePath: /threejs-demo/src/geometry/lathePolygon.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -33,28 +33,29 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
+  const camera = initPerspectiveCamera(new Vector3(-15, 15, 15));
   const scene = initScene();
   renderer.setClearColor(0xffffff);
   renderer.autoClear = false;
-  camera.up.set(0, 0, 1);
   resize(renderer, camera);
-  initCustomGrid(scene);
+
   initAxesHelper(scene);
+  const grid = initCustomGrid(scene);
+  grid.rotateX(Math.PI / 2);
 
   const controls = initOrbitControls(camera, renderer.domElement);
   const viewHelper = new ViewHelper(camera, renderer.domElement);
 
   draw(scene);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -72,16 +73,16 @@ function draw(scene) {
   ];
 
   const controls = {
-    drawFunc: 0,
+    drawFunc: 1,
     segment: 12,
-    phiLength: Math.PI * 2,
+    phiLength: Math.PI * 0.5,
   };
 
   const geometryParams = {
     xMin: -25,
     xMax: 25,
     yMin: -25,
-    yMax: 25,
+    yMax: 10,
     resolution: 200,
   };
 
@@ -89,7 +90,7 @@ function draw(scene) {
     return Number(num.toFixed(bit));
   }
 
-  function getFormularPoints() {
+  function getFormulaPoints() {
     const {
       xMax, xMin, yMax, yMin, resolution,
     } = geometryParams;
@@ -120,7 +121,7 @@ function draw(scene) {
     };
   }
 
-  const latheGeometry = new LatheGeometry(getFormularPoints(), controls.segment, 0, controls.phiLength);
+  const latheGeometry = new LatheGeometry(getFormulaPoints(), controls.segment, 0, controls.phiLength);
 
   const getOptions = () => {
     const options = {};
@@ -150,7 +151,7 @@ function draw(scene) {
 
   function update() {
     mesh.geometry.dispose();
-    mesh.geometry = new LatheGeometry(getFormularPoints(), controls.segment, 0, controls.phiLength);
+    mesh.geometry = new LatheGeometry(getFormulaPoints(), controls.segment, 0, controls.phiLength);
   }
 
   scene.add(mesh);

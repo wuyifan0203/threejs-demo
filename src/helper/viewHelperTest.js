@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-04 10:59:15
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-02-24 13:29:52
- * @FilePath: /threejs-demo/src/examples/viewHelperTest/index2.js
+ * @LastEditors: Yifan Wu 1208097313@qq.com
+ * @LastEditTime: 2024-07-22 16:30:50
+ * @FilePath: /threejs-demo/src/helper/viewHelperTest.js
  */
 import * as THREE from '../lib/three/three.module.js';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
@@ -12,7 +12,7 @@ let mesh; let renderer; let scene; let camera; let controls; let
   helper;
 
 init();
-animate();
+render();
 
 function init() {
   // renderer
@@ -63,8 +63,8 @@ function init() {
   helper = new ViewHelper(camera, renderer.domElement);
 }
 
-function animate() {
-  requestAnimationFrame(animate);
+function render() {
+  requestAnimationFrame(render);
 
   renderer.clear(); // 2
 

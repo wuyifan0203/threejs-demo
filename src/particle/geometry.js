@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-19 17:39:48
+ * @LastEditTime: 2024-07-22 17:54:02
  * @FilePath: /threejs-demo/src/particle/geometry.js
  */
 import {
@@ -18,7 +18,8 @@ import {
 } from '../lib/three/three.module.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
-  initRenderer, resize, angle2Radians, initGUI, initStats, initScene, initOrbitControls
+  initRenderer, resize, angle2Radians, initGUI, initStats, initScene, initOrbitControls,
+  previewCanvas
 } from '../lib/tools/index.js';
 
 
@@ -78,7 +79,7 @@ function init() {
     depthTest: true,
     depthWrite: false,
     transparent: true,
-    blending: AdditiveBlending,
+    // blending: AdditiveBlending,
   });
   const geometry = new SphereGeometry(16, 16, 16);
   const mesh = new Points(geometry, material);
@@ -107,6 +108,8 @@ function init() {
     context.fillRect(0, 0, canvas.width, canvas.height);
     const texture = new Texture(canvas);
     texture.needsUpdate = true;
+
+    previewCanvas(canvas)
     return texture;
   }
 

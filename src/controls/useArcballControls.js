@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-25 10:46:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-25 15:39:30
+ * @LastEditTime: 2024-07-22 15:31:43
  * @FilePath: /threejs-demo/src/controls/useArcballControls.js
  */
 import {
@@ -39,15 +39,15 @@ function init() {
 
     const controls = new ArcballControls(orthographic, renderer.domElement, scene);
 
-    controls.addEventListener('change', render);
 
     const viewHelper = new ViewHelper(orthographic, renderer.domElement);
 
-    function render() {
+    (function render() {
         renderer.clear();
         renderer.render(scene, orthographic);
         viewHelper.render(renderer);
-    }
+        requestAnimationFrame(render);
+    })()
 
     const geometry = new BoxGeometry(4, 4, 4);
     const material = new MeshNormalMaterial({});
@@ -58,7 +58,6 @@ function init() {
     mesh1.position.set(2, 2, 0)
 
     scene.add(mesh, mesh1);
-    render();
 
     const o = { gizmoVisible: true }
 

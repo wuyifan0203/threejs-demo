@@ -1,7 +1,7 @@
 /*
  * @Date: 2022-11-16 15:00:21
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:06:44
+ * @LastEditTime: 2024-07-22 17:04:34
  * @FilePath: /threejs-demo/src/line/useLine.js
  */
 
@@ -21,6 +21,7 @@ import {
   initRenderer,
   initOrthographicCamera,
   initAxesHelper,
+  resize,
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -41,9 +42,12 @@ function init() {
   function render() {
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
+  resize(renderer, camera);
+
 }
 
 function draw(scene) {

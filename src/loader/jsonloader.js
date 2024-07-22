@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-09 13:05:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:48:43
+ * @LastEditTime: 2024-07-22 17:06:05
  * @FilePath: /threejs-demo/src/loader/jsonloader.js
  */
 
@@ -72,10 +72,11 @@ function init() {
     orbitControls.update();
     renderer1.render(scene1, camera);
     renderer2.render(scene2, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
 
-  renderer1.setAnimationLoop(render);
   
   let result;
 

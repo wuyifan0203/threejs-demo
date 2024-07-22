@@ -44,7 +44,6 @@ function init() {
 
 
     resize(renderer, camera);
-    renderer.setAnimationLoop(render);
 
     const params = {
         count: 10000,
@@ -74,7 +73,9 @@ function init() {
         controls.update();
         renderer.clear();
         renderer.render(scene, camera);
+        requestAnimationFrame(render);
     }
+    render();
 
     const gui = initGUI();
     gui.add(params, 'count', 1000, 50000, 10).onChange(updateGeometry);

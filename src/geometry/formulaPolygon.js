@@ -44,14 +44,14 @@ function init() {
 
   draw(scene);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {
@@ -71,9 +71,9 @@ function draw(scene) {
   ];
 
   const controls = {
-    func1: 3,
-    func2: 4,
-    isSymmetric: false,
+    func1: 1,
+    func2: 2,
+    isSymmetric: true,
   };
 
   const extrudeSettings = {
@@ -81,7 +81,7 @@ function draw(scene) {
     depth: 1,
     bevelEnabled: false,
     bevelThickness: 1,
-    bevelSize: 1,
+    bevelSize: 0,
     bevelOffset: 0,
     bevelSegments: 1,
   };
@@ -202,4 +202,6 @@ function draw(scene) {
     mesh.geometry = new ExtrudeGeometry(path, extrudeSettings);
     mesh.geometry.needUpdate = true;
   }
+
+  update();
 }

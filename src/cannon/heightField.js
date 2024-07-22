@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-01-23 20:01:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-31 14:36:08
- * @FilePath: /threejs-demo/src/cannon/heightfield.js
+ * @LastEditTime: 2024-07-22 14:28:13
+ * @FilePath: /threejs-demo/src/cannon/heightField.js
  */
 import {
     Clock,
@@ -18,7 +18,8 @@ import {
     initAmbientLight,
     initDirectionLight,
     initCoordinates,
-    initStats
+    initStats,
+    resize
 } from '../lib/tools/index.js';
 import {
     World,
@@ -68,7 +69,7 @@ function init() {
 
     initAmbientLight(scene);
 
-    scene.add(initCoordinates(50))
+    // scene.add(initCoordinates(50))
 
     const aspect = window.innerWidth / window.innerHeight;
 
@@ -125,15 +126,16 @@ function init() {
     utils.add(terrainBody, fieldMesh);
 
     const clock = new Clock();
-    function render() {
+
+    (function render() {
         world.step(1 / 120, clock.getDelta());
         orbitControl.update();
         utils.update();
         renderer.render(scene, camera);
         stats.update();
-    }
+        requestAnimationFrame(render);
+    })()
 
-    renderer.setAnimationLoop(render);
 
     const operation = {
         reset() {
@@ -147,6 +149,8 @@ function init() {
     }
     const gui = initGUI();
     gui.add(operation, 'reset');
+
+    resize(renderer, camera);
 }
 
 

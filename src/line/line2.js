@@ -19,7 +19,8 @@ import {
   initAxesHelper,
   initScene,
   initGUI,
-  initOrbitControls
+  initOrbitControls,
+  resize
 } from '../lib/tools/index.js';
 
 import { LineMaterial } from '../lib/three/LineMaterial.js';
@@ -46,9 +47,10 @@ function init() {
   function render() {
     controls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 
   // 2. 创建 LineGeometry，并设置空间点
   const g = new BoxGeometry(5, 6, 4);
@@ -77,5 +79,7 @@ function init() {
   const gui = initGUI();
   gui.add(material, 'linewidth', 0.5, 10, 0.1);
   gui.add(material, 'wireframe');
+
+  resize(renderer, camera);
 }
 

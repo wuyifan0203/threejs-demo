@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-06-15 16:51:49
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:13:22
+ * @LastEditTime: 2024-07-22 16:29:24
  * @FilePath: /threejs-demo/src/geometry/shapeGeometry.js
  */
 import {
@@ -30,7 +30,6 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer();
-  renderer.setAnimationLoop(render);
   const camera = initOrthographicCamera(new Vector3(0, 0, 100));
   camera.up.set(0, 0, 1);
   const scene = initScene();
@@ -39,14 +38,14 @@ function init() {
   initCustomGrid(scene);
 
   const controls = initOrbitControls(camera, renderer.domElement);
-  controls.enableRotate = false;
+  controls.enableRotate = true;
 
-  function render() {
+  (function render() {
     controls.update();
     renderer.render(scene, camera);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 
   const params = {
     innerRadius: 2,
@@ -57,7 +56,7 @@ function init() {
   };
 
   const geometry = new ShapeGeometry();
-  const material = new MeshNormalMaterial({ wireframe: true });
+  const material = new MeshNormalMaterial({ wireframe: false });
 
   const mesh = new Mesh(geometry, material);
 

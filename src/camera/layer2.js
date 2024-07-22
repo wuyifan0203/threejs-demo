@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-13 16:19:45
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:43:30
+ * @LastEditTime: 2024-07-22 13:45:08
  * @FilePath: /threejs-demo/src/camera/layer2.js
  */
 import {
@@ -12,12 +12,13 @@ import {
   BoxGeometry,
   MeshLambertMaterial,
 } from '../lib/three/three.module.js';
-import { 
-  initRenderer, 
-  initPerspectiveCamera, 
+import {
+  initRenderer,
+  initPerspectiveCamera,
   initScene,
   initAmbientLight,
- } from '../lib/tools/index.js';
+  resize,
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -76,7 +77,7 @@ function init() {
     return camera
   })
 
-  const light = new PointLight(0xffffff, 3,0,0);
+  const light = new PointLight(0xffffff, 3, 0, 0);
   light.position.set(0, 0, 20);
   light.layers.enable(0);
   light.layers.enable(1);
@@ -99,7 +100,7 @@ function init() {
   }
   updateSize();
 
-  renderer.setAnimationLoop(() => {
+  (function render() {
     views.forEach((view, i) => {
       const left = Math.floor(windowWidth * (view.left));
       const top = Math.floor(windowHeight * (view.top));
@@ -117,7 +118,8 @@ function init() {
 
       renderer.render(scene, camera);
     })
-  })
+    requestAnimationFrame(render);
+  })();
 
   const redMaterial = new MeshLambertMaterial({ color: 'red' });
   const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -163,4 +165,7 @@ function init() {
 
   scene.add(mesh1, mesh2, mesh3);
 
+  window.addEventListener('resize', () => {
+    updateSize();
+  })
 }

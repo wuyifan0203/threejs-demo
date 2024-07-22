@@ -41,14 +41,17 @@ function init() {
     const clock = new Clock();
     let t = 0;
 
-    renderer.setAnimationLoop(() => {
+
+    function render() {
         let dt = clock.getDelta();
         t += dt;
         update();
         controls.update();
         // textTerrain.instancedMesh.instanceMatrix.needsUpdate = true;
         renderer.render(scene, camera);
-    });
+        requestAnimationFrame(render);
+    }
+    render();
 
     // const content = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890", '爱', '妳'];
     // const textTextureCanvas = createTextureCanvas(content);

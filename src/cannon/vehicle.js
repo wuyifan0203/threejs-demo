@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-25 17:31:30
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-14 17:51:55
+ * @LastEditTime: 2024-07-22 15:05:21
  * @FilePath: /threejs-demo/src/cannon/vehicle.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -71,15 +71,15 @@ function init() {
 
     const frame = 1 / 45;
     const clock = new Clock();
-    function render() {
+    (function render() {
         world.step(frame, clock.getDelta());
         orbitControls.update();
         renderer.render(scene, camera);
         update();
-    }
+        requestAnimationFrame(render);
+    })();
 
 
-    renderer.setAnimationLoop(render)
 
 }
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-01 13:44:22
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 17:21:31
+ * @LastEditTime: 2024-07-22 13:29:49
  * @FilePath: /threejs-demo/src/animate/useAnimation.js
  */
 import {
@@ -22,7 +22,8 @@ import {
     initOrbitControls,
     initGUI,
     initScene,
-    initDirectionLight
+    initDirectionLight,
+    resize
 } from '../lib/tools/index.js';
 
 
@@ -106,7 +107,9 @@ function init() {
         renderer.render(scene, camera);
         mixer.update(clock.getDelta());
         requestAnimationFrame(render)
-    })()
+    })();
+
+    resize(renderer, camera)
 
 
 }

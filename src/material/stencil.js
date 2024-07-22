@@ -31,7 +31,6 @@ window.onload = () => {
 function init() {
   const renderer = initRenderer();
   renderer.setClearColor(0xefefef);
-  renderer.setAnimationLoop(render);
 
   const camera = initOrthographicCamera(new Vector3(100, 100, 100));
   camera.lookAt(0, 0, 0);
@@ -84,7 +83,9 @@ function init() {
     renderer.clear();
     renderer.render(scene, camera);
     orbitControls.update();
+    requestAnimationFrame(render);
   }
+  render();
 
   resize(renderer, camera);
 }

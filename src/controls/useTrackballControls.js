@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-05-17 19:27:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-25 16:03:55
+ * @LastEditTime: 2024-07-22 15:42:06
  * @FilePath: /threejs-demo/src/controls/useTrackballControls.js
  */
 import {
@@ -66,16 +66,15 @@ function init() {
   mesh1.position.set(2, 2, 0)
 
   scene.add(mesh, mesh1);
-  render();
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 
 
   const gui = initGUI();

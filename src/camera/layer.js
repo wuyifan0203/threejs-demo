@@ -47,14 +47,14 @@ function init() {
   const orbitControls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
-  function render() {
+  (function render() {
     stats.begin();
     orbitControls.update();
     renderer.render(scene, camera);
     stats.end();
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 
   const redMaterial = new MeshLambertMaterial({ color: 'red' });
   const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -62,11 +62,11 @@ function init() {
 
   const geometry = new BoxGeometry(20, 20, 20);
 
-  const mlist = [redMaterial, greenMaterial, blueMaterial];
+  const materialList = [redMaterial, greenMaterial, blueMaterial];
 
   for (let i = 0; i < 500; i++) {
     const index = i % 3;
-    const mesh = new Mesh(geometry, mlist[index]);
+    const mesh = new Mesh(geometry, materialList[index]);
     mesh.scale.x = Math.random() + 0.5;
     mesh.scale.y = Math.random() + 0.5;
     mesh.scale.z = Math.random() + 0.5;

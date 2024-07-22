@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-02 14:03:01
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 15:13:11
+ * @LastEditTime: 2024-07-22 15:50:47
  * @FilePath: /threejs-demo/src/geometry/edgeGeometry.js
  */
 import {
@@ -54,13 +54,13 @@ function init() {
 
   scene.add(mesh);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
-  }
+    requestAnimationFrame(render);
+  })();
 
-  renderer.setAnimationLoop(render);
 
   const operation = {
     key: 'box',

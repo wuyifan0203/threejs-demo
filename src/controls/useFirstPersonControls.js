@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-25 10:46:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-29 11:15:27
+ * @LastEditTime: 2024-07-22 15:32:52
  * @FilePath: /threejs-demo/src/controls/useFirstPersonControls.js
  */
 import {
@@ -16,7 +16,6 @@ import {
     initAxesHelper,
     initCustomGrid,
     resize,
-    initOrthographicCamera,
     initScene,
     initGUI,
     initPerspectiveCamera
@@ -52,15 +51,15 @@ function init() {
 
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    renderer.setAnimationLoop(render);
 
-    const clock = new Clock()
-    function render() {
+    const clock = new Clock();
+    (function render() {
         renderer.clear();
         renderer.render(scene, camera);
         viewHelper.render(renderer);
         controls.update(clock.getDelta());
-    }
+        requestAnimationFrame(render);
+    })()
 
     const geometry = new BoxGeometry(4, 4, 4);
     const material = new MeshNormalMaterial({});

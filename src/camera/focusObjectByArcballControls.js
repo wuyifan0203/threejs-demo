@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 13:43:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-06-24 19:59:46
+ * @LastEditTime: 2024-07-22 15:47:55
  * @FilePath: /threejs-demo/src/camera/focusObjectByArcballControls.js
  */
 
@@ -52,23 +52,22 @@ function init() {
     controls.cursorZoom = true;
     window.controls = controls;
     // controls.setGizmosVisible(false)
-    controls.addEventListener('change', () => {
-        render()
-    })
+
 
     resize(renderer, camera);
     initCustomGrid(scene);
 
     const coord = initCoordinates();
 
-    function render() {
+    (function render() {
         renderer.clear();
 
         light.position.copy(camera.position);
 
         renderer.render(scene, camera);
         renderer.render(coord, camera)
-    }
+        requestAnimationFrame(render);
+    })();
 
     const redMaterial = new MeshLambertMaterial({ color: 'red' });
     const greenMaterial = new MeshLambertMaterial({ color: 'green' });
@@ -96,7 +95,6 @@ function init() {
     const meshes = [meshRed, meshGreen, meshBlue, meshYellow];
 
     scene.add(...meshes)
-    render();
     const o = {
         target: -1,
         focus() {

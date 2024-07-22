@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-13 13:42:58
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:24:55
+ * @LastEditTime: 2024-07-22 16:29:54
  * @FilePath: /threejs-demo/src/geometry/splitMesh.js
  */
 import {
@@ -48,14 +48,14 @@ function init() {
 
   draw(scene);
 
-  function render() {
+  (function render() {
     renderer.clear();
     controls.update();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
-  }
+    requestAnimationFrame(render);
+  })()
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

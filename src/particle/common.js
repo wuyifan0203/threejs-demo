@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-13 15:42:13
+ * @LastEditTime: 2024-07-22 17:44:50
  * @FilePath: /threejs-demo/src/particle/common.js
  */
 import {
@@ -53,9 +53,10 @@ function init() {
     renderer.render(scene, camera);
     viewHelper.render(renderer);
     stats.end();
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

@@ -96,9 +96,10 @@ function init() {
     mesh.rotation.z = time * 0.2;
     orbitControls.update();
     renderer.render(scene, camera);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
   
 
   resize(renderer, camera);

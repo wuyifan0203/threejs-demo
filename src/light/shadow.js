@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-30 14:03:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-20 14:23:00
+ * @LastEditTime: 2024-07-22 17:00:10
  * @FilePath: /threejs-demo/src/light/shadow.js
  */
 
@@ -63,16 +63,15 @@ const init = () => {
   draw(scene, spotLight, spotLightHelper);
   resize(renderer, camera);
 
-  function render() {
+  (function render() {
     controls.update();
     if (!stop) {
       spotLight.position.copy(camera.position);
       spotLightHelper.update();
     }
     renderer.render(scene, camera);
-  }
-
-  renderer.setAnimationLoop(render);
+    requestAnimationFrame(render);
+  })()
 };
 
 function draw(scene, light, helper) {

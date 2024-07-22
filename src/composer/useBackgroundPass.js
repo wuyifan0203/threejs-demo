@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-19 10:03:46
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-02 15:08:21
+ * @LastEditTime: 2024-07-22 15:10:08
  * @FilePath: /threejs-demo/src/composer/useBackgroundPass.js
  */
 import {
@@ -39,9 +39,6 @@ function init() {
     camera.up.set(0, 0, 1);
     resize(renderer, camera);
 
-    const controls = initOrbitControls(camera, renderer.domElement)
-
-
     const scene = initScene();
     const box = new Mesh(
         new BoxGeometry(2, 2, 2),
@@ -72,10 +69,8 @@ function init() {
     function render() {
         renderer.clear()
         composer.render();
+        requestAnimationFrame(render)
     }
-
-    controls.addEventListener('change', render);
-
     render()
 
 }

@@ -57,9 +57,11 @@ function init() {
     renderer.clear();
     renderer.render(scene, camera);
     light2.position.copy(camera.position);
+    requestAnimationFrame(render);
   }
+  render();
+  
 
-  renderer.setAnimationLoop(render);
 }
 
 function draw(scene) {

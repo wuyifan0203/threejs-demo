@@ -21,7 +21,7 @@ const planeFunctionParams = (normal, origin) => {
  * @param {number} d
  * @return {Matrix4} matrix
  */
-const generateMirrorModalMatrix = (normalVec3, d,target = new Matrix4()) => {
+const generateMirrorModalMatrix = (normalVec3, d, target = new Matrix4()) => {
   const { x, y, z } = normalVec3;
   const Nx2 = 2 * x * x;
   const Ny2 = 2 * y * y;
@@ -257,6 +257,12 @@ function isClockWise(loop) {
   return area < 0;
 }
 
+function previewCanvas(canvas) {
+  const img = document.createElement('img');
+  img.src = canvas.toDataURL(); // 将 canvas 转换为数据 URL
+  document.body.appendChild(img); // 将 <img> 元素添加到文档中
+}
+
 
 
 
@@ -279,5 +285,6 @@ export {
   radians2Angle,
   CC2SSC,
   isComplexPolygon,
-  isClockWise
+  isClockWise,
+  previewCanvas
 };

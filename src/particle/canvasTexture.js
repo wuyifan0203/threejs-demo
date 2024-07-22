@@ -51,9 +51,9 @@ function init() {
     renderer.render(scene, camera);
     viewHelper.render(renderer);
     stats.end();
+    requestAnimationFrame(render);
   }
-
-  renderer.setAnimationLoop(render);
+  render();
 
 }
 

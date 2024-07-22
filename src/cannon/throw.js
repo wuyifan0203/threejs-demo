@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 16:50:52
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-14 17:53:57
+ * @LastEditTime: 2024-07-22 15:03:35
  * @FilePath: /threejs-demo/src/cannon/throw.js
  */
 import {
@@ -22,7 +22,8 @@ import {
     initScene,
     initAmbientLight,
     initDirectionLight,
-    initCoordinates
+    initCoordinates,
+    resize
 } from '../lib/tools/index.js';
 import {
     World,
@@ -91,7 +92,7 @@ function init() {
     const timeStep = 1.0 / 60.0;
     const clock = new Clock();
 
-    function render() {
+    (function render() {
         const deltaTime = clock.getDelta();
         orbitControl.update();
         cannonDebugger.update();
@@ -101,9 +102,10 @@ function init() {
         updateColumn();
 
         renderer.render(scene, camera);
-    }
+        requestAnimationFrame(render);
+    })()
 
-    renderer.setAnimationLoop(render);
+
 
     const operation = {
         reset() {
@@ -131,7 +133,7 @@ function init() {
     debuggerFolder.add(cannonDebugger, 'visible').name('Cannon Debugger Visible');
     debuggerFolder.add(orbitControl, 'enabled').name('Orbit Control Enabled');
 
-    console.log(world);
+    resize(renderer, camera)
 }
 
 function createGround(scene, world) {

@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-21 11:09:02
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-03 17:09:15
+ * @LastEditTime: 2024-07-22 14:16:38
  * @FilePath: /threejs-demo/src/cannon/bowling.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -33,7 +33,8 @@ import {
     initAmbientLight,
     initPerspectiveCamera,
     initDirectionLight,
-    initCoordinates
+    initCoordinates,
+    resize
 } from '../lib/tools/index.js';
 import {
     World, Vec3, Body, Material, ContactMaterial, NaiveBroadphase, Box as BoxShape, Sphere, Cylinder,
@@ -108,7 +109,7 @@ function init() {
     cannonDebugger.visible = false;
 
     const clock = new Clock();
-    function update() {
+    (function render() {
         world.step(1 / 60, clock.getDelta());
         orbitControl.update();
         cannonDebugger.update();
@@ -119,9 +120,10 @@ function init() {
         if (checkBall && ballBody.velocity.y < -10) {
             resetBall();
         }
-    }
 
-    renderer.setAnimationLoop(update);
+        requestAnimationFrame(render);
+    })()
+
 
     const gui = initGUI();
 
@@ -138,6 +140,7 @@ function init() {
     debuggerFolder.add(coord, 'visible').name('Coord helper');
     debuggerFolder.add(orbitControl, 'enabled').onChange((e) => !e && orbitControl.reset()).name('God Mode')
 
+    resize(renderer, camera);
 }
 
 function initPosition(radius, offset = new Vector3(0, 0, 0)) {
@@ -295,17 +298,10 @@ function createBaffles(scene, world) {
     const leftBaffles = new Mesh(geometry, material);
     const rightBaffles = new Mesh(geometry, material);
 
-    leftBaffles.matrixAutoUpdate = false;
-    rightBaffles.matrixAutoUpdate = false;
-    leftBaffles.matrixWorldAutoUpdate = false;
-    rightBaffles.matrixWorldAutoUpdate = false;
     leftBaffles.castShadow = rightBaffles.castShadow = true;
 
     leftBaffles.position.z = -groundHalfSize.y;
     rightBaffles.position.z = groundHalfSize.y;
-
-    leftBaffles.updateMatrix();
-    rightBaffles.updateMatrix();
 
     scene.add(leftBaffles, rightBaffles);
 
@@ -363,16 +359,17 @@ function createBall(scene, world) {
             pushFlag = true;
         },
         controlBall(e) {
+            console.log(77777,e);
             const maxDistance = Math.abs(groundHalfSize.y);
             const distance = Math.abs(body.position.z);
 
-            if (e.key === 'a' && distance < maxDistance) {
+            if (e.key === 'A' && distance < maxDistance) {
                 body.position.z -= 0.2;
                 return;
-            } else if (e.key === 'd' && distance < maxDistance) {
+            } else if (e.key === 'D' && distance < maxDistance) {
                 body.position.z += 0.2;
                 return;
-            } else if (e.key === 'w' && pushFlag === false) {
+            } else if (e.key === 'W' && pushFlag === false) {
                 console.log(this);
                 this.pushBall();
             }

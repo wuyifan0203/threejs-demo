@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-25 10:46:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-30 13:46:00
+ * @LastEditTime: 2024-07-22 15:41:12
  * @FilePath: /threejs-demo/src/controls/usePointerLockControls.js
  */
 import {
@@ -23,7 +23,7 @@ import {
     initPerspectiveCamera,
     rainbowColors
 } from '../lib/tools/index.js';
-// import { PointerLockControls } from '../lib/three/PointerLockControls.js';
+// import { PointerLockControls } from '../lib/three/PointerLockControls.js'; 
 import { PointerLockControls } from './PointerLockControls.js';
 
 window.onload = () => {
@@ -67,6 +67,8 @@ function init() {
         console.log('controls.isLocked:', controls.isLocked);
     })
     let jumping = false
+
+    introductionDOM.addEventListener('click', () => controls.lock());
 
     window.addEventListener('keydown', (e) => {
         switch (e.code) {
@@ -125,17 +127,16 @@ function init() {
     const velocity = new Vector3(0, 0, 0);
 
     let lastTime = 0;
-    renderer.setAnimationLoop(render);
-    function render(dt) {
+    (function render(dt) {
         const deltaTime = (dt - lastTime) / 1000;
         lastTime = dt;
         renderer.clear();
         if (controls.isLocked) {
             updateCameraPosition(deltaTime);
-
         }
         renderer.render(scene, camera);
-    }
+        requestAnimationFrame(render);
+    })()
 
     const raycast = new Raycaster(camera.position, new Vector3(0, 0, -1));
 

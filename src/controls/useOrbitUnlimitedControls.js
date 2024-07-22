@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-25 09:55:13
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-25 10:00:03
+ * @LastEditTime: 2024-07-22 15:37:06
  * @FilePath: /threejs-demo/src/controls/useOrbitUnlimitedControls.js
  */
 import {
@@ -40,14 +40,14 @@ function init() {
     controls.zoomToCursor = true;
     const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-    function animate() {
+    function render() {
         renderer.clear();
         controls.update();
         renderer.render(scene, camera);
         viewHelper.render(renderer);
+        requestAnimationFrame(render);
     }
-
-    renderer.setAnimationLoop(animate);
+    render();
 
     const geometry = new BoxGeometry(4, 4, 4);
     const material = new MeshNormalMaterial({});

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-17 14:41:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-19 17:20:28
+ * @LastEditTime: 2024-07-22 13:53:10
  * @FilePath: /threejs-demo/src/camera/orthographic.js
  */
 import {
@@ -97,7 +97,7 @@ function init() {
     updateCamera();
 
 
-    function animate() {
+    (function render() {
         light.position.copy(camera.position);
         const [width, height] = [renderer.domElement.clientWidth, renderer.domElement.clientHeight];
         renderer.setClearColor(0xebebeb, 1);
@@ -112,16 +112,15 @@ function init() {
         renderer.setScissorTest(true);
         cameraHelper.visible = false;
 
-
+        light.position.copy(orthographicCamera.position);
         renderer.setViewport(0, 0, width * 0.3, height * 0.3);
         renderer.setScissor(0, 0, width * 0.3, height * 0.3);
         renderer.render(scene, orthographicCamera);
         renderer.setScissorTest(false);
 
         orbitControl.update();
-    }
-
-    renderer.setAnimationLoop(animate);
+        requestAnimationFrame(render);
+    })();
 
     const gui = initGUI();
 

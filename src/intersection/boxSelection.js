@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-09-06 10:24:50
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-22 10:36:33
+ * @LastEditTime: 2024-07-22 16:31:24
  * @FilePath: /threejs-demo/src/intersection/boxSelection.js
  */
 import {
@@ -89,7 +89,7 @@ function init() {
         }
     });
 
-    // render();
-    // viewHelper.render(renderer);
+    render();
+    viewHelper.render(renderer);
 
 }
