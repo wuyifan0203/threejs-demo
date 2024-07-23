@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 15:32:15
+ * @LastEditTime: 2024-07-23 13:22:47
  * @FilePath: /threejs-demo/src/render/scissorTest.js
  */
 import {
@@ -75,7 +75,7 @@ function init() {
     let width = renderer.domElement.clientWidth / 2;
     let height = renderer.domElement.clientHeight / 2;
 
-    function render() {
+    function update() {
         renderer.clear();
         orbitControl.update();
 
@@ -101,7 +101,7 @@ function init() {
         renderer.setScissorTest(false);
     }
 
-    function animate() {
+    function render() {
         const time = clock.getElapsedTime();
         mesh.rotation.x = time * 2;
         mesh.rotation.y = time * 2;
@@ -109,12 +109,12 @@ function init() {
         needUpdate = true;
 
         if (needUpdate) {
-            render();
+            update();
         }
 
-        requestAnimationFrame(animate);
+        requestAnimationFrame(render);
     }
-    animate();
+    render();
 
     resize(renderer, camera);
 }

@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:13:10
+ * @LastEditTime: 2024-07-23 11:00:55
  * @FilePath: /threejs-demo/src/render/renderMultiScene.js
  */
 import {
@@ -34,7 +34,6 @@ function init() {
   const loader= new TextureLoader()
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
   renderer.shadowMap.enabled = true;
-  renderer.setAnimationLoop(animate);
   renderer.setClearColor(0xfffee);
   renderer.autoClear = false;
 
@@ -72,14 +71,14 @@ function init() {
 
   let needUpdate = false;
 
-  function render() {
+  function update() {
     renderer.clear();
     orbitControl.update();
     renderer.render(scene1, camera);
     renderer.render(scene2, camera);
   }
 
-  function animate() {
+  function render() {
     const time = clock.getElapsedTime();
     mesh.rotation.x = time * 2;
     mesh.rotation.y = time * 2;
@@ -87,9 +86,11 @@ function init() {
     needUpdate = true;
 
     if (needUpdate) {
-      render();
+      update();
     }
+    requestAnimationFrame(render);
   }
+  render();
 
   resize(renderer, camera);
 }

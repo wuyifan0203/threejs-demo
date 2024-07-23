@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-12-25 09:42:14
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-25 10:37:10
+ * @LastEditTime: 2024-07-23 10:49:26
  * @FilePath: /threejs-demo/src/render/renderDeepPeeling.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -46,18 +46,25 @@ async function init() {
         '1920*1080': new Vector2(1920, 1080),
     };
 
+    const { innerWidth, innerHeight } = window;
+    const viewport = `${innerWidth}*${innerHeight}`;
+    const viewportSize = new Vector2(innerWidth, innerHeight);
+    sizeMap[viewport] = viewportSize;
+
     const params = {
         size: '1024*1024',
         layers: 3,
         enable: true
     }
+    params.size = viewport;
 
     const size = sizeMap[params.size];
     const dom = document.getElementById('webgl-output');
 
     const scene = initScene();
     const camera = new PerspectiveCamera(75, size.x / size.y, 0.1, 100);
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 5, 0);
+    camera.zoom = 0.9;
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 

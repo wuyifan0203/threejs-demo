@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-04-28 13:30:57
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-14 19:37:25
+ * @LastEditTime: 2024-07-23 11:00:06
  * @FilePath: /threejs-demo/src/render/renderForOpacity.js
  */
 import {
@@ -94,9 +94,10 @@ function init() {
         renderer.render(scene1, camera);
         renderer.render(scene2, camera);
         needUpdate = false;
+        requestAnimationFrame(render);
     }
+    render();
 
-    renderer.setAnimationLoop(render);
 
     resize(renderer, camera);
 }

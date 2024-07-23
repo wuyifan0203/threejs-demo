@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-19 17:42:06
+ * @LastEditTime: 2024-07-23 10:39:53
  * @FilePath: /threejs-demo/src/particle/GRAVITY.js
  */
 import {
@@ -60,9 +60,10 @@ function init() {
     updateParticles(camera, t);
     updateModelMesh(camera, t);
     t += 0.1;
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 }
 const random = (min, max) => min + Math.random() * (max - min);
 

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-10 20:15:32
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-11 20:12:32
+ * @LastEditTime: 2024-07-23 10:40:19
  * @FilePath: /threejs-demo/src/particle/image.js
  */
 import {
@@ -58,10 +58,6 @@ function init() {
 
     scene.add(new Mesh(new BoxGeometry(1, 1, 1), new MeshBasicMaterial({ color: 'red' })))
 
-    const control = {
-        unit: 1
-    }
-
     const image = new Image();
     image.src = '../../public/images/others/girl.jpg';
     image.onload = () => {
@@ -76,7 +72,7 @@ function init() {
 
     function updateGeometry(imageData) {
         const size = new Vector2()
-        size.set(canvas.width , canvas.height);
+        size.set(canvas.width, canvas.height);
 
         const positionBuffer = [];
         const colorBuffer = [];
@@ -104,9 +100,10 @@ function init() {
         controls.update();
         renderer.clear();
         renderer.render(scene, camera);
+        requestAnimationFrame(render);
     }
+    render();
 
-    renderer.setAnimationLoop(render);
 
 }
 

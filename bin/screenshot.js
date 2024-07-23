@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 15:43:43
+ * @LastEditTime: 2024-07-23 16:27:25
  * @FilePath: /threejs-demo/bin/screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -13,6 +13,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import jimp from 'jimp';
 import express from 'express';
+
+import { list } from '../pageList.js';
 
 
 class PromiseQueue {
@@ -38,6 +40,7 @@ console.red = (...arg) => console.log(chalk.red(...arg));
 console.yellow = (...arg) => console.log(chalk.yellow(...arg));
 console.green = (...arg) => console.log(chalk.green(...arg));
 console.blue = (...arg) => console.log(chalk.blue(...arg));
+console.bgBlue = (...arg) => console.log(chalk.bgCyanBright(...arg));
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,11 +77,13 @@ const server = app.listen(port, main);
 
 const errorPages = [];
 
+let total = 0;
+let current = 0;
 async function main() {
   // 获取所有标签的href
   let urls = [];
-  urls = await getAnchorsHref();
-
+  urls = await getAllHref();
+  total = urls.length;
 
   const pages = await browser.pages();
 
@@ -108,17 +113,13 @@ async function main() {
 };
 
 
-async function getAnchorsHref() {
-  // open a new blank page
-  const page = await browser.newPage();
-  // await page.setViewport({ width: 1080, height: 1024 });
-  await page.goto(`http://localhost:${port}${baseURL}/index2.html`, {
-    waitUntil: ['networkidle0', 'load'],
-    timeout: networkTimeout * 60000
-  });
-
-  const urls = await page.$$eval('a', (anchors) => anchors.map(anchor => anchor.href));
-  await page.close();
+async function getAllHref() {
+  const urls = [];
+  list.forEach(({ pages }) => {
+    pages.forEach((item) => {
+      urls.push(`http://localhost:${port}${baseURL}/src${item.path}`);
+    })
+  })
   return urls;
 }
 
@@ -196,7 +197,7 @@ async function renderPage(page) {
           if (renderTimeoutExceeded) {
             clearInterval(waitingLoop);
             // 不能reject 会阻塞整个page
-            page.outTime = true;
+            console.error('Render timeout exceeded');
             resolve();
           } else if (window._renderFinished) {
             clearInterval(waitingLoop);
@@ -254,13 +255,15 @@ async function pageCapture(pages, url) {
     const image = (await jimp.read(await page.screenshot())).scale(1 / viewScale).quality(jpgQuality);
     const fileName = url.match(/(\w+)\.html/)[1];
     image.writeAsync(path.join(__dirname, `../screenshots/${fileName}.jpg`));
-    console.green(`screenShot ${fileName} success! : ${page.url}`)
+    console.green(`screenShot ${fileName} success! : ${page.url}`);
+    console.bgBlue(`progress: ${current}/${total}  ${((current / total) * 100).toFixed(2)}%`);
   } catch (error) {
     console.red(`Error happened while capturing ${page.url}: ${error}`);
     errorPages.push(page.url)
   } finally {
     // 释放页面
     page.url = undefined;
+    current++;
   }
 }
 

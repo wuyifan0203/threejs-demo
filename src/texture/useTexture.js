@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-04 14:17:27
+ * @LastEditTime: 2024-07-23 13:41:07
  * @FilePath: /threejs-demo/src/texture/useTexture.js
  */
 import {
@@ -103,9 +103,9 @@ async function init() {
         renderer.clear();
         controls.update();
         renderer.render(scene, camera);
+        requestAnimationFrame(render);
     }
-
-    renderer.setAnimationLoop(render);
+    render();
 
     const operation = {
         currentTextureIndex: 0,

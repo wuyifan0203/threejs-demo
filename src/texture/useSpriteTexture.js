@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-12-26 16:50:44
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-05 15:57:17
+ * @LastEditTime: 2024-07-23 13:40:21
  * @FilePath: /threejs-demo/src/texture/useSpriteTexture.js
  */
 import {
@@ -143,13 +143,14 @@ async function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
     renderer.setClearColor(0xcccccc);
-    const camera = initOrthographicCamera(new Vector3(0, -800, 2));
+    const camera = initOrthographicCamera(new Vector3(0, -700, 520));
     camera.up.set(0, 0, 1);
-    camera.lookAt(0, 0, 0);
-    camera.zoom = 1;
+    camera.zoom = 0.5;
 
     const scene = initScene();
     const controls = initOrbitControls(camera, renderer.domElement);
+    controls.target.set(8, 2, 0);
+    controls.update();
     const loader = new TextureLoader();
 
     const asp = window.innerWidth / window.innerHeight;
@@ -247,9 +248,9 @@ async function init() {
         renderer.clear();
         controls.update();
         renderer.render(scene, camera);
+        requestAnimationFrame(render);
     }
-
-    renderer.setAnimationLoop(render);
+    render();
 
     resize(renderer,camera);
 }

@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-21 17:28:48
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 18:01:40
+ * @LastEditTime: 2024-07-23 13:31:05
  * @FilePath: /threejs-demo/src/texture/colorMap.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -18,12 +18,12 @@ import {
   Raycaster,
   Vector2,
 } from '../lib/three/three.module.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
-import { 
-  initRenderer, 
+import {
+  initRenderer,
   initScene,
-  initOrbitControls
- } from '../lib/tools/index.js';
+  initOrbitControls,
+  resize
+} from '../lib/tools/index.js';
 
 const basePath = '../../public/images/house/';
 const url = {
@@ -99,16 +99,15 @@ function init() {
   controls.enableDamping = true;
   controls.maxDistance = 50;
   draw(scene);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
 
-  renderer.setAnimationLoop(render);
-  
+
   function render() {
     controls.update();
-    renderer.clear();
     renderer.render(scene, camera);
-    viewHelper.render(renderer);
+    requestAnimationFrame(render);
   }
+  render();
+  resize(renderer, camera);
 
   renderer.domElement.addEventListener('dblclick', (event) => {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;

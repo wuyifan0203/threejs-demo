@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:55:58
+ * @LastEditTime: 2024-07-23 14:41:57
  * @FilePath: /threejs-demo/src/loader/gltfLoader.js
  */
 import {
@@ -33,7 +33,9 @@ function init() {
     10000,
   );
   camera.position.set(-43, 13, 0.6);
+  camera.zoom = 0.2;
   camera.lookAt(0, 0, 0);
+
   const scene = initScene();
   renderer.setClearColor(0xffffff);
 

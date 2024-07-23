@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2024-02-01 17:30:00
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-01 17:30:00
+ * @LastEditTime: 2024-07-23 13:30:03
  * @FilePath: /threejs-demo/src/texture/block.js
  */
 import {
@@ -18,11 +18,12 @@ import {
 import { EXRLoader } from '../lib/three/EXRLoader.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
-  initOrbitControls, 
-  initProgress, 
-  initRenderer, 
+  initOrbitControls,
+  initProgress,
+  initRenderer,
   initDirectionLight,
-  initScene
+  initScene,
+  resize
 } from '../lib/tools/index.js';
 
 const basePath = '../../public/images/block/rock_wall_';
@@ -110,17 +111,14 @@ function init() {
 
     scene.add(plane)
 
-
-
-
-
-  render();
   function render() {
     controls.update();
-    requestAnimationFrame(render);
     renderer.clear();
     light.position.copy(camera.position);
     renderer.render(scene, camera);
     viewHelper.render(renderer);
+    requestAnimationFrame(render);
   }
+  render();
+  resize(renderer, camera)
 }

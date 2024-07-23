@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-24 01:07:12
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-01 16:06:57
+ * @LastEditTime: 2024-07-23 16:11:27
  * @FilePath: /threejs-demo/src/particle/galaxy.js
  */
 import {
@@ -11,6 +11,7 @@ import {
     Color,
     Points,
     Vector3,
+    TextureLoader
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -19,7 +20,6 @@ import {
     initGUI,
     initOrbitControls,
     initPerspectiveCamera,
-    initCoordinates,
 } from '../lib/tools/index.js';
 
 
@@ -30,25 +30,25 @@ window.onload = () => {
 function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
-    renderer.setClearColor(0xffff00);
 
     const camera = initPerspectiveCamera(new Vector3(10, 10, 10));
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 
     const scene = initScene();
+    const basePath = '../../public/images/plants/2k_';
+    const loader = new TextureLoader();
+    const getTexture = (path) => loader.load(basePath + path);
+    scene.background = getTexture('stars_milky_way.jpg');
 
     const controls = initOrbitControls(camera, renderer.domElement);
-
-    scene.add(initCoordinates(10));
-
 
     resize(renderer, camera);
 
     const params = {
-        count: 10000,
-        branch: 3,
-        radius: 5,
+        count: 20000,
+        branch: 7,
+        radius: 9,
         scale: 0.5
     }
     const material = new PointsMaterial({
@@ -109,11 +109,11 @@ function createGeometry(params) {
 
         const total = angle + offset;
 
-        const offfetHeight = (radius - r);
+        const offsetHeight = (radius - r);
 
-        const randX = (pow(random() * 2 - 1, 3) * offfetHeight) / radius;
-        const randY = (pow(random() * 2 - 1, 3) * offfetHeight) / radius;
-        const randZ = (pow(random() * 2 - 1, 3) * offfetHeight) / radius;
+        const randX = (pow(random() * 2 - 1, 3) * offsetHeight) / radius;
+        const randY = (pow(random() * 2 - 1, 3) * offsetHeight) / radius;
+        const randZ = (pow(random() * 2 - 1, 3) * offsetHeight) / radius;
 
         const x = r * cos(total) + randX;
         const y = r * sin(total) + randY;
@@ -124,13 +124,11 @@ function createGeometry(params) {
         position[i * 3 + 2] = z;
 
         const scaleR = r / radius;
-        const index = (scaleR / 5)//floor(scaleR / 50);
         const lerp = (scaleR) % 0.2;
 
-        console.log(index, lerp);
 
 
-        const vertexColor = getColor(index, lerp);
+        const vertexColor = getColor(scaleR, lerp);
 
         color[i * 3] = vertexColor.r;
         color[i * 3 + 1] = vertexColor.g;
@@ -146,20 +144,24 @@ function createGeometry(params) {
 }
 
 
+const colorHash = ['#fefefe', '#f5f6fa', '#e7d9cd', '#90abbc', '#212c31', '#32313e'];
+const pice = 1 / (colorHash.length - 1);
+const startColor = new Color();
+const endColor = new Color();
+const getBetweenColor = (index) => {
+    const prev = Math.floor(index / pice);
+    const next = prev + 1;
+    startColor.set(colorHash[prev]);
+    endColor.set(colorHash[next]);
+}
+
+/**
+ * 获取插值颜色
+ * @param {number} index - 归一化的索引值（0到1之间）
+ * @param {number} lerp - 插值系数（0到1之间）
+ * @returns {THREE.Color} - 插值后的颜色
+ */
 function getColor(index, lerp) {
-    const colorHash = ['#ffffff', '#f5f6fa', '#e7d9cd', '#90abbc', '#212c31', '#32313e'];
-    const color = new Color();
-    const lerpColor = new Color();
-
-    return ((index, lerp) => {
-        color.set(colorHash[index]);
-        lerpColor.set(colorHash[index + 1]);
-        color.lerp(lerpColor, lerp);
-        return {
-            r: color.r,
-            g: color.g,
-            b: color.b
-        }
-    })(index, lerp)
-
+    getBetweenColor(index);
+    return  startColor.lerp(endColor, lerp);
 }

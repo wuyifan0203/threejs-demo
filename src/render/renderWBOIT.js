@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-25 10:30:05
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-26 09:38:55
+ * @LastEditTime: 2024-07-23 14:16:46
  * @FilePath: /threejs-demo/src/render/renderWBOIT.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -22,7 +22,6 @@ import {
     initOrbitControls,
     initAmbientLight,
     initDirectionLight,
-    initPerspectiveCamera,
 } from '../lib/tools/common.js';
 
 window.onload = function () {
@@ -35,7 +34,7 @@ async function init() {
     renderer.setClearColor(0x000000, 1);
 
     const camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 0, 5);
+    camera.position.set(0, 5, 0);
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
 

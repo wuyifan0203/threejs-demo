@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:54:02
+ * @LastEditTime: 2024-07-23 10:38:51
  * @FilePath: /threejs-demo/src/particle/geometry.js
  */
 import {
@@ -15,11 +15,17 @@ import {
   SubtractiveBlending,
   Points,
   Texture,
+  SRGBColorSpace,
 } from '../lib/three/three.module.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
-  initRenderer, resize, angle2Radians, initGUI, initStats, initScene, initOrbitControls,
-  previewCanvas
+  initRenderer, 
+  resize, 
+  angle2Radians, 
+  initGUI, 
+  initStats, 
+  initScene, 
+  initOrbitControls,
 } from '../lib/tools/index.js';
 
 
@@ -27,7 +33,7 @@ window.onload = () => {
   init();
 };
 
-let autoScale = false;
+let autoScale = true;
 let s = 0;
 let last = Date.now(); // Last time that this function was called
 const ANGLE_STEP = 100.0; // Rotation angle (degrees/second)
@@ -62,7 +68,7 @@ function init() {
     viewHelper.render(renderer);
     if (autoScale) {
       s = animate(s);
-      const scale = Math.sin(angle2Radians(s));
+      const scale = 3 * Math.sin(angle2Radians(s));
       mesh.scale.set(scale, scale, scale);
     }
     stats.end();
@@ -79,19 +85,24 @@ function init() {
     depthTest: true,
     depthWrite: false,
     transparent: true,
-    // blending: AdditiveBlending,
+    blending: AdditiveBlending,
   });
+
+
   const geometry = new SphereGeometry(16, 16, 16);
+  geometry.deleteAttribute('normal');
+  geometry.deleteAttribute('uv');
   const mesh = new Points(geometry, material);
   scene.add(mesh);
 
   const control = {
     radius: 16,
-    widthSegments: 16,
-    heightSegments: 16,
+    widthSegments: 32,
+    heightSegments: 32,
     background: '#000000',
     size: material.size,
     autoScale,
+    color: '#ffffff',
   };
 
   function createCanvasTexture() {
@@ -108,8 +119,9 @@ function init() {
     context.fillRect(0, 0, canvas.width, canvas.height);
     const texture = new Texture(canvas);
     texture.needsUpdate = true;
+    texture.colorSpace = SRGBColorSpace;
 
-    previewCanvas(canvas)
+    // previewCanvas(canvas);
     return texture;
   }
 
@@ -119,6 +131,9 @@ function init() {
   const geometryFolder = gui.addFolder('Geometry');
   geometryFolder.open();
   geometryFolder.add(control, 'radius', 1, 64, 0.1).onChange(() => {
+    updateGeometry();
+  });
+  geometryFolder.addColor(control, 'color', 1, 64, 0.1).onChange(() => {
     updateGeometry();
   });
   geometryFolder.add(control, 'widthSegments', 1, 64, 1).onChange(() => {
@@ -147,6 +162,7 @@ function init() {
   function updateGeometry() {
     mesh.geometry.dispose();
     mesh.geometry = new SphereGeometry(control.radius, control.widthSegments, control.heightSegments);
+    material.color.set(control.color);
   }
 
 }

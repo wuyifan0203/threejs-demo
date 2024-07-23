@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-05-10 18:26:20
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-02 14:09:29
- * @FilePath: /threejs-demo/src/shader/shader1.js
+ * @LastEditTime: 2024-07-23 15:31:24
+ * @FilePath: /threejs-demo/src/shader/shaderToy.js
  * @ShaderExample:https://www.shadertoy.com/view/4dl3zn
  */
 import {
@@ -14,10 +14,10 @@ import {
 } from '../lib/three/three.module.js';
 import {
   initRenderer,
-  initPerspectiveCamera,
   resize,
   initScene,
-  initOrbitControls
+  initOrbitControls,
+  initOrthographicCamera
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -26,9 +26,10 @@ window.onload = () => {
 
 function init() {
   const renderer = initRenderer({ logarithmicDepthBuffer: true });
-  const camera = initPerspectiveCamera(new Vector3(0, 0, 10));
+  const camera = initOrthographicCamera(new Vector3(0, 0, 10));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
+  camera.zoom = 1
 
   const scene = initScene();
 
@@ -36,7 +37,7 @@ function init() {
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-  const vertexShader = `
+  const vertexShader = /*glsl*/ `
   precision mediump float;
   varying vec2 vUv;
   void main() {
@@ -44,7 +45,7 @@ function init() {
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }`;
 
-  const fragmentShader = `
+  const fragmentShader = /*glsl*/ `
   precision mediump float;
   varying vec2 vUv;
   uniform float iTime;

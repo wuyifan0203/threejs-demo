@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-03 17:14:03
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:37:12
+ * @LastEditTime: 2024-07-23 14:39:42
  * @FilePath: /threejs-demo/src/math/rotateMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -97,51 +97,51 @@ function init() {
 
     function keyPressCallBack(e) {
         switch (e.key) {
-            case 'd': // 右
+            case 'D': // 右
                 _t.makeTranslation(1, 0, 0);
                 bottom.applyMatrix4(_t);
                 break;
-            case 'a': // 左
+            case 'A': // 左
                 _t.makeTranslation(-1, 0, 0);
                 bottom.applyMatrix4(_t);
                 break;
-            case 'w': // 上
+            case 'W': // 上
                 _t.makeTranslation(0, 1, 0);
                 bottom.applyMatrix4(_t);
                 break;
-            case 's': // 下
+            case 'S': // 下
                 _t.makeTranslation(0, -1, 0);
                 bottom.applyMatrix4(_t);
                 break;
-            case 'q': // 左转
+            case 'Q': // 左转
                 _r.makeRotationAxis(new Vector3(0, 0, 1), 0.1);
                 body.applyMatrix4(_r);
                 break;
-            case 'e': // 右转
+            case 'E': // 右转
                 _r.makeRotationAxis(new Vector3(0, 0, 1), -0.1);
                 body.applyMatrix4(_r);
                 break;
-            case 't':
+            case 'T':
                 _m.makeTranslation(0, 0, -5);
                 _m.premultiply(_r.makeRotationAxis(new Vector3(1, 0, 0), 0.1));
                 _m.premultiply(_t.makeTranslation(0, 0, 5));
                 arm.applyMatrix4(_m);
                 break;
-            case 'y':
+            case 'Y':
                 _m.makeTranslation(0, 0, -5);
                 _m.premultiply(_r.makeRotationAxis(new Vector3(1, 0, 0), -0.1));
                 _m.premultiply(_t.makeTranslation(0, 0, 5));
                 arm.applyMatrix4(_m);
                 break;
-            case 'g':
+            case 'G':
                 _r.makeRotationAxis(new Vector3(0, 0, 1), 0.1);
                 hand.applyMatrix4(_r);
                 break;
-            case 'h':
+            case 'H':
                 _r.makeRotationAxis(new Vector3(0, 0, 1), -0.1);
                 hand.applyMatrix4(_r);
                 break;
-            case 'j':
+            case 'J':
                 _m.makeTranslation(0, -2, -1.0);
                 _m.premultiply(_r.makeRotationAxis(new Vector3(1, 0, 0), 0.1));
                 _m.premultiply(_t.makeTranslation(0, 2, 1.0));
@@ -151,7 +151,7 @@ function init() {
                 _m.premultiply(_t.makeTranslation(0, -2, 1.0));
                 fingerB.applyMatrix4(_m);
                 break;
-            case 'k':
+            case 'K':
                 _m.makeTranslation(0, -2, -1.0);
                 _m.premultiply(_r.makeRotationAxis(new Vector3(1, 0, 0), -0.1));
                 _m.premultiply(_t.makeTranslation(0, 2, 1.0));

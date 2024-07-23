@@ -10,7 +10,6 @@ import {
   TextureLoader,
   PerspectiveCamera,
   AmbientLight,
-  SpotLight,
   WebGLRenderer,
   Color,
 } from '../lib/three/three.module.js';
@@ -109,9 +108,10 @@ async function init() {
     renderer.clear();
     renderer.render(scene, camera);
     viewHelper.render(renderer);
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 
   const gui = initGUI();
 

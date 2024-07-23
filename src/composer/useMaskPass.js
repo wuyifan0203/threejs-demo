@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-08-19 14:33:06
  * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-23 16:35:20
+ * @LastEditTime: 2024-07-23 14:51:53
  * @FilePath: /threejs-demo/src/composer/useMaskPass.js
  */
 import {
@@ -23,7 +23,8 @@ import {
     initOrbitControls,
     resize,
     initOrthographicCamera,
-    initCustomGrid
+    initCustomGrid,
+    initScene
 } from '../lib/tools/index.js';
 import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
 

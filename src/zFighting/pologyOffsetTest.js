@@ -55,9 +55,10 @@ function init() {
     renderer.render(scene, camera);
     light.position.copy(camera.position);
     stats.end();
+    requestAnimationFrame(render);
   }
+  render();
 
-  renderer.setAnimationLoop(render);
 
   const redMaterial = new MeshPhongMaterial({ color: 'red', polygonOffset: true });
   const blueMaterial = new MeshPhongMaterial({ color: 'blue', polygonOffset: true });
