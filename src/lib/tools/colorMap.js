@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-31 16:37:15
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-07-24 16:36:17
  * @FilePath: /threejs-demo/src/lib/tools/colorMap.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -284,7 +284,29 @@ const getColor = (index) => {
   return '#' + (r.length !== 1 ? r : '0' + r) + (g.length !== 1 ? g : '0' + g) + (b.length !== 1 ? b : '0' + b);
 };
 
+const colors = [
+  [0, 32, g => [0, 0, 128 + 4 * g]],
+  [32, 33, g => [0, 0, 255]],
+  [33, 96, g => [0, 4 + 4 * (g - 32), 255]],
+  [96, 97, g => [0, 255, 255]],
+  [97, 159, g => [6 + 4 * (g - 96), 255, 250 - 4 * (g - 96)]],
+  [159, 160, g => [254, 255, 1]],
+  [160, 224, g => [255, 252 - 4 * (g - 159), 0]],
+  [224, 256, g => [252 - 4 * (g - 223), 0, 0]]
+];
+
+function jet(x) {
+  const g = parseInt(x * 256);
+  for (let i = 0; i < colors.length; i++) {
+    const [min, max, func] = colors[i];
+    if (g >= min && g < max) {
+      return func(g).map(v => v / 256);
+    }
+  }
+  return [0, 0, 0]; // 处理超出范围的情况
+}
 export {
   getColor,
-  rainbowColors
+  rainbowColors,
+  jet
 };
