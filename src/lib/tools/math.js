@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-05 14:31:55
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-05 14:38:07
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-07-25 11:30:19
  * @FilePath: /threejs-demo/src/lib/tools/math.js
  */
 
@@ -47,7 +47,18 @@ function createMirrorMatrix(planeNormal, planeOrigin) {
     );
 }
 
+/**
+ * @description: 生成min到max之间的随机数
+ * @param {number} min
+ * @param {number} max
+ * @return {number}
+ */
+function createRandom(min = 0, max = 1) {
+    return Math.random() * (max - min) + min;
+}
+
 export {
     createNDCMatrix,
-    createMirrorMatrix
+    createMirrorMatrix,
+    createRandom
 }

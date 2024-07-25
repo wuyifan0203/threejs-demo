@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-24 01:07:12
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 16:11:27
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-07-25 17:52:59
  * @FilePath: /threejs-demo/src/particle/galaxy.js
  */
 import {
@@ -42,6 +42,7 @@ function init() {
     scene.background = getTexture('stars_milky_way.jpg');
 
     const controls = initOrbitControls(camera, renderer.domElement);
+    controls.autoRotate = true;
 
     resize(renderer, camera);
 
