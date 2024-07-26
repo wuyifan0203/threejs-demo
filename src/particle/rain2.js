@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-25 13:54:50
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-07-25 18:03:36
+ * @LastEditTime: 2024-07-26 13:40:46
  * @FilePath: /threejs-demo/src/particle/rain2.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -33,6 +33,34 @@ window.onload = () => {
     init();
 };
 
+const vertexShader = /*glsl*/`
+#pragma vscode_glsllint_stage : vert
+attribute vec3 initPosition;
+attribute float speed;
+uniform float dt;
+uniform float range;
+uniform float size;
+const float gravity = 9.8;
+void main() {
+    vec3 transformed = initPosition;
+    float time = dt;
+    transformed.z += dt * (speed - 0.5 * gravity * dt); 
+    if(transformed.z < 0.0){
+        transformed.z = 0.0;
+    }
+    gl_PointSize = size;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(transformed, 1.0);
+}
+`
+
+const fragmentShader = /*glsl*/`
+#pragma vscode_glsllint_stage : frag
+void main() {
+    gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5);
+}
+`
+
+
 function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
@@ -50,10 +78,13 @@ function init() {
     const material = new ShaderMaterial({
         uniforms: {
             dt: { value: 0.0 },
-            speed: { value: 10 },
-        }
+            range: { value: 40 },
+            size: { value: 1 }
+        },
+        vertexShader,
+        fragmentShader
     });
-    const points = new Points(geometry, new PointsMaterial());
+    const points = new Points(geometry, material);
     scene.add(points);
 
     scene.add(new Mesh(new BoxGeometry(1, 1, 1), new MeshNormalMaterial({})));
@@ -68,8 +99,8 @@ function init() {
         controls.update();
         renderer.clear();
         renderer.render(scene, camera);
-        renderGeometry(clock.getDelta())
         stats.update();
+        points.material.uniforms.dt.value = clock.getElapsedTime();
         requestAnimationFrame(render);
     }
     render();
@@ -88,29 +119,16 @@ function init() {
             speeds[i] = createRandom(0.1, 0.3);
         }
         geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-    }
-
-    function renderGeometry(dt) {
-        const attribute = geometry.getAttribute('position');
-        if (!attribute) return
-        for (let i = 0, l = attribute.count; i < l; i++) {
-            const posZ = attribute.getZ(i)
-            if (posZ < 0) {
-                attribute.setZ(i, options.range);
-            } else {
-                attribute.setZ(i, posZ - dt * options.speed);
-            }
-        }
-        attribute.needsUpdate = true;
+        geometry.setAttribute('initPosition', new Float32BufferAttribute(initPosition, 3));
+        geometry.setAttribute('speed', new Float32BufferAttribute(speeds, 1));
     }
 
     updateGeometry();
 
     const gui = initGUI();
     gui.add(options, 'range', 30, 100).onChange(updateGeometry);
-    gui.add(options, 'speed', 0, 100, 0.2);
     gui.add(options, 'count', 1000, 10000).onChange(updateGeometry);
-    gui.add(points.material, 'size', 1, 10, 0.2).onChange(() => {
+    gui.add(points.material.uniforms.size, 'value', 1, 10, 0.2).name('size').onChange(() => {
         points.material.needsUpdate = true;
     });
 
