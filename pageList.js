@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 15:35:52
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-07-24 23:46:33
  * @FilePath: /threejs-demo/pageList.js
  */
 const list = [
@@ -58,7 +58,7 @@ const list = [
                 title: "Use OIT Render Pass"
             },
             {
-                path:'/composer/useCopyShader.html',
+                path: '/composer/useCopyShader.html',
                 title: "Use Copy Shader"
             },
             {
@@ -238,7 +238,7 @@ const list = [
                 title: "Image"
             },
             {
-                path:'/particle/galaxy.html',
+                path: '/particle/galaxy.html',
                 title: "Galaxy"
             }
         ]
@@ -306,7 +306,7 @@ const list = [
                 title: "FBX Loader"
             },
             {
-                path: "/loader/objLoader.html",
+                path: "/loader/OBJLoader.html",
                 title: "OBJ Loader"
             }
         ]
@@ -417,6 +417,13 @@ const list = [
                 path: "/algorithms/quadTreeDemo.html",
                 title: "Quad Tree Demo"
             }
+        ]
+    },
+    {
+        category: 'plot',
+        title: "Plot",
+        pages: [
+            { path: "/plot/triangularMesh.html", title: "Triangular Mesh Plot" }
         ]
     },
     {
