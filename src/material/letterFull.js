@@ -25,7 +25,6 @@ import {
     resize
 } from "../lib/tools/common.js";
 
-const simplex = new SimplexNoise();
 window.onload = () => {
     init();
 }
@@ -61,12 +60,7 @@ function init() {
         requestAnimationFrame(render);
     }
     render();
-
-    // const content = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890", '爱', '妳'];
-    // const textTextureCanvas = createTextureCanvas(content);
-    // document.body.appendChild(textTextureCanvas);
-
-
+    
 }
 
 
@@ -91,6 +85,7 @@ function createTextureCanvas(content) {
 }
 
 class TextTerrain extends Object3D {
+    simplex = new SimplexNoise();
     constructor(anisotropy) {
         super();
 
