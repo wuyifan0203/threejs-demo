@@ -29,6 +29,8 @@ window.onload = () => {
     init();
 }
 
+const dummy = new Object3D();
+
 function init() {
     const renderer = initRenderer();
     const scene = initScene();
@@ -60,7 +62,7 @@ function init() {
         requestAnimationFrame(render);
     }
     render();
-    
+
 }
 
 
@@ -84,8 +86,15 @@ function createTextureCanvas(content) {
     return canvas;
 }
 
+const triangle = new Triangle();
+const normal = new Vector3();
+const vTmp = new Vector3();
+
 class TextTerrain extends Object3D {
-    simplex = new SimplexNoise();
+    static simplex = new SimplexNoise();
+    static getY(x, z) {
+        return TextTerrain.simplex.noise(x * 0.01, z * 0.01) * 7.5;
+    }
     constructor(anisotropy) {
         super();
 
@@ -114,7 +123,6 @@ class TextTerrain extends Object3D {
         });
 
         material.onBeforeCompile = (shader) => {
-
             console.log(shader);
             shader.vertexShader = /*glsl*/`
                     attribute float letterIdx;
@@ -149,6 +157,38 @@ class TextTerrain extends Object3D {
         const instanceMesh = new InstancedMesh(geometry, material, tileNum * tileNum);
 
         this.add(instanceMesh);
+    }
+
+    static setFinals() {
+        const { x, z } = dummy.position;
+        const y0 = this.getY(x, z);
+        const y1 = this.getY(x, z - 1);
+        const y2 = this.getY(x + 1, z);
+        dummy.position.y = y0;
+
+        triangle.a.set(x, y1, z - 1);
+        triangle.b.set(x, y0, z);
+        triangle.c.set(x + 1, y2, z);
+        triangle.getNormal(normal);
+
+        vTmp.copy(dummy.position).add(normal);
+        dummy.lookAt(vTmp);
+        dummy.rotation.z = 0;
+        dummy.updateMatrix();
+
+        return {
+            y: y0,
+            position: dummy.position.clone(),
+            rotation: dummy.rotation.clone(),
+            isAction: false,
+            mediators: {
+                v1: new Vector3(),
+                v2: new Vector3()
+            }
+
+        }
+
+
     }
 }
 
