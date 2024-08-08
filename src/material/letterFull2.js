@@ -48,6 +48,8 @@ class TextTerrain extends THREE.Object3D {
     }, () => {
       return THREE.MathUtils.randInt(0, alphabet.length - 1)
     })), 1));
+
+    console.log(g);
     
     let m = new THREE.MeshBasicMaterial({
       map: textTexture,
@@ -230,7 +232,7 @@ let t = 0;
 renderer.setAnimationLoop(() => {
   let dt = clock.getDelta();
   t += dt;
-  TWEEN.update();
+  // TWEEN.update();
   controls.update();
   textTerrain.instancedMesh.instanceMatrix.needsUpdate = true;
   renderer.render(scene, camera);

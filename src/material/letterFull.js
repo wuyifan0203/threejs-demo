@@ -13,7 +13,8 @@ import {
     InstancedBufferAttribute,
     ShaderMaterial,
     ShaderLib,
-    UniformsUtils
+    UniformsUtils,
+    Mesh
 } from "../lib/three/three.module.js";
 import { update, Tween } from "../lib/other/tween.esm.js";
 import { SimplexNoise } from "../lib/three/SimplexNoise.js";
@@ -110,9 +111,10 @@ class TextTerrain extends Object3D {
         }
 
         const geometry = new PlaneGeometry();
-        geometry.setAttribute('letterId', new InstancedBufferAttribute(letterIdxArray, 1));
+        geometry.setAttribute('letterIdx', new InstancedBufferAttribute(letterIdxArray, 1));
 
-        console.log(geometry);
+
+        // this.add(new Mesh(new PlaneGeometry(10, 10), new MeshBasicMaterial({ map: canvasTexture, transparent: true })));
 
 
         const material = new MeshBasicMaterial({
@@ -123,15 +125,14 @@ class TextTerrain extends Object3D {
         });
 
         material.onBeforeCompile = (shader) => {
-            console.log(shader);
             shader.vertexShader = /*glsl*/`
                     attribute float letterIdx;
                     varying float vLetterIdx;
                     ${shader.vertexShader}
                 `.replace(
-                   /*glsl*/`#include <map_fragment>`,
+                   /*glsl*/`#include <uv_vertex>`,
                    /*glsl*/`
-                        #include <map_fragment>;
+                        #include <uv_vertex>
                         vLetterIdx = letterIdx;
                    `
             );
@@ -152,11 +153,36 @@ class TextTerrain extends Object3D {
             )
         }
 
-        console.log(material);
 
         const instanceMesh = new InstancedMesh(geometry, material, tileNum * tileNum);
 
         this.add(instanceMesh);
+
+        this.finals = [];
+        const halfTileNum = (1 - tileNum) / 2;
+        for (let z = 0; z < tileNum; z++) {
+            for (let x = 0; x < tileNum; x++) {
+                dummy.position.x = halfTileNum + x;
+                dummy.position.z = halfTileNum + z;
+                this.finals.push(TextTerrain.setFinals());
+                instanceMesh.setMatrixAt(x + z * tileNum, dummy.matrix);
+            }
+        }
+
+        function getFreeLetterIndex() {
+            let letterIndex = Math.floor(Math.random() * this.finals.length);
+            return this.finals[letterIndex].inAction ? getFreeLetterIndex() : letterIndex;
+        }
+
+        const height = 30;
+        function action(delay) {
+            const letterIndex = getFreeLetterIndex();
+            const letter = this.finals[letterIndex];
+
+
+        }
+
+        this.actions = [].fill()
     }
 
     static setFinals() {
