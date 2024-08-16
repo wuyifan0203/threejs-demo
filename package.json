@@ -15,11 +15,11 @@
     "chalk": "^5.3.0",
     "express": "^4.19.2",
     "jimp": "^0.22.12",
-    "puppeteer": "^22.12.1",
-    "three": "^0.166.1"
+    "puppeteer": "^23.1.0",
+    "three": "^0.167.1"
   },
   "license": "MIT",
   "devDependencies": {
-    "vite": "^5.3.3"
+    "vite": "^5.4.0"
   }
 }
