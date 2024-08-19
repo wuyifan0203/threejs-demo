@@ -13,9 +13,6 @@ import {
     MeshStandardMaterial,
     Mesh,
     Vector3,
-    Ray,
-    Triangle,
-    Box3
 } from '../lib/three/three.module.js';
 import {
     initAmbientLight,

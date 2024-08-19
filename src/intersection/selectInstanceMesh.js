@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-08-17 16:28:59
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-17 18:02:10
+ * @LastEditTime: 2024-08-19 11:30:31
  * @FilePath: /threejs-demo/src/intersection/selectinstanceMesh.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -11,7 +11,6 @@ import {
     Vector3,
     InstancedMesh,
     ConeGeometry,
-    Group,
     Mesh,
     Vector2,
     MeshStandardMaterial,
@@ -27,16 +26,12 @@ import {
     initOrbitControls,
     initAmbientLight,
     initDirectionLight,
-    initGUI,
     resize
 } from '../lib/tools/index.js';
-import { TransformControls } from '../lib/three/TransformControls.js';
 
 window.onload = () => {
     init();
 };
-
-
 
 function init() {
     const renderer = initRenderer();
@@ -94,8 +89,8 @@ function init() {
     const mouse = new Vector2();
 
     const selectMesh = new Mesh(geometry, new MeshNormalMaterial());
-    selectMesh.scale.set(1.1, 1.1, 1.1)
     scene.add(selectMesh);
+    selectMesh.matrixAutoUpdate = false;
 
     const selectMatrix = new Matrix4();
     window.addEventListener('dblclick', (event) => {
@@ -110,8 +105,10 @@ function init() {
             instancedMesh.getMatrixAt(instanceId, selectMatrix);
             selectMesh.matrixWorld.copy(instancedMesh.matrixWorld);
             selectMesh.matrixWorld.multiplyMatrices(instancedMesh.matrixWorld, selectMatrix);
+
             selectMatrix.decompose(selectMesh.position, selectMesh.quaternion, selectMesh.scale);
             selectMesh.scale.set(1.01, 1.01, 1.01);
+            selectMesh.updateMatrix();
 
             selectMesh.visible = true;
         } else {
