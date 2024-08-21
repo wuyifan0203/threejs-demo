@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-21 14:29:13
+ * @LastEditTime: 2024-08-21 16:45:26
  * @FilePath: /threejs-demo/pageList.js
  */
 const list = [
@@ -192,6 +192,10 @@ const list = [
             {
                 path: "/object/instanceMesh.html",
                 title: "Use Instance Mesh"
+            },
+            {
+                path: "/geometry/edgeGeometry.html",
+                title: "Edge Geometry"
             }
         ]
     },
@@ -240,6 +244,10 @@ const list = [
             {
                 path: '/particle/galaxy.html',
                 title: "Galaxy"
+            },
+            {
+                path: '/particle/rain.html',
+                title: "Rain"
             }
         ]
     },

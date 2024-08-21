@@ -2,25 +2,45 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-08-17 16:20:55
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-17 16:21:21
+ * @LastEditTime: 2024-08-21 16:46:34
  * @FilePath: /threejs-demo/src/geometry/editGeometry.html
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
 -->
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Geometry</title>
     <style>
-        body{
+        body {
             margin: 0;
+        }
+
+        #info {
+            position: absolute;
+            top: 0px;
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            text-align: center;
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            pointer-events: none;
+            z-index: 1;
         }
     </style>
 </head>
+
 <body>
-    <div id="webgl-output"></div>
+    <div id="webgl-output">
+        <div id="info"> dbClick to select point and edit </div>
+    </div>
     <script src="./editGeometry.js" type="module"></script>
 </body>
+
 </html>
