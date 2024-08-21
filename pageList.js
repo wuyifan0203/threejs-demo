@@ -316,7 +316,7 @@ const list = [
                 title: "FBX Loader"
             },
             {
-                path: "/loader/OBJLoader.html",
+                path: "/loader/objLoader.html",
                 title: "OBJ Loader"
             }
         ]
