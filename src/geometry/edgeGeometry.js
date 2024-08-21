@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-02 14:03:01
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-20 17:41:58
+ * @LastEditTime: 2024-08-21 11:22:06
  * @FilePath: /threejs-demo/src/geometry/edgeGeometry.js
  */
 import {
@@ -9,7 +9,7 @@ import {
   CylinderGeometry,
   SphereGeometry,
   BoxGeometry,
-  BufferGeometry,
+  FogExp2,
   Mesh,
   LineBasicMaterial,
   InstancedMesh,
@@ -50,7 +50,8 @@ const mouse = new Vector2();
 const gui = initGUI();
 
 const controls = {
-  key: 'box',
+  key: 'cylinder',
+  wireframe: true
 }
 
 function init() {
@@ -61,12 +62,14 @@ function init() {
   renderer.autoClear = false;
   camera.up.set(0, 0, 1);
   resize(renderer, camera);
-  initCustomGrid(scene);
+  initCustomGrid(scene, 100, 100);
   initAxesHelper(scene);
 
   const orbit = initOrbitControls(camera, renderer.domElement);
   orbit.update();
   orbit.addEventListener('change', render);
+
+  scene.fog = new FogExp2(0xffffff, 0.015);
 
 
   const mesh = new Mesh(geometryPool[controls.key], new MeshNormalMaterial({ wireframe: true }));
@@ -75,8 +78,6 @@ function init() {
   function render() {
     renderer.render(scene, camera);
   }
-
-
 
   const pointGeometry = new SphereGeometry(0.3, 8, 8);
   const instanceMaterial = new MeshNormalMaterial();
@@ -99,7 +100,7 @@ function init() {
     scene.remove(instanceMesh);
     instanceMesh.dispose();
     instanceMesh = new InstancedMesh(pointGeometry, instanceMaterial, countSet.size);
-
+    instanceMesh.visible = controls.wireframe;
     const vertexArray = Array.from(countSet);
     for (let i = 0, l = countSet.size; i < l; i++) {
       const vertex = vertexArray[i].split(',');
@@ -117,11 +118,7 @@ function init() {
   transformControls.addEventListener('change', render);
   const origin = new Vector3();
   transformControls.addEventListener('mouseUp', () => {
-    origin.copy(transformControls.position);
-  })
-  const currentPos = new Vector3();
-  transformControls.addEventListener('mouseDown', () => {
-    tmpV.copy(transformControls.position);
+    tmpV.copy(selectPoints.position);
     const buffer = mesh.geometry.attributes.position;
     for (let i = 0, l = mesh.geometry.attributes.position.count; i < l; i++) {
       currentPos.fromBufferAttribute(buffer, i);
@@ -130,9 +127,17 @@ function init() {
       }
     }
     mesh.geometry.attributes.position.needsUpdate = true;
+    mesh.geometry.computeVertexNormals();
+    instanceMesh.setMatrixAt(selectId, tmpM.makeTranslation(tmpV.x, tmpV.y, tmpV.z));
+    instanceMesh.instanceMatrix.needsUpdate = true;
+  })
+  const currentPos = new Vector3();
+  transformControls.addEventListener('mouseDown', () => {
+    origin.copy(selectPoints.position);
   });
 
   const raycaster = new Raycaster();
+  let selectId = null;
 
   renderer.domElement.addEventListener('dblclick', (evt) => {
     renderer.getSize(tmpV2);
@@ -140,7 +145,8 @@ function init() {
     mouse.y = -(evt.clientY / tmpV2.y) * 2 + 1;
 
     raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObject(instanceMesh, true);
+
+    const intersects = raycaster.intersectObjects([instanceMesh].filter(m => m.visible), true);
     if (intersects.length > 0) {
       const instanceId = intersects[0].instanceId;
       console.log(instanceId);
@@ -151,7 +157,9 @@ function init() {
       selectPoints.scale.set(1.01, 1.01, 1.01);
       selectPoints.visible = true;
       transformControls.attach(selectPoints);
+      selectId = instanceId;
     } else {
+      selectId = null;
       selectPoints.visible = false;
       transformControls.detach();
     }
@@ -159,21 +167,26 @@ function init() {
   })
 
 
-
-
-
   updateInstanceMesh()
-
-  console.log(instanceMesh);
 
   render();
 
   gui.add(controls, 'key', Object.keys(geometryPool)).onChange(
     () => {
       mesh.geometry = geometryPool[controls.key];
-      updateInstanceMesh()
+      updateInstanceMesh();
+      transformControls.detach();
+      selectPoints.visible = false;
+      render();
     }
   );
+  gui.add(controls, 'wireframe').onChange((e) => {
+    mesh.material.wireframe = controls.wireframe;
+    instanceMesh.visible = controls.wireframe;
+    transformControls.detach();
+    selectPoints.visible = false;
+    render();
+  })
 }
 
 function isEqual(v1, v2, epsilon = 1e-5) {

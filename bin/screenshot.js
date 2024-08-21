@@ -1,18 +1,20 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 16:27:25
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-08-21 15:57:01
  * @FilePath: /threejs-demo/bin/screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import * as puppeteer from 'puppeteer';
-import * as fs from 'fs/promises';
+import * as fsp from 'node:fs/promises';
+import * as fs from 'node:fs';
 import chalk from 'chalk';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import jimp from 'jimp';
 import express from 'express';
+import pixelmatch from 'pixelmatch';
 
 import { list } from '../pageList.js';
 
@@ -54,6 +56,8 @@ const width = 400;
 const height = 250;
 const viewScale = 2;
 const jpgQuality = 95;
+const maxDifferentPixels = 0.3;
+const pixelThreshold = 0.1; // threshold error in one pixel
 
 const pageNum = 8;
 const viewport = { width: width * viewScale, height: height * viewScale };
@@ -64,9 +68,9 @@ const browser = await puppeteer.launch({
 });
 
 // 获取清页脚本代码
-const cleanPageScript = await fs.readFile(path.join(__dirname, '/cleanPage.js'), 'utf8');
+const cleanPageScript = await fsp.readFile(path.join(__dirname, '/cleanPage.js'), 'utf8');
 // 获取注入脚本代码
-const injectionScript = await fs.readFile(path.join(__dirname, '/injection.js'), 'utf8');
+const injectionScript = await fsp.readFile(path.join(__dirname, '/injection.js'), 'utf8');
 
 const port = 6600;
 const baseURL = '/threejs-demo';
@@ -252,11 +256,48 @@ async function pageCapture(pages, url) {
     // 出错提前结束
     if (page.error !== undefined) throw new Error(page.error);
     // 截图
-    const image = (await jimp.read(await page.screenshot())).scale(1 / viewScale).quality(jpgQuality);
+
+
+    let image = null;
+    try {
+      const screenBuffer = await page.screenshot();
+      const imageBuffer = Buffer.from(screenBuffer);
+      image = await jimp.read(imageBuffer);
+      image.scale(1 / viewScale).quality(jpgQuality);
+    } catch (error) {
+      console.error('Error at Jimp processing:', error);
+    }
+
+
     const fileName = url.match(/(\w+)\.html/)[1];
-    image.writeAsync(path.join(__dirname, `../screenshots/${fileName}.jpg`));
-    console.green(`screenShot ${fileName} success! : ${page.url}`);
-    console.bgBlue(`progress: ${current}/${total}  ${((current / total) * 100).toFixed(2)}%`);
+
+    const filePath = path.join(__dirname, `../screenshots/${fileName}.jpg`);
+
+    try {
+      if (fs.existsSync(filePath)) {
+        const expected = (await jimp.read(filePath)).quality(jpgQuality);
+        const actual = image.bitmap;
+        const diff = image.clone();
+
+        const numDifferentPixels = pixelmatch(expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
+          threshold: pixelThreshold,
+          alpha: 0.2
+        });
+        const differentPixels = numDifferentPixels / (actual.width * actual.height) * 100;
+        if (differentPixels < maxDifferentPixels) {
+          console.green(`Diff ${differentPixels.toFixed(1)}% in file: ${fileName} not change`);
+        } else {
+          image.writeAsync(path.join(__dirname, `../screenshots/${fileName}.jpg`));
+          console.green(`[update] screenShot ${fileName} success! : ${page.url}`);
+        }
+      } else {
+        image.writeAsync(filePath);
+        console.green(`[new add] screenShot ${fileName} success! : ${page.url}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+
   } catch (error) {
     console.red(`Error happened while capturing ${page.url}: ${error}`);
     errorPages.push(page.url)
@@ -264,6 +305,7 @@ async function pageCapture(pages, url) {
     // 释放页面
     page.url = undefined;
     current++;
+    console.bgBlue(`progress: ${current}/${total}  ${((current / total) * 100).toFixed(2)}%`);
   }
 }
 

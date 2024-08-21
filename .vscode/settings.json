@@ -31,6 +31,7 @@
     "Octree",
     "Phong",
     "physijs",
+    "pixelmatch",
     "plusplus",
     "raycaster",
     "slerp",
