@@ -14,9 +14,9 @@ This is a case library that serves as a feasibility verification and learning to
 and more.
 ## Getting Started
 ```shell
-# 安装依赖
+# Install dependencies
 pnpm install
-# 预览查看
+# Preview the project
 pnpm dev
 ```
 
