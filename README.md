@@ -1,6 +1,6 @@
 # Threejs-Demo
 
-preview : https://wuyifan0203.github.io/threejs-demo/
+Preview Link: https://wuyifan0203.github.io/threejs-demo/
 
 ## Introduction
 
