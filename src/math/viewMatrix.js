@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-08 10:54:14
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:41:09
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:56:04
  * @FilePath: /threejs-demo/src/math/viewMatrix.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -39,6 +39,7 @@ function init() {
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
     camera.zoom = 0.25;
+    camera.updateProjectionMatrix();
     const scene = initScene();
     initAmbientLight(scene);
     const light = initDirectionLight();

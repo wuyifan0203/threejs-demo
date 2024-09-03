@@ -33,7 +33,7 @@ const fragmentShader = /* glsl */`
     varying vec2 vUv;
     void main() {
        // CopyShader with GammaCorrectionShader 
-        gl_FragColor = LinearTosRGB(texture2D( tDiffuse, vUv ));
+        gl_FragColor = sRGBTransferOETF(texture2D( tDiffuse, vUv ));
         gl_FragColor.a *= opacity;
 
     }`;

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-10 20:15:32
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 10:40:19
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:57:04
  * @FilePath: /threejs-demo/src/particle/image.js
  */
 import {
@@ -34,7 +34,8 @@ function init() {
     const camera = initOrthographicCamera(new Vector3(0, 0, 2000))
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
-    camera.zoom = 0.01
+    camera.zoom = 0.01;
+    camera.updateProjectionMatrix();
 
     const scene = initScene();
     renderer.setClearColor(0x000000, 1);

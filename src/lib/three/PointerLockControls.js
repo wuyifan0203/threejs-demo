@@ -1,10 +1,10 @@
 import {
+	Controls,
 	Euler,
-	EventDispatcher,
 	Vector3
-} from './three.module.js';
+} from 'three';
 
-const _euler = new Euler(0, 0, 0, 'YXZ');
+const _euler = new Euler( 0, 0, 0, 'YXZ' );
 const _vector = new Vector3();
 
 const _changeEvent = { type: 'change' };
@@ -13,14 +13,11 @@ const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
 
-class PointerLockControls extends EventDispatcher {
+class PointerLockControls extends Controls {
 
-	constructor(camera, domElement) {
+	constructor( camera, domElement = null ) {
 
-		super();
-
-		this.camera = camera;
-		this.domElement = domElement;
+		super( camera, domElement );
 
 		this.isLocked = false;
 
@@ -31,27 +28,33 @@ class PointerLockControls extends EventDispatcher {
 
 		this.pointerSpeed = 1.0;
 
-		this._onMouseMove = onMouseMove.bind(this);
-		this._onPointerlockChange = onPointerlockChange.bind(this);
-		this._onPointerlockError = onPointerlockError.bind(this);
+		// event listeners
 
-		this.connect();
+		this._onMouseMove = onMouseMove.bind( this );
+		this._onPointerlockChange = onPointerlockChange.bind( this );
+		this._onPointerlockError = onPointerlockError.bind( this );
+
+		if ( this.domElement !== null ) {
+
+			this.connect();
+
+		}
 
 	}
 
 	connect() {
 
-		this.domElement.ownerDocument.addEventListener('mousemove', this._onMouseMove);
-		this.domElement.ownerDocument.addEventListener('pointerlockchange', this._onPointerlockChange);
-		this.domElement.ownerDocument.addEventListener('pointerlockerror', this._onPointerlockError);
+		this.domElement.ownerDocument.addEventListener( 'mousemove', this._onMouseMove );
+		this.domElement.ownerDocument.addEventListener( 'pointerlockchange', this._onPointerlockChange );
+		this.domElement.ownerDocument.addEventListener( 'pointerlockerror', this._onPointerlockError );
 
 	}
 
 	disconnect() {
 
-		this.domElement.ownerDocument.removeEventListener('mousemove', this._onMouseMove);
-		this.domElement.ownerDocument.removeEventListener('pointerlockchange', this._onPointerlockChange);
-		this.domElement.ownerDocument.removeEventListener('pointerlockerror', this._onPointerlockError);
+		this.domElement.ownerDocument.removeEventListener( 'mousemove', this._onMouseMove );
+		this.domElement.ownerDocument.removeEventListener( 'pointerlockchange', this._onPointerlockChange );
+		this.domElement.ownerDocument.removeEventListener( 'pointerlockerror', this._onPointerlockError );
 
 	}
 
@@ -61,46 +64,46 @@ class PointerLockControls extends EventDispatcher {
 
 	}
 
-	getObject() { // retaining this method for backward compatibility
+	getObject() {
 
-		return this.camera;
+		console.warn( 'THREE.PointerLockControls: getObject() has been deprecated. Use controls.object instead.' ); // @deprecated r169
 
-	}
-
-	getDirection(v) {
-
-		return v.set(0, 0, - 1).applyQuaternion(this.camera.quaternion);
+		return this.object;
 
 	}
 
-	moveForward(distance) {
+	getDirection( v ) {
+
+		return v.set( 0, 0, - 1 ).applyQuaternion( this.object.quaternion );
+
+	}
+
+	moveForward( distance ) {
+
+		if ( this.enabled === false ) return;
 
 		// move forward parallel to the xz-plane
 		// assumes camera.up is y-up
 
-		const camera = this.camera;
+		const camera = this.object;
 
-		_vector.setFromMatrixColumn(camera.matrix, 0);
+		_vector.setFromMatrixColumn( camera.matrix, 0 );
 
-		console.log(_vector.clone(), '-V');
+		_vector.crossVectors( camera.up, _vector );
 
-		_vector.crossVectors(camera.up, _vector);
-
-		console.log(_vector.clone(), '-V2');
-
-		camera.position.addScaledVector(_vector, distance);
-
-		console.log(_vector, distance, camera.position, '-V3');
+		camera.position.addScaledVector( _vector, distance );
 
 	}
 
-	moveRight(distance) {
+	moveRight( distance ) {
 
-		const camera = this.camera;
+		if ( this.enabled === false ) return;
 
-		_vector.setFromMatrixColumn(camera.matrix, 0);
+		const camera = this.object;
 
-		camera.position.addScaledVector(_vector, distance);
+		_vector.setFromMatrixColumn( camera.matrix, 0 );
+
+		camera.position.addScaledVector( _vector, distance );
 
 	}
 
@@ -120,38 +123,38 @@ class PointerLockControls extends EventDispatcher {
 
 // event listeners
 
-function onMouseMove(event) {
+function onMouseMove( event ) {
 
-	if (this.isLocked === false) return;
+	if ( this.enabled === false || this.isLocked === false ) return;
 
 	const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 	const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
 
-	const camera = this.camera;
-	_euler.setFromQuaternion(camera.quaternion);
+	const camera = this.object;
+	_euler.setFromQuaternion( camera.quaternion );
 
 	_euler.y -= movementX * 0.002 * this.pointerSpeed;
 	_euler.x -= movementY * 0.002 * this.pointerSpeed;
 
-	_euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x));
+	_euler.x = Math.max( _PI_2 - this.maxPolarAngle, Math.min( _PI_2 - this.minPolarAngle, _euler.x ) );
 
-	camera.quaternion.setFromEuler(_euler);
+	camera.quaternion.setFromEuler( _euler );
 
-	this.dispatchEvent(_changeEvent);
+	this.dispatchEvent( _changeEvent );
 
 }
 
 function onPointerlockChange() {
 
-	if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
+	if ( this.domElement.ownerDocument.pointerLockElement === this.domElement ) {
 
-		this.dispatchEvent(_lockEvent);
+		this.dispatchEvent( _lockEvent );
 
 		this.isLocked = true;
 
 	} else {
 
-		this.dispatchEvent(_unlockEvent);
+		this.dispatchEvent( _unlockEvent );
 
 		this.isLocked = false;
 
@@ -161,7 +164,7 @@ function onPointerlockChange() {
 
 function onPointerlockError() {
 
-	console.error('THREE.PointerLockControls: Unable to use Pointer Lock API');
+	console.error( 'THREE.PointerLockControls: Unable to use Pointer Lock API' );
 
 }
 

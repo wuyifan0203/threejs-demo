@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 17:10:53
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:59:06
  * @FilePath: /threejs-demo/src/algorithms/quadTreeDemo.js
  */
 import { Box2, BoxGeometry, Vector2, Vector3, Mesh, MeshBasicMaterial, Color } from '../lib/three/three.module.js';
@@ -32,6 +32,7 @@ function init() {
     camera.up.set(0, 0, 1);
     camera.lookAt(0, 0, 0);
     camera.zoom = 0.2;
+    camera.updateProjectionMatrix();
     const scene = initScene();
     renderer.setClearColor(0xffffff);
 

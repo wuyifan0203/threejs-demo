@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-30 14:42:30
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:42:46
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:56:32
  * @FilePath: /threejs-demo/src/object/instanceMesh.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -38,6 +38,7 @@ function init() {
     camera.lookAt(0, 0, 0);
     camera.up.set(0, 0, 1);
     camera.zoom = 0.09;
+    camera.updateProjectionMatrix();
     const scene = initScene();
 
     initAmbientLight(scene);

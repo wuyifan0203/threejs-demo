@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-20 13:19:03
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-22 13:15:41
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:43:25
  * @FilePath: /threejs-demo/src/render/debugDepthPeeling.js
  */
 import { FullScreenQuad } from '../lib/three/Pass.js';
@@ -118,7 +118,7 @@ function debugDeepPeeling(scene, camera) {
         varying vec2 vUv;
         void main() {
            // CopyShader with GammaCorrectionShader 
-            gl_FragColor = LinearTosRGB(texture2D( tDiffuse, vUv ));
+            gl_FragColor = sRGBTransferOETF(texture2D( tDiffuse, vUv ));
             gl_FragColor.a *= 1.0;
     
         }`,

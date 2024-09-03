@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-05 17:30:07
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 15:34:06
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:58:48
  * @FilePath: /threejs-demo/src/shader/fresnelEffect.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -48,6 +48,7 @@ function init() {
     renderer.setClearColor(new Color(0x000000));
     const camera = initOrthographicCamera(new Vector3(7, 4, 57));
     camera.zoom = 0.4;
+    camera.updateProjectionMatrix();
 
     const scene = initScene();
 

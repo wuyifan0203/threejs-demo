@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-12-18 19:08:43
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-24 00:58:57
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-03 10:42:18
  * @FilePath: /threejs-demo/src/render/DepthPeeling2.js
  */
 
@@ -32,7 +32,7 @@ const fragmentShader = /* glsl */`
     varying vec2 vUv;
     void main() {
        // CopyShader with GammaCorrectionShader 
-        gl_FragColor = LinearTosRGB(texture2D( tDiffuse, vUv ));
+        gl_FragColor = sRGBTransferOETF(texture2D( tDiffuse, vUv ));
         gl_FragColor.a *= opacity;
 
     }`;
