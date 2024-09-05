@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "preview":"vite preview",
     "screenshot": "node bin/screenshot.js",
     "prepare": "husky",
     "commit": "git cz"
@@ -31,7 +32,8 @@
     "lint-staged": "^15.2.9",
     "pixelmatch": "^6.0.0",
     "puppeteer": "^23.2.1",
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "vite-plugin-static-copy": "^1.0.6"
   },
   "config": {
     "commitizen": {
