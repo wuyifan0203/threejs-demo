@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-25 17:31:30
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-04 18:18:47
+ * @LastEditTime: 2024-09-05 18:35:15
  * @FilePath: /threejs-demo/src/cannon/vehicle.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -10,12 +10,11 @@ import {
     Mesh,
     Clock,
     Vector3,
-    TorusGeometry,
+    Matrix4,
     CylinderGeometry,
     MeshStandardMaterial,
     BoxGeometry,
-    MeshBasicMaterial,
-    Vector4,
+    Quaternion as TreQuaternion,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -42,6 +41,7 @@ import {
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
 
 const halfPI = Math.PI / 2;
+const tmp4 = new Matrix4()
 
 window.onload = () => {
     init();
@@ -69,8 +69,15 @@ function init() {
     world.broadphase = new SAPBroadphase(world);
     world.defaultContactMaterial.friction = 0.2;
 
-    createGround(scene, world);
+    const ground = createGround(scene, world);
     const vehicle = createVehicle(scene, world);
+
+    const wheel_ground = new ContactMaterial(vehicle.wheelMaterial, ground.material, {
+        friction: 0.3,
+        restitution: 0,
+        contactEquationStiffness: 1000,
+    })
+    world.addContactMaterial(wheel_ground)
 
     const cannonDebugger = CannonDebugger(scene, world, { color: 0xffff00 });
 
@@ -104,6 +111,9 @@ function init() {
             case 'D':
             case 'ARROWRIGHT':
                 vehicle.control('right', true);
+                break;
+            case 'R':
+                vehicle.reset();
                 break;
         }
     })
@@ -147,17 +157,23 @@ function createGround(scene, world) {
     body.position.copy(mesh.position);
 
     world.addBody(body);
+    return {
+        material: body.material,
+    }
 }
 
 function createVehicle(scene, world) {
-    const vehicleSize = new Vector3(4, 2, 2);
+    const vehicleSize = new Vector3(4, 1, 2);
     const wheelMass = 1;
     const wheelRadius = new Vector3(0.5, 0.5 / 2, 16); // 半径，半轴长，段数
+
+    const centerOfMassOffset = new Vector3(0, -1, 0);
     // 添加小车
     /// 添加小车Mesh
 
     const halfSize = vehicleSize.clone().multiplyScalar(0.5);
     const vehicleGeometry = new BoxGeometry(vehicleSize.x, vehicleSize.y, vehicleSize.z);
+    vehicleGeometry.translate(centerOfMassOffset.x, centerOfMassOffset.y, centerOfMassOffset.z);
 
     const vehicleMeshMaterial = new MeshStandardMaterial({ color: 0x00ff00 });
 
@@ -169,9 +185,9 @@ function createVehicle(scene, world) {
     scene.add(vehicleMesh);
 
     // 添加小车Body
-    const vehicleBody = new Body({ mass: 5 });
+    const vehicleBody = new Body({ mass: 2 });
     const vehicleShape = new BoxShape(new Vec3().copy(halfSize));
-    vehicleBody.addShape(vehicleShape);
+    vehicleBody.addShape(vehicleShape, centerOfMassOffset);
     vehicleBody.position.copy(vehicleMesh.position);
     const vehicle = new RigidVehicle({ chassisBody: vehicleBody, });
 
@@ -210,36 +226,31 @@ function createVehicle(scene, world) {
         mesh.material.color.setHex(colors[i]);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        mesh.position.copy(position);
         wheelMeshes.push(mesh);
         scene.add(mesh);
 
         const body = new Body({ mass: wheelMass, material: wheelMaterial });
         body.addShape(wheelShape, new Vec3(0, 0, 0), new Quaternion().setFromAxisAngle(rotateX, halfPI));
+        body.angularDamping = 0.4
         wheelBodies.push(body);
 
 
         vehicle.addWheel({
             body,
-            position,
+            position: position.vadd(centerOfMassOffset),
             direction: down,
             axis: new Vec3(0, 0, i % 2 ? -1 : 1),
         })
     })
 
-    const wheel_ground = new ContactMaterial(wheelMaterial, groundMaterial, {
-        friction: 0.3,
-        restitution: 0,
-        contactEquationStiffness: 1000,
-    })
-    world.addContactMaterial(wheel_ground)
-
     vehicle.addToWorld(world);
 
-    const maxForce = 100;
+    const maxForce = 50;
     const maxSteerVal = Math.PI / 8;
 
     return {
+        wheelMaterial,
+        position: vehicleBody.position,
         update() {
             vehicleMesh.position.copy(vehicleBody.position);
             vehicleMesh.quaternion.copy(vehicleBody.quaternion);
@@ -252,12 +263,12 @@ function createVehicle(scene, world) {
             if (state) {
                 switch (key) {
                     case 'up':
-                        vehicle.applyWheelForce(maxForce, 2);
-                        vehicle.applyWheelForce(-maxForce, 3);
+                        vehicle.applyWheelForce(-maxForce, 2);
+                        vehicle.applyWheelForce(maxForce, 3);
                         break;
                     case 'down':
-                        vehicle.setWheelForce(-maxForce / 2, 2)
-                        vehicle.setWheelForce(maxForce / 2, 3)
+                        vehicle.setWheelForce(maxForce / 2, 2)
+                        vehicle.setWheelForce(-maxForce / 2, 3)
                         break;
                     case 'left':
                         vehicle.setSteeringValue(maxSteerVal, 0)
@@ -271,23 +282,46 @@ function createVehicle(scene, world) {
             } else {
                 switch (key) {
                     case 'up':
-                        vehicle.setWheelForce(0, 2)
-                        vehicle.setWheelForce(0, 3)
-                        break;
                     case 'down':
                         vehicle.setWheelForce(0, 2)
                         vehicle.setWheelForce(0, 3)
                         break;
                     case 'left':
-                        vehicle.setSteeringValue(0, 0)
-                        vehicle.setSteeringValue(0, 1)
-                        break;
                     case 'right':
                         vehicle.setSteeringValue(0, 0)
                         vehicle.setSteeringValue(0, 1)
                         break;
                 }
             }
+        },
+        reset() {
+            const currentPos = vehicle.chassisBody.position.clone();
+            currentPos.y = 10;
+
+
+            const axisX = new Vector3(1, 0, 0);
+            const axisZ = new Vector3(0, 0, 1);
+            const quaternion = new TreQuaternion().copy(vehicle.chassisBody.quaternion).invert();
+            axisX.applyQuaternion(quaternion).normalize();
+            axisZ.applyQuaternion(quaternion).normalize();;
+
+
+            // 4. 计算新的四元数，使车辆的Y轴正方向朝上
+            const upDirection = new Vec3(0, 1, 0);  // 世界坐标系中的Y轴正方向
+            const newQuaternion = new Quaternion();
+            newQuaternion.setFromVectors(new Vec3().copy(axisZ), upDirection);
+
+            // 5. 将车辆的位置和新的旋转应用到车体上
+            vehicle.chassisBody.position.copy(currentPos);
+            vehicle.chassisBody.quaternion.copy(newQuaternion);
+
+            vehicle.wheelBodies.forEach(wheelBody => {
+                wheelBody.quaternion.copy(newQuaternion);
+            });
+
+            // 7. 重置车辆的速度和角速度（可选，根据需要）
+            vehicle.chassisBody.velocity.set(0, 0, 0);
+            vehicle.chassisBody.angularVelocity.set(0, 0, 0);
         }
     }
 }
