@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-03-25 17:31:30
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-05 18:35:15
+ * @LastEditTime: 2024-09-10 15:31:10
  * @FilePath: /threejs-demo/src/cannon/vehicle.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -15,6 +15,9 @@ import {
     MeshStandardMaterial,
     BoxGeometry,
     Quaternion as TreQuaternion,
+    SphereGeometry,
+    Group,
+    CameraHelper
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -37,8 +40,10 @@ import {
     Quaternion,
     ContactMaterial,
     Box as BoxShape,
+    Sphere
 } from '../lib/other/physijs/cannon-es.js';
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
+import { CannonUtils } from '../lib/other/physijs/cannon-utils.js'
 
 const halfPI = Math.PI / 2;
 const tmp4 = new Matrix4()
@@ -56,7 +61,16 @@ function init() {
 
     initAmbientLight(scene);
     const light = initDirectionLight();
-    light.position.set(20, 20, 20);
+    light.position.set(300, 300, 300);
+    light.shadow.camera.top = 500;
+    light.shadow.camera.bottom = -500;
+    light.shadow.camera.left = -800;
+    light.shadow.camera.right = 800;
+    light.shadow.camera.near = 10;
+    light.shadow.camera.far = 1000;
+    light.shadow.mapSize.height = 10240;
+    light.shadow.mapSize.width = 10240;
+    light.shadow.bias = -0.0005;
     scene.add(light);
 
     // 坐标轴
@@ -72,12 +86,20 @@ function init() {
     const ground = createGround(scene, world);
     const vehicle = createVehicle(scene, world);
 
+    const vehicle2 = createVehicle2(scene, world);
+
     const wheel_ground = new ContactMaterial(vehicle.wheelMaterial, ground.material, {
         friction: 0.3,
         restitution: 0,
         contactEquationStiffness: 1000,
     })
+    const wheel2_ground = new ContactMaterial(vehicle2.wheelMaterial, ground.material, {
+        friction: 0.5,
+        restitution: 0.1,
+        contactEquationStiffness: 1000,
+    })
     world.addContactMaterial(wheel_ground)
+    world.addContactMaterial(wheel2_ground)
 
     const cannonDebugger = CannonDebugger(scene, world, { color: 0xffff00 });
 
@@ -88,6 +110,7 @@ function init() {
         orbitControls.update();
         renderer.render(scene, camera);
         vehicle.update();
+        vehicle2.update();
         cannonDebugger.update();
         requestAnimationFrame(render);
     };
@@ -97,45 +120,60 @@ function init() {
         console.log(event.key, 'keydown');
         switch (event.key.toUpperCase()) {
             case 'W':
-            case 'ARROWUP':
                 vehicle.control('up', true);
                 break;
             case 'S':
-            case 'ARROWDOWN':
                 vehicle.control('down', true);
                 break;
             case 'A':
-            case 'AARROWLEFT':
                 vehicle.control('left', true);
                 break;
             case 'D':
-            case 'ARROWRIGHT':
                 vehicle.control('right', true);
                 break;
             case 'R':
                 vehicle.reset();
                 break;
+            case 'ARROWUP':
+                vehicle2.control('up', true);
+                break;
+            case 'ARROWDOWN':
+                vehicle2.control('down', true);
+                break;
+            case 'ARROWLEFT':
+                vehicle2.control('left', true);
+                break;
+            case 'ARROWRIGHT':
+                vehicle2.control('right', true);
+                break;
         }
     })
 
     document.addEventListener('keyup', (event) => {
-        console.log(event.key, 'keyup');
         switch (event.key.toUpperCase()) {
             case 'W':
-            case 'ARROWUP':
                 vehicle.control('up', false);
                 break;
             case 'S':
-            case 'ARROWDOWN':
                 vehicle.control('down', false);
                 break;
             case 'A':
-            case 'AARROWLEFT':
                 vehicle.control('left', false);
                 break;
             case 'D':
-            case 'ARROWRIGHT':
                 vehicle.control('right', false);
+                break;
+            case 'ARROWUP':
+                vehicle2.control('up', false);
+                break;
+            case 'ARROWDOWN':
+                vehicle2.control('down', false);
+                break;
+            case 'ARROWLEFT':
+                vehicle2.control('left', false);
+                break;
+            case 'ARROWRIGHT':
+                vehicle2.control('right', false);
                 break;
         }
     })
@@ -215,11 +253,7 @@ function createVehicle(scene, world) {
         new Vec3(-wheelDistanceToCarX, -halfSize.y, wheelDistanceToCarZ) // 右后轮
     ];
 
-    console.log(wheelsPosition);
-
     const colors = [0x00ff00, 0x0000ff, 0xff0000, 0xffffff];
-
-    console.log(vehicle.wheelAxes);
 
     wheelsPosition.forEach((position, i) => {
         const mesh = new Mesh(wheelGeometry, wheelMeshMaterial.clone());
@@ -233,7 +267,6 @@ function createVehicle(scene, world) {
         body.addShape(wheelShape, new Vec3(0, 0, 0), new Quaternion().setFromAxisAngle(rotateX, halfPI));
         body.angularDamping = 0.4
         wheelBodies.push(body);
-
 
         vehicle.addWheel({
             body,
@@ -325,3 +358,109 @@ function createVehicle(scene, world) {
         }
     }
 }
+
+function createVehicle2(scene, world) {
+    const size = new Vector3(5, 0.5, 2);
+    const wheelRadius = 0.5;
+    // Build the car chassis
+    const halfSize = size.clone().multiplyScalar(0.5);
+    const chassisShape = new BoxShape(halfSize)
+    const chassisBody = new Body({ mass: 1 })
+    chassisBody.position.set(0, 10, 10)
+    const centerOfMassAdjust = new Vec3(0, -1, 0)
+    chassisBody.addShape(chassisShape, centerOfMassAdjust)
+
+    // Create the vehicle
+    const vehicle = new RigidVehicle({
+        chassisBody,
+    })
+
+    const mass = 1
+    const axisWidth = size.z + wheelRadius * 2;
+    const wheelShape = new Sphere(wheelRadius)
+    const wheelMaterial = new Material('wheel')
+    const down = new Vec3(0, -1, 0)
+
+    const positions = [
+        new Vec3(-halfSize.x, 0, axisWidth / 2),
+        new Vec3(-halfSize.x, 0, -axisWidth / 2),
+        new Vec3(halfSize.x, 0, axisWidth / 2),
+        new Vec3(halfSize.x, 0, -axisWidth / 2)
+    ]
+
+    positions.forEach((position, i) => {
+        const wheelBody = new Body({ mass, material: wheelMaterial })
+        wheelBody.addShape(wheelShape);
+        wheelBody.angularDamping = 0.4;
+        vehicle.addWheel({
+            body: wheelBody,
+            position: position.vadd(centerOfMassAdjust),
+            axis: new Vec3(0, 0, i % 2 ? 1 : -1),
+            direction: down,
+        })
+    })
+
+    vehicle.addToWorld(world);
+
+    const vehicleMesh = CannonUtils.body2Mesh(chassisBody, new MeshStandardMaterial({ color: 'gray' }))
+    scene.add(vehicleMesh);
+
+    const wheelGeometry = new SphereGeometry(wheelRadius);
+    const colors = ['red', 'blue', 'green', 'white'];
+    const wheelMeshes = [];
+    vehicle.wheelBodies.forEach((_, i) => {
+        const wheelMesh = new Mesh(wheelGeometry, new MeshStandardMaterial({ color: colors[i] }));
+        wheelMeshes.push(wheelMesh);
+        scene.add(wheelMesh);
+    });
+    const maxForce = 100;
+    const maxSteerVal = Math.PI / 8;
+    return {
+        wheelMaterial,
+        update() {
+            vehicleMesh.position.copy(chassisBody.position);
+            vehicleMesh.quaternion.copy(chassisBody.quaternion);
+            wheelMeshes.forEach((mesh, i) => {
+                const body = vehicle.wheelBodies[i];
+                mesh.position.copy(body.position);
+                mesh.quaternion.copy(body.quaternion);
+            })
+        },
+        control(key, state) {
+            if (state) {
+                switch (key) {
+                    case 'up':
+                        vehicle.applyWheelForce(maxForce, 2);
+                        vehicle.applyWheelForce(-maxForce, 3);
+                        break;
+                    case 'down':
+                        vehicle.setWheelForce(-maxForce / 2, 2)
+                        vehicle.setWheelForce(maxForce / 2, 3)
+                        break;
+                    case 'left':
+                        vehicle.setSteeringValue(maxSteerVal, 0)
+                        vehicle.setSteeringValue(maxSteerVal, 1)
+                        break;
+                    case 'right':
+                        vehicle.setSteeringValue(-maxSteerVal, 0)
+                        vehicle.setSteeringValue(-maxSteerVal, 1)
+                        break;
+                }
+            } else {
+                switch (key) {
+                    case 'up':
+                    case 'down':
+                        vehicle.setWheelForce(0, 2)
+                        vehicle.setWheelForce(0, 3)
+                        break;
+                    case 'left':
+                    case 'right':
+                        vehicle.setSteeringValue(0, 0)
+                        vehicle.setSteeringValue(0, 1)
+                        break;
+                }
+            }
+        }
+    }
+}
+
