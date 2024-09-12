@@ -1,12 +1,19 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-06-19 14:33:10
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-31 16:37:41
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-12 14:40:03
  * @FilePath: /threejs-demo/src/lib/tools/dataFormat.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import { Vector2, Vector3 } from "../three/three.module.js";
+
+/**
+ * @description: Vector2转三维BUffer
+ * @param {Vector2[]} pointList
+ * @param {number} h
+ * @return {number[]}
+ */
 function vec2ToVec3Vertex(pointList, h = 0) {
   const vertices = [];
   const { length } = pointList;
@@ -17,6 +24,11 @@ function vec2ToVec3Vertex(pointList, h = 0) {
   return vertices;
 }
 
+/**
+ * @description: 二维数组转Vector2数组
+ * @param {[number,number][]} data
+ * @return {Vector2[]}
+ */
 function arrayToVec2(data) {
   return data.map((d) => new Vector2(d[0], d[1]));
 }
@@ -33,7 +45,7 @@ function array2DToVertex(data,h = 0) {
 
 /**
  * @description: 一维数组转二维向量
- * @param {Array<number>} data
+ * @param {number[]} data
  * @return {Vector2[]}
  * @example  
  *  let data = [1,2,3,4,5,6];
@@ -48,6 +60,11 @@ function dataToVec2(data){
     return res
 }
 
+/**
+ * @description: Vector2数组转一维数组
+ * @param {Vector2[]} data
+ * @return {number[]}
+ */
 function vec2ToData(data) {
   const array = [];
   data.forEach(v => {
@@ -57,6 +74,12 @@ function vec2ToData(data) {
   return array
 }
 
+/**
+ * @description: Vector2数组转Vector3数组
+ * @param {Vector2[]} data
+ * @param {number} h
+ * @return {Vector3[]}
+ */
 function vec2ToVec3(data,h) {
   const array = [];
   data.forEach(v => {

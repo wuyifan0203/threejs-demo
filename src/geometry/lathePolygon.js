@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2023-04-23 16:05:22
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 16:18:26
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-12 14:41:14
  * @FilePath: /threejs-demo/src/geometry/lathePolygon.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,6 +12,8 @@ import {
   MeshNormalMaterial,
   Vector2,
   LatheGeometry,
+  BufferGeometry,
+  Float32BufferAttribute,
 } from '../lib/three/three.module.js';
 import {
   initRenderer,
@@ -21,9 +23,11 @@ import {
   resize,
   initGUI,
   initOrbitControls,
-  initScene
+  initScene,
+  vec2ToVec3
 } from '../lib/tools/index.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
+import { VertexNormalsHelper } from '../lib/three/VertexNormalsHelper.js';
 
 const { compile, isComplex } = math;
 
@@ -121,7 +125,6 @@ function draw(scene) {
     };
   }
 
-  const latheGeometry = new LatheGeometry(getFormulaPoints(), controls.segment, 0, controls.phiLength);
 
   const getOptions = () => {
     const options = {};
@@ -131,7 +134,10 @@ function draw(scene) {
     return options;
   };
 
-  const mesh = new Mesh(latheGeometry, material);
+  const normalMesh = new Mesh(new BufferGeometry(), new MeshNormalMaterial());
+  let normalHelper = null;
+  const mesh = new Mesh(new BufferGeometry(), material);
+  update();
 
   const gui = initGUI();
   gui.width = 350;
@@ -149,9 +155,75 @@ function draw(scene) {
   geometryFolder.add(controls, 'segment', 1, 36, 1).onChange(() => update());
   geometryFolder.add(controls, 'phiLength', 0, Math.PI * 2, 0.01).onChange(() => update());
 
+  const materialFolder = gui.addFolder('Material');
+  materialFolder.add(material, 'wireframe');
+
+  const helperFolder = gui.addFolder('Helper');
+  helperFolder.add(normalHelper, 'visible').name('normal');
+
+
+
   function update() {
     mesh.geometry.dispose();
-    mesh.geometry = new LatheGeometry(getFormulaPoints(), controls.segment, 0, controls.phiLength);
+    const points = getFormulaPoints();
+    mesh.geometry = new LatheGeometry(points, controls.segment, 0, controls.phiLength);
+
+    const geometry = new BufferGeometry().setFromPoints(vec2ToVec3(points, 0))
+    geometry.setAttribute('normal', new Float32BufferAttribute(calcPreNormal(points), 3));
+
+    normalMesh.geometry.dispose();
+    normalMesh.geometry = geometry;
+    normalHelper && scene.remove(normalHelper);
+    normalHelper = new VertexNormalsHelper(normalMesh);
+    normalHelper.visible = false;
+    scene.add(normalHelper);
+  }
+
+  function calcPreNormal(points) {
+    const initNormals = [];
+    const normal = new Vector3();
+    const curNormal = new Vector3();
+    const prevNormal = new Vector3();
+    let dx = 0;
+    let dy = 0;
+    for (let j = 0; j <= (points.length - 1); j++) {
+      switch (j) {
+        case 0:				// special handling for 1st vertex on path
+          dx = points[j + 1].x - points[j].x;
+          dy = points[j + 1].y - points[j].y;
+
+          normal.x = dy * 1.0;
+          normal.y = - dx;
+          normal.z = dy * 0.0;
+
+          prevNormal.copy(normal);
+          normal.normalize();
+          initNormals.push(normal.x, normal.y, normal.z);
+          break;
+
+        case (points.length - 1):	// special handling for last Vertex on path
+          initNormals.push(prevNormal.x, prevNormal.y, prevNormal.z);
+          break;
+        default:			// default handling for all vertices in between
+          dx = points[j + 1].x - points[j].x;
+          dy = points[j + 1].y - points[j].y;
+          normal.x = dy * 1.0;
+          normal.y = - dx;
+          normal.z = dy * 0.0;
+
+          curNormal.copy(normal);
+
+          normal.x += prevNormal.x;
+          normal.y += prevNormal.y;
+          normal.z += prevNormal.z;
+
+          normal.normalize();
+          initNormals.push(normal.x, normal.y, normal.z);
+          prevNormal.copy(curNormal);
+      }
+    }
+
+    return initNormals
   }
 
   scene.add(mesh);
