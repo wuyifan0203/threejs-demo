@@ -111,7 +111,6 @@ const init = () => {
 
   const options = {
     color: light.color,
-    stop,
   };
 
   const updateHelper = (e) => spotLightHelper.update();
@@ -143,6 +142,4 @@ const init = () => {
 
 };
 
-
-const stop = false;
 
