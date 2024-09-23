@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-21 15:57:01
+ * @LastEditTime: 2024-09-23 21:07:49
  * @FilePath: /threejs-demo/bin/screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -12,7 +12,7 @@ import * as fs from 'node:fs';
 import chalk from 'chalk';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import jimp from 'jimp';
+import { Jimp } from 'jimp';
 import express from 'express';
 import pixelmatch from 'pixelmatch';
 
@@ -87,6 +87,9 @@ async function main() {
   // 获取所有标签的href
   let urls = [];
   urls = await getAllHref();
+
+  urls.length = 1;
+
   total = urls.length;
 
   const pages = await browser.pages();
@@ -259,11 +262,15 @@ async function pageCapture(pages, url) {
 
 
     let image = null;
+    let bInt = null;
     try {
       const screenBuffer = await page.screenshot();
       const imageBuffer = Buffer.from(screenBuffer);
-      image = await jimp.read(imageBuffer);
-      image.scale(1 / viewScale).quality(jpgQuality);
+      image = await Jimp.read(imageBuffer);
+
+      const scaleImage = image.scale(1 / viewScale);
+      console.log(scaleImage.bitmap.width, scaleImage.bitmap.height,'scaleImage.size');
+      bInt = Uint8Array.from(await scaleImage.getBuffer('image/png'));
     } catch (error) {
       console.error('Error at Jimp processing:', error);
     }
@@ -271,15 +278,31 @@ async function pageCapture(pages, url) {
 
     const fileName = url.match(/(\w+)\.html/)[1];
 
-    const filePath = path.join(__dirname, `../screenshots/${fileName}.jpg`);
+    const filePath = path.join(__dirname, `../screenshots/${fileName}.png`);
 
     try {
       if (fs.existsSync(filePath)) {
-        const expected = (await jimp.read(filePath)).quality(jpgQuality);
-        const actual = image.bitmap;
-        const diff = image.clone();
+        const originImage = await Jimp.read(filePath);
 
-        const numDifferentPixels = pixelmatch(expected.bitmap.data, actual.data, diff.bitmap.data, actual.width, actual.height, {
+        // const compareBuffer = Uint8Array.from(await originImage.getBuffer('image/png', { quality: jpgQuality }));
+
+        // console.log(compareBuffer.length, bInt.length);
+
+
+        const actual = image.bitmap;
+        // const writeBuffer = new Uint8Array(actual.width * actual.height);
+
+        // console.log(writeBuffer.length);
+        // console.log(actual.width, actual.height);
+
+      
+
+        // console.log(originImage.bitmap.width, originImage.bitmap.height, 'originImage.size');
+
+        const diff = image.clone()
+        console.log(originImage.bitmap.data.length, image.bitmap.data.length, diff.bitmap.data.length);
+
+        const numDifferentPixels = pixelmatch(originImage.bitmap.data, image.bitmap.data, diff.bitmap.data, actual.width, actual.height, {
           threshold: pixelThreshold,
           alpha: 0.2
         });
@@ -287,11 +310,11 @@ async function pageCapture(pages, url) {
         if (differentPixels < maxDifferentPixels) {
           console.green(`Diff ${differentPixels.toFixed(1)}% in file: ${fileName} not change`);
         } else {
-          image.writeAsync(path.join(__dirname, `../screenshots/${fileName}.jpg`));
+          await image.write(path.join(__dirname, `../screenshots/${fileName}.png`));
           console.green(`[update] screenShot ${fileName} success! : ${page.url}`);
         }
       } else {
-        image.writeAsync(filePath);
+        await image.write(filePath);
         console.green(`[new add] screenShot ${fileName} success! : ${page.url}`);
       }
     } catch (error) {

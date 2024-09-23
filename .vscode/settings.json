@@ -20,10 +20,12 @@
     "source.fixAll.stylelint": "explicit"
   },
   "cSpell.words": [
+    "absarc",
     "broadphase",
     "commitlint",
     "contactmaterials",
     "CONVEXPOLYHEDRON",
+    "fflate",
     "FXAA",
     "GLTF",
     "HEIGHTFIELD",
@@ -40,6 +42,7 @@
     "threejs",
     "TRIMESH",
     "unproject",
+    "USDZ",
     "vadd",
     "vitepress",
     "WBOIT",
