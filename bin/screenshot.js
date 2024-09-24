@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-23 21:07:49
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-09-25 02:38:30
  * @FilePath: /threejs-demo/bin/screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -55,7 +55,7 @@ const renderTimeout = 5; // 5 seconds, set to 0 to disable
 const width = 400;
 const height = 250;
 const viewScale = 2;
-const jpgQuality = 95;
+const imageQuality = 95;
 const maxDifferentPixels = 0.3;
 const pixelThreshold = 0.1; // threshold error in one pixel
 
@@ -83,6 +83,10 @@ const errorPages = [];
 
 let total = 0;
 let current = 0;
+
+let generateLowImage = null;
+let compareImage = null;
+
 async function main() {
   // 获取所有标签的href
   let urls = [];
@@ -269,7 +273,9 @@ async function pageCapture(pages, url) {
       image = await Jimp.read(imageBuffer);
 
       const scaleImage = image.scale(1 / viewScale);
-      console.log(scaleImage.bitmap.width, scaleImage.bitmap.height,'scaleImage.size');
+      console.log(scaleImage.bitmap.width, scaleImage.bitmap.height, 'scaleImage.size');
+      const scaleBuffer = await scaleImage.getBuffer('image/png', { quality: imageQuality });
+      generateLowImage = Jimp.read(scaleBuffer);
       bInt = Uint8Array.from(await scaleImage.getBuffer('image/png'));
     } catch (error) {
       console.error('Error at Jimp processing:', error);
@@ -283,26 +289,15 @@ async function pageCapture(pages, url) {
     try {
       if (fs.existsSync(filePath)) {
         const originImage = await Jimp.read(filePath);
+        const originBuffer = Uint8Array.from(await originImage.getBuffer('image/png', { quality: imageQuality }));
 
-        // const compareBuffer = Uint8Array.from(await originImage.getBuffer('image/png', { quality: jpgQuality }));
+        const compareImage = Jimp.read(originBuffer);
 
-        // console.log(compareBuffer.length, bInt.length);
+        const actual = generateLowImage.bitmap;
 
+        const diff = compareImage.clone()
 
-        const actual = image.bitmap;
-        // const writeBuffer = new Uint8Array(actual.width * actual.height);
-
-        // console.log(writeBuffer.length);
-        // console.log(actual.width, actual.height);
-
-      
-
-        // console.log(originImage.bitmap.width, originImage.bitmap.height, 'originImage.size');
-
-        const diff = image.clone()
-        console.log(originImage.bitmap.data.length, image.bitmap.data.length, diff.bitmap.data.length);
-
-        const numDifferentPixels = pixelmatch(originImage.bitmap.data, image.bitmap.data, diff.bitmap.data, actual.width, actual.height, {
+        const numDifferentPixels = pixelmatch(generateLowImage.bitmap.data, compareImage.bitmap.data, diff.bitmap.data, actual.width, actual.height, {
           threshold: pixelThreshold,
           alpha: 0.2
         });
