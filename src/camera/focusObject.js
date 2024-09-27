@@ -142,6 +142,7 @@ function init() {
         });
 
         const center = new Vector3();
+        window.camera.updateProjectionMatrix()
         const tempZoom = window.camera.zoom;
 
         const { max, min } = box;
@@ -187,6 +188,9 @@ function init() {
             objectsBox2.max.x - objectsBox2.min.x,
             objectsBox2.max.y - objectsBox2.min.y
         ];
+
+        // console.log('boxWidth, boxHeight', boxWidth, boxHeight);
+
 
         const [targetWidth, targetHeight] = [
             width * 0.8,
@@ -239,6 +243,13 @@ function init() {
             orbitControls.object.zoom = zoom;
             orbitControls.target.copy(center);
             orbitControls.update();
+            camera.updateProjectionMatrix();
         }
+
+        // console.log('POS', camera.position.x, camera.position.y, camera.position.z);
+        // console.log('Tar', center.x, center.y, center.z);
+        // console.log('Zoom', zoom);
+
+        // console.log(orbitControls);
     }
 }
