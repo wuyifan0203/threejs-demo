@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-09-25 02:38:30
- * @FilePath: /threejs-demo/bin/screenshot.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-09-28 14:10:19
+ * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import * as puppeteer from 'puppeteer';
@@ -92,7 +92,7 @@ async function main() {
   let urls = [];
   urls = await getAllHref();
 
-  urls.length = 1;
+  // urls.length = 1;
 
   total = urls.length;
 
@@ -266,17 +266,13 @@ async function pageCapture(pages, url) {
 
 
     let image = null;
-    let bInt = null;
     try {
       const screenBuffer = await page.screenshot();
       const imageBuffer = Buffer.from(screenBuffer);
       image = await Jimp.read(imageBuffer);
 
       const scaleImage = image.scale(1 / viewScale);
-      console.log(scaleImage.bitmap.width, scaleImage.bitmap.height, 'scaleImage.size');
-      const scaleBuffer = await scaleImage.getBuffer('image/png', { quality: imageQuality });
-      generateLowImage = Jimp.read(scaleBuffer);
-      bInt = Uint8Array.from(await scaleImage.getBuffer('image/png'));
+      generateLowImage = await Jimp.read( await scaleImage.getBuffer('image/png', { quality: imageQuality }));
     } catch (error) {
       console.error('Error at Jimp processing:', error);
     }
@@ -289,12 +285,10 @@ async function pageCapture(pages, url) {
     try {
       if (fs.existsSync(filePath)) {
         const originImage = await Jimp.read(filePath);
-        const originBuffer = Uint8Array.from(await originImage.getBuffer('image/png', { quality: imageQuality }));
 
-        const compareImage = Jimp.read(originBuffer);
+        compareImage = await Jimp.read(await originImage.getBuffer('image/png', { quality: imageQuality }));
 
         const actual = generateLowImage.bitmap;
-
         const diff = compareImage.clone()
 
         const numDifferentPixels = pixelmatch(generateLowImage.bitmap.data, compareImage.bitmap.data, diff.bitmap.data, actual.width, actual.height, {
