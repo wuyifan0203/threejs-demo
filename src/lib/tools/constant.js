@@ -7,21 +7,13 @@
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
-
-const publicPath = '/public/';
-const modelPath = '/public/model/';
-
+const publicPath = "public";
+const modelPath = `${publicPath}/model`;
+const imagePath = `${publicPath}/images`;
 
 const PI = Math.PI;
 const TWO_PI = Math.PI * 2;
 const HALF_PI = Math.PI / 2;
 const QUARTER_PI = Math.PI / 4;
 
-export {
-    publicPath,
-    modelPath,
-    PI,
-    TWO_PI,
-    HALF_PI,
-    QUARTER_PI,
-}
+export { publicPath, modelPath, imagePath, PI, TWO_PI, HALF_PI, QUARTER_PI };
