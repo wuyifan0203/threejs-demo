@@ -1,8 +1,8 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 15:04:38
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-10-11 22:44:11
  * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -23,7 +23,8 @@ import {
   Scene,
   CanvasTexture,
   ClampToEdgeWrapping,
-  DirectionalLight
+  DirectionalLight,
+  Clock
 } from '../three/three.module.js';
 import { CustomGrid } from '../three/CustomGrid.js';
 import { OrbitControls } from '../three/OrbitControls.js';
@@ -333,6 +334,14 @@ function initTransformControls(camera, domElement) {
   return new TransformControls(camera, domElement);
 }
 
+/**
+ * @description: init Clock
+ * @return {Clock}
+ */
+function initClock() {
+  return new Clock();
+}
+
 export {
   initAxesHelper,
   initSpotLight,
@@ -352,5 +361,6 @@ export {
   initAmbientLight,
   initStats,
   initViewHelper,
-  initTransformControls
+  initTransformControls,
+  initClock
 };

@@ -1,48 +1,30 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-09 17:45:30
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-11 18:32:56
- * @FilePath: \threejs-demo\src\material\cloud.JS
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-10-12 00:10:42
+ * @FilePath: /threejs-demo/src/material/cloud.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
-  Vector3,
-  Mesh,
-  AmbientLight,
-  BoxGeometry,
-  PointLight,
-  MeshStandardMaterial,
-  NoBlending,
-  NormalBlending,
-  AdditiveBlending,
-  SubtractiveBlending,
-  MultiplyBlending,
-  FrontSide,
-  BackSide,
-  DoubleSide,
   CanvasTexture,
-  ClampToEdgeWrapping,
-  RepeatWrapping,
   TextureLoader,
   PlaneGeometry,
   ShaderMaterial,
   InstancedMesh,
   Object3D,
+  Vector2,
   InstancedBufferAttribute,
-  MeshBasicMaterial,
+  PerspectiveCamera,
+  Color
 } from "../lib/three/three.module.js";
-import { mergeBufferGeometries } from "../lib/three/BufferGeometryUtils.js";
 import {
   initRenderer,
-  initOrthographicCamera,
-  resize,
-  initCustomGrid,
-  initOrbitControls,
   initGUI,
   initScene,
   imagePath,
   initStats,
+  resize,
 } from "../lib/tools/index.js";
 import { createRandom } from "../lib/tools/math.js";
 
@@ -61,35 +43,47 @@ void main(){
 const fs = /* glsl */ `
 varying vec2 vUv;
 uniform sampler2D map;
+uniform float fogNear;
+uniform float fogFar;
+uniform vec3 fogColor;
+uniform int enableFog; // 0: false, 1: true
 
 void main(){
-  gl_FragColor = texture2D(map, vUv);
+  if(enableFog == 1){
+    // 计算片源深度 
+    float depth = gl_FragCoord.z / gl_FragCoord.w;
+    // 计算归一化的深度
+    float fogFactor = smoothstep(fogNear, fogFar, depth);
+    // 计算雾透明度
+    gl_FragColor.w *= pow(gl_FragCoord.z, 20.0);
+    // 最终结果
+    gl_FragColor = mix(texture2D(map, vUv), vec4(fogColor, gl_FragColor.w), fogFactor);
+  }else{
+    gl_FragColor = texture2D(map, vUv);
+  }
 }
-`;
+`
 
 async function init() {
-  const renderer = initRenderer();
-
-  const camera = initOrthographicCamera(new Vector3(100, 100, 100));
-  camera.lookAt(0, 0, 0);
-  camera.up.set(0, 0, 1);
-  camera.updateProjectionMatrix();
-
-  const orbitControls = initOrbitControls(camera, renderer.domElement);
-
-  const status = initStats();
-
-  const scene = initScene();
-  // initCustomGrid(scene);
-
-  scene.add(new AmbientLight());
-
+  const dummy = new Object3D();
+  const mouse = new Vector2();
+  const halfSize = new Vector2(window.innerWidth / 2, window.innerHeight / 2);
+  const startTime = Date.now();
   const params = {
     count: 800,
+    enableFog: true,
+    fogColor: '#4584b4',
+    fogNear: -100,
+    fogFar: 3000,
   };
 
-  // dummy
-  const dummy = new Object3D();
+
+  const renderer = initRenderer();
+  const camera = new PerspectiveCamera(30, halfSize.x / halfSize.y, 1, 6000);
+  window.camera = camera;
+
+  const status = initStats();
+  const scene = initScene();
 
   // background
   const backgroundCanvas = document.createElement("canvas");
@@ -109,44 +103,46 @@ async function init() {
     `../../${imagePath}/others/cloud.png`
   );
 
-  const geometry = new PlaneGeometry(10, 10);
+  const geometry = new PlaneGeometry(64, 64);
   const material = new ShaderMaterial({
     uniforms: {
       map: {
         value: cloudTexture,
       },
+      fogColor: {
+        value: new Color(params.fogColor),
+      },
+      fogNear: {
+        value: params.fogNear,
+      },
+      fogFar: {
+        value: params.fogFar,
+      },
+      enableFog: {
+        value: Number(params.enableFog),
+      }
     },
     vertexShader: vs,
     fragmentShader: fs,
+    depthWrite: false,
+    depthTest: false,
     transparent: true,
   });
 
   const mesh = new InstancedMesh(geometry, material, params.count);
-  console.log("mesh: ", mesh);
-
-  // for (let j = 0, k = params.count; j < k; j++) {
-  //   dummy.position.x = createRandom(-500, 500);
-  //   dummy.position.y = -Math.random() * Math.random() * 200 - 15;
-  //   dummy.position.z = j;
-  //   dummy.rotation.z = Math.random() * Math.PI;
-  //   dummy.scale.x = dummy.scale.y = Math.random() * Math.random() * 1.5 + 0.5;
-  //   dummy.updateMatrix();
-
-  //   mesh.setMatrixAt(j, dummy.matrix);
-  // }
-
-  // mesh.instanceMatrix.needsUpdate = true;
-
   scene.add(mesh);
+
+
   function updateMeshCount() {
-    mesh.count = params.count;
+    const count = params.count;
+    mesh.count = count;
     mesh.dispose();
     mesh.instanceMatrix = new InstancedBufferAttribute(
-      new Float32Array(params.count * 16),
+      new Float32Array(count * 16),
       16
     );
 
-    for (let j = 0, k = params.count; j < k; j++) {
+    for (let j = 0, k = count; j < k; j++) {
       dummy.position.x = createRandom(-500, 500);
       dummy.position.y = -Math.random() * Math.random() * 200 - 15;
       dummy.position.z = j;
@@ -157,20 +153,58 @@ async function init() {
     }
 
     mesh.instanceMatrix.needsUpdate = true;
+    camera.position.z = count
   }
 
   updateMeshCount();
+
   function render() {
+    camera.position.x += (mouse.x - camera.position.x) * 0.01;
+    camera.position.y += (-mouse.y - camera.position.y) * 0.01;
+    camera.position.z = -((Date.now() - startTime) * 0.03) % params.count + params.count;
+
     renderer.render(scene, camera);
-    orbitControls.update();
     status.update();
     requestAnimationFrame(render);
   }
   render();
 
-  resize(renderer, camera);
 
+  renderer.domElement.addEventListener("mousemove", ({ clientX, clientY }) => {
+    mouse.set(
+      (clientX - halfSize.x) * 0.25,
+      (clientY - halfSize.y) * 0.15
+    );
+  })
+
+  resize(renderer, [camera], () => {
+    halfSize.set(window.innerWidth / 2, window.innerHeight / 2);
+  })
+
+  // gui
   const gui = initGUI();
 
-  gui.add(params, "count", 0, 10000).onChange(updateMeshCount);
+  gui.add(params, "count", 0, 10000).onChange(updateMeshCount).name("Count");
+  const enableFogOption = gui.add(params, "enableFog").name('Enable Fog');
+
+  const fogFolder = gui.addFolder('Fog');
+  fogFolder.show(params.enableFog);
+  fogFolder.addColor(params, "fogColor").onChange((e) => {
+    material.uniforms.fogColor.value.set(e);
+    material.needsUpdate = true;
+  }).name("Fog Color");
+  fogFolder.add(params, "fogNear", -1000, 1000).onChange((e) => { 
+    material.uniforms.fogNear.value = e;
+    material.needsUpdate = true;
+  }).name("Fog Near");
+  fogFolder.add(params, "fogFar", 0, 5000).onChange((e) => {
+    material.uniforms.fogFar.value = e;
+    material.needsUpdate = true;
+  }).name("Fog Far");
+
+  enableFogOption.onChange((e) => {
+    material.uniforms.enableFog.value = e ? 1 : 0;
+    material.needsUpdate = true;
+    fogFolder.show(e);
+  });
 }
