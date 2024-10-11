@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-09 17:45:30
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-10-12 00:10:42
+ * @LastEditTime: 2024-10-12 00:27:15
  * @FilePath: /threejs-demo/src/material/cloud.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -79,7 +79,7 @@ async function init() {
 
 
   const renderer = initRenderer();
-  const camera = new PerspectiveCamera(30, halfSize.x / halfSize.y, 1, 6000);
+  const camera = new PerspectiveCamera(30, halfSize.x / halfSize.y, 1, params.count * 1.5);
   window.camera = camera;
 
   const status = initStats();
@@ -153,7 +153,9 @@ async function init() {
     }
 
     mesh.instanceMatrix.needsUpdate = true;
-    camera.position.z = count
+    camera.position.z = count;
+    camera.far = count * 1.5;
+    camera.updateProjectionMatrix();
   }
 
   updateMeshCount();
@@ -193,7 +195,7 @@ async function init() {
     material.uniforms.fogColor.value.set(e);
     material.needsUpdate = true;
   }).name("Fog Color");
-  fogFolder.add(params, "fogNear", -1000, 1000).onChange((e) => { 
+  fogFolder.add(params, "fogNear", -1000, 1000).onChange((e) => {
     material.uniforms.fogNear.value = e;
     material.needsUpdate = true;
   }).name("Fog Near");
