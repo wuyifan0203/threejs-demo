@@ -2,11 +2,19 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date:  2023-05-10 18:26:20
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-12 18:24:27
+ * @LastEditTime: 2024-10-14 18:09:44
  * @FilePath: \threejs-demo\src\shader\materialTest.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Vector3, Mesh, BoxGeometry } from "../lib/three/three.module.js";
+import {
+  Vector3,
+  Mesh,
+  BoxGeometry,
+  SphereGeometry,
+  TorusKnotGeometry,
+  CubeTextureLoader,
+  PlaneGeometry,
+} from "../lib/three/three.module.js";
 import {
   initRenderer,
   initPerspectiveCamera,
@@ -14,60 +22,102 @@ import {
   initGUI,
   resize,
   initScene,
+  imagePath,
+  normalizeBufferAttribute,
+  initStats
 } from "../lib/tools/index.js";
+import { Reflector } from "../lib/three/Reflector.js";
 
 import { BasicMaterial } from "./material/basic.js";
 import { NormalMaterial } from "./material/normal.js";
+import { NormalizePositionMaterial } from "./material/normalizePosition.js";
 
 window.onload = () => {
   init();
 };
 
-function init() {
-  const renderer = initRenderer({ logarithmicDepthBuffer: true });
-  const camera = initPerspectiveCamera(new Vector3(0, 0, 100));
-  camera.lookAt(0, 0, 0);
-  camera.up.set(0, 0, 1);
+async function init() {
+  const renderer = initRenderer();
+  const camera = initPerspectiveCamera(new Vector3(0, 30, -100));
   const scene = initScene();
-  renderer.setClearColor(0xffffff);
+
+  const stats = initStats();
+
   const orbitControls = initOrbitControls(camera, renderer.domElement);
   const params = {
-    materialType: "basic",
-    color: "#ff0000",
+    materialType: "normalizePosition",
+    color: "#ffffff",
   };
+
+  const loader = new CubeTextureLoader();
+  loader.setPath(`../../${imagePath}/snow_field/`);
+  scene.background = await loader.loadAsync([
+    "px.png",
+    "nx.png",
+    "py.png",
+    "ny.png",
+    "pz.png",
+    "nz.png",
+  ]);
 
   const materials = {
     basic: new BasicMaterial(),
     normal: new NormalMaterial(),
+    normalizePosition: new NormalizePositionMaterial(),
   };
 
-  const material = new BasicMaterial();
-  material.uniforms.color.value.set(1.0, 0.0, 0.0);
+  materials[params.materialType].uniforms.color.value.set(params.color);
+  materials[params.materialType].needsUpdate = true;
 
-  const geometry = new BoxGeometry(10, 10, 10);
+  const meshes = [
+    new BoxGeometry(10, 10, 10),
+    new SphereGeometry(5, 32, 32),
+    new TorusKnotGeometry(5, 2, 100, 16),
+  ].map((geometry, i, array) => {
+    const mesh = new Mesh(geometry, materials[params.materialType]);
+    mesh.geometry.setAttribute(
+      "normalPosition",
+      normalizeBufferAttribute(mesh.geometry.getAttribute("position"))
+    );
+    mesh.position.set(i * 20 - array.length * 5, 0, 0);
 
-  const mesh = new Mesh(geometry, material);
+    return mesh;
+  });
 
-  scene.add(mesh);
+  scene.add(...meshes);
+  const reflect = new Reflector(new PlaneGeometry(100, 100), {
+    // 太他妈的卡了
+    // textureWidth: window.innerWidth * 2, // 提高宽度分辨率
+    // textureHeight: window.innerHeight * 2, // 提高高度分辨率
+    clipBias: 0.003, // 可选，减少Z-fighting
+  });
+  reflect.rotateX(-Math.PI / 2);
+  reflect.position.set(0, -10, 0);
+  scene.add(reflect);
 
   resize(renderer, camera);
 
-  function render() {
+  (function render() {
     orbitControls.update();
+    stats.update();
     renderer.render(scene, camera);
-  }
-
-  renderer.setAnimationLoop(render);
+    requestAnimationFrame(render);
+  })();
 
   const gui = initGUI();
   gui.add(params, "materialType", Object.keys(materials)).onChange(() => {
-    mesh.material = materials[params.materialType];
-    mesh.material.uniforms.color.value.set(params.color);
-    mesh.material.needsUpdate = true;
-    console.log('params.materialType: ', params.materialType);
+    meshes.forEach((mesh) => {
+      mesh.material = materials[params.materialType];
+      mesh.material.uniforms.color.value.set(params.color);
+      mesh.material.needsUpdate = true;
+    });
+
+    console.log("params.materialType: ", params.materialType);
   });
   gui.addColor(params, "color").onChange(() => {
-    mesh.material.uniforms.color.value.set(params.color);
-    mesh.material.needsUpdate = true;
+    meshes.forEach((mesh) => {
+      mesh.material.uniforms.color.value.set(params.color);
+      mesh.material.needsUpdate = true;
+    });
   });
 }

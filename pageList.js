@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-07-19 22:28:29
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-10-12 00:13:50
- * @FilePath: /threejs-demo/pageList.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-14 18:25:38
+ * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
     {
@@ -186,7 +186,7 @@ const list = [
             {
                 path:"/material/cloud.html",
                 title: "Cloud"
-            }
+            },
         ]
     },
     {
@@ -436,7 +436,12 @@ const list = [
             {
                 path: "/shader/fresnelEffect.html",
                 title: "Fresnel Effect"
-            }
+            },
+            {
+                path: "/shader/materialTest.html",
+                title: "Custom Material"
+            },
+
         ]
     },
     {

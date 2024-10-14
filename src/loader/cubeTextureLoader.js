@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:05:24
- * @FilePath: /threejs-demo/src/loader/cubeTextureLoader.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-14 13:22:24
+ * @FilePath: \threejs-demo\src\loader\cubeTextureLoader.js
  */
 import {
   Vector3,
