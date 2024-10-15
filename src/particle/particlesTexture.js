@@ -2,7 +2,7 @@
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: Yifan Wu 1208097313@qq.com
  * @LastEditTime: 2023-12-28 15:26:47
- * @FilePath: /threejs-demo/src/particle/canvasTexture.js
+ * @FilePath: /threejs-demo/src/particle/particlesTexture.js
  */
 import {
   TextureLoader,

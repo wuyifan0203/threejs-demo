@@ -190,6 +190,25 @@ const list = [
         ]
     },
     {
+        category: "shader",
+        title: "Shader",
+        pages: [
+            {
+                path: "/shader/shaderToy.html",
+                title: "Shader Toy Test"
+            },
+            {
+                path: "/shader/fresnelEffect.html",
+                title: "Fresnel Effect"
+            },
+            {
+                path: "/shader/materialTest.html",
+                title: "Custom Material"
+            },
+
+        ]
+    },
+    {
         category: "object",
         title: "Object",
         pages: [
@@ -226,12 +245,12 @@ const list = [
         title: "Particle",
         pages: [
             {
-                path: "/particle/canvasTexture.html",
-                title: "Canvas Texture"
-            },
-            {
                 path: "/particle/common.html",
                 title: "Common"
+            },
+            {
+                path: "/particle/particlesTexture.html",
+                title: "Particles Texture"
             },
             {
                 path: "/particle/geometry.html",
@@ -337,20 +356,7 @@ const list = [
             }
         ]
     },
-    {
-        category: "booleanOperation",
-        title: "Boolean Operation",
-        pages: [
-            {
-                path: "/booleanOperation/3d.html",
-                title: "3D Boolean Operation"
-            },
-            {
-                path: "/booleanOperation/2d.html",
-                title: "2D Boolean Operation"
-            }
-        ]
-    },
+
     {
         category: "texture",
         title: "Texture",
@@ -370,6 +376,10 @@ const list = [
             {
                 path: "/texture/useSpriteTexture.html",
                 title: "Use Sprite Texture"
+            },
+            {
+                path: "/texture/canvasTexture.html",
+                title: "Use Canvas Texture"
             }
         ]
     },
@@ -382,9 +392,9 @@ const list = [
                 title: "Canvas Draw Gradient"
             },
             {
-                path: "/canvas/useOne2.html",
-                title: "Use One Canvas to Render in Three.js"
-            }
+                path: "/canvas/addWaterMark.html",
+                title: "WaterMark"
+            },
         ]
     },
     {
@@ -425,25 +435,7 @@ const list = [
             }
         ]
     },
-    {
-        category: "shader",
-        title: "Shader",
-        pages: [
-            {
-                path: "/shader/shaderToy.html",
-                title: "Shader Toy Test"
-            },
-            {
-                path: "/shader/fresnelEffect.html",
-                title: "Fresnel Effect"
-            },
-            {
-                path: "/shader/materialTest.html",
-                title: "Custom Material"
-            },
 
-        ]
-    },
     {
         category: "algorithms",
         title: "Algorithms",
@@ -459,6 +451,20 @@ const list = [
         title: "Plot",
         pages: [
             { path: "/plot/triangularMesh.html", title: "Triangular Mesh Plot" }
+        ]
+    },
+    {
+        category: "booleanOperation",
+        title: "Boolean Operation",
+        pages: [
+            {
+                path: "/booleanOperation/3d.html",
+                title: "3D Boolean Operation"
+            },
+            {
+                path: "/booleanOperation/2d.html",
+                title: "2D Boolean Operation"
+            }
         ]
     },
     {
