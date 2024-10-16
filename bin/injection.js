@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-13 19:19:20
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-16 19:31:07
- * @FilePath: /threejs-demo/bin/injection.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-16 17:16:12
+ * @FilePath: \threejs-demo\bin\injection.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 (function () {
@@ -65,6 +65,4 @@
         RAF(renew);
     };
 
-    /* Additional variable for ~5 examples */
-    window.TESTING = true;
 }());

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-14 18:25:38
+ * @LastEditTime: 2024-10-16 16:56:53
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -186,6 +186,10 @@ const list = [
             {
                 path:"/material/cloud.html",
                 title: "Cloud"
+            },
+            {
+                path:"/material/audioContext.html",
+                title: "Audio Context Visualization"
             },
         ]
     },

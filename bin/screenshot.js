@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-28 14:10:19
+ * @LastEditTime: 2024-10-16 17:11:50
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -193,6 +193,12 @@ async function renderPage(page) {
     });
 
     const isWebGLContext = await page.$$eval('#webgl-output', elements => elements.length) > 0;
+
+    await page.evaluate(() => {
+      const playBtn = window.document.querySelector('#webgl-play');
+      if (playBtn) playBtn.click();
+    })
+
     if (!isWebGLContext) return
     await page.evaluate(async (renderTimeout, parseTime) => {
       // 等待 parseTime 后 resolve
@@ -300,7 +306,7 @@ async function pageCapture(pages, url) {
           console.green(`Diff ${differentPixels.toFixed(1)}% in file: ${fileName} not change`);
         } else {
           await image.write(path.join(__dirname, `../screenshots/${fileName}.png`));
-          console.green(`[update] screenShot ${fileName} success! : ${page.url}`);
+          console.green(`Diff ${differentPixels.toFixed(1)}% in file  ~ [update] screenShot ${fileName} success!`);
         }
       } else {
         await image.write(filePath);
