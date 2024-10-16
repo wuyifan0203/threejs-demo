@@ -194,8 +194,8 @@ function resize(render, cameras, callback) {
  * @param {number} height 默认50
  * @return {CustomGrid}
  */
-function initCustomGrid(scene, width = 50, height = 50) {
-  const grid = new CustomGrid(width, height, 1, 1);
+function initCustomGrid(scene, width = 50, height = 50, dx = 1, dy = 1) {
+  const grid = new CustomGrid(width, height, dx, dy);
   grid.name = 'grid';
 
   scene.add(grid);

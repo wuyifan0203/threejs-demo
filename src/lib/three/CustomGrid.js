@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-11-21 16:26:11
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-01-23 14:42:48
- * @FilePath: /threejs-demo/src/lib/three/customGrid.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-16 16:52:30
+ * @FilePath: \threejs-demo\src\lib\three\CustomGrid.js
  */
 
 import {
@@ -18,12 +18,11 @@ class CustomGrid extends LineSegments {
     color1 = new Color(color1);
     color2 = new Color(color2);
     const [w, h] = [width, height];
+    const [timesX, timesY] = [w / dx, h / dy];
 
-    const [centerX, centerY] = [w / 2, h / 2];
+    const [centerX, centerY] = [timesX / 2, timesY / 2];
 
     const [halfW, halfH] = [w / 2, h / 2];
-
-    const [timesX, timesY] = [w / dx, h / dy];
 
     const vertices = [];
     const colors = [];
