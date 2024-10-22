@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-11-05 15:56:16
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:11:25
- * @FilePath: /threejs-demo/src/material/transport.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-22 17:11:40
+ * @FilePath: \threejs-demo\src\material\transport.js
  */
 import {
   Vector3,
@@ -38,6 +38,7 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(100, 100, 100));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
+  camera.zoom = 0.4;
   camera.updateProjectionMatrix();
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
@@ -80,7 +81,7 @@ function init() {
 
 
 
-  const geometry = new CylinderGeometry(5, 5, 15, 25, 25, true);
+  const geometry = new CylinderGeometry(5, 5, 15, 64, 64, true);
   const material = new MeshBasicMaterial({
     color: 0x007eff,
     transparent: true,
@@ -112,12 +113,14 @@ function init() {
   const clock = new Clock()
   function render() {
     let t = clock.getDelta();
+    console.log(t);
+    
     renderer.clear();
     renderer.render(scene, camera);
     orbitControls.update();
 
-    swirl.rotateZ(t * 0.00001);
-    swirl.material.opacity = Math.abs(0.7 - 0.3 * Math.sin(t * 0.01));
+    swirl.rotateZ(t);
+    swirl.material.opacity = Math.abs(0.7 - 0.3 * Math.sin(t));
     requestAnimationFrame(render);
   }
   render();
