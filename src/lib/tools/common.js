@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-10-11 22:44:11
- * @FilePath: /threejs-demo/src/lib/tools/common.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-22 16:23:31
+ * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -24,15 +24,17 @@ import {
   CanvasTexture,
   ClampToEdgeWrapping,
   DirectionalLight,
-  Clock
-} from '../three/three.module.js';
-import { CustomGrid } from '../three/CustomGrid.js';
-import { OrbitControls } from '../three/OrbitControls.js';
-import { GUI } from '../util/lil-gui.module.min.js'
-import { CoordinateHelper } from '../three/CoordinateHelper.js';
-import { Stats } from '../util/Stats.js';
-import { ViewHelper } from '../three/viewHelper.js';
-import { TransformControls } from '../three/TransformControls.js';
+  Clock,
+  MathUtils,
+} from "../three/three.module.js";
+import { CustomGrid } from "../three/CustomGrid.js";
+import { OrbitControls } from "../three/OrbitControls.js";
+import { GUI } from "../util/lil-gui.module.min.js";
+import { CoordinateHelper } from "../three/CoordinateHelper.js";
+import { Stats } from "../util/Stats.js";
+import { ViewHelper } from "../three/viewHelper.js";
+import { TransformControls } from "../three/TransformControls.js";
+import { Sky } from "../three/Sky.js";
 
 /**
  * @description: 初始化渲染器
@@ -40,9 +42,9 @@ import { TransformControls } from '../three/TransformControls.js';
  * @return {WebGLRenderer}
  */
 function initRenderer(props = {}) {
-  const dom = document.getElementById('webgl-output');
-  dom.style.width = '100vw';
-  dom.style.height = '100vh';
+  const dom = document.getElementById("webgl-output");
+  dom.style.width = "100vw";
+  dom.style.height = "100vh";
 
   const renderer = new WebGLRenderer({ antialias: true, ...props });
   renderer.shadowMap.enabled = true;
@@ -65,9 +67,15 @@ function initRenderer(props = {}) {
  * @return {PerspectiveCamera}
  */
 function initPerspectiveCamera(initialPosition) {
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position =
+    initialPosition !== undefined ? initialPosition : new Vector3(-30, 40, 30);
 
-  const camera = new PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+  const camera = new PerspectiveCamera(
+    45,
+    window.innerWidth / window.innerHeight,
+    1,
+    10000
+  );
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
@@ -85,9 +93,17 @@ function initOrthographicCamera(initialPosition) {
   const s = 15;
   const h = window.innerHeight;
   const w = window.innerWidth;
-  const position = (initialPosition !== undefined) ? initialPosition : new Vector3(-30, 40, 30);
+  const position =
+    initialPosition !== undefined ? initialPosition : new Vector3(-30, 40, 30);
 
-  const camera = new OrthographicCamera(-s, s, s * (h / w), -s * (h / w), 1, 10000);
+  const camera = new OrthographicCamera(
+    -s,
+    s,
+    s * (h / w),
+    -s * (h / w),
+    1,
+    10000
+  );
   camera.position.copy(position);
   camera.lookAt(new Vector3(0, 0, 0));
 
@@ -105,7 +121,7 @@ function initGroundPlane(scene, size = { x: 200, y: 200 }) {
   const planeGeometry = new PlaneGeometry(size.x, size.y);
   const planeMaterial = new MeshPhongMaterial({ color: 0xd3d3d3 });
   const plane = new Mesh(planeGeometry, planeMaterial);
-  plane.name = 'LargeGroundPlane';
+  plane.name = "LargeGroundPlane";
   plane.receiveShadow = true;
 
   scene.add(plane);
@@ -128,15 +144,14 @@ function initSpotLight(color = 0xffffff, intensity = 1000) {
   spotLight.decay = 2;
   spotLight.distance = 0;
   spotLight.penumbra = 0.05;
-  spotLight.name = 'spotLight';
+  spotLight.name = "spotLight";
 
   return spotLight;
 }
 
-
 function initAmbientLight(scene, color = 0xffffff, intensity = 1) {
   const ambientLight = new AmbientLight(color, intensity);
-  ambientLight.name = 'ambientLight';
+  ambientLight.name = "ambientLight";
   scene.add(ambientLight);
   return ambientLight;
 }
@@ -148,14 +163,21 @@ function initAmbientLight(scene, color = 0xffffff, intensity = 1) {
  */
 function initAxesHelper(scene) {
   const arrowHelper = new Group();
-  arrowHelper.name = 'arrowHelper';
+  arrowHelper.name = "arrowHelper";
 
-  ['X', 'Y', 'Z'].forEach((e) => {
+  ["X", "Y", "Z"].forEach((e) => {
     const pos = { X: [1, 0, 0], Y: [0, 1, 0], Z: [0, 0, 1] }[e];
     const size = { X: 1000 * 0.5, Y: 1000 * 0.5, Z: 1000 * 0.5 }[e];
-    const color = { X: 'red', Y: 'green', Z: 'blue' }[e];
-    const arrowSize = (size) * 0.025;
-    const arrow = new ArrowHelper(new Vector3(...pos), new Vector3(0, 0, 0), size, color, arrowSize, 0.1 * arrowSize);
+    const color = { X: "red", Y: "green", Z: "blue" }[e];
+    const arrowSize = size * 0.025;
+    const arrow = new ArrowHelper(
+      new Vector3(...pos),
+      new Vector3(0, 0, 0),
+      size,
+      color,
+      arrowSize,
+      0.1 * arrowSize
+    );
     arrowHelper.add(arrow);
   });
   arrowHelper.position.set(0, 0, 0);
@@ -171,19 +193,19 @@ function initAxesHelper(scene) {
  */
 function resize(render, cameras, callback) {
   cameras = Array.isArray(cameras) ? cameras : [cameras];
-  window.addEventListener('resize', () => {
+  window.addEventListener("resize", () => {
     const [w, h] = [window.innerWidth, window.innerHeight];
     render.setSize(window.innerWidth, window.innerHeight);
     cameras.forEach((camera) => {
-      if (camera.type === 'OrthographicCamera') {
+      if (camera.type === "OrthographicCamera") {
         camera.top = 15 * (h / w);
         camera.bottom = -15 * (h / w);
-      } else if (camera.type === 'PerspectiveCamera') {
+      } else if (camera.type === "PerspectiveCamera") {
         camera.aspect = window.innerWidth / window.innerHeight;
       }
       camera.updateProjectionMatrix();
-    })
-    callback && callback()
+    });
+    callback && callback();
   });
 }
 
@@ -196,7 +218,7 @@ function resize(render, cameras, callback) {
  */
 function initCustomGrid(scene, width = 50, height = 50, dx = 1, dy = 1) {
   const grid = new CustomGrid(width, height, dx, dy);
-  grid.name = 'grid';
+  grid.name = "grid";
 
   scene.add(grid);
 
@@ -210,16 +232,16 @@ function initOrbitControls(camera, container) {
 }
 
 function initGUI(params) {
-  return new GUI(params)
+  return new GUI(params);
 }
 function initScene() {
   const scene = new Scene();
-  window.scene = scene
+  window.scene = scene;
   return scene;
 }
 
 function initCoordinates(axesLength) {
-  window.coordinateHelper = new CoordinateHelper(axesLength)
+  window.coordinateHelper = new CoordinateHelper(axesLength);
   return window.coordinateHelper;
 }
 
@@ -234,29 +256,27 @@ function initDirectionLight(color = 0xffffff, intensity = 3) {
 }
 
 function initProgress() {
+  const main = document.createElement("div");
+  main.style.position = "absolute";
+  main.style.left = "50%";
+  main.style.bottom = "20%";
+  main.style.transform = "translateX(-50%)";
 
-  const main = document.createElement('div');
-  main.style.position = 'absolute';
-  main.style.left = '50%';
-  main.style.bottom = '20%';
-  main.style.transform = 'translateX(-50%)';
-
-  const progress = document.createElement('progress');
+  const progress = document.createElement("progress");
   progress.max = 100;
   progress.min = 0;
-  progress.style.width = '300px';
-  progress.style.height = '20px';
-  main.appendChild(progress)
+  progress.style.width = "300px";
+  progress.style.height = "20px";
+  main.appendChild(progress);
 
-  const value = document.createElement('span');
-  value.style.marginLeft = '20px';
+  const value = document.createElement("span");
+  value.style.marginLeft = "20px";
   main.appendChild(value);
 
-  const label = document.createElement('div');
-  label.style.textAlign = 'center';
-  label.innerText = 'Loading...';
+  const label = document.createElement("div");
+  label.style.textAlign = "center";
+  label.innerText = "Loading...";
   main.appendChild(label);
-
 
   main.setText = function (text) {
     label.innerText = text;
@@ -264,28 +284,25 @@ function initProgress() {
 
   main.setProgress = function (num) {
     progress.value = num;
-    value.innerText = num + '%';
-  }
-
+    value.innerText = num + "%";
+  };
 
   main.show = function () {
-    main.style.display = 'block';
-  }
+    main.style.display = "block";
+  };
 
   main.hide = function () {
-    main.style.display = 'none';
-  }
+    main.style.display = "none";
+  };
 
-
-  return main
-
+  return main;
 }
 
 function createBackgroundTexture(color, color2) {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = window.screen.width;
   canvas.height = window.screen.height;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
 
   return (function () {
     const gradient = ctx.createLinearGradient(0, 0, 0, window.screen.height);
@@ -307,11 +324,11 @@ function createBackgroundTexture(color, color2) {
  * @description: 用来展示FPS，内存等信息
  * @param {number} showPanel
  * @return {Stats}
- * 
+ *
  * @example
- * 
+ *
  * const status = initStats();
- * 
+ *
  * function render() {
  *    // other code for render
  *    status.update();
@@ -320,7 +337,7 @@ function createBackgroundTexture(color, color2) {
 function initStats(showPanel = 0) {
   const stats = new Stats();
   stats.showPanel(showPanel);
-  const dom = document.querySelector('#webgl-output')
+  const dom = document.querySelector("#webgl-output");
   dom.appendChild(stats.dom);
   return stats;
 }
@@ -340,6 +357,55 @@ function initTransformControls(camera, domElement) {
  */
 function initClock() {
   return new Clock();
+}
+
+const defaultSkyParams = {
+  turbidity: 0,
+  rayleigh: 0.16,
+  mieCoefficient: 0.005,
+  mieDirectionalG: 0.8,
+  elevation: 7,
+  azimuth: 180,
+};
+
+const sun = new Vector3();
+/**
+ * @description: init Sky Mesh
+ * @param {*} params =  {
+  turbidity: 10,
+  rayleigh: 3,
+  mieCoefficient: 0.005,
+  mieDirectionalG: 0.8,
+};
+ * @return {Sky}
+ */
+function initSky(scene, params = {}) {
+  const mergedParams = Object.assign({}, defaultSkyParams, params);
+
+  const sky = new Sky();
+  const uniforms = sky.material.uniforms;
+
+
+  sky.scale.setScalar(450000);
+  scene.add(sky);
+  sky.name = "sky";
+
+  sky.update = function (params = defaultSkyParams) {
+    Object.keys(mergedParams).forEach((key) => {
+      if(Object.hasOwn(uniforms,key)){
+        sky.material.uniforms[key].value = mergedParams[key];
+      }
+    });
+    const phi = MathUtils.degToRad(90 - params.elevation);
+    const theta = MathUtils.degToRad(params.azimuth);
+
+    sun.setFromSphericalCoords(1, phi, theta);
+
+    uniforms["sunPosition"].value.copy(sun);
+  };
+  sky.update(mergedParams);
+
+  return sky;
 }
 
 export {
@@ -362,5 +428,6 @@ export {
   initStats,
   initViewHelper,
   initTransformControls,
-  initClock
+  initClock,
+  initSky,
 };
