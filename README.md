@@ -1,5 +1,7 @@
 # Threejs-Demo
 
+![alt text](./public/images/cover.png)
+
 Preview Link: https://wuyifan0203.github.io/threejs-demo/
 
 ## Introduction
