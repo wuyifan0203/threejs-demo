@@ -39,6 +39,7 @@ function init() {
   const camera = initOrthographicCamera(new Vector3(0, 0, 5));
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
+  camera.zoom = 6;
   camera.updateProjectionMatrix();
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);

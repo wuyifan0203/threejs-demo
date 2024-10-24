@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-22 17:14:58
+ * @LastEditTime: 2024-10-24 17:00:27
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -189,8 +189,16 @@ const list = [
       },
       {
         path: "/material/blendingTest.html",
-        title: "Blending",
+        title: "Blending (WIP)",
       },
+      {
+        path: "/material/depthTest.html",
+        title: "Depth Test (WIP)", 
+      },
+      {
+        path: "/material/stencilMaterial.html",
+        title: "Stencil Test (WIP)", 
+      }
     ],
   },
   {
