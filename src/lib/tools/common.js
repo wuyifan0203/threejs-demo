@@ -189,6 +189,7 @@ function initAxesHelper(scene) {
  * @description: 窗口自适应
  * @param {WebGLRenderer} render
  * @param {Camera} camera
+ * @param {Function} callback (width,height)=>void
  * @return {void}
  */
 function resize(render, cameras, callback) {
@@ -205,7 +206,7 @@ function resize(render, cameras, callback) {
       }
       camera.updateProjectionMatrix();
     });
-    callback && callback();
+    callback && callback(w, h);
   });
 }
 
@@ -385,14 +386,13 @@ function initSky(scene, params = {}) {
   const sky = new Sky();
   const uniforms = sky.material.uniforms;
 
-
   sky.scale.setScalar(450000);
   scene.add(sky);
   sky.name = "sky";
 
   sky.update = function (params = defaultSkyParams) {
     Object.keys(mergedParams).forEach((key) => {
-      if(Object.hasOwn(uniforms,key)){
+      if (Object.hasOwn(uniforms, key)) {
         sky.material.uniforms[key].value = mergedParams[key];
       }
     });
