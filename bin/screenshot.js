@@ -2,22 +2,21 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-16 17:11:50
+ * @LastEditTime: 2024-10-25 18:22:34
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import * as puppeteer from 'puppeteer';
-import * as fsp from 'node:fs/promises';
-import * as fs from 'node:fs';
-import chalk from 'chalk';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { Jimp } from 'jimp';
-import express from 'express';
-import pixelmatch from 'pixelmatch';
+import * as puppeteer from "puppeteer";
+import * as fsp from "node:fs/promises";
+import * as fs from "node:fs";
+import chalk from "chalk";
+import path from "path";
+import { fileURLToPath } from "url";
+import { Jimp } from "jimp";
+import express from "express";
+import pixelmatch from "pixelmatch";
 
-import { list } from '../pageList.js';
-
+import { list } from "../pageList.js";
 
 class PromiseQueue {
   constructor(func, ...args) {
@@ -63,17 +62,28 @@ const pageNum = 8;
 const viewport = { width: width * viewScale, height: height * viewScale };
 const browser = await puppeteer.launch({
   // headless: false, // 设置为 false 以启用可视模式
-  args: ['--disable-web-security', '--allow-file-access-from-files', '--hide-scrollbars', '--enable-gpu'],
+  args: [
+    "--disable-web-security",
+    "--allow-file-access-from-files",
+    "--hide-scrollbars",
+    "--enable-gpu",
+  ],
   defaultViewport: viewport,
 });
 
 // 获取清页脚本代码
-const cleanPageScript = await fsp.readFile(path.join(__dirname, '/cleanPage.js'), 'utf8');
+const cleanPageScript = await fsp.readFile(
+  path.join(__dirname, "/cleanPage.js"),
+  "utf8"
+);
 // 获取注入脚本代码
-const injectionScript = await fsp.readFile(path.join(__dirname, '/injection.js'), 'utf8');
+const injectionScript = await fsp.readFile(
+  path.join(__dirname, "/injection.js"),
+  "utf8"
+);
 
 const port = 6600;
-const baseURL = '/threejs-demo';
+const baseURL = "/threejs-demo";
 
 const app = express();
 app.use(baseURL, express.static(path.resolve()));
@@ -98,88 +108,95 @@ async function main() {
 
   const pages = await browser.pages();
 
-  console.yellow('initialize pages');
+  console.yellow("initialize pages");
   // 同时开启8个浏览器页面
-  while (pages.length < pageNum && pages.length < urls.length) pages.push(await browser.newPage());
-  console.green('initialize pages success');
+  while (pages.length < pageNum && pages.length < urls.length)
+    pages.push(await browser.newPage());
+  console.green("initialize pages success");
 
-  console.yellow('prepare pages');
+  console.yellow("prepare pages");
   // 初始化页面
   for (const page of pages) await preparePage(page);
 
-  console.green('prepare pages success');
+  console.green("prepare pages success");
 
   const queue = new PromiseQueue(pageCapture, pages);
   for (const url of urls) queue.add(url);
 
   await queue.waitForAll();
 
-
   if (errorPages.length > 0) {
-    console.yellow('errorPages', errorPages)
+    console.yellow("errorPages", errorPages);
   }
 
-
   close();
-};
-
+}
 
 async function getAllHref() {
-  const urls = [];
+  const paths = new Set();
   list.forEach(({ pages }) => {
-    pages.forEach((item) => {
-      urls.push(`http://localhost:${port}${baseURL}/src${item.path}`);
-    })
+    pages.forEach(({path}) => {
+      paths.add(path);
+    });
+  });
+  exceptionURLs.forEach((exceeded)=>{
+    paths.delete(exceeded);
   })
-  return urls;
+
+  return  Array.from(paths).map(path => (`http://localhost:${port}${baseURL}/src${path}`));
 }
 
 async function preparePage(page) {
   await page.evaluateOnNewDocument(injectionScript);
 
   // 代理页面报错信息
-  page.on('console', async (msg) => {
+  page.on("console", async (msg) => {
     const type = msg.type();
 
-    if (type !== 'error' || type !== 'warning') return;
+    if (type !== "error" || type !== "warning") return;
 
-    const args = await Promise.all(msg.args().map(async arg => {
-      try {
-        return await arg.executionContext().evaluate(arg => arg instanceof Error ? arg.message : arg, arg);
-      } catch (e) { // Execution context might have been already destroyed
-        return arg;
-      }
-    }));
+    const args = await Promise.all(
+      msg.args().map(async (arg) => {
+        try {
+          return await arg
+            .executionContext()
+            .evaluate((arg) => (arg instanceof Error ? arg.message : arg), arg);
+        } catch (e) {
+          // Execution context might have been already destroyed
+          return arg;
+        }
+      })
+    );
 
-    let text = args.join(' '); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
+    let text = args.join(" "); // https://github.com/puppeteer/puppeteer/issues/3397#issuecomment-434970058
 
     text = text.trim();
-    if (text === '') return;
+    if (text === "") return;
 
-    if (errorCache.includes(text)) return
+    if (errorCache.includes(text)) return;
     errorCache.push(text);
 
-    if (type === 'warning') {
+    if (type === "warning") {
       console.yellow(text);
     } else {
       console.red(text);
     }
-
-  })
+  });
 
   // 代理请求，统计页面资源大小
-  page.on('response', async (response) => {
+  page.on("response", async (response) => {
     try {
       if (response.status() === 200 || response.status() === 304) {
-        await response.buffer().then(buffer => page.pageSize += buffer.length);
+        await response
+          .buffer()
+          .then((buffer) => (page.pageSize += buffer.length));
       }
-    } catch { }
-  })
+    } catch {}
+  });
 
   page.url = undefined;
 
-  console.green('prepare page success');
-
+  console.green("prepare page success");
 }
 
 async function renderPage(page) {
@@ -189,40 +206,47 @@ async function renderPage(page) {
     // 等待页面的网络空闲状态
     await page.waitForNetworkIdle({
       timeout: networkTimeout * 60000,
-      idleTime: idleTime * 1000
+      idleTime: idleTime * 1000,
     });
 
-    const isWebGLContext = await page.$$eval('#webgl-output', elements => elements.length) > 0;
+    const isWebGLContext =
+      (await page.$$eval("#webgl-output", (elements) => elements.length)) > 0;
 
     await page.evaluate(() => {
-      const playBtn = window.document.querySelector('#webgl-play');
+      const playBtn = window.document.querySelector("#webgl-play");
       if (playBtn) playBtn.click();
-    })
+    });
 
-    if (!isWebGLContext) return
-    await page.evaluate(async (renderTimeout, parseTime) => {
-      // 等待 parseTime 后 resolve
-      await new Promise(resolve => setTimeout(resolve, parseTime));
-      /* Resolve render promise */
-      window._renderStarted = true;
-      await new Promise(function (resolve) {
-        // 记录开始渲染时间
-        const renderStart = performance._now();
-        const waitingLoop = setInterval(function () {
-          // 是否渲染了 5 秒
-          const renderTimeoutExceeded = (renderTimeout > 0) && (performance._now() - renderStart > 1000 * renderTimeout);
-          if (renderTimeoutExceeded) {
-            clearInterval(waitingLoop);
-            // 不能reject 会阻塞整个page
-            console.error('Render timeout exceeded');
-            resolve();
-          } else if (window._renderFinished) {
-            clearInterval(waitingLoop);
-            resolve();
-          }
-        }, 10);
-      })
-    }, renderTimeout, page.pageSize / 1024 / 1024 / parseTime);
+    if (!isWebGLContext) return;
+    await page.evaluate(
+      async (renderTimeout, parseTime) => {
+        // 等待 parseTime 后 resolve
+        await new Promise((resolve) => setTimeout(resolve, parseTime));
+        /* Resolve render promise */
+        window._renderStarted = true;
+        await new Promise(function (resolve) {
+          // 记录开始渲染时间
+          const renderStart = performance._now();
+          const waitingLoop = setInterval(function () {
+            // 是否渲染了 5 秒
+            const renderTimeoutExceeded =
+              renderTimeout > 0 &&
+              performance._now() - renderStart > 1000 * renderTimeout;
+            if (renderTimeoutExceeded) {
+              clearInterval(waitingLoop);
+              // 不能reject 会阻塞整个page
+              console.error("Render timeout exceeded");
+              resolve();
+            } else if (window._renderFinished) {
+              clearInterval(waitingLoop);
+              resolve();
+            }
+          }, 10);
+        });
+      },
+      renderTimeout,
+      page.pageSize / 1024 / 1024 / parseTime
+    );
   } catch (error) {
     throw new Error(`Error happened while rendering: ${error}`);
   }
@@ -253,23 +277,21 @@ async function pageCapture(pages, url) {
     //  加载页面
     try {
       await page.goto(url, {
-        waitUntil: ['networkidle0'],
-        timeout: networkTimeout * 60000
+        waitUntil: ["networkidle0"],
+        timeout: networkTimeout * 60000,
       });
     } catch (error) {
       throw new Error(`Failed to navigate to URL: ${error}`);
     }
 
-    console.blue(`Navigated to ${url}`, 'pageSize:', page.pageSize);
+    console.blue(`Navigated to ${url}`, "pageSize:", page.pageSize);
     // 渲染页面
-
 
     await renderPage(page);
 
     // 出错提前结束
     if (page.error !== undefined) throw new Error(page.error);
     // 截图
-
 
     let image = null;
     try {
@@ -278,11 +300,12 @@ async function pageCapture(pages, url) {
       image = await Jimp.read(imageBuffer);
 
       const scaleImage = image.scale(1 / viewScale);
-      generateLowImage = await Jimp.read( await scaleImage.getBuffer('image/png', { quality: imageQuality }));
+      generateLowImage = await Jimp.read(
+        await scaleImage.getBuffer("image/png", { quality: imageQuality })
+      );
     } catch (error) {
-      console.error('Error at Jimp processing:', error);
+      console.error("Error at Jimp processing:", error);
     }
-
 
     const fileName = url.match(/(\w+)\.html/)[1];
 
@@ -292,45 +315,69 @@ async function pageCapture(pages, url) {
       if (fs.existsSync(filePath)) {
         const originImage = await Jimp.read(filePath);
 
-        compareImage = await Jimp.read(await originImage.getBuffer('image/png', { quality: imageQuality }));
+        compareImage = await Jimp.read(
+          await originImage.getBuffer("image/png", { quality: imageQuality })
+        );
 
         const actual = generateLowImage.bitmap;
-        const diff = compareImage.clone()
+        const diff = compareImage.clone();
 
-        const numDifferentPixels = pixelmatch(generateLowImage.bitmap.data, compareImage.bitmap.data, diff.bitmap.data, actual.width, actual.height, {
-          threshold: pixelThreshold,
-          alpha: 0.2
-        });
-        const differentPixels = numDifferentPixels / (actual.width * actual.height) * 100;
+        const numDifferentPixels = pixelmatch(
+          generateLowImage.bitmap.data,
+          compareImage.bitmap.data,
+          diff.bitmap.data,
+          actual.width,
+          actual.height,
+          {
+            threshold: pixelThreshold,
+            alpha: 0.2,
+          }
+        );
+        const differentPixels =
+          (numDifferentPixels / (actual.width * actual.height)) * 100;
         if (differentPixels < maxDifferentPixels) {
-          console.green(`Diff ${differentPixels.toFixed(1)}% in file: ${fileName} not change`);
+          console.green(
+            `Diff ${differentPixels.toFixed(
+              1
+            )}% in file: ${fileName} not change`
+          );
         } else {
-          await image.write(path.join(__dirname, `../screenshots/${fileName}.png`));
-          console.green(`Diff ${differentPixels.toFixed(1)}% in file  ~ [update] screenShot ${fileName} success!`);
+          await image.write(
+            path.join(__dirname, `../screenshots/${fileName}.png`)
+          );
+          console.green(
+            `Diff ${differentPixels.toFixed(
+              1
+            )}% in file  ~ [update] screenShot ${fileName} success!`
+          );
         }
       } else {
         await image.write(filePath);
-        console.green(`[new add] screenShot ${fileName} success! : ${page.url}`);
+        console.green(
+          `[new add] screenShot ${fileName} success! : ${page.url}`
+        );
       }
     } catch (error) {
       console.log(error);
     }
-
   } catch (error) {
     console.red(`Error happened while capturing ${page.url}: ${error}`);
-    errorPages.push(page.url)
+    errorPages.push(page.url);
   } finally {
     // 释放页面
     page.url = undefined;
     current++;
-    console.bgBlue(`progress: ${current}/${total}  ${((current / total) * 100).toFixed(2)}%`);
+    console.bgBlue(
+      `progress: ${current}/${total}  ${((current / total) * 100).toFixed(2)}%`
+    );
   }
 }
 
 function close() {
-  console.log('Closing...');
+  console.log("Closing...");
   browser.close();
   server.close();
   process.exit(1);
-
 }
+
+const exceptionURLs = ['/canvas/mediaDevices.html'];

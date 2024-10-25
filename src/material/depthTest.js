@@ -1,5 +1,4 @@
 import {
-  Vector3,
   Mesh,
   BoxGeometry,
   PlaneGeometry,
@@ -21,10 +20,10 @@ import {
   DepthFormat,
   UnsignedShortType,
   NearestFilter,
+  PerspectiveCamera,
 } from "../lib/three/three.module.js";
 import {
   initRenderer,
-  initOrthographicCamera,
   resize,
   initOrbitControls,
   initScene,
@@ -60,39 +59,57 @@ const fragmentShader = /* glsl */ `
     varying vec2 vUv;
     uniform sampler2D tDepth;
     uniform float uCameraNear;
-	uniform float uCameraFar;
+    uniform float uCameraFar;
 
-    float viewZToOrthographicDepth( const in float viewZ, const in float near, const in float far ) {
-	    // -near maps to 0; -far maps to 1
-	    return ( viewZ + near ) / ( near - far );
+    float viewZToPerspectiveDepth( const in float viewZ, const in float near, const in float far ) {
+      // -near maps to 0; -far maps to 1
+      return ( ( near + viewZ ) * far ) / ( ( far - near ) * viewZ );
     }
-
-    float orthographicDepthToViewZ( const in float depth, const in float near, const in float far ) {
-	    // maps orthographic depth in [ 0, 1 ] to viewZ
-	    return depth * ( near - far ) - near;
+    
+    float perspectiveDepthToViewZ( const in float depth, const in float near, const in float far ) {
+      // maps perspective depth in [ 0, 1 ] to viewZ
+      return ( near * far ) / ( ( far - near ) * depth - far );
     }
 
     float readDepth( sampler2D depthSampler, vec2 coord ) {
         float fragCoordZ = texture2D( depthSampler, coord ).x;
-        float viewZ = orthographicDepthToViewZ( fragCoordZ, uCameraNear, uCameraFar );
-        return viewZToOrthographicDepth( viewZ, uCameraNear, uCameraFar );
+        float viewZ = perspectiveDepthToViewZ( fragCoordZ, uCameraNear, uCameraFar );
+        return viewZToPerspectiveDepth( viewZ, uCameraNear, uCameraFar );
     }
 
     void main() {
         float depth = readDepth( tDepth, vUv );
-        // float depth = smoothstep(uCameraNear, uCameraFar,  gl_FragCoord.z);
+        depth = pow(depth,3.0);
 
         gl_FragColor.rgb = 1.0 - vec3( depth );
         gl_FragColor.a = 1.0;
     }
 `;
 
+const fragmentShaderTexture = /* glsl */ `
+    varying vec2 vUv;
+    uniform sampler2D tDiffuse;
+
+    vec4 gammaCorrect( in vec4 value ) {
+      return vec4( mix( pow( value.rgb, vec3( 0.41666 ) ) * 1.055 - vec3( 0.055 ), value.rgb * 12.92, vec3( lessThanEqual( value.rgb, vec3( 0.0031308 ) ) ) ), value.a );
+    }
+    
+    void main() {
+        gl_FragColor = gammaCorrect(texture2D( tDiffuse, vUv ));
+    }
+`;
+
 function init() {
   const renderer = initRenderer();
-  const camera = initOrthographicCamera(new Vector3(0, -100, 70));
+  const camera = new PerspectiveCamera(
+    70,
+    window.innerWidth / window.innerHeight,
+    10,
+    60
+  );
+  camera.position.set(0, -30, 25);
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
-  camera.zoom = 0.5;
   camera.updateProjectionMatrix();
 
   const scene = initScene();
@@ -108,18 +125,46 @@ function init() {
   const size = new Vector2();
   renderer.getSize(size);
 
-  const renderTarget = new WebGLRenderTarget(size.x, size.y, {
-    depthTexture: new DepthTexture(size.x, size.y),
-  });
+  // init target
+  // #region
+  const renderTarget = new WebGLRenderTarget(size.x, size.y);
+  renderTarget.depthTexture = new DepthTexture();
   renderTarget.depthTexture.format = DepthFormat;
   renderTarget.depthTexture.type = UnsignedShortType;
   renderTarget.depthTexture.minFilter = NearestFilter;
   renderTarget.depthTexture.magFilter = NearestFilter;
 
+  const viewCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const planeGeometry = new PlaneGeometry(2, 2);
+  const depthPlant = new Mesh(
+    planeGeometry,
+    new ShaderMaterial({
+      uniforms: {
+        tDepth: { value: renderTarget.depthTexture },
+        uCameraFar: { value: camera.far },
+        uCameraNear: { value: camera.near },
+      },
+      vertexShader,
+      fragmentShader,
+    })
+  );
+
+  const colorPlant = new Mesh(planeGeometry, new ShaderMaterial({
+    uniforms: {
+      tDiffuse: { value: renderTarget.texture },
+    },
+    vertexShader,
+    fragmentShader:fragmentShaderTexture,
+  }));
+  // #endregion
+
+  // init scene
+  //#region
   const plant = new Mesh(
-    new PlaneGeometry(40, 20),
+    planeGeometry,
     new MeshStandardMaterial({ color: "chartreuse", side: 2 })
   );
+  plant.scale.set(20, 10, 0);
   plant.rotateX(Math.PI / 2);
 
   const box = new Mesh(
@@ -147,27 +192,17 @@ function init() {
   cone.position.set(0, -15, 0);
 
   scene.add(box, plant, sphere, cone);
-  const depthCamera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const depthPlant = new Mesh(
-    new PlaneGeometry(2, 2),
-    new ShaderMaterial({
-      uniforms: {
-        tDepth: { value: renderTarget.depthTexture },
-        uCameraFar: { value: camera.far },
-        uCameraNear: { value: camera.near },
-      },
-      vertexShader,
-      fragmentShader,
-    })
-  );
 
+  //#endregion
+
+  //init gui
+  //#region
   const gui = initGUI();
   const df = gui.addFolder("DepthFunc");
   df.add(box.material, "depthFunc", depthFunc).name("Box").disable();
   df.add(plant.material, "depthFunc", depthFunc).name("Plant");
   df.add(sphere.material, "depthFunc", depthFunc).name("Sphere");
   df.add(cone.material, "depthFunc", depthFunc).name("Cone");
-
   gui.add(
     {
       catch() {
@@ -177,6 +212,7 @@ function init() {
     },
     "catch"
   );
+  //#endregion
 
   function render(t) {
     const time = t / 1000;
@@ -186,29 +222,33 @@ function init() {
     sphere.position.x = 13 + Math.sin(time) * 3;
     orbitControls.update();
 
-    renderer.setViewport(0, 0, size.x, size.y);
-    renderer.setScissor(0, 0, size.x, size.y);
-    renderer.render(scene, camera);
-    renderer.setRenderTarget(renderTarget);
-    renderer.render(scene, camera);
-    renderer.setRenderTarget(null);
-
-    depthPlant.material.uniforms.tDepth.value = renderTarget.depthTexture;
-
-    renderer.setScissorTest(true);
-    renderer.setViewport(0, 0, size.x * 0.3, size.y * 0.3);
-    renderer.setScissor(0, 0, size.x * 0.3, size.y * 0.3);
-    renderer.render(depthPlant, depthCamera);
-    renderer.setRenderTarget(null);
-    renderer.setScissorTest(false);
+    renderViewPort();
 
     requestAnimationFrame(render);
   }
   render();
+
+  function renderViewPort() {
+
+    renderer.setRenderTarget(renderTarget);
+    renderer.render(scene, camera);
+    depthPlant.material.uniforms.tDepth.value = renderTarget.depthTexture;
+    colorPlant.material.uniforms.tDiffuse.value = renderTarget.texture;
+    renderer.setRenderTarget(null);
+
+    renderer.setViewport(0, 0, size.x, size.y);
+    renderer.setScissor(0, 0, size.x, size.y);
+    renderer.render(depthPlant, viewCamera);
+
+    renderer.setScissorTest(true);
+    renderer.setViewport(0, 0, size.x * 0.3, size.y * 0.3);
+    renderer.setScissor(0, 0, size.x * 0.3, size.y * 0.3);
+    renderer.render(colorPlant, viewCamera);
+    renderer.setScissorTest(false);
+  }
+
   resize(renderer, camera, (w, h) => {
     size.set(w, h);
     renderTarget.setSize(w, h);
-    renderTarget.depthTexture.dispose();
-    renderTarget.depthTexture = new DepthTexture(w, h);
   });
 }

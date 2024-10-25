@@ -14,7 +14,8 @@ import {
     ShaderMaterial,
     ShaderLib,
     UniformsUtils,
-    Mesh
+    Mesh,
+    MeshNormalMaterial
 } from "../lib/three/three.module.js";
 import { update, Tween } from "../lib/other/tween.esm.js";
 import { SimplexNoise } from "../lib/three/SimplexNoise.js";
@@ -152,6 +153,39 @@ class TextTerrain extends Object3D {
                     `
             )
         }
+
+        const material2 = new ShaderMaterial({
+            uniforms:{
+                tDiffuse:{ value:canvasTexture },
+            },
+            vertexShader:/*glsl*/`
+                varying vec2 vUv;
+                attribute float letterIdx;
+                varying float vLetterIdx;
+
+                void main() {
+                    vUv = uv;
+                    vLetterIdx = letterIdx;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+                }
+            `,
+            fragmentShader:/*glsl*/`
+                uniform sampler2D tDiffuse;
+                varying float vLetterIdx;
+                varying vec2 vUv;
+                void main() {
+                    gl_FragColor = texture2D( tDiffuse, vUv );
+                    float letterIdx = floor(vLetterIdx + 0.1);
+                    float tileStep = 1.0 / 8.0;
+                    float u = mod(letterIdx , 8.0);
+                    float v = floor(letterIdx / 8.0);
+                    vec2 tileUV = (vec2(u,v) + vUv) * tileStep;
+                    gl_FragColor = texture2D( tDiffuse, tileUV );
+                }
+            `,
+        })
+
+        const material3 = new MeshNormalMaterial();
 
 
         const instanceMesh = new InstancedMesh(geometry, material, tileNum * tileNum);

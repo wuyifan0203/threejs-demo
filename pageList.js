@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-24 17:00:27
+ * @LastEditTime: 2024-10-25 15:50:47
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -106,16 +106,12 @@ const list = [
         title: "Layer",
       },
       {
-        path: "/camera/layer2.html",
-        title: "How to Use Layer",
-      },
-      {
         path: "/camera/dynamicGrid.html",
         title: "Dynamic Grid",
       },
       {
         path: "/camera/focusObject.html",
-        title: "Focus Object by Orbit Controls",
+        title: "Focus Object",
       },
       {
         path: "/camera/saveState.html",
@@ -193,7 +189,7 @@ const list = [
       },
       {
         path: "/material/depthTest.html",
-        title: "Depth Test (WIP)", 
+        title: "Depth Test", 
       },
       {
         path: "/material/stencilMaterial.html",
@@ -417,6 +413,10 @@ const list = [
       {
         path: "/canvas/addWaterMark.html",
         title: "WaterMark",
+      },
+      {
+        path: "/canvas/mediaDevices.html",
+        title: "Microphone Visualization",
       },
     ],
   },
