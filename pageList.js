@@ -193,7 +193,7 @@ const list = [
       },
       {
         path: "/material/stencilMaterial.html",
-        title: "Stencil Test (WIP)", 
+        title: "Magic Box", 
       }
     ],
   },
