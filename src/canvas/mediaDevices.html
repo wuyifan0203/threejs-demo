@@ -2,138 +2,146 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-25 16:44:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-25 17:00:13
+ * @LastEditTime: 2024-10-28 09:47:05
  * @FilePath: \threejs-demo\src\canvas\mediaDevices.html
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
 -->
 <!DOCTYPE html>
 <html lang="zh">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Microphone visualization</title>
     <style>
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        canvas {
-            width: 99vw;
-            height: 99vh;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      canvas {
+        width: 99vw;
+        height: 99vh;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <canvas id="canvas"></canvas>
     <script>
-        // 获取 Canvas 元素和绘图上下文
-        const canvas = document.getElementById('canvas');
-        const canvasCtx = canvas.getContext('2d');
+      // 获取 Canvas 元素和绘图上下文
+      const canvas = document.getElementById("canvas");
+      const canvasCtx = canvas.getContext("2d");
 
-        // 设置 Canvas 大小
+      // 设置 Canvas 大小
+      canvas.width = window.innerWidth * 0.99;
+      canvas.height = window.innerHeight * 0.99;
+
+      const title = "Microphone visualization";
+
+      canvasCtx.fillStyle = "rgb(200, 200, 200)";
+      canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      canvasCtx.lineWidth = 2;
+      canvasCtx.strokeStyle = "rgb(0, 0, 0)";
+
+      canvasCtx.beginPath();
+      canvasCtx.font = `35px Arial`;
+      canvasCtx.fillStyle = "rgba(0,0,0,0.5)";
+      const { width, height } = canvasCtx.measureText(title);
+
+      canvasCtx.fillText(title, window.innerWidth / 2 - width / 2, 35);
+
+      const sliceWidth = (canvas.width * 1.0) / 1024;
+      let x = 0;
+
+      const defaultDataArray = new Array(1024).fill(125);
+
+      for (let i = 0; i < 1024; i++) {
+        const v = defaultDataArray[i] / 128.0;
+        const y = (v * canvas.height) / 2;
+        if (i === 0) {
+          canvasCtx.moveTo(x, y);
+        } else {
+          canvasCtx.lineTo(x, y);
+        }
+        x += sliceWidth;
+      }
+
+      canvasCtx.lineTo(canvas.width, canvas.height / 2);
+      canvasCtx.stroke();
+
+      window.addEventListener("resize", function () {
         canvas.width = window.innerWidth * 0.99;
         canvas.height = window.innerHeight * 0.99;
+      });
 
-        const title = 'Microphone visualization';
-
-        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-        canvasCtx.lineWidth = 2;
-        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
-
-        canvasCtx.beginPath();
-        canvasCtx.font = `35px Arial`;
-        canvasCtx.fillStyle = "rgba(0,0,0,0.5)";
-        const { width, height } = canvasCtx.measureText(title);
-                        
-        canvasCtx.fillText(title, window.innerWidth / 2 - width / 2, 35);
-
-        const sliceWidth = canvas.width * 1.0 / 1024;
-        let x = 0;
-
-        const defaultDataArray = new Array(1024).fill(125);
-        
-        for (let i = 0; i < 1024; i++) {
-            const v = defaultDataArray[i] / 128.0;
-            const y = v * canvas.height /2;
-            if (i === 0) {
-                canvasCtx.moveTo(x, y);
-            } else {
-                canvasCtx.lineTo(x, y);
-            }
-            x += sliceWidth;
-        }
-
-        canvasCtx.lineTo(canvas.width, canvas.height / 2);
-        canvasCtx.stroke();
-
+      if (!window.TEST) {
         // 检查浏览器是否支持 getUserMedia
         if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-            const constraints = { audio: true };
+          const constraints = { audio: true };
 
-            navigator.mediaDevices.getUserMedia(constraints)
-                .then(function(stream) {
-                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    const source = audioContext.createMediaStreamSource(stream);
+          navigator.mediaDevices
+            .getUserMedia(constraints)
+            .then(function (stream) {
+              const audioContext = new (window.AudioContext ||
+                window.webkitAudioContext)();
+              const source = audioContext.createMediaStreamSource(stream);
 
-                    const analyser = audioContext.createAnalyser();
-                    analyser.fftSize = 2048;
-                    const bufferLength = analyser.fftSize;
-                    const dataArray = new Uint8Array(bufferLength);
+              const analyser = audioContext.createAnalyser();
+              analyser.fftSize = 2048;
+              const bufferLength = analyser.fftSize;
+              const dataArray = new Uint8Array(bufferLength);
 
-                    source.connect(analyser);
+              source.connect(analyser);
 
-                    function draw() {
-                        requestAnimationFrame(draw);
+              function draw() {
+                requestAnimationFrame(draw);
 
-                        analyser.getByteTimeDomainData(dataArray);
+                analyser.getByteTimeDomainData(dataArray);
 
-                        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
-                        canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                canvasCtx.fillStyle = "rgb(200, 200, 200)";
+                canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-                        canvasCtx.lineWidth = 2;
-                        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+                canvasCtx.lineWidth = 2;
+                canvasCtx.strokeStyle = "rgb(0, 0, 0)";
 
-                        canvasCtx.beginPath();
-                        canvasCtx.font = `35px Arial`;
-                        canvasCtx.fillStyle = "rgba(0,0,0,0.5)";
-                        const { width, height } = canvasCtx.measureText(title);
-                        
-                        canvasCtx.fillText(title, window.innerWidth / 2 - width / 2, 35);
+                canvasCtx.beginPath();
+                canvasCtx.font = `35px Arial`;
+                canvasCtx.fillStyle = "rgba(0,0,0,0.5)";
+                const { width, height } = canvasCtx.measureText(title);
 
-                        const sliceWidth = canvas.width * 1.0 / bufferLength;
-                        let x = 0;
-                        
-                        for (let i = 0; i < bufferLength; i++) {
-                            const v = dataArray[i] / 128.0;
-                            const y = v * canvas.height / 2;
+                canvasCtx.fillText(
+                  title,
+                  window.innerWidth / 2 - width / 2,
+                  35
+                );
 
-                            if (i === 0) {
-                                canvasCtx.moveTo(x, y);
-                            } else {
-                                canvasCtx.lineTo(x, y);
-                            }
+                const sliceWidth = (canvas.width * 1.0) / bufferLength;
+                let x = 0;
 
-                            x += sliceWidth;
-                        }
+                for (let i = 0; i < bufferLength; i++) {
+                  const v = dataArray[i] / 128.0;
+                  const y = (v * canvas.height) / 2;
 
-                        canvasCtx.lineTo(canvas.width, canvas.height / 2);
-                        canvasCtx.stroke();
-                    }
+                  if (i === 0) {
+                    canvasCtx.moveTo(x, y);
+                  } else {
+                    canvasCtx.lineTo(x, y);
+                  }
 
-                    draw();
-                })
-                .catch(function(err) {
-                    console.error('获取音频失败：', err);
-                });
+                  x += sliceWidth;
+                }
+
+                canvasCtx.lineTo(canvas.width, canvas.height / 2);
+                canvasCtx.stroke();
+              }
+
+              draw();
+            })
+            .catch(function (err) {
+              console.error("获取音频失败：", err);
+            });
         } else {
-            alert('您的浏览器不支持访问麦克风。');
+          alert("您的浏览器不支持访问麦克风。");
         }
-
-        window.addEventListener('resize', function() {
-            canvas.width = window.innerWidth * 0.99;
-            canvas.height = window.innerHeight * 0.99;
-        });
+      }
     </script>
-</body>
+  </body>
 </html>

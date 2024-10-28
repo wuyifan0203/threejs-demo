@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-13 15:31:21
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-13 15:41:44
- * @FilePath: /threejs-demo/bin/cleanPage.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-28 09:48:52
+ * @FilePath: \threejs-demo\bin\cleanPage.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 ( function () {
@@ -23,4 +23,6 @@
 			break;
 		}
 	}
+
+	window.TEST = true;
 }() );

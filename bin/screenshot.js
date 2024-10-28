@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-25 18:22:34
+ * @LastEditTime: 2024-10-28 09:49:28
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -380,4 +380,4 @@ function close() {
   process.exit(1);
 }
 
-const exceptionURLs = ['/canvas/mediaDevices.html'];
+const exceptionURLs = [];
