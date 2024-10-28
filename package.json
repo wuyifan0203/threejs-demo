@@ -1,7 +1,7 @@
 {
   "name": "threejs-demo",
   "version": "1.0.0",
-  "description": "",
+  "description": "This developed by Three.js",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -12,7 +12,14 @@
     "prepare": "husky",
     "commit": "git cz"
   },
-  "keywords": [],
+  "keywords": [
+    "three",
+    "webgl",
+    "demo",
+    "shader",
+    "postprocessing",
+    "GLSL"
+  ],
   "author": "wuyifan",
   "dependencies": {
     "three": "^0.168.0"
