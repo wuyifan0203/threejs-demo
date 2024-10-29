@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-05-31 16:08:18
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-18 17:19:38
- * @FilePath: /threejs-demo/src/animate/loadBot.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-10-29 16:43:18
+ * @FilePath: \threejs-demo\src\animate\loadBot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -57,6 +57,7 @@ async function init() {
     const renderer = initRenderer({});
     const camera = initOrthographicCamera(new Vector3(50, 50, 50));
     camera.zoom = 6;
+    camera.updateProjectionMatrix();
     const scene = initScene();
 
     initStats()
@@ -92,22 +93,31 @@ async function init() {
 
 async function loadBot(scene) {
     const loader = new GLTFLoader();
+
+    // animations为AnimationClip实例，一个实例代表一种动画
     const { scene: mesh, animations } = await loader.loadAsync('../../public/models/XBot.glb');
 
     console.log(animations);
 
     scene.add(mesh);
 
+    console.log(mesh);
+    
+
+    // 创建骨骼辅助器
     const helper = new SkeletonHelper(mesh);
     helper.visible = false;
     scene.add(helper);
 
     const allActions = [];
     const actionsMap = {};
+    // 1.动画混合器
     const mixer = new AnimationMixer(mesh);
+    
     animations.forEach(clip => {
         const name = clip.name;
         if (baseActions[name]) {
+            // 2.调用clipAction返回一个AnimationAction实例
             const action = mixer.clipAction(clip);
             baseActions[name]['action'] = action;
             activeAction(action);
@@ -115,6 +125,7 @@ async function loadBot(scene) {
         } else if (additiveActions[name]) {
             AnimationUtils.makeClipAdditive(clip);
             if (clip.name.endsWith('_pose')) {
+                // 创建一个新的动画片段AnimationClip
                 clip = AnimationUtils.subclip(clip, clip.name, 2, 3, 30)
             }
             const action = mixer.clipAction(clip);

@@ -2,13 +2,13 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-27 17:59:07
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-23 17:26:11
- * @FilePath: /threejs-demo/src/lib/tools/constant.js
+ * @LastEditTime: 2024-10-29 11:09:09
+ * @FilePath: \threejs-demo\src\lib\tools\constant.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
 const publicPath = "public";
-const modelPath = `${publicPath}/model`;
+const modelPath = `${publicPath}/models`;
 const imagePath = `${publicPath}/images`;
 
 const PI = Math.PI;
