@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-25 15:50:47
+ * @LastEditTime: 2024-10-30 14:57:43
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -10,17 +10,17 @@ const list = [
     title: "Animation",
     pages: [
       {
-        path: "/animate/useAnimation.html",
-        title: "Use Animation",
+        path: "/animate/keyframeTrack.html",
+        title: "Custom Keyframe Track",
       },
       {
         path: "/animate/loadModalWithAnimation.html",
         title: "Load Modal With Animation",
       },
-      {
-        path: "/tween/useTween.html",
-        title: "Use Tween",
-      },
+      // {
+      //   path: "/animate/animateAction.html",
+      //   title: "Animate Action",
+      // },
       {
         path: "/tween/portal.html",
         title: "Portal",
@@ -98,10 +98,6 @@ const list = [
     title: "Camera",
     pages: [
       {
-        path: "/camera/orthographic.html",
-        title: "Orthographic",
-      },
-      {
         path: "/camera/layer.html",
         title: "Layer",
       },
@@ -146,14 +142,6 @@ const list = [
         title: "Extrude Geometry",
       },
       {
-        path: "/geometry/isSamplePolygon.html",
-        title: "Judge if Sample Polygon",
-      },
-      {
-        path: "/geometry/splitMesh.html",
-        title: "Split Mesh",
-      },
-      {
         path: "/geometry/formulaPolygon.html",
         title: "Create Mesh Using Formula",
       },
@@ -176,12 +164,16 @@ const list = [
         title: "Clipping",
       },
       {
+        path: "/material/polygonOffsetTest.html",
+        title: "PolygonOffset", 
+      },
+      {
         path: "/material/stencil.html",
         title: "Stencil",
       },
       {
         path: "/material/transport.html",
-        title: "Transport",
+        title: "Texture Transport",
       },
       {
         path: "/material/blendingTest.html",
@@ -194,7 +186,7 @@ const list = [
       {
         path: "/material/stencilMaterial.html",
         title: "Magic Box", 
-      }
+      },
     ],
   },
   {
@@ -228,16 +220,40 @@ const list = [
     ],
   },
   {
-    category: "object",
-    title: "Object",
+    category: "Physics",
+    title: "Physics",
     pages: [
       {
-        path: "/object/instanceMesh.html",
-        title: "Use Instance Mesh",
+        path: "/cannon/index.html",
+        title: "Cannon 1",
       },
       {
-        path: "/geometry/edgeGeometry.html",
-        title: "Edge Geometry",
+        path: "/cannon/throw.html",
+        title: "Throw Circle",
+      },
+      {
+        path: "/cannon/lockConstraint.html",
+        title: "Bridge (Lock Constraint)",
+      },
+      {
+        path: "/cannon/pointConstraint.html",
+        title: "Bridge (Point Constraint)",
+      },
+      {
+        path: "/cannon/heightField.html",
+        title: "Height Field",
+      },
+      {
+        path: "/cannon/pointerLockControl.html",
+        title: "Pointer Lock Controls",
+      },
+      {
+        path: "/cannon/bowling.html",
+        title: "Bowling Game",
+      },
+      {
+        path: "/cannon/vehicle.html",
+        title: "Vehicle",
       },
     ],
   },
@@ -294,89 +310,6 @@ const list = [
     ],
   },
   {
-    category: "helper",
-    title: "Helper",
-    pages: [
-      {
-        path: "/helper/viewHelperTest.html",
-        title: "View Helper Test",
-      },
-      {
-        path: "/helper/rulerHelper.html",
-        title: "Ruler Helper Demo",
-      },
-    ],
-  },
-  {
-    category: "intersection",
-    title: "Intersection",
-    pages: [
-      {
-        path: "/intersection/selectInstanceMesh.html",
-        title: "Select InstanceMesh",
-      },
-    ],
-  },
-  {
-    category: "math",
-    title: "Math",
-    pages: [
-      {
-        path: "/math/modalMatrix.html",
-        title: "Modal Matrix",
-      },
-      {
-        path: "/math/rotateMatrix.html",
-        title: "Robotic Arm",
-      },
-      {
-        path: "/math/viewMatrix.html",
-        title: "Look At Ball",
-      },
-    ],
-  },
-  {
-    category: "noise",
-    title: "Noise",
-    pages: [
-      {
-        path: "/noise/perlinNoiseDemo1.html",
-        title: "Perlin Noise Demo 1",
-      },
-    ],
-  },
-  {
-    category: "loader",
-    title: "Loader",
-    pages: [
-      {
-        path: "/loader/gltfLoader.html",
-        title: "GLTF Loader",
-      },
-      {
-        path: "/loader/cubeTextureLoader.html",
-        title: "Cube Texture Loader",
-      },
-      {
-        path: "/loader/rgbeLoader.html",
-        title: "RGBE Loader",
-      },
-      {
-        path: "/texture/commonTexture.html",
-        title: "FBX Loader",
-      },
-      {
-        path: "/loader/objLoader.html",
-        title: "OBJ Loader",
-      },
-      {
-        path: "/loader/usdzLoader.html",
-        title: "USDZ Loader",
-      },
-    ],
-  },
-
-  {
     category: "texture",
     title: "Texture",
     pages: [
@@ -421,40 +354,102 @@ const list = [
     ],
   },
   {
-    category: "cannon",
-    title: "Cannon",
+    category: "loader",
+    title: "Loader",
     pages: [
       {
-        path: "/cannon/index.html",
-        title: "Cannon 1",
+        path: "/loader/gltfLoader.html",
+        title: "GLTF Loader",
       },
       {
-        path: "/cannon/throw.html",
-        title: "Throw Circle",
+        path: "/loader/cubeTextureLoader.html",
+        title: "Cube Texture Loader",
       },
       {
-        path: "/cannon/lockConstraint.html",
-        title: "Bridge (Lock Constraint)",
+        path: "/loader/rgbeLoader.html",
+        title: "RGBE Loader",
       },
       {
-        path: "/cannon/pointConstraint.html",
-        title: "Bridge (Point Constraint)",
+        path: "/texture/commonTexture.html",
+        title: "FBX Loader",
       },
       {
-        path: "/cannon/heightField.html",
-        title: "Height Field",
+        path: "/loader/objLoader.html",
+        title: "OBJ Loader",
       },
       {
-        path: "/cannon/pointerLockControl.html",
-        title: "Pointer Lock Controls",
+        path: "/loader/usdzLoader.html",
+        title: "USDZ Loader",
+      },
+    ],
+  },
+  {
+    category: "intersection",
+    title: "Intersection",
+    pages: [
+      {
+        path: "/intersection/selectInstanceMesh.html",
+        title: "Select InstanceMesh",
+      },
+    ],
+  },
+  {
+    category: "object",
+    title: "Object",
+    pages: [
+      {
+        path: "/object/instanceMesh.html",
+        title: "Use Instance Mesh",
       },
       {
-        path: "/cannon/bowling.html",
-        title: "Bowling Game",
+        path: "/geometry/edgeGeometry.html",
+        title: "Edge Geometry",
+      },
+    ],
+  },
+  {
+    category: "helper",
+    title: "Helper",
+    pages: [
+      {
+        path: "/helper/viewHelperTest.html",
+        title: "View Helper Test",
       },
       {
-        path: "/cannon/vehicle.html",
-        title: "Vehicle",
+        path: "/helper/rulerHelper.html",
+        title: "Ruler Helper Demo",
+      },
+    ],
+  },
+  {
+    category: "math",
+    title: "Math",
+    pages: [
+      {
+        path: "/math/modalMatrix.html",
+        title: "Solar System (ModalMatrix)",
+      },
+      {
+        path: "/math/rotateMatrix.html",
+        title: "Robotic Arm (Matrix4)",
+      },
+      {
+        path: "/math/viewMatrix.html",
+        title: "Look At Ball (ViewMatrix)",
+      },
+      {
+        path: "/math/orthographic.html",
+        title: "Frustum (ProjectionMatrix)",
+      },
+    ],
+  },
+  {
+    category: "noise",
+    title: "Noise",
+    pages: [
+      {
+        path: "/noise/perlinNoiseDemo1.html",
+        title: "Perlin Noise Demo 1",
       },
     ],
   },
@@ -466,6 +461,14 @@ const list = [
       {
         path: "/algorithms/quadTreeDemo.html",
         title: "Quad Tree Demo",
+      },
+      {
+        path: "/algorithms/isSamplePolygon.html",
+        title: "Judge if Sample Polygon",
+      },
+      {
+        path: "/algorithms/splitMesh.html",
+        title: "Split Mesh",
       },
     ],
   },
@@ -503,8 +506,8 @@ const list = [
         title: "Polygon Offset Test",
       },
       {
-        path: "/zFighting/renderOrderTest.html",
-        title: "Use Polygon Offset",
+        path: "/tween/useTween.html",
+        title: "Use Tween",
       },
     ],
   },

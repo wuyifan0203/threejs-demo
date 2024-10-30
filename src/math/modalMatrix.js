@@ -38,6 +38,7 @@ function init() {
   camera.lookAt(0, 0, 0);
   camera.up.set(0, 0, 1);
   camera.zoom = 0.2;
+  camera.updateProjectionMatrix();
   const scene = initScene();
 
   renderer.setClearColor(0xffffff);
