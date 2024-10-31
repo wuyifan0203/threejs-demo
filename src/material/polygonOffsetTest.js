@@ -7,10 +7,8 @@
 import {
   Mesh,
   BoxGeometry,
-  AmbientLight,
   Vector3,
   MeshLambertMaterial,
-  OrthographicCamera,
   Box3,
 } from "../lib/three/three.module.js";
 import {
@@ -120,7 +118,6 @@ function init() {
     });
   });
 }
-
 
 const target = new Box3();
 const current = new Box3();
