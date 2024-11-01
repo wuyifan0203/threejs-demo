@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-01 16:04:11
+ * @LastEditTime: 2024-11-01 18:26:55
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -19,7 +19,7 @@ const list = [
       },
       {
         path: "/animate/animateControl.html",
-        title: "Animate Control",
+        title: "Animate Control (WIP)",
       },
       {
         path: "/tween/portal.html",

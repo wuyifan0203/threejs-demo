@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-31 11:16:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-31 11:17:20
+ * @LastEditTime: 2024-11-01 15:31:52
  * @FilePath: \threejs-demo\src\animate\animateControl.html
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
 -->
@@ -30,12 +30,16 @@
             user-select: none;
             pointer-events: none;
             z-index: 1;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
     <div id="webgl-output">
-        <div id="info"> Effective Duration = clip.duration / (action.timeScale * mixer.timeScale )</div>
+        <div id="info"> 
+            <p>Effective Duration = clip.duration / (action.timeScale * mixer.timeScale )</p>
+            <p>Control use key 'W' 'A' 'S' 'D' 'Shift'</p>
+        </div>
     </div>
     <script src="./animateControl.js" type="module"></script>
 </body>
