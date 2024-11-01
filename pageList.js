@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-30 14:57:43
+ * @LastEditTime: 2024-11-01 16:04:11
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -17,10 +17,10 @@ const list = [
         path: "/animate/loadModalWithAnimation.html",
         title: "Load Modal With Animation",
       },
-      // {
-      //   path: "/animate/animateAction.html",
-      //   title: "Animate Action",
-      // },
+      {
+        path: "/animate/animateControl.html",
+        title: "Animate Control",
+      },
       {
         path: "/tween/portal.html",
         title: "Portal",
@@ -73,7 +73,7 @@ const list = [
     pages: [
       {
         path: "/controls/useArcballControls.html",
-        title: "Use Arcball Controls",
+        title: "Use ArcBall Controls",
       },
       {
         path: "/controls/useOrbitControls.html",
@@ -470,6 +470,10 @@ const list = [
         path: "/algorithms/splitMesh.html",
         title: "Split Mesh",
       },
+      {
+        path: "/algorithms/mazeGenerate.html",
+        title: "Maze Generate",
+      }
     ],
   },
   {
