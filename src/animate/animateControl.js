@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-31 11:16:20
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-04 17:28:25
+ * @LastEditTime: 2024-11-04 18:17:51
  * @FilePath: \threejs-demo\src\animate\animateControl.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -20,14 +20,11 @@ import {
   initGUI,
   initScene,
   initDirectionLight,
-  HALF_PI,
-  PI,
   modelPath,
   initClock,
   initCustomGrid,
   resize,
   initAxesHelper,
-  initCoordinates,
 } from "../lib/tools/index.js";
 import { FBXLoader } from "../lib/three/FBXLoader.js";
 
@@ -37,10 +34,11 @@ window.onload = () => {
 
 let isWalking = false;
 let speed = 0;
+let currentAction = null;
 
 const baseSpeed = 2;
 const zero = new Vector3(0, 0, 0);
-const axis = new Vector3(0, 0, 1);
+
 const translate = new Vector3();
 const direction = new Vector3();
 const targetQuaternion = new Quaternion();
@@ -80,7 +78,7 @@ async function init() {
   walkGroup.scale.set(0.05, 0.05, 0.05);
   const model = new Object3D();
   model.up.set(0, 0, 1);
-  model.lookAt(1, 0, 0);
+  model.lookAt(0, 1, 0);
   model.add(walkGroup);
   scene.add(model);
 
@@ -165,6 +163,7 @@ async function init() {
       orbitControl.update();
       // orbitControl.enabled = false;
       idleAction.fadeIn(0.5);
+      currentAction = idleAction;
     }
   }
 
@@ -172,7 +171,7 @@ async function init() {
   // keyboard control
 
   const walkKey = ['w', 'a', 's', 'd'];
-  
+
   window.addEventListener('keydown', (e) => {
     if (params.mode === 'common') return;
     const key = e.key.toLowerCase();
@@ -186,9 +185,11 @@ async function init() {
 
   function startWalking() {
     if (!isWalking) {
+      crossFade(idleAction, walkAction, 0.5);
       isWalking = true
     }
-    updateDirection();
+    walkAction.setEffectiveTimeScale(keyPressed.shift ? 3 : 1); // 如果按下Shift键，加速动画播放速度
+    updateDirection(model);
   }
 
   window.addEventListener('keyup', (e) => {
@@ -198,6 +199,9 @@ async function init() {
     if (walkKey.includes(key)) {
       stopWalking();
     }
+    if (isWalking) {
+      walkAction.setEffectiveTimeScale(keyPressed.shift ? 3 : 1); // 如果按下Shift键，加速动画播放速度
+    }
     updateSpeed();
   });
 
@@ -206,10 +210,11 @@ async function init() {
       if (isWalking) {
         isWalking = false;
       }
+      crossFade(walkAction, idleAction, 0.5);
       direction.set(0, 0, 0); // 停止移动
-    }else{
+    } else {
       // 当还有按键按下时，说明方向发生变化需要更新方向
-      updateDirection();
+      updateDirection(model);
     }
   }
 
@@ -251,4 +256,12 @@ function updateDirection() {
 
 function updateSpeed() {
   speed = keyPressed.shift ? baseSpeed * 3 : baseSpeed;
+}
+
+function crossFade(fromAction, toAction, duration) {
+  if (fromAction === toAction) return;
+
+  fromAction.fadeOut(duration);
+  toAction.reset().fadeIn(duration).play();
+  currentAction = toAction;
 }
