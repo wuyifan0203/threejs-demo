@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-31 11:16:20
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-01 18:24:26
+ * @LastEditTime: 2024-11-04 17:28:25
  * @FilePath: \threejs-demo\src\animate\animateControl.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -78,12 +78,11 @@ async function init() {
 
   const walkGroup = await loader.loadAsync(`../../${modelPath}/ZombieWalk.fbx`);
   walkGroup.scale.set(0.05, 0.05, 0.05);
-  walkGroup.rotateX(HALF_PI);
-  walkGroup.rotateY(PI);
   const model = new Object3D();
-
+  model.up.set(0, 0, 1);
+  model.lookAt(1, 0, 0);
   model.add(walkGroup);
-  // scene.add(model);
+  scene.add(model);
 
   const idleGroup = await loader.loadAsync(`../../${modelPath}/ZombieIdle.fbx`);
   // 删除位移，保证动画在原点
@@ -173,6 +172,7 @@ async function init() {
   // keyboard control
 
   const walkKey = ['w', 'a', 's', 'd'];
+  
   window.addEventListener('keydown', (e) => {
     if (params.mode === 'common') return;
     const key = e.key.toLowerCase();
@@ -185,7 +185,6 @@ async function init() {
   });
 
   function startWalking() {
-    console.log('start walking');
     if (!isWalking) {
       isWalking = true
     }
@@ -203,22 +202,16 @@ async function init() {
   });
 
   function stopWalking() {
-    console.log('stop walking')
-    if (isWalking) {
-      isWalking = false;
+    if (!keyPressed['w'] && !keyPressed['s'] && !keyPressed['a'] && !keyPressed['d']) {
+      if (isWalking) {
+        isWalking = false;
+      }
+      direction.set(0, 0, 0); // 停止移动
+    }else{
+      // 当还有按键按下时，说明方向发生变化需要更新方向
+      updateDirection();
     }
-    direction.set(0, 0, 0); // 停止移动
-    console.log(model.position);
-
   }
-
-  console.log(model);
-
-  const dummy = new Object3D();
-  dummy.add(initCoordinates());
-  dummy.up.set(0, 1, 0);
-
-  scene.add(dummy);
 
   const clock = initClock();
   let delta = 0;
@@ -231,11 +224,10 @@ async function init() {
 
     if (isWalking && direction.lengthSq() > 0) {
       translate.copy(direction).multiplyScalar(speed * delta);
-      model.position.add(translate);
-      rotateMatrix.lookAt(translate, zero, new Vector3(0, 0, 1));
+      rotateMatrix.lookAt(translate, zero, model.up);
       targetQuaternion.setFromRotationMatrix(rotateMatrix);
-      model.quaternion.slerp(targetQuaternion, 0.2);
-
+      model.quaternion.slerp(targetQuaternion, 0.5);
+      model.position.add(translate);
     }
   }
 
