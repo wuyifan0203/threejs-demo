@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-10-31 11:16:20
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-04 18:17:51
+ * @LastEditTime: 2024-11-05 15:20:31
  * @FilePath: \threejs-demo\src\animate\animateControl.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -55,21 +55,20 @@ const keyPressed = {
 async function init() {
   const renderer = initRenderer({});
 
-  const defaultPosition = new Vector3(100, -100, 100)
+  const defaultPosition = new Vector3(-100, 100, 100)
 
   const camera = initOrthographicCamera(defaultPosition);
   camera.lookAt(0, 0, 0);
-  camera.up.set(0, 0, 1);
-  camera.zoom = 0.5;
   camera.updateProjectionMatrix();
 
   const scene = initScene();
-  initCustomGrid(scene);
+  const grid = initCustomGrid(scene);
+  grid.rotateX(Math.PI / 2);
   initAxesHelper(scene);
   const orbitControl = initOrbitControls(camera, renderer.domElement);
 
   const light = initDirectionLight();
-  light.position.set(45, -50, 0);
+  light.position.copy(defaultPosition);
   scene.add(light);
 
   const loader = new FBXLoader();
@@ -77,8 +76,6 @@ async function init() {
   const walkGroup = await loader.loadAsync(`../../${modelPath}/ZombieWalk.fbx`);
   walkGroup.scale.set(0.05, 0.05, 0.05);
   const model = new Object3D();
-  model.up.set(0, 0, 1);
-  model.lookAt(0, 1, 0);
   model.add(walkGroup);
   scene.add(model);
 
@@ -143,7 +140,6 @@ async function init() {
     Object.values(actionMap).forEach((action) => {
       action.timeScale = 1;
       action.reset();
-      action.play();
     });
 
     params.currentActionTimeScale = mixer.timeScale = 1;
@@ -154,15 +150,23 @@ async function init() {
   function changeMode() {
     if (params.mode === 'common') {
       commonFolder.show();
-      // orbitControl.enabled = true;
+      orbitControl.enabled = true;
+      changeAction();
+      camera.zoom = 0.5;
+      orbitControl.target.set(0, 0, 0);
+      camera.position.copy(defaultPosition);
+      orbitControl.update();
+      camera.updateProjectionMatrix();
     } else {
       commonFolder.hide();
       model.position.set(0, 0, 0);
       orbitControl.target.set(0, 0, 0);
       camera.position.copy(defaultPosition);
+      camera.zoom = 0.32;
       orbitControl.update();
-      // orbitControl.enabled = false;
-      idleAction.fadeIn(0.5);
+      camera.updateProjectionMatrix();
+      orbitControl.enabled = false;
+      idleAction.reset().fadeIn(0.5).play();
       currentAction = idleAction;
     }
   }
@@ -180,6 +184,7 @@ async function init() {
     if (walkKey.includes(key)) {
       startWalking();
     }
+    walkAction.timeScale = keyPressed.shift ? 5 : 1; // 如果按下Shift键，加速动画播放速度
     updateSpeed();
   });
 
@@ -188,7 +193,6 @@ async function init() {
       crossFade(idleAction, walkAction, 0.5);
       isWalking = true
     }
-    walkAction.setEffectiveTimeScale(keyPressed.shift ? 3 : 1); // 如果按下Shift键，加速动画播放速度
     updateDirection(model);
   }
 
@@ -200,7 +204,7 @@ async function init() {
       stopWalking();
     }
     if (isWalking) {
-      walkAction.setEffectiveTimeScale(keyPressed.shift ? 3 : 1); // 如果按下Shift键，加速动画播放速度
+      walkAction.timeScale = keyPressed.shift ? 5 : 1; // 如果按下Shift键，加速动画播放速度
     }
     updateSpeed();
   });
@@ -228,7 +232,7 @@ async function init() {
     mixer.update(delta);
 
     if (isWalking && direction.lengthSq() > 0) {
-      translate.copy(direction).multiplyScalar(speed * delta);
+      translate.copy(direction).multiplyScalar(delta * speed)
       rotateMatrix.lookAt(translate, zero, model.up);
       targetQuaternion.setFromRotationMatrix(rotateMatrix);
       model.quaternion.slerp(targetQuaternion, 0.5);
@@ -237,19 +241,18 @@ async function init() {
   }
 
   renderer.setAnimationLoop(render);
-  changeMode();
   reset();
-  changeAction();
+  changeMode();
   resize(renderer, camera);
 }
 
 function updateDirection() {
   direction.set(0, 0, 0);
 
-  if (keyPressed.w) direction.y += 1;
-  if (keyPressed.s) direction.y -= 1;
-  if (keyPressed.a) direction.x -= 1;
-  if (keyPressed.d) direction.x += 1;
+  if (keyPressed.w) direction.x += 1;
+  if (keyPressed.s) direction.x -= 1;
+  if (keyPressed.a) direction.z -= 1;
+  if (keyPressed.d) direction.z += 1;
 
   direction.normalize();
 }

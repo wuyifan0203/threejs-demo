@@ -19,7 +19,7 @@ const list = [
       },
       {
         path: "/animate/animateControl.html",
-        title: "Animate Control (WIP)",
+        title: "Animate Control",
       },
       {
         path: "/tween/portal.html",
