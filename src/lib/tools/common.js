@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-22 16:23:31
+ * @LastEditTime: 2024-11-08 16:45:51
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -35,6 +35,7 @@ import { Stats } from "../util/Stats.js";
 import { ViewHelper } from "../three/viewHelper.js";
 import { TransformControls } from "../three/TransformControls.js";
 import { Sky } from "../three/Sky.js";
+import { OmnipotentLoader } from "./OmnipotentLoader.js";
 
 /**
  * @description: 初始化渲染器
@@ -253,6 +254,10 @@ function initDirectionLight(color = 0xffffff, intensity = 3) {
   light.shadow.mapSize.height = 2048;
   light.shadow.camera.near = 1;
   light.shadow.camera.far = 10000;
+  light.shadow.camera.left = -50;
+  light.shadow.camera.right = 50;
+  light.shadow.camera.top = 50;
+  light.shadow.camera.bottom = -50;
   return light;
 }
 
@@ -359,6 +364,13 @@ function initTransformControls(camera, domElement) {
 function initClock() {
   return new Clock();
 }
+/**
+ * @description: init Loader
+ * @return {OmnipotentLoader}
+ */
+function initLoader(manager) {
+  return new OmnipotentLoader(manager)
+}
 
 const defaultSkyParams = {
   turbidity: 0,
@@ -430,4 +442,5 @@ export {
   initTransformControls,
   initClock,
   initSky,
+  initLoader
 };
