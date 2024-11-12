@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-08 16:45:51
+ * @LastEditTime: 2024-11-12 11:23:56
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -253,7 +253,7 @@ function initDirectionLight(color = 0xffffff, intensity = 3) {
   light.shadow.mapSize.width = 2048;
   light.shadow.mapSize.height = 2048;
   light.shadow.camera.near = 1;
-  light.shadow.camera.far = 10000;
+  light.shadow.camera.far = 200;
   light.shadow.camera.left = -50;
   light.shadow.camera.right = 50;
   light.shadow.camera.top = 50;
