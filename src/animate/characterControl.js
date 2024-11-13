@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-07 17:09:45
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-12 18:33:41
+ * @LastEditTime: 2024-11-13 14:42:21
  * @FilePath: \threejs-demo\src\animate\characterControl.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -26,6 +26,9 @@ import {
     initLoader,
     initGroundPlane,
     HALF_PI,
+    initViewHelper,
+    resize,
+    initGUI,
 } from "../lib/tools/index.js";
 import {
     World,
@@ -35,6 +38,7 @@ import {
     Vec3,
     Material,
     Quaternion as QuaternionPsy,
+    ContactMaterial
 } from '../lib/other/physijs/cannon-es.js';
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js'
 
@@ -55,8 +59,11 @@ const keyMap = {
 
 async function init() {
     const renderer = initRenderer();
+    renderer.autoClear = false;
 
     const camera = initOrthographicCamera(new Vector3(-100, 100, 0));
+    camera.zoom = 0.1;
+    camera.updateProjectionMatrix();
 
     const scene = initScene();
 
@@ -81,7 +88,7 @@ async function init() {
     ground.rotateX(-HALF_PI);
     const groundBody = new Body({
         mass: 0,
-        material: new Material({ friction: 0.5, restitution: 0.5 })
+        material: new Material()
     });
 
     groundBody.addShape(new BoxShape(new Vec3(100, 1, 100)), new Vec3(0, -1, 0));
@@ -90,9 +97,16 @@ async function init() {
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-    const debug = CannonDebugger(scene, world)
+    const debug = CannonDebugger(scene, world);
+    debug.visible = false;
 
     const character = await createCharacter();
+
+    const contactMaterial = new ContactMaterial(groundBody.material, character.body.material, { friction: 0.05, restitution: 0.1 });
+    world.addContactMaterial(contactMaterial);
+
+    const viewHelper = initViewHelper(camera, renderer.domElement);
+    viewHelper.center.copy(orbitControls.target)
 
     scene.add(character.model);
     world.addBody(character.body);
@@ -105,20 +119,36 @@ async function init() {
         character.keyUp(keyMap[event.key.toLowerCase()]);
     });
 
+    resize(renderer, camera);
 
     const clock = initClock();
     const timeStep = 1 / 60;
     let delta = 0;
     function render() {
+        renderer.clear();
         delta = clock.getDelta();
         world.step(timeStep, delta, 5);
         orbitControls.update();
         renderer.render(scene, camera);
         debug.update();
         character.update(delta);
+        viewHelper.render(renderer);
         requestAnimationFrame(render);
     }
     render();
+
+    const gui = initGUI();
+    gui.add(world.gravity, 'y', -200, 200, 10).name('Gravity');
+    gui.add(contactMaterial, 'friction', 0, 1, 0.1).name('Friction');
+    gui.add(contactMaterial, 'restitution', 0, 1, 0.1).name('Restitution');
+    gui.add(debug, 'visible').name('Debug');
+    gui.save();
+    gui.add({
+        reset() {
+            gui.reset();
+            character.reset();
+        }
+    }, 'reset');
 }
 
 async function createCharacter() {
@@ -154,16 +184,18 @@ async function createCharacter() {
     const rotateMatrix = new Matrix4();
     const targetQuaternion = new Quaternion();
     const targetQuaternionPsy = new QuaternionPsy();
-    const velocity = 40;
+    const velocity = 50;
     let currentVelocity = 0;
 
 
     const body = new Body({
-        mass: 100,
-        material: new Material(),
+        mass: 80,
+        material: new Material()
     })
     body.addShape(new BoxShape(new Vec3(3.5, 9.3, 4)), new Vec3(0, 9.3, 0));
     body.name = 'character';
+    // 修改模型初始方向
+    const primaryQ = new QuaternionPsy().setFromAxisAngle(new Vec3(0, 1, 0), HALF_PI);
 
     const direction = new Vector3();
 
@@ -175,9 +207,6 @@ async function createCharacter() {
         space: false,
         shift: false
     };
-
-    // 记录按下方向键的数量
-    let count = 0;
 
     function keyDown(key) {
         keyPressed[key] = true;
@@ -229,31 +258,13 @@ async function createCharacter() {
 
     function updateDirection() {
         direction.set(0, 0, 0);
-        count = 0;
 
-        if (keyPressed.w) {
-            direction.x += 1;
-            count++;
-        }
-        if (keyPressed.s) {
-            direction.x -= 1;
-            count++;
-        }
-        if (keyPressed.a) {
-            direction.z -= 1;
-            count++;
-        }
-        if (keyPressed.d) {
-            direction.z += 1;
-            count++;
-        }
+        if (keyPressed.w) direction.x += 1;
+        if (keyPressed.s) direction.x -= 1;
+        if (keyPressed.a) direction.z -= 1;
+        if (keyPressed.d) direction.z += 1;
 
-        if (count > 1) {
-            // 如果按下两个方向键，速度应该扩大原来的 √2，以保持整体速度恒定
-            direction.normalize().multiplyScalar(Math.SQRT2);
-        } else if (count === 1) {
-            direction.normalize();
-        }
+        direction.normalize();
     }
 
     function updateCharacter() {
@@ -261,7 +272,11 @@ async function createCharacter() {
             if (isWalking) {
                 currentVelocity = velocity;
             } else if (isRunning) {
-                currentVelocity = velocity * 1.5;
+                if (isJumping) {
+                    currentVelocity = velocity * 0.5;
+                } else {
+                    currentVelocity = velocity * 1.3;
+                }
             }
             force.copy(direction).multiplyScalar(currentVelocity);
             rotateMatrix.lookAt(direction, zero, model.up);
@@ -283,12 +298,21 @@ async function createCharacter() {
         model.quaternion.copy(body.quaternion);
     }
 
+    function reset() {
+        body.quaternion.copy(primaryQ);
+        body.position.set(0, 0, 0);
+        body.velocity.set(0, 0, 0);
+    }
+
+    reset();
+
     return {
         model,
         body,
         keyDown,
         keyUp,
-        update
+        update,
+        reset
     }
 }
 

@@ -22,6 +22,10 @@ const list = [
         title: "Animate Control",
       },
       {
+        path: "/animate/characterControl.html",
+        title: "Character Control",
+      },
+      {
         path: "/tween/portal.html",
         title: "Portal",
       },
