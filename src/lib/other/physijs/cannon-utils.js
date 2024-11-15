@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-01-31 10:26:52
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-03-29 13:52:11
- * @FilePath: /threejs-demo/src/lib/other/physijs/cannon-utils.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-11-15 14:09:00
+ * @FilePath: \threejs-demo\src\lib\other\physijs\cannon-utils.js
  */
 import {
     BoxGeometry,
@@ -86,7 +86,12 @@ class CannonUtils {
                     const geometry = new BufferGeometry();
                     const s = shape.elementSize || 1; // assumes square heightfield, else i*x, j*y
 
+                    console.log(shape.data)
+
                     const positions = shape.data.flatMap((row, i) => row.flatMap((z, j) => [i * s, j * s, z]));
+                    console.log('positions: ', positions);
+
+
                     const indices = [];
 
                     for (let xi = 0; xi < shape.data.length - 1; xi++) {

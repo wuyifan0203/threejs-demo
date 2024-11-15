@@ -1,3 +1,11 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-11-01 14:41:11
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-11-15 11:18:54
+ * @FilePath: \threejs-demo\src\algorithms\Maze.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 // DFS
 class Maze {
     static directions = [
@@ -54,8 +62,8 @@ class Maze {
     draw(ctx) {
         ctx.fillStyle = 'black';
         ctx.fillRect(0, 0, this.width * this.cellSize, this.height * this.cellSize); // 先填充黑色背景
-        for (let y = 0; y < this.height; y++) {
-            for (let x = 0; x < this.width; x++) {
+        for (let y = 0; y < this.grid.length; y++) {
+            for (let x = 0; x < this.grid[y].length; x++) {
                 if (this.grid[y][x] === 0) {
                     ctx.fillStyle = 'white'; // 通路为白色
                     ctx.fillRect(x * this.cellSize, y * this.cellSize, this.cellSize, this.cellSize);
