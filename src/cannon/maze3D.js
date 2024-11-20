@@ -11,6 +11,10 @@ import {
     BufferGeometry,
     MeshNormalMaterial,
     PlaneGeometry,
+    MeshBasicMaterial,
+    Camera,
+    RepeatWrapping,
+    MeshPhysicalMaterial,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -21,14 +25,17 @@ import {
     initDirectionLight,
     HALF_PI,
     initAxesHelper,
-    previewCanvas
+    initLoader,
+    imagePath,
 } from '../lib/tools/index.js';
 import {
     World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase,
 } from '../lib/other/physijs/cannon.js';
+import { printTexture } from "../lib/util/catch.js";
 import { Maze } from '../algorithms/Maze.js'
-import { printTexture } from '../lib/util/catch.js';
 
+
+const loader = initLoader();
 window.onload = () => {
     init();
 };
@@ -38,14 +45,11 @@ function init() {
 
     const camera = initOrthographicCamera(new Vector3(-500, 500, 500));
 
-
     const scene = initScene();
-
     initAmbientLight(scene);
+    addLight(scene);
 
-    const light = initDirectionLight();
-
-    initAxesHelper(scene)
+    initAxesHelper(scene);
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
@@ -84,30 +88,44 @@ function createMaze() {
     });
     maze.draw(ctx);
     const geometry = createGeometry(maze.grid, height);
+    const groundMaterial = new MeshPhysicalMaterial();
+    const wallMaterial = new MeshPhysicalMaterial();
+    const topMaterial = new MeshPhysicalMaterial();
 
-    const mesh = new Mesh(geometry, new MeshNormalMaterial({ side: 0 }));
+    // loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
+    // loader.load(`basecolor.png`, (texture) => {
+    //     texture.wrapS = RepeatWrapping; // 横向重复
+    //     wallMaterial.map = texture;
+    //     texture.repeat.set(1, 50);
+    //     texture.needUpdate = true;
+    //     printTexture(' ', texture, renderer);
+    // });
+    loader.load(`../../${imagePath}/others/uv_grid_opengl.jpg`, (texture) => {
+        wallMaterial.map = texture;
+        printTexture(' ', texture, renderer);
+    });
+
+    const mesh = new Mesh(geometry, [new MeshPhongMaterial({ color: 'green' }), new MeshPhongMaterial({ color: 'gray' }), wallMaterial]);
     mesh.receiveShadow = mesh.castShadow = true;
 
     const texture = new CanvasTexture(canvas);
     material.map = texture;
 
-    printTexture('maze', texture, renderer)
     console.log(maze);
 
     function createGeometry(data) {
-        const [j, k] = [data.length - 1, data[0].length - 1];
-        console.log('j, k: ', j, k);
         const geometry = new BufferGeometry();
         const position = [];
-        const indices = [];
         const uvs = [];
+
+        const indicesTop = [];
+        const indicesBottom = [];
+        const indicesSides = [];
 
 
         let [ax, ay, bx, by, cx, cy, dx, dy] = [0, 0, 0, 0, 0, 0, 0, 0];
-        let [x0, y0, x1, y1, x2, y2, x3, y3] = [0, 0, 0, 0, 0, 0, 0, 0];
         let [ia, ib, ic, id] = [0, 0, 0, 0];
         const [pa, pb, pc, pd] = [new Vector3(), new Vector3(), new Vector3(), new Vector3()];
-        let [va, vb, vc, vd] = [0, 0, 0, 0];
         let total = 0;
         //   --->
         //  a-----b
@@ -115,27 +133,34 @@ function createMaze() {
         //  |  /  |  |/
         //  d-----c
 
-        for (let row = 0; row < j; row = row + 2) {
-            for (let col = 0; col < k; col = col + 2) {
-                [x0, y0, x1, y1, x2, y2, x3, y3] = [row, col, row, col + 1, row + 1, col + 1, row + 1, col];
-                [va, vb, vc, vd] = [data[x0][y0], data[x1][y1], data[x2][y2], data[x3][y3]];
-
-                singleFace(x0, y0, va * height, total);
-                total += 4;
-                singleFace(x1, y1, vb * height, total);
-                total += 4;
-                singleFace(x2, y2, vc * height, total);
-                total += 4;
-                singleFace(x3, y3, vd * height, total);
-                total += 4;
+        const topVertex = [];
+        const bottomVertex = [];
+        for (let row = 0, j = data.length; row < j; row++) {
+            for (let col = 0, k = data[0].length; col < k; col++) {
+                if (data[row][col] === 1) {
+                    topVertex.push({ x: row, y: col });
+                } else {
+                    bottomVertex.push({ x: row, y: col });
+                }
             }
         }
+
+        topVertex.forEach(({ x, y }) => {
+            addFace(x, y, 'top', total, indicesTop);
+            total += 4;
+        });
+
+        bottomVertex.forEach(({ x, y }) => {
+            addFace(x, y, 'bottom', total, indicesBottom);
+            total += 4;
+        });
+
 
         // 用于存储侧墙的位置
         const sideWalls = [];
         // 水平方向检查侧墙
-        for (let i = 0; i < data.length; i++) {
-            for (let j = 0; j < data[i].length - 1; j++) {
+        for (let i = 0, il = data.length; i < il; i++) {
+            for (let j = 0, jl = data[i].length - 1; j < jl; j++) {
                 if (data[i][j] === 0 && data[i][j + 1] === 1) {
                     sideWalls.push({ row: i, col: j, direction: 'left' });
                 } else if (data[i][j] === 1 && data[i][j + 1] === 0) {
@@ -145,42 +170,52 @@ function createMaze() {
         }
 
         // 垂直方向检查侧墙
-        for (let j = 0; j < data[0].length; j++) {
-            for (let i = 0; i < data.length - 1; i++) {
+        for (let j = 0, jl = data[0].length; j < jl; j++) {
+            for (let i = 0, il = data.length - 1; i < il; i++) {
                 if (data[i][j] === 0 && data[i + 1][j] === 1) {
-                    sideWalls.push({ row: i, col: j, direction: 'bottom' });
+                    sideWalls.push({ row: i, col: j, direction: 'back' });
                 } else if (data[i][j] === 1 && data[i + 1][j] === 0) {
-                    sideWalls.push({ row: i, col: j, direction: 'top' });
+                    sideWalls.push({ row: i, col: j, direction: 'front' });
                 }
             }
         }
 
         sideWalls.forEach(({ row, col, direction }, i) => {
-            sideFace(row, col, direction, total);
-            total = total + 4;
+            addFace(row, col, direction, total, indicesSides);
+            total += 4;
         })
 
-        console.log(sideWalls);
+        geometry.addGroup(0, indicesTop.length, 0);   // 顶部
+        geometry.addGroup(indicesTop.length, indicesBottom.length, 1); // 底部
+        geometry.addGroup(indicesTop.length + indicesBottom.length, indicesSides.length, 2);  // 侧墙
 
-        function singleFace(x, y, h, offset) {
-            [ax, ay, bx, by, cx, cy, dx, dy] = [x, y, x, y + 1, x + 1, y + 1, x + 1, y];
-            pa.set(ax * cellSize, h, ay * cellSize);
-            pb.set(bx * cellSize, h, by * cellSize);
-            pc.set(cx * cellSize, h, cy * cellSize);
-            pd.set(dx * cellSize, h, dy * cellSize);
-            position.push(pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, pc.x, pc.y, pc.z, pd.x, pd.y, pd.z);
+        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        geometry.setIndex([...indicesTop, ...indicesBottom, ...indicesSides]);
+        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
+        geometry.userData['materialOrder'] = ['top', 'bottom', 'side'];
 
-            [ia, ib, ic, id] = [offset, offset + 1, offset + 2, offset + 3];
-            indices.push(ib, id, ia, id, ib, ic);
-
-            uvs.push(0, 0, 1, 0, 1, 1, 0, 1);
-        }
-
-        function sideFace(x, y, direction, offset) {
+        function addFace(x, y, direction, offset, indices) {
             [ax, ay, bx, by, cx, cy, dx, dy] = [x, y, x, y + 1, x + 1, y + 1, x + 1, y];
 
             switch (direction) {
+                case 'top':
+                    {
+                        pa.set(dx * cellSize, height, dy * cellSize);
+                        pb.set(cx * cellSize, height, cy * cellSize);
+                        pc.set(bx * cellSize, height, by * cellSize);
+                        pd.set(ax * cellSize, height, ay * cellSize);
+                    }
+                    break;
                 case 'bottom':
+                    {
+                        pa.set(dx * cellSize, 0, dy * cellSize);
+                        pb.set(cx * cellSize, 0, cy * cellSize);
+                        pc.set(bx * cellSize, 0, by * cellSize);
+                        pd.set(ax * cellSize, 0, ay * cellSize);
+                    }
+                    break;
+                case 'back':
                     {
                         const [na, nb] = [ax + 1, bx + 1]
                         pa.set(na * cellSize, height, ay * cellSize);
@@ -189,7 +224,7 @@ function createMaze() {
                         pd.set(na * cellSize, 0, ay * cellSize);
                     }
                     break;
-                case 'top':
+                case 'front':
                     {
                         pa.set(cx * cellSize, height, cy * cellSize);
                         pb.set(dx * cellSize, height, dy * cellSize);
@@ -223,18 +258,24 @@ function createMaze() {
             uvs.push(0, 0, 1, 0, 1, 1, 0, 1);
         }
 
-
-        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-        geometry.setIndex(indices);
-        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-        geometry.computeVertexNormals();
         return geometry;
     }
-
-
 
     return {
         mesh
     }
 
+}
+
+function addLight(scene) {
+    const light = initDirectionLight();
+    light.position.set(-50, 200, 25);
+    light.shadow.camera.left = -200;
+    light.shadow.camera.right = 200;
+    light.shadow.camera.top = 180;
+    light.shadow.camera.bottom = -180;
+    light.shadow.camera.far = 270;
+    light.shadow.mapSize.height = 4096;
+    light.shadow.mapSize.width = 4096;
+    scene.add(light);
 }
