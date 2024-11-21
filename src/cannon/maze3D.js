@@ -102,6 +102,7 @@ function createMaze() {
     // });
     loader.load(`../../${imagePath}/others/uv_grid_opengl.jpg`, (texture) => {
         wallMaterial.map = texture;
+        wallMaterial.needsUpdate = true;
         printTexture(' ', texture, renderer);
     });
 
