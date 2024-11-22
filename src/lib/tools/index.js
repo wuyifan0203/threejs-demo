@@ -14,3 +14,4 @@ export * from './func.js';
 export * from './colorMap.js';
 export * from './dataFormat.js';
 export * from './constant.js';
+export * from './render.js';

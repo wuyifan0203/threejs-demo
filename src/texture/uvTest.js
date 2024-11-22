@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-21 11:04:15
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-21 15:03:59
+ * @LastEditTime: 2024-11-22 14:43:02
  * @FilePath: \threejs-demo\src\texture\uvTest.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -12,125 +12,199 @@ import {
     Mesh,
     Vector3,
     BufferGeometry,
-    MeshNormalMaterial,
+    Matrix3,
     Matrix4,
-    MeshStandardMaterial,
-    MeshPhysicalMaterial,
+    MeshBasicMaterial,
+    RepeatWrapping,
+    MirroredRepeatWrapping,
+    SRGBColorSpace,
 } from '../lib/three/three.module.js';
 import {
     initOrbitControls,
-    initProgress,
     initRenderer,
-    initDirectionLight,
     initScene,
     resize,
-    initAmbientLight,
     initOrthographicCamera,
     initLoader,
-    imagePath
+    imagePath,
+    matrixRender
 } from '../lib/tools/index.js';
-
-
 
 window.onload = async () => {
     init()
 }
 
-function init() {
+async function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
-    const camera = initOrthographicCamera(new Vector3(50, 50, 50));
-    const loader = initLoader();
-
+    const camera = initOrthographicCamera(new Vector3(0, 0, 50));
     const orbitControl = initOrbitControls(camera, renderer.domElement);
+    orbitControl.enableRotate = false;
 
-    initAmbientLight(camera);
-    const light = initDirectionLight();
-    camera.add(light);
+    const loader = initLoader();
+    const texture = await loader.loadAsync(`../../${imagePath}/others/uv_grid_opengl.jpg`);
 
-    const material = new MeshPhysicalMaterial();
+    const viewport0 = createViewPort();
+    const viewport1 = createViewPort1();
+    const viewPort2 = createViewPort2();
+    const viewPort3 = createViewPort3();
 
-    loader.load(`../../${imagePath}/others/uv_grid_opengl.jpg`, (texture) => {
-        material.map = texture;
-        material.needsUpdate = true; // 确保材质更新
-    })
 
-    const viewport0 = createViewPort(renderer, camera, material);
-    const viewport1 = createViewPort1(renderer, camera, material);
-
+    const viewPorts = [
+        [
+            viewport0,
+            viewport1,
+        ],
+        [
+            viewPort2,
+            viewPort3
+        ]
+    ]
 
     function render() {
         orbitControl.update();
         renderer.clear();
-        light.position.copy(camera.position);
-        viewport1.render();
+        matrixRender(viewPorts, renderer)
         requestAnimationFrame(render);
     }
     render();
-    resize(renderer, camera)
-}
+    resize(renderer, camera);
 
-function createViewPort(renderer, camera, material) {
-    const axis = [-2, - 1, 0, 1, 2];
 
-    const position = [];
-    const indices = [];
-    const uvs = [];
-    let offset = 0;
 
-    axis.forEach((x) => {
-        axis.forEach((y) => {
-            addPlane(x, y, position, offset, indices, uvs);
-            offset += 4;
+    function createViewPort() {
+        const axis = [-2, - 1, 0, 1, 2];
+
+        const position = [];
+        const indices = [];
+        const uvs = [];
+        let offset = 0;
+
+        axis.forEach((x) => {
+            axis.forEach((y) => {
+                addPlane(x, y, position, offset, indices, uvs);
+                offset += 4;
+            })
         })
-    })
 
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-    geometry.setIndex(indices);
-    geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-    geometry.computeVertexNormals();
-
-
-    const mesh = new Mesh(geometry,material);
-    mesh.add(camera);
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
 
 
+        const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture.clone() }));
 
-    return {
-        render() {
-            renderer.render(mesh, camera);
+        return {
+            render() {
+                renderer.render(mesh, camera);
+            }
         }
+
     }
 
-}
+    function createViewPort1() {
+        const position = [];
+        const indices = [];
+        const uvs = [];
+        let offset = 0;
+        addPlane(0, 0, position, offset, indices, uvs);
 
-function createViewPort1(renderer, camera, material) {
-    const position = [];
-    const indices = [];
-    const uvs = [];
-    let offset = 0;
-    addPlane(0, 0, position, offset, indices, uvs);
-
-    const geometry = new BufferGeometry();
-    geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-    geometry.setIndex(indices);
-    geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-    geometry.computeVertexNormals();
-
-    const mesh = new Mesh(geometry, material);
-    mesh.add(camera);
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
 
 
-    return {
-        render() {
-            renderer.render(mesh, camera);
+        const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture.clone() }));
+        const currentTexture = mesh.material.map;
+        const uvTransform = new Matrix3();
+        uvTransform.scale(0.5, 1); // 将 UV 的 X 方向缩小一半，使比例为 1:1
+        currentTexture.matrixAutoUpdate = false;
+        currentTexture.matrix.copy(uvTransform);
+
+        return {
+            render() {
+                renderer.render(mesh, camera);
+            }
         }
+
     }
 
+    function createViewPort2() {
+        const position = [];
+        const indices = [];
+        const uvs = [];
+        let offset = 0;
+        addPlane(0, 0, position, offset, indices, uvs);
+        const scene = initScene();
+
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
+
+
+        const meshA = new Mesh(geometry, new MeshBasicMaterial({ map: texture.clone() }));
+        meshA.position.set(-4, 0, 0);
+        const textureA = meshA.material.map;
+        textureA.wrapS = RepeatWrapping;
+        textureA.wrapT = RepeatWrapping;
+        textureA.repeat.set(2, 2);
+        textureA.needUpdate = true;
+
+        const meshB = new Mesh(geometry, new MeshBasicMaterial({ map: texture.clone() }));
+        meshB.position.set(4, 0, 0);
+        const textureB = meshB.material.map;
+        textureB.wrapS = MirroredRepeatWrapping;
+        textureB.wrapT = MirroredRepeatWrapping;
+        textureB.repeat.set(2, 2);
+        textureB.needUpdate = true;
+
+        scene.add(meshA);
+        scene.add(meshB);
+
+        return {
+            render() {
+                renderer.render(scene, camera);
+            }
+        }
+
+    }
+
+    function createViewPort3() {
+        const position = [];
+        const indices = [];
+        const uvs = [];
+        let offset = 0;
+        addPlane(0, 0, position, offset, indices, uvs);
+        const scene = initScene();
+
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        geometry.setIndex(indices);
+        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+        geometry.computeVertexNormals();
+
+
+        const mesh = new Mesh(geometry, new MeshBasicMaterial({ map: texture.clone() }));
+        const textureA = mesh.material.map;
+        textureA.colorSpace = SRGBColorSpace;
+        textureA.needUpdate = true;
+        scene.add(mesh);
+
+
+        return {
+            render() {
+                renderer.render(scene, camera);
+            }
+        }
+
+    }
 }
-
-
 // a-d  a->b->c->d
 // |\|
 // b-c

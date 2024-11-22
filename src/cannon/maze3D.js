@@ -40,7 +40,7 @@ window.onload = () => {
     init();
 };
 
-function init() {
+async function init() {
     const renderer = initRenderer();
 
     const camera = initOrthographicCamera(new Vector3(-500, 500, 500));
@@ -53,7 +53,7 @@ function init() {
 
     const orbitControl = initOrbitControls(camera, renderer.domElement);
 
-    const maze = createMaze();
+    const maze = await createMaze();
     maze.mesh.position.set(-130, 0, -130);
 
     scene.add(maze.mesh);
@@ -67,9 +67,7 @@ function init() {
     render();
 }
 
-function createMaze() {
-
-    const material = new MeshPhongMaterial({ color: '#000000' });
+async function createMaze() {
 
     const cellSize = 5;
     const height = 10;
@@ -88,29 +86,20 @@ function createMaze() {
     });
     maze.draw(ctx);
     const geometry = createGeometry(maze.grid, height);
-    const groundMaterial = new MeshPhysicalMaterial();
-    const wallMaterial = new MeshPhysicalMaterial();
-    const topMaterial = new MeshPhysicalMaterial();
 
-    // loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
-    // loader.load(`basecolor.png`, (texture) => {
-    //     texture.wrapS = RepeatWrapping; // 横向重复
-    //     wallMaterial.map = texture;
-    //     texture.repeat.set(1, 50);
-    //     texture.needUpdate = true;
-    //     printTexture(' ', texture, renderer);
-    // });
-    loader.load(`../../${imagePath}/others/uv_grid_opengl.jpg`, (texture) => {
-        wallMaterial.map = texture;
-        wallMaterial.needsUpdate = true;
-        printTexture(' ', texture, renderer);
-    });
+    const materials = await createMaterial();
 
-    const mesh = new Mesh(geometry, [new MeshPhongMaterial({ color: 'green' }), new MeshPhongMaterial({ color: 'gray' }), wallMaterial]);
+    const mesh = new Mesh(geometry,
+        [
+            materials.topMaterial,
+            materials.groundMaterial,
+            materials.wallMaterial
+        ]
+    );
     mesh.receiveShadow = mesh.castShadow = true;
 
     const texture = new CanvasTexture(canvas);
-    material.map = texture;
+    // material.map = texture;
 
     console.log(maze);
 
@@ -260,6 +249,56 @@ function createMaze() {
         }
 
         return geometry;
+    }
+
+    async function createMaterial() {
+        loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
+
+        const wallColorMap = await loader.loadAsync(`baseColor.jpg`);
+        const wallNormalMap = await loader.loadAsync(`normal.jpg`);
+        const wallRoughnessMap = await loader.loadAsync(`roughness.jpg`);
+        const wallAOMap = await loader.loadAsync(`ambientOcclusion.jpg`);
+
+        loader.setPath(`../../${imagePath}/Stylized_Stone/`);
+        const groundColorMap = await loader.loadAsync(`baseColor.jpg`);
+        const groundNormalMap = await loader.loadAsync(`normal.jpg`);
+        const groundRoughnessMap = await loader.loadAsync(`roughness.jpg`);
+        const groundAOMap = await loader.loadAsync(`ambientOcclusion.jpg`);
+
+        [wallColorMap, wallNormalMap, wallRoughnessMap, wallAOMap].forEach((texture) => {
+            texture.wrapT = RepeatWrapping;
+            texture.repeat.set(1, 2);
+        });
+
+        [groundColorMap, groundNormalMap, groundRoughnessMap, groundAOMap].forEach((texture) => {
+            texture.wrapT = texture.wrapS = RepeatWrapping;
+            texture.repeat.set(2, 2);
+        });
+
+        const groundMaterial = new MeshPhysicalMaterial({
+            map: groundColorMap,
+            normalMap: groundNormalMap,
+            roughnessMap: groundRoughnessMap,
+            aoMap: groundAOMap,
+        });
+        const wallMaterial = new MeshPhysicalMaterial({
+            map: wallColorMap,
+            normalMap: wallNormalMap,
+            roughnessMap: wallRoughnessMap,
+            aoMap: wallAOMap,
+        });
+        const topMaterial = new MeshPhysicalMaterial({
+            map: wallColorMap,
+            normalMap: wallNormalMap,
+            roughnessMap: wallRoughnessMap,
+            aoMap: wallAOMap,
+        });
+
+        return {
+            wallMaterial,
+            groundMaterial,
+            topMaterial
+        }
     }
 
     return {

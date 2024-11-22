@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 13:22:47
- * @FilePath: /threejs-demo/src/render/scissorTest.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-11-22 13:45:34
+ * @FilePath: \threejs-demo\src\render\scissorTest.js
  */
 import {
     Mesh,
@@ -22,7 +22,8 @@ import {
     initGroundPlane,
     initScene,
     initDirectionLight,
-    initOrbitControls
+    initOrbitControls,
+    matrixRender
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -49,8 +50,6 @@ function init() {
     light.position.set(20, 20, 20);
     light.target = scene2;
 
-    
-
     scene2.add(light);
     scene2.add(new AmbientLight());
 
@@ -72,33 +71,44 @@ function init() {
 
     let needUpdate = false;
 
-    let width = renderer.domElement.clientWidth / 2;
-    let height = renderer.domElement.clientHeight / 2;
+    const viewPort0 = {
+        render() {
+            renderer.render(scene1, camera);
+            renderer.render(scene2, camera);
+            renderer.render(scene3, camera);
+        }
+    }
+
+    const viewPort1 = {
+        render() {
+            renderer.render(scene1, camera);
+        }
+    }
+
+    const viewPort2 = {
+        render() {
+            renderer.render(scene2, camera);
+        }
+    }
+
+    const viewPort3 = {
+        render() {
+            renderer.render(scene3, camera);
+        }
+    }
+
+
+    const viewPorts = [
+        [viewPort0, viewPort1],
+        [viewPort2, viewPort3],
+    ]
+
+
 
     function update() {
         renderer.clear();
         orbitControl.update();
-
-        renderer.setScissorTest(true);
-        renderer.setScissor(0, 0,width, height);
-        renderer.setViewport(0, 0, width,height);
-        renderer.render(scene1, camera);
-        renderer.render(scene2, camera);
-        renderer.render(scene3, camera);
-
-        renderer.setScissor(width, 0, width, height);
-        renderer.setViewport(width, 0, width, height);
-        renderer.render(scene1, camera);
-
-        renderer.setScissor(0, height, width, height);
-        renderer.setViewport(0, height, width, height);
-        renderer.render(scene2, camera);
-
-        renderer.setScissor(width, height, width, height);
-        renderer.setViewport(width, height, width, height);
-        renderer.render(scene3, camera);
-
-        renderer.setScissorTest(false);
+        matrixRender(viewPorts, renderer);
     }
 
     function render() {
