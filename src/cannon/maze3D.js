@@ -28,10 +28,6 @@ import {
     initLoader,
     imagePath,
 } from '../lib/tools/index.js';
-import {
-    World, Sphere, Body, Material, ContactMaterial, Plane, NaiveBroadphase,
-} from '../lib/other/physijs/cannon.js';
-import { printTexture } from "../lib/util/catch.js";
 import { Maze } from '../algorithms/Maze.js'
 
 

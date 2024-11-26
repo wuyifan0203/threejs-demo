@@ -2,21 +2,16 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-25 16:59:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-25 18:00:43
+ * @LastEditTime: 2024-11-26 13:19:59
  * @FilePath: \threejs-demo\src\algorithms\contain.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
     Vector3,
     Mesh,
-    SphereGeometry,
-    Float32BufferAttribute,
+    IcosahedronGeometry,
     MeshStandardMaterial,
-    TorusKnotGeometry,
-    Sphere,
-    MeshBasicMaterial,
-    BufferGeometry,
-    BoxGeometry
+    DodecahedronGeometry
 } from '../lib/three/three.module.js';
 import {
     initScene,
@@ -28,7 +23,7 @@ import {
     initGUI,
     initAxesHelper
 } from '../lib/tools/common.js';
-import { containTest } from './collision.js';
+import { isContain } from './collision.js';
 
 
 window.onload = function () {
@@ -54,7 +49,7 @@ function init() {
     scene.add(light);
 
     const meshA = new Mesh(
-        new BoxGeometry(5, 5, 5),
+        new IcosahedronGeometry(5, 0),
         new MeshStandardMaterial({
             color: 0x00ffff,
             transparent: true,
@@ -64,7 +59,7 @@ function init() {
     );
 
     const meshB = new Mesh(
-        new BoxGeometry(3, 3, 3),
+        new DodecahedronGeometry(3, 0),
         new MeshStandardMaterial({
             color: 0xfffff00,
         })
@@ -85,7 +80,7 @@ function init() {
     const gui = initGUI();
 
     function update() {
-        if (containTest(meshA, meshB)) {
+        if (isContain(meshA, meshB)) {
             meshB.material.color.set(0x00ff00);
         } else {
             meshB.material.color.set(0xff0000);
