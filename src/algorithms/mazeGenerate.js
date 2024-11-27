@@ -2,11 +2,11 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-01 14:47:28
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-01 15:08:54
+ * @LastEditTime: 2024-11-27 18:56:09
  * @FilePath: \threejs-demo\src\algorithms\mazeGenerate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Maze } from './Maze.js';
+import { Maze } from '../lib/custom/Maze.js';
 import { initGUI } from '../lib/tools/common.js'
 
 window.onload = () => {

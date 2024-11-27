@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-01 18:26:55
+ * @LastEditTime: 2024-11-27 18:47:12
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -169,7 +169,7 @@ const list = [
       },
       {
         path: "/material/polygonOffsetTest.html",
-        title: "PolygonOffset", 
+        title: "PolygonOffset",
       },
       {
         path: "/material/stencil.html",
@@ -185,11 +185,11 @@ const list = [
       },
       {
         path: "/material/depthTest.html",
-        title: "Depth Test", 
+        title: "Depth Test",
       },
       {
         path: "/material/stencilMaterial.html",
-        title: "Magic Box", 
+        title: "Magic Box",
       },
     ],
   },
@@ -477,6 +477,14 @@ const list = [
       {
         path: "/algorithms/mazeGenerate.html",
         title: "Maze Generate",
+      },
+      {
+        path: "/algorithms/contain.html",
+        title: "Contain",
+      },
+      {
+        path: "/cannon/maze3D.html",
+        title: "Maze Adventure",
       }
     ],
   },
