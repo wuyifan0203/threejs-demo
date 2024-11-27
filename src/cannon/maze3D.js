@@ -1,20 +1,24 @@
-
-
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-11-15 10:25:55
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-11-27 18:30:14
+ * @FilePath: \threejs-demo\src\cannon\maze3D.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 import {
     Mesh,
-    Clock,
-    Vector2,
     Vector3,
-    MeshPhongMaterial,
-    Float32BufferAttribute,
     CanvasTexture,
-    BufferGeometry,
-    MeshNormalMaterial,
-    PlaneGeometry,
-    MeshBasicMaterial,
-    Camera,
     RepeatWrapping,
     MeshPhysicalMaterial,
+    BoxGeometry,
+    MeshNormalMaterial,
+    PerspectiveCamera,
+    CameraHelper,
+    Box3,
+    Object3D,
+    WebGLRenderer
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -27,9 +31,19 @@ import {
     initAxesHelper,
     initLoader,
     imagePath,
+    initClock,
+    resize,
 } from '../lib/tools/index.js';
-import { Maze } from '../algorithms/Maze.js'
+import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
+import { AbstractPlayer } from '../lib/custom/AbstractPlayer.js';
+import { PointerLockControls } from '../lib/three/PointerLockControls.js'
 
+
+const layerMap = {
+    ALL: 7,
+    DEBUG: 4,
+    PLAYER: 2
+};
 
 const loader = initLoader();
 window.onload = () => {
@@ -37,9 +51,11 @@ window.onload = () => {
 };
 
 async function init() {
-    const renderer = initRenderer();
 
-    const camera = initOrthographicCamera(new Vector3(-500, 500, 500));
+
+    const renderer = initRenderer();
+    const playerPosition = new Vector3(-117.5, 3, -117.5);
+
 
     const scene = initScene();
     initAmbientLight(scene);
@@ -47,18 +63,107 @@ async function init() {
 
     initAxesHelper(scene);
 
-    const orbitControl = initOrbitControls(camera, renderer.domElement);
+    const eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 50);
+    eye.lookAt(new Vector3(1, 0, 0));
+    const eyeHelper = new CameraHelper(eye);
+
+    const pointLockControl = new PointerLockControls(eye, document.body);
+
+    const playerMesh = new Mesh(new BoxGeometry(2, 6, 2), new MeshNormalMaterial());
+    playerMesh.geometry.computeBoundingBox();
+
+    const player = new Player(pointLockControl, playerMesh);
+
+    player.position.copy(playerPosition);
+    player.shape.copy(playerMesh.geometry.boundingBox);
+    player.add(playerMesh);
+    player.add(eye);
+    scene.add(eyeHelper);
+    eyeHelper.layers.set(1);
+    console.log(player);
+
+    scene.add(player);
 
     const maze = await createMaze();
     maze.mesh.position.set(-130, 0, -130);
-
     scene.add(maze.mesh);
 
+    const viewPort = useSideViewPort();
 
+    resize(renderer, [eye], viewPort.resize)
+
+    const blocker = document.getElementById('blocker');
+
+    blocker.addEventListener('click', function () {
+        pointLockControl.lock();
+    });
+
+    pointLockControl.addEventListener('lock', function () {
+        blocker.style.display = 'none';
+    });
+
+    pointLockControl.addEventListener('unlock', function () {
+        blocker.style.display = 'block';
+    });
+
+    window.addEventListener('keyup', (evt) => {
+        player.keyUp(evt);
+    })
+
+    window.addEventListener('keydown', (evt) => {
+        player.keyDown(evt);
+    })
+
+    function useSideViewPort() {
+        const camera = initOrthographicCamera(new Vector3(-500, 500, 500));
+        camera.layers.mask = layerMap.DEBUG;
+
+        const renderer = new WebGLRenderer({ antialias: true });
+        const dom = document.createElement('div');
+        document.body.appendChild(dom);
+        dom.appendChild(renderer.domElement);
+
+        dom.style.position = 'absolute';
+        dom.style.top = '0px';
+
+        resize();
+        function resize() {
+            renderer.setSize(window.innerWidth / 3, window.innerHeight / 3);
+            camera.aspect = window.innerWidth / window.innerHeight;
+        }
+        camera.position.set(0, 10, 10);
+        camera.lookAt(0, 0, 0);
+
+        playerMesh.add(camera);
+
+        return {
+            resize,
+            render(scene, camera) {
+                renderer.render(scene, camera);
+            }
+
+        }
+
+    }
+
+    scene.traverse((obj) => {
+        obj.layers && (obj.layers.mask = layerMap.ALL);
+    });
+    eye.layers.mask = layerMap.PLAYER;
+    eyeHelper.layers.mask = layerMap.DEBUG;
+    playerMesh.layers.mask = layerMap.DEBUG;
+
+    const clock = initClock();
+    let deltaTime = 0;
     function render() {
-        orbitControl.update();
-        renderer.render(scene, camera);
+        deltaTime = clock.getDelta();
+
+        renderer.render(scene, eye);
+        eyeHelper.update();
+        player.update(deltaTime);
+        viewPort.render(scene, camera);
         requestAnimationFrame(render);
+
     }
     render();
 }
@@ -72,7 +177,9 @@ async function createMaze() {
     canvas.width = 265;
     canvas.height = 265;
     const ctx = canvas.getContext('2d');
-    const maze = new Maze(51, 51, cellSize);
+
+    const geometry = new MazeGeometry(51, 51, cellSize);
+    const maze = geometry.maze;
     maze.generate(1, 1);
     maze.grid.unshift(new Array(51).fill(0));
     maze.grid.push(new Array(51).fill(0));
@@ -80,172 +187,17 @@ async function createMaze() {
         row.unshift(0);
         row.push(0);
     });
+    geometry.generate(height);
     maze.draw(ctx);
-    const geometry = createGeometry(maze.grid, height);
 
-    const materials = await createMaterial();
+    const { topMaterial, groundMaterial, wallMaterial } = await createMaterial();
+    const mesh = new Mesh(geometry, [topMaterial, groundMaterial, wallMaterial]);
 
-    const mesh = new Mesh(geometry,
-        [
-            materials.topMaterial,
-            materials.groundMaterial,
-            materials.wallMaterial
-        ]
-    );
+    // mesh.material.forEach(m => m.wireframe = true);
     mesh.receiveShadow = mesh.castShadow = true;
 
     const texture = new CanvasTexture(canvas);
     // material.map = texture;
-
-    console.log(maze);
-
-    function createGeometry(data) {
-        const geometry = new BufferGeometry();
-        const position = [];
-        const uvs = [];
-
-        const indicesTop = [];
-        const indicesBottom = [];
-        const indicesSides = [];
-
-
-        let [ax, ay, bx, by, cx, cy, dx, dy] = [0, 0, 0, 0, 0, 0, 0, 0];
-        let [ia, ib, ic, id] = [0, 0, 0, 0];
-        const [pa, pb, pc, pd] = [new Vector3(), new Vector3(), new Vector3(), new Vector3()];
-        let total = 0;
-        //   --->
-        //  a-----b
-        //  |   / |  |
-        //  |  /  |  |/
-        //  d-----c
-
-        const topVertex = [];
-        const bottomVertex = [];
-        for (let row = 0, j = data.length; row < j; row++) {
-            for (let col = 0, k = data[0].length; col < k; col++) {
-                if (data[row][col] === 1) {
-                    topVertex.push({ x: row, y: col });
-                } else {
-                    bottomVertex.push({ x: row, y: col });
-                }
-            }
-        }
-
-        topVertex.forEach(({ x, y }) => {
-            addFace(x, y, 'top', total, indicesTop);
-            total += 4;
-        });
-
-        bottomVertex.forEach(({ x, y }) => {
-            addFace(x, y, 'bottom', total, indicesBottom);
-            total += 4;
-        });
-
-
-        // 用于存储侧墙的位置
-        const sideWalls = [];
-        // 水平方向检查侧墙
-        for (let i = 0, il = data.length; i < il; i++) {
-            for (let j = 0, jl = data[i].length - 1; j < jl; j++) {
-                if (data[i][j] === 0 && data[i][j + 1] === 1) {
-                    sideWalls.push({ row: i, col: j, direction: 'left' });
-                } else if (data[i][j] === 1 && data[i][j + 1] === 0) {
-                    sideWalls.push({ row: i, col: j, direction: 'right' });
-                }
-            }
-        }
-
-        // 垂直方向检查侧墙
-        for (let j = 0, jl = data[0].length; j < jl; j++) {
-            for (let i = 0, il = data.length - 1; i < il; i++) {
-                if (data[i][j] === 0 && data[i + 1][j] === 1) {
-                    sideWalls.push({ row: i, col: j, direction: 'back' });
-                } else if (data[i][j] === 1 && data[i + 1][j] === 0) {
-                    sideWalls.push({ row: i, col: j, direction: 'front' });
-                }
-            }
-        }
-
-        sideWalls.forEach(({ row, col, direction }, i) => {
-            addFace(row, col, direction, total, indicesSides);
-            total += 4;
-        })
-
-        geometry.addGroup(0, indicesTop.length, 0);   // 顶部
-        geometry.addGroup(indicesTop.length, indicesBottom.length, 1); // 底部
-        geometry.addGroup(indicesTop.length + indicesBottom.length, indicesSides.length, 2);  // 侧墙
-
-        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-        geometry.setIndex([...indicesTop, ...indicesBottom, ...indicesSides]);
-        geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
-        geometry.computeVertexNormals();
-        geometry.userData['materialOrder'] = ['top', 'bottom', 'side'];
-
-        function addFace(x, y, direction, offset, indices) {
-            [ax, ay, bx, by, cx, cy, dx, dy] = [x, y, x, y + 1, x + 1, y + 1, x + 1, y];
-
-            switch (direction) {
-                case 'top':
-                    {
-                        pa.set(dx * cellSize, height, dy * cellSize);
-                        pb.set(cx * cellSize, height, cy * cellSize);
-                        pc.set(bx * cellSize, height, by * cellSize);
-                        pd.set(ax * cellSize, height, ay * cellSize);
-                    }
-                    break;
-                case 'bottom':
-                    {
-                        pa.set(dx * cellSize, 0, dy * cellSize);
-                        pb.set(cx * cellSize, 0, cy * cellSize);
-                        pc.set(bx * cellSize, 0, by * cellSize);
-                        pd.set(ax * cellSize, 0, ay * cellSize);
-                    }
-                    break;
-                case 'back':
-                    {
-                        const [na, nb] = [ax + 1, bx + 1]
-                        pa.set(na * cellSize, height, ay * cellSize);
-                        pb.set(nb * cellSize, height, by * cellSize);
-                        pc.set(nb * cellSize, 0, by * cellSize);
-                        pd.set(na * cellSize, 0, ay * cellSize);
-                    }
-                    break;
-                case 'front':
-                    {
-                        pa.set(cx * cellSize, height, cy * cellSize);
-                        pb.set(dx * cellSize, height, dy * cellSize);
-                        pc.set(dx * cellSize, 0, dy * cellSize);
-                        pd.set(cx * cellSize, 0, cy * cellSize);
-                    }
-                    break;
-                case 'left':
-                    {
-                        const [nd, na] = [dy + 1, ay + 1]
-                        pa.set(dx * cellSize, height, nd * cellSize);
-                        pb.set(ax * cellSize, height, na * cellSize);
-                        pc.set(ax * cellSize, 0, na * cellSize);
-                        pd.set(dx * cellSize, 0, nd * cellSize);
-                    }
-                    break;
-                case 'right':
-                    {
-                        pa.set(bx * cellSize, height, by * cellSize);
-                        pb.set(cx * cellSize, height, cy * cellSize);
-                        pc.set(cx * cellSize, 0, cy * cellSize);
-                        pd.set(bx * cellSize, 0, by * cellSize);
-                    }
-                    break;
-            }
-
-            position.push(pa.x, pa.y, pa.z, pb.x, pb.y, pb.z, pc.x, pc.y, pc.z, pd.x, pd.y, pd.z);
-            [ia, ib, ic, id] = [offset, offset + 1, offset + 2, offset + 3];
-            indices.push(ia, id, ib, ic, ib, id);
-
-            uvs.push(0, 0, 1, 0, 1, 1, 0, 1);
-        }
-
-        return geometry;
-    }
 
     async function createMaterial() {
         loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
@@ -314,4 +266,62 @@ function addLight(scene) {
     light.shadow.mapSize.height = 4096;
     light.shadow.mapSize.width = 4096;
     scene.add(light);
+}
+
+class Player extends AbstractPlayer {
+    constructor(controls, mesh) {
+        super(new Box3());
+        this.controls = controls;
+        this.camera = controls.object;
+        this.speed = 5;
+
+        this.keyMap = {
+            w: 'w',
+            a: 'a',
+            s: 's',
+            d: 'd',
+            shift: 'shift'
+        }
+
+        this.keyState = {
+            w: false,
+            a: false,
+            s: false,
+            d: false,
+            shift: false
+        }
+        this.mesh = mesh;
+    }
+
+    keyDown(event) {
+        const key = this.keyMap[event.key.toLowerCase()];
+        this.keyState[key] = true;
+    }
+
+
+    keyUp(event) {
+        const key = this.keyMap[event.key.toLowerCase()];
+        this.keyState[key] = false;
+    }
+
+    update(dt) {
+        this._updateVelocity();
+        this._updatePosition(dt);
+        this.mesh.position.copy(this.camera.position);
+        this.mesh.quaternion.copy(this.camera.quaternion);
+    }
+
+    _updateVelocity() {
+        this.velocity.set(0, 0, 0);
+
+        if (this.keyState.w) this.velocity.z += this.speed;
+        if (this.keyState.s) this.velocity.z -= this.speed;
+        if (this.keyState.a) this.velocity.x -= this.speed;
+        if (this.keyState.d) this.velocity.x += this.speed;
+    }
+
+    _updatePosition(dt) {
+        this.controls.moveForward(dt * this.velocity.z);
+        this.controls.moveRight(dt * this.velocity.x);
+    }
 }

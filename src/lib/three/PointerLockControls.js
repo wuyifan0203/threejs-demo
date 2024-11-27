@@ -2,7 +2,7 @@ import {
 	Controls,
 	Euler,
 	Vector3
-} from 'three';
+} from '../three/three.module.js';
 
 const _euler = new Euler( 0, 0, 0, 'YXZ' );
 const _vector = new Vector3();

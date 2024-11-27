@@ -2,25 +2,56 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:26:07
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-15 10:26:30
+ * @LastEditTime: 2024-11-27 17:53:11
  * @FilePath: \threejs-demo\src\cannon\maze3D.html
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Maze 3D</title>
     <style>
-        body{
-            margin: 0;
-        }
+      body {
+        margin: 0;
+      }
+      #blocker {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 3;
+      }
+
+      #instructions {
+        width: 100%;
+        height: 100%;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        text-align: center;
+        font-size: 14px;
+        cursor: pointer;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="blocker">
+      <div id="instructions">
+        <p style="font-size: 36px">Click to play</p>
+        <p>
+          Move: WASD<br />
+          Jump: SPACE<br />
+          Look: MOUSE
+        </p>
+      </div>
+    </div>
     <div id="webgl-output"></div>
     <script src="./maze3D.js" type="module"></script>
-</body>
+  </body>
 </html>
