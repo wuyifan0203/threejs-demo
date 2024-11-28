@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-28 18:40:57
- * @FilePath: \threejs-demo\src\cannon\maze3D.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-11-29 00:57:02
+ * @FilePath: /threejs-demo/src/cannon/maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -58,7 +58,6 @@ async function init() {
 
 
     const renderer = initRenderer();
-    const playerPosition = new Vector3(-117.5, 0, -117.5);
 
 
     const scene = initScene();
@@ -81,7 +80,10 @@ async function init() {
     console.log(maze.mesh.geometry.boundingBox.clone().applyMatrix4(maze.mesh.matrixWorld));
     octree.fromGraphNode(maze.mesh);
 
+    const playerPosition = new Vector3(-117.5, 0, -117.5);
+
     player.position.copy(playerPosition);
+    player.shape.translate(playerPosition);
     scene.add(eyeHelper);
 
     console.log(player);
@@ -112,6 +114,7 @@ async function init() {
 
     window.addEventListener('keydown', (evt) => {
         player.keyDown(evt);
+        if (evt.key.toLowerCase() === 'q') collisionTest();
     })
 
     const octreeHelper = new OctreeHelper(octree);
@@ -145,20 +148,14 @@ async function init() {
 
         player.add(camera);
 
-
         camera.zoom = 2;
         return {
             resize,
             render(scene, camera) {
                 renderer.render(scene, camera);
             }
-
         }
-
     }
-
-
-
 
     scene.traverse((obj) => {
         obj.layers && (obj.layers.mask = layerMap.ALL);
@@ -174,20 +171,18 @@ async function init() {
         player.update(deltaTime);
         viewPort.render(scene, camera);
         requestAnimationFrame(render);
-
     }
     render();
 
-    playerMesh.updateMatrixWorld(true);
+    function collisionTest() {
+        const result = octree.capsuleIntersect(player.shape);
+        console.log(result);
 
-    console.log(player.shape.start.clone().applyMatrix4(playerMesh.matrixWorld));
-    eye.updateMatrixWorld(true);
-    console.log(eye.position);
 
+    }
 }
 
 async function createMaze() {
-
     const cellSize = 5;
     const height = 10;
 
@@ -289,9 +284,10 @@ function addLight(scene) {
 class Player extends Mesh {
     constructor(octree) {
         super(new CapsuleGeometry(1, 4), new MeshNormalMaterial());
+        this.geometry.translate(0, 3, 0);
 
         this.layers.mask = layerMap.DEBUG;
-        
+
         this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 50);
         this.eye.layers.mask = layerMap.PLAYER;
         this.eye.lookAt(new Vector3(1, 0, 0));
@@ -304,6 +300,7 @@ class Player extends Mesh {
         this.acceleration = 2;
         this.shape = new Capsule(new Vector3(0, 0, 0), new Vector3(0, 6, 0), 1);
 
+        this.deltaPos = new Vector3();
         this.octree = octree;
         this.velocity = new Vector3();
 
@@ -325,6 +322,8 @@ class Player extends Mesh {
         this.euler = new Euler();
         this.add(this.eye);
         this.eye.position.set(0, 6, 0);
+
+        this.direction = new Vector3();
     }
 
     keyDown(event) {
@@ -358,8 +357,19 @@ class Player extends Mesh {
     }
 
     _updatePosition(dt) {
-        this.controls.moveForward(dt * this.velocity.z);
-        this.controls.moveRight(dt * this.velocity.x);
+        // this.controls.moveForward(dt * this.velocity.z);
+        // this.controls.moveRight(dt * this.velocity.x);
+        
+        this.deltaPos.copy(this.position);
+
+        this.direction.setFromMatrixColumn(this.eye.matrix, 0);
+        this.position.addScaledVector(this.direction, dt * this.velocity.x);
+        this.direction.crossVectors(this.up, this.direction);
+        this.position.addScaledVector(this.direction, dt * this.velocity.z);
+
+        this.deltaPos.subVectors(this.position, this.deltaPos);
+        this.shape.translate(this.deltaPos);
+
     }
 
     _fixedPosition() {
