@@ -175,6 +175,8 @@ class MazeGeometry extends BufferGeometry {
         this.setIndex([...indicesTop, ...indicesBottom, ...indicesSides]);
         this.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
         this.computeVertexNormals();
+        this.computeBoundingBox();
+        this.computeBoundingSphere();
         this.userData['materialOrder'] = ['top', 'bottom', 'side'];
     }
 

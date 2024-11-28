@@ -7,7 +7,7 @@
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import { Maze } from '../lib/custom/Maze.js';
-import { initGUI } from '../lib/tools/common.js'
+import { initGUI } from '../lib/tools/common.js';
 
 window.onload = () => {
     init();

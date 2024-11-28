@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-27 18:30:14
+ * @LastEditTime: 2024-11-28 18:40:57
  * @FilePath: \threejs-demo\src\cannon\maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -12,18 +12,17 @@ import {
     CanvasTexture,
     RepeatWrapping,
     MeshPhysicalMaterial,
-    BoxGeometry,
+    CapsuleGeometry,
     MeshNormalMaterial,
     PerspectiveCamera,
     CameraHelper,
     Box3,
-    Object3D,
+    Euler,
     WebGLRenderer
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
     initOrthographicCamera,
-    initOrbitControls,
     initScene,
     initAmbientLight,
     initDirectionLight,
@@ -33,11 +32,16 @@ import {
     imagePath,
     initClock,
     resize,
+    initGUI,
+    clamp,
+    symbolFlag
 } from '../lib/tools/index.js';
 import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
 import { AbstractPlayer } from '../lib/custom/AbstractPlayer.js';
 import { PointerLockControls } from '../lib/three/PointerLockControls.js'
-
+import { Octree } from '../lib/three/Octree.js';
+import { Capsule } from '../lib/three/Capsule.js';
+import { OctreeHelper } from '../lib/three/OctreeHelper.js'
 
 const layerMap = {
     ALL: 7,
@@ -54,7 +58,7 @@ async function init() {
 
 
     const renderer = initRenderer();
-    const playerPosition = new Vector3(-117.5, 3, -117.5);
+    const playerPosition = new Vector3(-117.5, 0, -117.5);
 
 
     const scene = initScene();
@@ -63,46 +67,42 @@ async function init() {
 
     initAxesHelper(scene);
 
-    const eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 50);
-    eye.lookAt(new Vector3(1, 0, 0));
-    const eyeHelper = new CameraHelper(eye);
+    const octree = new Octree();
 
-    const pointLockControl = new PointerLockControls(eye, document.body);
+    const player = new Player(octree);
 
-    const playerMesh = new Mesh(new BoxGeometry(2, 6, 2), new MeshNormalMaterial());
-    playerMesh.geometry.computeBoundingBox();
-
-    const player = new Player(pointLockControl, playerMesh);
-
-    player.position.copy(playerPosition);
-    player.shape.copy(playerMesh.geometry.boundingBox);
-    player.add(playerMesh);
-    player.add(eye);
-    scene.add(eyeHelper);
-    eyeHelper.layers.set(1);
-    console.log(player);
-
-    scene.add(player);
+    const eyeHelper = new CameraHelper(player.eye);
 
     const maze = await createMaze();
     maze.mesh.position.set(-130, 0, -130);
     scene.add(maze.mesh);
 
+    maze.mesh.updateMatrixWorld(true);
+    console.log(maze.mesh.geometry.boundingBox.clone().applyMatrix4(maze.mesh.matrixWorld));
+    octree.fromGraphNode(maze.mesh);
+
+    player.position.copy(playerPosition);
+    scene.add(eyeHelper);
+
+    console.log(player);
+
+    scene.add(player);
+
     const viewPort = useSideViewPort();
 
-    resize(renderer, [eye], viewPort.resize)
+    resize(renderer, [player.eye], viewPort.resize)
 
     const blocker = document.getElementById('blocker');
 
     blocker.addEventListener('click', function () {
-        pointLockControl.lock();
+        player.controls.lock();
     });
 
-    pointLockControl.addEventListener('lock', function () {
+    player.controls.addEventListener('lock', function () {
         blocker.style.display = 'none';
     });
 
-    pointLockControl.addEventListener('unlock', function () {
+    player.controls.addEventListener('unlock', function () {
         blocker.style.display = 'block';
     });
 
@@ -114,8 +114,17 @@ async function init() {
         player.keyDown(evt);
     })
 
+    const octreeHelper = new OctreeHelper(octree);
+    scene.add(octreeHelper);
+
+    const gui = initGUI();
+    gui.add(octreeHelper, 'visible').name('Octree Helper');
+
     function useSideViewPort() {
-        const camera = initOrthographicCamera(new Vector3(-500, 500, 500));
+        const camera = initOrthographicCamera();
+        camera.far = 100;
+        camera.near = 0;
+        camera.updateProjectionMatrix();
         camera.layers.mask = layerMap.DEBUG;
 
         const renderer = new WebGLRenderer({ antialias: true });
@@ -131,11 +140,13 @@ async function init() {
             renderer.setSize(window.innerWidth / 3, window.innerHeight / 3);
             camera.aspect = window.innerWidth / window.innerHeight;
         }
-        camera.position.set(0, 10, 10);
+        camera.position.set(0, 10, -10);
         camera.lookAt(0, 0, 0);
 
-        playerMesh.add(camera);
+        player.add(camera);
 
+
+        camera.zoom = 2;
         return {
             resize,
             render(scene, camera) {
@@ -146,19 +157,19 @@ async function init() {
 
     }
 
+
+
+
     scene.traverse((obj) => {
         obj.layers && (obj.layers.mask = layerMap.ALL);
     });
-    eye.layers.mask = layerMap.PLAYER;
     eyeHelper.layers.mask = layerMap.DEBUG;
-    playerMesh.layers.mask = layerMap.DEBUG;
 
     const clock = initClock();
     let deltaTime = 0;
     function render() {
         deltaTime = clock.getDelta();
-
-        renderer.render(scene, eye);
+        renderer.render(scene, player.eye);
         eyeHelper.update();
         player.update(deltaTime);
         viewPort.render(scene, camera);
@@ -166,6 +177,13 @@ async function init() {
 
     }
     render();
+
+    playerMesh.updateMatrixWorld(true);
+
+    console.log(player.shape.start.clone().applyMatrix4(playerMesh.matrixWorld));
+    eye.updateMatrixWorld(true);
+    console.log(eye.position);
+
 }
 
 async function createMaze() {
@@ -268,12 +286,26 @@ function addLight(scene) {
     scene.add(light);
 }
 
-class Player extends AbstractPlayer {
-    constructor(controls, mesh) {
-        super(new Box3());
-        this.controls = controls;
-        this.camera = controls.object;
-        this.speed = 5;
+class Player extends Mesh {
+    constructor(octree) {
+        super(new CapsuleGeometry(1, 4), new MeshNormalMaterial());
+
+        this.layers.mask = layerMap.DEBUG;
+        
+        this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 50);
+        this.eye.layers.mask = layerMap.PLAYER;
+        this.eye.lookAt(new Vector3(1, 0, 0));
+
+        this.controls = new PointerLockControls(this.eye, document.body);
+
+        this.walkSpeed = 5;
+        this.currentSpeed = 0;
+        this.runSpeed = 8;
+        this.acceleration = 2;
+        this.shape = new Capsule(new Vector3(0, 0, 0), new Vector3(0, 6, 0), 1);
+
+        this.octree = octree;
+        this.velocity = new Vector3();
 
         this.keyMap = {
             w: 'w',
@@ -290,7 +322,9 @@ class Player extends AbstractPlayer {
             d: false,
             shift: false
         }
-        this.mesh = mesh;
+        this.euler = new Euler();
+        this.add(this.eye);
+        this.eye.position.set(0, 6, 0);
     }
 
     keyDown(event) {
@@ -306,22 +340,33 @@ class Player extends AbstractPlayer {
 
     update(dt) {
         this._updateVelocity();
+        this._fixedPosition();
         this._updatePosition(dt);
-        this.mesh.position.copy(this.camera.position);
-        this.mesh.quaternion.copy(this.camera.quaternion);
     }
 
     _updateVelocity() {
         this.velocity.set(0, 0, 0);
 
-        if (this.keyState.w) this.velocity.z += this.speed;
-        if (this.keyState.s) this.velocity.z -= this.speed;
-        if (this.keyState.a) this.velocity.x -= this.speed;
-        if (this.keyState.d) this.velocity.x += this.speed;
+        if (this.keyState.w) this.velocity.z += 1;
+        if (this.keyState.s) this.velocity.z -= 1;
+        if (this.keyState.a) this.velocity.x -= 1;
+        if (this.keyState.d) this.velocity.x += 1;
+
+        this.currentSpeed = clamp(this.currentSpeed + (symbolFlag(this.keyState.shift) * this.acceleration), this.walkSpeed, this.runSpeed)
+
+        this.velocity.normalize().multiplyScalar(this.currentSpeed);
     }
 
     _updatePosition(dt) {
         this.controls.moveForward(dt * this.velocity.z);
         this.controls.moveRight(dt * this.velocity.x);
+    }
+
+    _fixedPosition() {
+        const result = this.octree.capsuleIntersect(this.shape);
+        if (result) {
+
+        }
+
     }
 }
