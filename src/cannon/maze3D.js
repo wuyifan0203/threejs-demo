@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-29 11:16:59
+ * @LastEditTime: 2024-11-29 18:07:42
  * @FilePath: \threejs-demo\src\cannon\maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -16,17 +16,16 @@ import {
     MeshNormalMaterial,
     PerspectiveCamera,
     CameraHelper,
-    Box3,
+    OrthographicCamera,
     Euler,
-    WebGLRenderer
+    WebGLRenderer,
+    Vector2
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
-    initOrthographicCamera,
     initScene,
     initAmbientLight,
     initDirectionLight,
-    HALF_PI,
     initAxesHelper,
     initLoader,
     imagePath,
@@ -37,7 +36,6 @@ import {
     symbolFlag
 } from '../lib/tools/index.js';
 import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
-import { AbstractPlayer } from '../lib/custom/AbstractPlayer.js';
 import { PointerLockControls } from '../lib/three/PointerLockControls.js'
 import { Octree } from '../lib/three/Octree.js';
 import { Capsule } from '../lib/three/Capsule.js';
@@ -83,7 +81,7 @@ async function init() {
     scene.add(eyeHelper);
     scene.add(player);
 
-    const viewPort = useSideViewPort();
+    const viewPort = createSideViewPort();
 
     resize(renderer, [player.eye], viewPort.resize)
 
@@ -95,10 +93,12 @@ async function init() {
 
     player.controls.addEventListener('lock', function () {
         blocker.style.display = 'none';
+        renderer.setAnimationLoop(render);
     });
 
     player.controls.addEventListener('unlock', function () {
         blocker.style.display = 'block';
+        renderer.setAnimationLoop(null);
     });
 
     window.addEventListener('keyup', (evt) => {
@@ -118,11 +118,9 @@ async function init() {
     gui.add(octreeHelper, 'visible').name('Octree Helper');
     gui.add({ text: 'press Q to test collision' }, 'text')
 
-    function useSideViewPort() {
-        const camera = initOrthographicCamera();
-        camera.far = 100;
-        camera.near = 0;
-        camera.updateProjectionMatrix();
+    function createSideViewPort() {
+        const s = 15, aspect = window.innerWidth / window.innerHeight;
+        const camera = new OrthographicCamera(-s, s, s * aspect, -s * aspect, 0.01, 500);
         camera.layers.mask = layerMap.DEBUG;
 
         const renderer = new WebGLRenderer({ antialias: true });
@@ -137,16 +135,65 @@ async function init() {
         function resize() {
             renderer.setSize(window.innerWidth / 3, window.innerHeight / 3);
             camera.aspect = window.innerWidth / window.innerHeight;
+            camera.top = s * camera.aspect;
+            camera.bottom = -s * camera.aspect;
+            camera.updateProjectionMatrix();
+            console.log(camera);
+
         }
-        camera.position.set(0, 10, -10);
-        camera.lookAt(0, 0, 0);
 
-        player.add(camera);
+        // / 方案
+        // const direction = new Vector3();
+        // const distance = 5;
+        // player.add(camera);
+        // const target = new Vector3();
 
-        camera.zoom = 2;
+        // function updateCameraPos() {
+        //    //获取相机的方向
+        //     player.eye.getWorldDirection(direction);
+        //     // 清楚y轴分量
+        //     direction.y = 0;
+        //     // 计算相机target的位置，在player的位置上加上视野方向的一段距离，在player之前
+        //     target.copy(player.position).add(direction.normalize().multiplyScalar(distance));
+        //     // 计算相机位置，基于player位置，在player之后，距离player的距离为distance,与视野方向相反
+        //     camera.position.copy(player.position).add(direction.negate().multiplyScalar(distance));
+        //      // 固定高度
+        //     camera.position.y = 15;
+        //     camera.lookAt(target);
+        //     camera.updateProjectionMatrix();
+
+        //     console.log(camera.position, target);
+
+        // }
+
+        //零时方案
+        player.eye.add(camera);
+        camera.zoom = 0.5;
+        camera.position.set(-15, 15, 0);
+        camera.lookAt(0, 0, 0)
+        camera.updateProjectionMatrix();
         return {
             resize,
-            render(scene, camera) {
+            render(scene) {
+                // updateCameraPos();
+                renderer.render(scene, camera);
+            }
+        }
+    }
+
+    function createMapViewPort() {
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 265;
+        const ctx = canvas.getContext('2d');
+        maze.draw(ctx);
+
+        const scene = initScene();
+        scene.background = new CanvasTexture(canvas);
+
+        const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+        return {
+            render() { 
                 renderer.render(scene, camera);
             }
         }
@@ -165,9 +212,9 @@ async function init() {
         renderer.render(scene, player.eye);
         eyeHelper.update();
         player.update(deltaTime);
-        viewPort.render(scene, camera);
-        requestAnimationFrame(render);
+        viewPort.render(scene);
     }
+    // 首次加载
     render();
 
     function collisionTest() {
@@ -180,11 +227,6 @@ async function createMaze() {
     const cellSize = 5;
     const height = 10;
 
-    const canvas = document.createElement('canvas');
-    canvas.width = 265;
-    canvas.height = 265;
-    const ctx = canvas.getContext('2d');
-
     const geometry = new MazeGeometry(51, 51, cellSize);
     const maze = geometry.maze;
     maze.generate(1, 1);
@@ -195,15 +237,11 @@ async function createMaze() {
         row.push(0);
     });
     geometry.generate(height);
-    maze.draw(ctx);
 
     const { topMaterial, groundMaterial, wallMaterial } = await createMaterial();
     const mesh = new Mesh(geometry, [topMaterial, groundMaterial, wallMaterial]);
 
     mesh.receiveShadow = mesh.castShadow = true;
-
-    const texture = new CanvasTexture(canvas);
-    // material.map = texture;
 
     async function createMaterial() {
         loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
@@ -280,7 +318,7 @@ class Player extends Mesh {
 
         this.layers.mask = layerMap.DEBUG;
 
-        this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 50);
+        this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
         this.eye.layers.mask = layerMap.PLAYER;
         this.eye.lookAt(new Vector3(1, 0, 0));
 
@@ -294,14 +332,16 @@ class Player extends Mesh {
 
         this.deltaPos = new Vector3();
         this.octree = octree;
-        this.velocity = new Vector3();
+        this.velocity = new Vector2();
+        this.velocityVertical = 0;
 
         this.keyMap = {
             w: 'w',
             a: 'a',
             s: 's',
             d: 'd',
-            shift: 'shift'
+            shift: 'shift',
+            ' ': 'space',
         }
 
         this.keyState = {
@@ -309,11 +349,15 @@ class Player extends Mesh {
             a: false,
             s: false,
             d: false,
-            shift: false
+            shift: false,
+            space: false,
         }
+        this.onFloor = false;
         this.euler = new Euler();
         this.add(this.eye);
         this.eye.position.set(0, 6, 0);
+
+        this.gravity = -12;
 
         this.direction = new Vector3();
     }
@@ -329,22 +373,25 @@ class Player extends Mesh {
     }
 
     update(dt) {
-        this._updateVelocity();
+        this._updateVelocity(dt);
         this._updatePosition(dt);
         // 修复位置
         this._fixedPosition();
     }
 
-    _updateVelocity() {
-        this.velocity.set(0, 0, 0);
+    _updateVelocity(dt) {
+        this.velocity.set(0, 0);
 
-        if (this.keyState.w) this.velocity.z += 1;
-        if (this.keyState.s) this.velocity.z -= 1;
+        if (this.keyState.w) this.velocity.y += 1;
+        if (this.keyState.s) this.velocity.y -= 1;
         if (this.keyState.a) this.velocity.x -= 1;
         if (this.keyState.d) this.velocity.x += 1;
+        if (!this.onFloor) this.velocityVertical += this.gravity * dt;
+        if (this.keyState.space && this.onFloor) {
+            this.velocityVertical = 7;
+        }
 
-        this.currentSpeed = clamp(this.currentSpeed + (symbolFlag(this.keyState.shift) * this.acceleration), this.walkSpeed, this.runSpeed)
-
+        this.currentSpeed = clamp(this.currentSpeed + (symbolFlag(this.keyState.shift) * this.acceleration * dt), this.walkSpeed, this.runSpeed);
         this.velocity.normalize().multiplyScalar(this.currentSpeed);
     }
 
@@ -354,7 +401,8 @@ class Player extends Mesh {
         this.direction.setFromMatrixColumn(this.eye.matrix, 0);
         this.position.addScaledVector(this.direction, dt * this.velocity.x);
         this.direction.crossVectors(this.up, this.direction);
-        this.position.addScaledVector(this.direction, dt * this.velocity.z);
+        this.position.addScaledVector(this.direction, dt * this.velocity.y);
+        this.position.y += dt * this.velocityVertical;
 
         this.deltaPos.subVectors(this.position, this.deltaPos);
         this.shape.translate(this.deltaPos);
@@ -362,7 +410,9 @@ class Player extends Mesh {
 
     _fixedPosition() {
         const result = this.octree.capsuleIntersect(this.shape);
+        this.onFloor = false;
         if (result) {
+            this.onFloor = result.normal.y > 0;
             this.deltaPos.copy(result.normal).multiplyScalar(result.depth);
             this.position.add(this.deltaPos);
             this.shape.translate(this.deltaPos);
