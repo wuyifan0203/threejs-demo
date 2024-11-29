@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-11-29 00:57:02
- * @FilePath: /threejs-demo/src/cannon/maze3D.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-11-29 11:16:59
+ * @FilePath: \threejs-demo\src\cannon\maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -55,11 +55,7 @@ window.onload = () => {
 };
 
 async function init() {
-
-
     const renderer = initRenderer();
-
-
     const scene = initScene();
     initAmbientLight(scene);
     addLight(scene);
@@ -85,9 +81,6 @@ async function init() {
     player.position.copy(playerPosition);
     player.shape.translate(playerPosition);
     scene.add(eyeHelper);
-
-    console.log(player);
-
     scene.add(player);
 
     const viewPort = useSideViewPort();
@@ -118,10 +111,12 @@ async function init() {
     })
 
     const octreeHelper = new OctreeHelper(octree);
+    octreeHelper.visible = false;
     scene.add(octreeHelper);
 
     const gui = initGUI();
     gui.add(octreeHelper, 'visible').name('Octree Helper');
+    gui.add({ text: 'press Q to test collision' }, 'text')
 
     function useSideViewPort() {
         const camera = initOrthographicCamera();
@@ -160,6 +155,7 @@ async function init() {
     scene.traverse((obj) => {
         obj.layers && (obj.layers.mask = layerMap.ALL);
     });
+    player.eye.layers.mask = layerMap.PLAYER;
     eyeHelper.layers.mask = layerMap.DEBUG;
 
     const clock = initClock();
@@ -177,8 +173,6 @@ async function init() {
     function collisionTest() {
         const result = octree.capsuleIntersect(player.shape);
         console.log(result);
-
-
     }
 }
 
@@ -206,7 +200,6 @@ async function createMaze() {
     const { topMaterial, groundMaterial, wallMaterial } = await createMaterial();
     const mesh = new Mesh(geometry, [topMaterial, groundMaterial, wallMaterial]);
 
-    // mesh.material.forEach(m => m.wireframe = true);
     mesh.receiveShadow = mesh.castShadow = true;
 
     const texture = new CanvasTexture(canvas);
@@ -265,7 +258,6 @@ async function createMaze() {
     return {
         mesh
     }
-
 }
 
 function addLight(scene) {
@@ -288,7 +280,7 @@ class Player extends Mesh {
 
         this.layers.mask = layerMap.DEBUG;
 
-        this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 50);
+        this.eye = new PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 50);
         this.eye.layers.mask = layerMap.PLAYER;
         this.eye.lookAt(new Vector3(1, 0, 0));
 
@@ -331,7 +323,6 @@ class Player extends Mesh {
         this.keyState[key] = true;
     }
 
-
     keyUp(event) {
         const key = this.keyMap[event.key.toLowerCase()];
         this.keyState[key] = false;
@@ -339,8 +330,9 @@ class Player extends Mesh {
 
     update(dt) {
         this._updateVelocity();
-        this._fixedPosition();
         this._updatePosition(dt);
+        // 修复位置
+        this._fixedPosition();
     }
 
     _updateVelocity() {
@@ -357,9 +349,6 @@ class Player extends Mesh {
     }
 
     _updatePosition(dt) {
-        // this.controls.moveForward(dt * this.velocity.z);
-        // this.controls.moveRight(dt * this.velocity.x);
-        
         this.deltaPos.copy(this.position);
 
         this.direction.setFromMatrixColumn(this.eye.matrix, 0);
@@ -369,13 +358,14 @@ class Player extends Mesh {
 
         this.deltaPos.subVectors(this.position, this.deltaPos);
         this.shape.translate(this.deltaPos);
-
     }
 
     _fixedPosition() {
         const result = this.octree.capsuleIntersect(this.shape);
         if (result) {
-
+            this.deltaPos.copy(result.normal).multiplyScalar(result.depth);
+            this.position.add(this.deltaPos);
+            this.shape.translate(this.deltaPos);
         }
 
     }
