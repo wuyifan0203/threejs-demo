@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-29 18:07:42
- * @FilePath: \threejs-demo\src\cannon\maze3D.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-12-02 01:01:04
+ * @FilePath: /threejs-demo/src/cannon/maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -33,7 +33,8 @@ import {
     resize,
     initGUI,
     clamp,
-    symbolFlag
+    symbolFlag,
+    initSky
 } from '../lib/tools/index.js';
 import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
 import { PointerLockControls } from '../lib/three/PointerLockControls.js'
@@ -60,6 +61,8 @@ async function init() {
 
     initAxesHelper(scene);
 
+    initSky(scene);
+
     const octree = new Octree();
 
     const player = new Player(octree);
@@ -82,6 +85,7 @@ async function init() {
     scene.add(player);
 
     const viewPort = createSideViewPort();
+    const mapViewPort = createMapViewPort();
 
     resize(renderer, [player.eye], viewPort.resize)
 
@@ -185,15 +189,19 @@ async function init() {
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 265;
         const ctx = canvas.getContext('2d');
-        maze.draw(ctx);
+        maze.mesh.geometry.maze.draw(ctx);
 
         const scene = initScene();
         scene.background = new CanvasTexture(canvas);
 
         const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
+        const player = new Mesh();
+
         return {
-            render() { 
+            render() {
+                renderer.setScissor(0,0,265,265);
+                renderer.setViewport(0,0,265,265);
                 renderer.render(scene, camera);
             }
         }
@@ -209,10 +217,15 @@ async function init() {
     let deltaTime = 0;
     function render() {
         deltaTime = clock.getDelta();
+        renderer.setScissorTest(true);
+        renderer.setScissor(0,0,window.innerWidth,window.innerHeight);
+        renderer.setViewport(0,0,window.innerWidth,window.innerHeight);
         renderer.render(scene, player.eye);
         eyeHelper.update();
         player.update(deltaTime);
         viewPort.render(scene);
+        mapViewPort.render();
+        renderer.setScissorTest(false);
     }
     // 首次加载
     render();
