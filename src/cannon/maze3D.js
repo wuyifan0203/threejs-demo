@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-12-02 01:01:04
- * @FilePath: /threejs-demo/src/cannon/maze3D.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-02 18:13:24
+ * @FilePath: \threejs-demo\src\cannon\maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -19,7 +19,11 @@ import {
     OrthographicCamera,
     Euler,
     WebGLRenderer,
-    Vector2
+    Vector2,
+    ShaderMaterial,
+    Color,
+    Matrix4,
+    PlaneGeometry
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -143,7 +147,6 @@ async function init() {
             camera.bottom = -s * camera.aspect;
             camera.updateProjectionMatrix();
             console.log(camera);
-
         }
 
         // / 方案
@@ -196,12 +199,96 @@ async function init() {
 
         const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
-        const player = new Mesh();
+        const material = new ShaderMaterial({
+            uniforms: {
+                color: { value: new Color('#ff0000') },
+                triangleSize: { value: new Vector2(1.0, 2.0) }
+            },
+            depthTest: false,
+            vertexShader:/*glsl*/`
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
 
+            `,
+            fragmentShader: /*glsl*/`
+                uniform vec3 color;
+                uniform vec2 triangleSize;
+                varying vec2 vUv;
+                bool isPointInTriangle(vec2 coord, vec2 size) {
+                    // 标准三角形顶点
+                    vec2 v0 = vec2(0.0, size.y / 2.0); // 顶点
+                    vec2 v1 = vec2(-size.x / 2.0, -size.y / 2.0); // 左下角
+                    vec2 v2 = vec2(size.x / 2.0, -size.y / 2.0); // 右下角
+
+                    // 边的向量
+                    vec2 e0 = v1 - v0;
+                    vec2 e1 = v2 - v1;
+                    vec2 e2 = v0 - v2;
+
+                    // 点到各边的向量
+                    vec2 p0 = coord - v0;
+                    vec2 p1 = coord - v1;
+                    vec2 p2 = coord - v2;
+
+                    // 叉积，用于计算点是否在边的内部
+                    float c0 = e0.x * p0.y - e0.y * p0.x;
+                    float c1 = e1.x * p1.y - e1.y * p1.x;
+                    float c2 = e2.x * p2.y - e2.y * p2.x;
+
+                    // 如果点都在边的内部，叉积符号应该一致
+                    return (c0 > 0.0 && c1 > 0.0 && c2 > 0.0) || (c0 < 0.0 && c1 < 0.0 && c2 < 0.0);
+                }
+
+                void main() {
+                    vec2 coord = vUv * 2.0 - 1.0; // 将 gl_PointCoord 转换到 -1 到 1 的范围
+                    if (isPointInTriangle(coord, triangleSize)) {
+                        gl_FragColor = vec4(color, 1.0); // 在三角形内设置为红色
+                    } else {
+                        discard; // 在三角形外丢弃像素
+                    }
+                }
+            `
+        });
+        const mark = new Mesh(new PlaneGeometry(1, 1), material);
+
+        const mark2 = new Mesh(new PlaneGeometry(1, 1), new MeshNormalMaterial());
+
+        mark.scale.multiplyScalar(0.1);
+        mark2.scale.multiplyScalar(0.05);
+
+        scene.add(mark2);
+        scene.add(mark);
+
+        const size = new Vector3();
+        maze.mesh.geometry.boundingBox.getSize(size);
+
+        const halfSize = new Vector2(size.x, size.z).multiplyScalar(0.5);
+        const mat4 = new Matrix4().set(
+            0, 0, 1 / halfSize.y, 0, // 第一行
+            -1 / halfSize.x, 0, 0, 0, // 第二行
+            0, 0, 0, 0,             // 第三行
+            0, 0, 0, 1              // 第四行
+        );
+        const direction = new Vector3();
+        function updatePoint() {
+            // 方块标记
+            mark2.position.copy(player.position).applyMatrix4(mat4);
+            // 三角标记
+            mark.position.copy(player.position).applyMatrix4(mat4);
+            // player.eye.getWorldDirection(direction);
+            // direction.y = 0;
+            // direction.normalize().multiplyScalar(1).add(player.position);
+            // direction.applyMatrix4(mat4);
+            // mark.lookAt(direction);
+        }
         return {
             render() {
-                renderer.setScissor(0,0,265,265);
-                renderer.setViewport(0,0,265,265);
+                updatePoint();
+                renderer.setScissor(0, 0, 400, 400);
+                renderer.setViewport(0, 0, 400, 400);
                 renderer.render(scene, camera);
             }
         }
@@ -218,8 +305,8 @@ async function init() {
     function render() {
         deltaTime = clock.getDelta();
         renderer.setScissorTest(true);
-        renderer.setScissor(0,0,window.innerWidth,window.innerHeight);
-        renderer.setViewport(0,0,window.innerWidth,window.innerHeight);
+        renderer.setScissor(0, 0, window.innerWidth, window.innerHeight);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.render(scene, player.eye);
         eyeHelper.update();
         player.update(deltaTime);

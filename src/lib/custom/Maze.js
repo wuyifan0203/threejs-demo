@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-01 14:41:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-20 14:57:45
- * @FilePath: \threejs-demo\src\algorithms\Maze.js
+ * @LastEditTime: 2024-12-02 18:00:38
+ * @FilePath: \threejs-demo\src\lib\custom\Maze.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 // DFS
@@ -62,8 +62,7 @@ class Maze {
     draw(ctx) {
         ctx.fillStyle = 'black';
         const [width, height] = [this.grid.length, this.grid[0].length];
-        console.log(width, height);
-        
+
         ctx.fillRect(0, 0, width * this.cellSize, height * this.cellSize); // 先填充黑色背景
         for (let y = 0; y < width; y++) {
             for (let x = 0; x < height; x++) {
