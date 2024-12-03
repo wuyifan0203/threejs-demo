@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-15 10:25:55
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-02 18:13:24
+ * @LastEditTime: 2024-12-03 15:44:10
  * @FilePath: \threejs-demo\src\cannon\maze3D.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -23,7 +23,7 @@ import {
     ShaderMaterial,
     Color,
     Matrix4,
-    PlaneGeometry
+    PlaneGeometry,
 } from '../lib/three/three.module.js';
 import {
     initRenderer,
@@ -38,13 +38,15 @@ import {
     initGUI,
     clamp,
     symbolFlag,
-    initSky
+    initSky,
+    HALF_PI
 } from '../lib/tools/index.js';
 import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
 import { PointerLockControls } from '../lib/three/PointerLockControls.js'
 import { Octree } from '../lib/three/Octree.js';
 import { Capsule } from '../lib/three/Capsule.js';
-import { OctreeHelper } from '../lib/three/OctreeHelper.js'
+import { OctreeHelper } from '../lib/three/OctreeHelper.js';
+import { FullScreenQuad } from '../lib/three/Pass.js';
 
 const layerMap = {
     ALL: 7,
@@ -89,6 +91,8 @@ async function init() {
     scene.add(player);
 
     const viewPort = createSideViewPort();
+    viewPort.changeVisible(false);
+
     const mapViewPort = createMapViewPort();
 
     resize(renderer, [player.eye], viewPort.resize)
@@ -104,6 +108,14 @@ async function init() {
         renderer.setAnimationLoop(render);
     });
 
+    const debuggerBtn = document.getElementById('debuggerBtn');
+    let trigger = false;
+    debuggerBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+        trigger = !trigger;
+        trigger ? gui.show() : gui.hide();
+    })
+
     player.controls.addEventListener('unlock', function () {
         blocker.style.display = 'block';
         renderer.setAnimationLoop(null);
@@ -111,24 +123,32 @@ async function init() {
 
     window.addEventListener('keyup', (evt) => {
         player.keyUp(evt);
+        if (evt.key.toLowerCase() === 'm') mapViewPort.needsRender = false;
     })
 
     window.addEventListener('keydown', (evt) => {
         player.keyDown(evt);
-        if (evt.key.toLowerCase() === 'q') collisionTest();
+        if (evt.key.toLowerCase() === 'm') mapViewPort.needsRender = true;
     })
 
     const octreeHelper = new OctreeHelper(octree);
     octreeHelper.visible = false;
     scene.add(octreeHelper);
 
+    const params = {
+        showSide: false
+    };
+
     const gui = initGUI();
+    gui.hide();
     gui.add(octreeHelper, 'visible').name('Octree Helper');
-    gui.add({ text: 'press Q to test collision' }, 'text')
+    gui.add(params, 'showSide').name('show side').onChange((flag) => {
+        viewPort.changeVisible(flag);
+    })
 
     function createSideViewPort() {
         const s = 15, aspect = window.innerWidth / window.innerHeight;
-        const camera = new OrthographicCamera(-s, s, s * aspect, -s * aspect, 0.01, 500);
+        const camera = new OrthographicCamera(-s, s, s * aspect, -s * aspect, 1, 500);
         camera.layers.mask = layerMap.DEBUG;
 
         const renderer = new WebGLRenderer({ antialias: true });
@@ -146,44 +166,39 @@ async function init() {
             camera.top = s * camera.aspect;
             camera.bottom = -s * camera.aspect;
             camera.updateProjectionMatrix();
-            console.log(camera);
         }
 
-        // / 方案
-        // const direction = new Vector3();
-        // const distance = 5;
-        // player.add(camera);
-        // const target = new Vector3();
+        const distance = 30;
+        const direction = new Vector3();
+        function updateCameraPos() {
+            direction.copy(player.eyeDirection);
+            direction.y = 0;
+            direction.normalize();
+            // 计算相机target的位置，在player的位置上加上视野方向的一段距离，在player之前
+            camera.position.copy(player.position).add(direction.multiplyScalar(-distance));
+            // 固定高度
+            camera.position.y = 50;
+            camera.lookAt(player.position);
+            camera.updateProjectionMatrix();
+        }
+        let visible = false;
 
-        // function updateCameraPos() {
-        //    //获取相机的方向
-        //     player.eye.getWorldDirection(direction);
-        //     // 清楚y轴分量
-        //     direction.y = 0;
-        //     // 计算相机target的位置，在player的位置上加上视野方向的一段距离，在player之前
-        //     target.copy(player.position).add(direction.normalize().multiplyScalar(distance));
-        //     // 计算相机位置，基于player位置，在player之后，距离player的距离为distance,与视野方向相反
-        //     camera.position.copy(player.position).add(direction.negate().multiplyScalar(distance));
-        //      // 固定高度
-        //     camera.position.y = 15;
-        //     camera.lookAt(target);
-        //     camera.updateProjectionMatrix();
-
-        //     console.log(camera.position, target);
-
-        // }
-
-        //零时方案
-        player.eye.add(camera);
-        camera.zoom = 0.5;
-        camera.position.set(-15, 15, 0);
-        camera.lookAt(0, 0, 0)
-        camera.updateProjectionMatrix();
         return {
+            changeVisible(flag) {
+                visible = flag;
+                dom.style.display = visible ? 'block' : 'none';
+                if (flag) {
+                    resize();
+                    updateCameraPos();
+                    renderer.render(scene, camera);
+                }
+            },
             resize,
-            render(scene) {
-                // updateCameraPos();
-                renderer.render(scene, camera);
+            render() {
+                if (visible) {
+                    updateCameraPos();
+                    renderer.render(scene, camera);
+                }
             }
         }
     }
@@ -194,10 +209,29 @@ async function init() {
         const ctx = canvas.getContext('2d');
         maze.mesh.geometry.maze.draw(ctx);
 
-        const scene = initScene();
-        scene.background = new CanvasTexture(canvas);
+        const fullScreen = new FullScreenQuad(
+            new ShaderMaterial({
+                uniforms: {
+                    tDiffuse: { value: new CanvasTexture(canvas) }
+                },
+                vertexShader:/*glsl*/`
+                varying vec2 vUv;
+                    void main(){
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader:/*glsl*/`
+                    uniform sampler2D tDiffuse;
+                    varying vec2 vUv;
+                    void main(){
+                        vec2 flippedUV = vec2(vUv.x, 1.0 - vUv.y);
+                        gl_FragColor = texture2D(tDiffuse, flippedUV);
+                    }
 
-        const camera = new OrthographicCamera(-1, 1, 1, -1, 0, 1);
+                `
+            })
+        )
 
         const material = new ShaderMaterial({
             uniforms: {
@@ -253,43 +287,35 @@ async function init() {
             `
         });
         const mark = new Mesh(new PlaneGeometry(1, 1), material);
-
-        const mark2 = new Mesh(new PlaneGeometry(1, 1), new MeshNormalMaterial());
-
         mark.scale.multiplyScalar(0.1);
-        mark2.scale.multiplyScalar(0.05);
-
-        scene.add(mark2);
-        scene.add(mark);
+        fullScreen._mesh.add(mark);
 
         const size = new Vector3();
         maze.mesh.geometry.boundingBox.getSize(size);
 
         const halfSize = new Vector2(size.x, size.z).multiplyScalar(0.5);
         const mat4 = new Matrix4().set(
-            0, 0, 1 / halfSize.y, 0, // 第一行
-            -1 / halfSize.x, 0, 0, 0, // 第二行
+            0, 0, 1 / halfSize.x, 0, // 第一行
+            1 / halfSize.y, 0, 0, 0, // 第二行
             0, 0, 0, 0,             // 第三行
             0, 0, 0, 1              // 第四行
         );
+
         const direction = new Vector3();
         function updatePoint() {
-            // 方块标记
-            mark2.position.copy(player.position).applyMatrix4(mat4);
             // 三角标记
             mark.position.copy(player.position).applyMatrix4(mat4);
-            // player.eye.getWorldDirection(direction);
-            // direction.y = 0;
-            // direction.normalize().multiplyScalar(1).add(player.position);
-            // direction.applyMatrix4(mat4);
-            // mark.lookAt(direction);
+            direction.copy(player.eyeDirection); // 获取相机的世界方向
+            const angleY = Math.atan2(direction.x, direction.z);
+            mark.rotation.z = angleY - HALF_PI;
         }
         return {
-            render() {
+            needsRender: false,
+            render(renderer) {
                 updatePoint();
                 renderer.setScissor(0, 0, 400, 400);
                 renderer.setViewport(0, 0, 400, 400);
-                renderer.render(scene, camera);
+                fullScreen.render(renderer);
             }
         }
     }
@@ -311,16 +337,11 @@ async function init() {
         eyeHelper.update();
         player.update(deltaTime);
         viewPort.render(scene);
-        mapViewPort.render();
+        mapViewPort.needsRender && mapViewPort.render(renderer);
         renderer.setScissorTest(false);
     }
     // 首次加载
     render();
-
-    function collisionTest() {
-        const result = octree.capsuleIntersect(player.shape);
-        console.log(result);
-    }
 }
 
 async function createMaze() {
@@ -460,6 +481,7 @@ class Player extends Mesh {
         this.gravity = -12;
 
         this.direction = new Vector3();
+        this.eyeDirection = new Vector3();
     }
 
     keyDown(event) {
@@ -477,6 +499,7 @@ class Player extends Mesh {
         this._updatePosition(dt);
         // 修复位置
         this._fixedPosition();
+        this.updateEyeDirection();
     }
 
     _updateVelocity(dt) {
@@ -518,5 +541,8 @@ class Player extends Mesh {
             this.shape.translate(this.deltaPos);
         }
 
+    }
+    updateEyeDirection() {
+        this.eye.getWorldDirection(this.eyeDirection)
     }
 }
