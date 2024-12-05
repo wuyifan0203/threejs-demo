@@ -26,6 +26,7 @@ import {
   DirectionalLight,
   Clock,
   MathUtils,
+  Fog,
 } from "../three/three.module.js";
 import { CustomGrid } from "../three/CustomGrid.js";
 import { OrbitControls } from "../three/OrbitControls.js";
@@ -420,6 +421,11 @@ function initSky(scene, params = {}) {
   return sky;
 }
 
+function initFog(scene, near = 0.01, far = 500, color = '#ffffff') {
+  const fog = new Fog(color, near, far);
+  scene.fog = fog;
+}
+
 export {
   initAxesHelper,
   initSpotLight,
@@ -442,5 +448,6 @@ export {
   initTransformControls,
   initClock,
   initSky,
-  initLoader
+  initLoader,
+  initFog
 };
