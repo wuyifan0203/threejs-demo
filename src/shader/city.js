@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-03 15:13:16
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-05 18:05:22
+ * @LastEditTime: 2024-12-06 18:04:20
  * @FilePath: \threejs-demo\src\shader\city.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -104,19 +104,18 @@ async function createCity() {
     cityBox.applyMatrix4(city.matrixWorld);
     cityBox.getCenter(cityCenter);
     cityBox.getSize(citySize);
-    console.log('cityBox: ', cityBox);
 
     city.material.onBeforeCompile = (materialPrams) => {
         materialPrams.uniforms['uMinHeightAndRange'] = { value: new Vector2(cityBox.min.y, citySize.y) };
-        console.log(materialPrams.vertexShader);
-        console.log(materialPrams.fragmentShader);
-        addGradation(materialPrams);
-        addScanLine(materialPrams);
-        console.log(materialPrams.vertexShader);
-        console.log(materialPrams.fragmentShader);
+        useGradation(materialPrams);
+        useScanLine(materialPrams);
     }
 
-    function addGradation(params) {
+    land.material.onBeforeCompile = (materialParams) => {
+        useScanCircle(materialParams);
+    }
+
+    function useGradation(params) {
         params.uniforms['uTopColor'] = { value: new Color('#a9ff00') };
 
         params.vertexShader = params.vertexShader.replace(
@@ -164,11 +163,11 @@ async function createCity() {
 
     }
 
-    function addScanLine(params) {
+    function useScanLine(params) {
         params.uniforms['uTime'] = { value: 0 };
         params.uniforms['uLineSpeed'] = { value: 60.0 };
         params.uniforms['uLineWidth'] = { value: 10.0 };
-        params.uniforms['uLineColor'] = { value: new Color('#fffff') };
+        params.uniforms['uLineColor'] = { value: new Color('#ffffff') };
 
         params.fragmentShader = params.fragmentShader.replace(
             V_INJECT_END,
@@ -196,8 +195,36 @@ async function createCity() {
         timeTween.start();
     }
 
+    function useScanCircle(params) {
+        const scanCIrcle = {
+            innerRadius: 10,
+            outerRadius: 20,
+            center: new Vector2(0, 0)
+        };
+        console.log(params.fragmentShader, 888, params.vertexShader);
+        const defineVPosition = 'varying vec3 vPosition;'
+        if(!params.vertexShader.includes(defineVPosition)){
+            params.vertexShader = params.vertexShader.replace(
+                '#include <common>',
+                /*glsl*/`
+                #include <common>
+                ${V_INJECT_START}
+                ${defineVPosition}
+                ${V_INJECT_END}
+                `
+            )
+        }
+       
+    }
+
 
 
     return model;
 
+}
+
+
+function defineVPosition(materialParams) {
+    
+    
 }
