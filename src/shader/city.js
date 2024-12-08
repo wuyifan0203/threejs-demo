@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-03 15:13:16
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-06 18:04:20
- * @FilePath: \threejs-demo\src\shader\city.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2024-12-09 01:42:19
+ * @FilePath: /threejs-demo/src/shader/city.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -12,6 +12,7 @@ import {
     EdgesGeometry,
     LineBasicMaterial,
     LineSegments,
+    Uniform,
     Vector2,
     Vector3,
 } from "../lib/three/three.module.js";
@@ -27,10 +28,10 @@ import {
     initAxesHelper,
     initAmbientLight,
     initDirectionLight,
-    initFog,
 } from "../lib/tools/index.js";
 
 import { Tween, update } from '../lib/other/tween.esm.js';
+import g from "../lib/util/lil-gui.module.min.js";
 
 const V_INJECT_START = '//variable_inject_start';
 const V_INJECT_END = '//variable_inject_end';
@@ -99,52 +100,33 @@ async function createCity() {
     const cityCenter = new Vector3();
     const citySize = new Vector3();
     const cityBox = new Box3();
-    city.geometry.computeBoundingBox();
-    cityBox.copy(city.geometry.boundingBox);
-    cityBox.applyMatrix4(city.matrixWorld);
-    cityBox.getCenter(cityCenter);
-    cityBox.getSize(citySize);
+ 
 
-    city.material.onBeforeCompile = (materialPrams) => {
-        materialPrams.uniforms['uMinHeightAndRange'] = { value: new Vector2(cityBox.min.y, citySize.y) };
-        useGradation(materialPrams);
-        useScanLine(materialPrams);
+    city.material.onBeforeCompile = (materialParams) => {
+        city.geometry.computeBoundingBox();
+        cityBox.copy(city.geometry.boundingBox);
+        cityBox.applyMatrix4(city.matrixWorld);
+        cityBox.getCenter(cityCenter);
+        cityBox.getSize(citySize);
+        
+        materialParams.uniforms['uMinHeightAndRange'] = new Uniform(new Vector2(cityBox.min.y, citySize.y));
+        injectVPosition(materialParams);
+        useGradation(materialParams);
+        useScanLine(materialParams);
     }
 
     land.material.onBeforeCompile = (materialParams) => {
+        injectVPosition(materialParams);
         useScanCircle(materialParams);
     }
 
     function useGradation(params) {
         params.uniforms['uTopColor'] = { value: new Color('#a9ff00') };
-
-        params.vertexShader = params.vertexShader.replace(
-            '#include <common>',
-            /*glsl*/`
-            #include <common>
-            ${V_INJECT_START}
-            varying vec3 vPosition;
-            ${V_INJECT_END}
-            `
-        );
-        params.vertexShader = params.vertexShader.replace(
-            '#include <uv_vertex>',
-            /*glsl*/`
-            #include <uv_vertex>
-            ${F_INJECT_START}
-            vPosition = position;
-            ${F_INJECT_END}
-            `
-        );
-
         params.fragmentShader = params.fragmentShader.replace(
-            '#include <common>',
+            V_INJECT_END,
             /*glsl*/`
-            #include <common>
-            ${V_INJECT_START}
             uniform vec2 uMinHeightAndRange;
             uniform vec3 uTopColor;
-            varying vec3 vPosition;
             ${V_INJECT_END}
             `
         );
@@ -154,19 +136,17 @@ async function createCity() {
             /*glsl*/`
             vec4 diffuseColor = vec4( diffuse, opacity );
             ${F_INJECT_START}
-            float scale = (vPosition.z - uMinHeightAndRange.x) / (uMinHeightAndRange.y * 0.3);
+            float scale = (vWorldPosition.y - uMinHeightAndRange.x) / (uMinHeightAndRange.y * 0.3);
             diffuseColor.rgb = mix( diffuseColor.rgb, uTopColor, scale );
             ${F_INJECT_END}
-        
             `
         )
-
     }
 
     function useScanLine(params) {
         params.uniforms['uTime'] = { value: 0 };
-        params.uniforms['uLineSpeed'] = { value: 60.0 };
-        params.uniforms['uLineWidth'] = { value: 10.0 };
+        params.uniforms['uLineSpeed'] = { value: 10.0 };
+        params.uniforms['uLineWidth'] = { value: 0.5 };
         params.uniforms['uLineColor'] = { value: new Color('#ffffff') };
 
         params.fragmentShader = params.fragmentShader.replace(
@@ -185,7 +165,7 @@ async function createCity() {
             /*glsl*/`
             float distanceToBottom = mod(uLineSpeed * uTime, uMinHeightAndRange.y);
             float scanLineToTop = distanceToBottom + uLineWidth;
-            float insideLine  = step(distanceToBottom, vPosition.z) * step(vPosition.z, scanLineToTop);
+            float insideLine  = step(distanceToBottom, vWorldPosition.y) * step(vWorldPosition.y, scanLineToTop);
             diffuseColor.rgb = mix(diffuseColor.rgb, uLineColor, insideLine);
             ${F_INJECT_END}
            `
@@ -196,35 +176,128 @@ async function createCity() {
     }
 
     function useScanCircle(params) {
-        const scanCIrcle = {
+        const scanCircle = {
             innerRadius: 10,
-            outerRadius: 20,
-            center: new Vector2(0, 0)
+            radius: 10,
+            center: new Vector2(0, 0),
+            color: new Color('#0000ff'),
+            gradation: true,
         };
-        console.log(params.fragmentShader, 888, params.vertexShader);
-        const defineVPosition = 'varying vec3 vPosition;'
-        if(!params.vertexShader.includes(defineVPosition)){
-            params.vertexShader = params.vertexShader.replace(
-                '#include <common>',
+
+        params.uniforms['uScanCircle'] = new Uniform(scanCircle);
+        const diffuseColor = 'vec4 diffuseColor = vec4( diffuse, opacity );';
+        params.fragmentShader = params.fragmentShader.replace(
+            V_INJECT_END,
+            /*glsl*/`
+            struct ScanCircle {
+                vec2 center;
+                float innerRadius;
+                float radius;
+                vec3 color;
+                bool gradation;
+            };
+            uniform ScanCircle uScanCircle;
+            ${V_INJECT_END}
+            `
+        );
+
+        params.fragmentShader = params.fragmentShader.replace(
+            diffuseColor,
+            /*glsl*/`
+            ${diffuseColor}
+            float d = distance(vWorldPosition.xz, uScanCircle.center);
+            float outerRadius = uScanCircle.radius + uScanCircle.innerRadius;
+            float insideRing = step(uScanCircle.innerRadius, d) * step(d, outerRadius);
+            // if(uScanCircle.gradation){
+                // insideRing = clamp(0.0,1.0,insideRing - (d - uScanCircle.innerRadius)/ uScanCircle.radius);
+            // }
+            diffuseColor.rgb = mix(diffuseColor.rgb, uScanCircle.color, insideRing);
+            `
+        )
+
+        const timeTween = new Tween(params.uniforms.uScanCircle.value).to({ innerRadius: 300 }, 3000).repeat(Infinity);
+        timeTween.start();
+    }
+
+
+
+    return model;
+}
+
+function injectVPosition(materialParams) {
+    const defineVPosition = /*glsl*/`
+    varying vec3 vPosition;
+    varying vec3 vWorldPosition;
+    `;
+    const vPosition = /*glsl*/`
+    vPosition = position;
+    vWorldPosition = (modelMatrix * vec4(position,1.)).xyz;
+    `;
+    const includeCommon = '#include <common>';
+    const includeUV = '#include <uv_vertex>';
+    if (!materialParams.vertexShader.includes(defineVPosition)) {
+        if (materialParams.vertexShader.includes(V_INJECT_END)) {
+            materialParams.vertexShader = materialParams.vertexShader.replace(
+                V_INJECT_END,
                 /*glsl*/`
-                #include <common>
+                ${defineVPosition}
+                ${V_INJECT_END}
+                `
+            )
+        } else {
+            materialParams.vertexShader = materialParams.vertexShader.replace(
+                includeCommon,
+                /*glsl*/`
+                ${includeCommon}
                 ${V_INJECT_START}
                 ${defineVPosition}
                 ${V_INJECT_END}
                 `
             )
         }
-       
+    }
+    if (!materialParams.vertexShader.includes(vPosition)) {
+        if (materialParams.vertexShader.includes(F_INJECT_END)) {
+            materialParams.vertexShader = materialParams.vertexShader.replace(
+                F_INJECT_END,
+                /*glsl*/`
+                ${vPosition}
+                ${F_INJECT_END}
+                `
+            )
+        } else {
+            materialParams.vertexShader = materialParams.vertexShader.replace(
+                includeUV,
+                /*glsl*/`
+                ${includeUV}
+                ${F_INJECT_START}
+                ${vPosition}
+                ${F_INJECT_END}
+                `
+            )
+        }
     }
 
+    if (!materialParams.fragmentShader.includes(defineVPosition)) {
+        if (materialParams.fragmentShader.includes(V_INJECT_END)) {
+            materialParams.fragmentShader = materialParams.fragmentShader.replace(
+                V_INJECT_END,
+                /*glsl*/`
+                ${defineVPosition}
+                ${V_INJECT_END}
+                `
+            )
+        } else {
+            materialParams.fragmentShader = materialParams.fragmentShader.replace(
+                includeCommon,
+                /*glsl*/`
+                ${includeCommon}
+                ${V_INJECT_START}
+                ${defineVPosition}
+                ${V_INJECT_END}
+                `
+            )
+        }
 
-
-    return model;
-
-}
-
-
-function defineVPosition(materialParams) {
-    
-    
+    }
 }
