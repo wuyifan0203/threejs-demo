@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-03 15:13:16
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2024-12-09 01:42:19
- * @FilePath: /threejs-demo/src/shader/city.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-09 15:12:19
+ * @FilePath: \threejs-demo\src\shader\city.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -28,6 +28,7 @@ import {
     initAxesHelper,
     initAmbientLight,
     initDirectionLight,
+    QUARTER_PI,
 } from "../lib/tools/index.js";
 
 import { Tween, update } from '../lib/other/tween.esm.js';
@@ -100,7 +101,7 @@ async function createCity() {
     const cityCenter = new Vector3();
     const citySize = new Vector3();
     const cityBox = new Box3();
- 
+
 
     city.material.onBeforeCompile = (materialParams) => {
         city.geometry.computeBoundingBox();
@@ -108,7 +109,7 @@ async function createCity() {
         cityBox.applyMatrix4(city.matrixWorld);
         cityBox.getCenter(cityCenter);
         cityBox.getSize(citySize);
-        
+
         materialParams.uniforms['uMinHeightAndRange'] = new Uniform(new Vector2(cityBox.min.y, citySize.y));
         injectVPosition(materialParams);
         useGradation(materialParams);
@@ -118,6 +119,7 @@ async function createCity() {
     land.material.onBeforeCompile = (materialParams) => {
         injectVPosition(materialParams);
         useScanCircle(materialParams);
+        useRadar(materialParams)
     }
 
     function useGradation(params) {
@@ -132,10 +134,8 @@ async function createCity() {
         );
 
         params.fragmentShader = params.fragmentShader.replace(
-            'vec4 diffuseColor = vec4( diffuse, opacity );',
+            F_INJECT_END,
             /*glsl*/`
-            vec4 diffuseColor = vec4( diffuse, opacity );
-            ${F_INJECT_START}
             float scale = (vWorldPosition.y - uMinHeightAndRange.x) / (uMinHeightAndRange.y * 0.3);
             diffuseColor.rgb = mix( diffuseColor.rgb, uTopColor, scale );
             ${F_INJECT_END}
@@ -177,15 +177,14 @@ async function createCity() {
 
     function useScanCircle(params) {
         const scanCircle = {
-            innerRadius: 10,
-            radius: 10,
+            innerRadius: 0,
+            radius: 5,
             center: new Vector2(0, 0),
             color: new Color('#0000ff'),
-            gradation: true,
+            gradation: 1,
         };
 
         params.uniforms['uScanCircle'] = new Uniform(scanCircle);
-        const diffuseColor = 'vec4 diffuseColor = vec4( diffuse, opacity );';
         params.fragmentShader = params.fragmentShader.replace(
             V_INJECT_END,
             /*glsl*/`
@@ -194,7 +193,7 @@ async function createCity() {
                 float innerRadius;
                 float radius;
                 vec3 color;
-                bool gradation;
+                float gradation;
             };
             uniform ScanCircle uScanCircle;
             ${V_INJECT_END}
@@ -202,20 +201,80 @@ async function createCity() {
         );
 
         params.fragmentShader = params.fragmentShader.replace(
-            diffuseColor,
+            F_INJECT_END,
             /*glsl*/`
-            ${diffuseColor}
             float d = distance(vWorldPosition.xz, uScanCircle.center);
             float outerRadius = uScanCircle.radius + uScanCircle.innerRadius;
+            // 是否为圆环部分
             float insideRing = step(uScanCircle.innerRadius, d) * step(d, outerRadius);
-            // if(uScanCircle.gradation){
-                // insideRing = clamp(0.0,1.0,insideRing - (d - uScanCircle.innerRadius)/ uScanCircle.radius);
-            // }
-            diffuseColor.rgb = mix(diffuseColor.rgb, uScanCircle.color, insideRing);
+            float gradient = smoothstep(uScanCircle.innerRadius, outerRadius, d);
+            // 是否开启渐变
+            gradient = mix(1.0, gradient, uScanCircle.gradation); 
+            diffuseColor.rgb = mix(diffuseColor.rgb, uScanCircle.color, insideRing * gradient);
+            ${F_INJECT_END}
             `
         )
 
-        const timeTween = new Tween(params.uniforms.uScanCircle.value).to({ innerRadius: 300 }, 3000).repeat(Infinity);
+        const timeTween = new Tween(params.uniforms.uScanCircle.value).to({ innerRadius: 30 }, 1000).repeat(Infinity);
+        timeTween.start();
+    }
+
+    function useRadar(params) {
+        const radar = {
+            center: new Vector2(50, 50),
+            radius: 20,
+            color: new Color('#ff0000'),
+            speed: 0.5,
+            angleLength: QUARTER_PI
+        };
+
+        params.uniforms['uRadar'] = new Uniform(radar);
+        params.uniforms['uTime'] = new Uniform(0);
+
+        params.fragmentShader = params.fragmentShader.replace(
+            V_INJECT_END,
+            /*glsl*/`
+            struct Radar {
+                vec2 center;
+                float radius;
+                vec3 color;
+                float speed;
+                float angleLength;
+            };
+            uniform Radar uRadar;
+            uniform float uTime;
+
+            float SMOOTH(float r, float R){
+                return 1.0 - smoothstep( R-1.0,R+1.0,r);
+            }
+
+            float useRadar(vec2 uv, Radar radar){
+                vec2 pos = uv - radar.center;
+                float theta = uTime * radar.speed * radar.angleLength;
+                float currentR = length(pos);
+
+                if(radar.radius >= currentR){
+                    // point 为圆上一点
+                    vec2 point = radar.radius * vec2(cos(theta),-sin(theta));
+                    float len = length(pos - point * clamp(dot(pos,point)/dot(point,point),0.0,1.0));
+
+                    return SMOOTH(len,0.5);
+                }else return 0.0;
+            }
+            ${V_INJECT_END}
+            `
+        );
+
+        params.fragmentShader = params.fragmentShader.replace(
+            F_INJECT_END,
+            /*glsl*/`
+            diffuseColor.rgb += useRadar(vWorldPosition.xz, uRadar) * uRadar.color;
+            ${F_INJECT_END}
+            `
+        )
+
+
+        const timeTween = new Tween(params.uniforms.uTime).to({ value: 20 }, 3000).repeat(Infinity);
         timeTween.start();
     }
 
@@ -235,6 +294,7 @@ function injectVPosition(materialParams) {
     `;
     const includeCommon = '#include <common>';
     const includeUV = '#include <uv_vertex>';
+    const diffuseColor = 'vec4 diffuseColor = vec4( diffuse, opacity );';
     if (!materialParams.vertexShader.includes(defineVPosition)) {
         if (materialParams.vertexShader.includes(V_INJECT_END)) {
             materialParams.vertexShader = materialParams.vertexShader.replace(
@@ -299,5 +359,16 @@ function injectVPosition(materialParams) {
             )
         }
 
+    }
+
+    if (!materialParams.fragmentShader.includes(F_INJECT_END)) {
+        materialParams.fragmentShader = materialParams.fragmentShader.replace(
+            diffuseColor,
+            /*glsl*/`
+            ${diffuseColor}
+            ${F_INJECT_START}
+            ${F_INJECT_END}
+            `
+        )
     }
 }
