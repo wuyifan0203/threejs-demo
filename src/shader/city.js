@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-03 15:13:16
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-09 15:12:19
+ * @LastEditTime: 2024-12-10 18:42:52
  * @FilePath: \threejs-demo\src\shader\city.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -29,6 +29,7 @@ import {
     initAmbientLight,
     initDirectionLight,
     QUARTER_PI,
+    HALF_PI,
 } from "../lib/tools/index.js";
 
 import { Tween, update } from '../lib/other/tween.esm.js';
@@ -61,7 +62,7 @@ async function init() {
     light.position.set(100, 100, 100);
 
     const orbitControls = initOrbitControls(camera, renderer.domElement);
-    orbitControls.autoRotate = true;
+    // orbitControls.autoRotate = true;
 
     const cityModel = await createCity();
     cityModel.position.x = 20;
@@ -222,10 +223,11 @@ async function createCity() {
     function useRadar(params) {
         const radar = {
             center: new Vector2(50, 50),
-            radius: 20,
+            radius: 40,
             color: new Color('#ff0000'),
-            speed: 0.5,
-            angleLength: QUARTER_PI
+            speed: 1,
+            angleLength: HALF_PI,
+            clockwise: 1
         };
 
         params.uniforms['uRadar'] = new Uniform(radar);
@@ -240,25 +242,25 @@ async function createCity() {
                 vec3 color;
                 float speed;
                 float angleLength;
+                float clockwise;
             };
             uniform Radar uRadar;
             uniform float uTime;
 
-            float SMOOTH(float r, float R){
-                return 1.0 - smoothstep( R-1.0,R+1.0,r);
+            mat2 rotate2D(float angle){
+                float c = cos(angle);
+                float s = sin(angle);
+
+                return mat2(c,-s,s,c);
             }
 
             float useRadar(vec2 uv, Radar radar){
-                vec2 pos = uv - radar.center;
-                float theta = uTime * radar.speed * radar.angleLength;
-                float currentR = length(pos);
+                vec2 pos = rotate2D(uTime * radar.speed * radar.angleLength) * (uv - radar.center);
+                if(radar.radius >= length(pos)){
+                    float theta = mod(-1.0 * atan(pos.y,pos.x), PI);
+                    float gradient = clamp(1.0 - theta / radar.angleLength, 0.0, 1.0);
 
-                if(radar.radius >= currentR){
-                    // point 为圆上一点
-                    vec2 point = radar.radius * vec2(cos(theta),-sin(theta));
-                    float len = length(pos - point * clamp(dot(pos,point)/dot(point,point),0.0,1.0));
-
-                    return SMOOTH(len,0.5);
+                    return gradient;
                 }else return 0.0;
             }
             ${V_INJECT_END}
@@ -268,13 +270,14 @@ async function createCity() {
         params.fragmentShader = params.fragmentShader.replace(
             F_INJECT_END,
             /*glsl*/`
-            diffuseColor.rgb += useRadar(vWorldPosition.xz, uRadar) * uRadar.color;
+            float radarEffect = useRadar(vWorldPosition.xz, uRadar);
+            diffuseColor.rgb = mix(diffuseColor.rgb,uRadar.color, step(0.0, radarEffect) * radarEffect);
             ${F_INJECT_END}
             `
         )
 
 
-        const timeTween = new Tween(params.uniforms.uTime).to({ value: 20 }, 3000).repeat(Infinity);
+        const timeTween = new Tween(params.uniforms.uTime).to({ value: 10 }, 3200).repeat(Infinity);
         timeTween.start();
     }
 
