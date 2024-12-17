@@ -11,7 +11,7 @@ import {
   Color,
   BoxGeometry,
   MeshLambertMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initPerspectiveCamera,

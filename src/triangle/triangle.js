@@ -16,7 +16,7 @@ import {
   Vector3,
   BufferGeometry,
   Vector2,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initCustomGrid,
   initOrbitControls,

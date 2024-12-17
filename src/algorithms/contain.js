@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-25 16:59:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-26 13:19:59
+ * @LastEditTime: 2024-12-17 17:53:58
  * @FilePath: \threejs-demo\src\algorithms\contain.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -12,7 +12,7 @@ import {
     IcosahedronGeometry,
     MeshStandardMaterial,
     DodecahedronGeometry
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initScene,
     initRenderer,

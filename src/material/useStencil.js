@@ -9,7 +9,7 @@ import {
     AmbientLight,
     Mesh,
     MeshBasicMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { STLLoader } from '../lib/three/STLLoader.js'
 import {
     initRenderer,

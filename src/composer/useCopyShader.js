@@ -12,7 +12,7 @@ import {
     TextureLoader,
     MeshStandardMaterial,
     GridHelper,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import { RenderPass } from '../lib/three/RenderPass.js'
 import { ShaderPass } from '../lib/three/ShaderPass.js'

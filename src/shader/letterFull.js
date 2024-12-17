@@ -16,7 +16,7 @@ import {
     UniformsUtils,
     Mesh,
     MeshNormalMaterial
-} from "../lib/three/three.module.js";
+} from "three";
 import { update, Tween } from "../lib/other/tween.esm.js";
 import { SimplexNoise } from "../lib/three/SimplexNoise.js";
 import {

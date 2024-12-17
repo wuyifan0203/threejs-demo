@@ -12,7 +12,7 @@ import {
   LineLoop,
   Points,
   PointsMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

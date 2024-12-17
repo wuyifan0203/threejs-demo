@@ -1,19 +1,30 @@
 <!--
  * @Date: 2022-11-16 15:00:07
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2023-04-20 13:24:38
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-17 18:42:23
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/mathjs@7.0.1/dist/math.min.js" type="text/javascript"></script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script
+      src="https://unpkg.com/mathjs@7.0.1/dist/math.min.js"
+      type="text/javascript"
+    ></script>
     <title>ring</title>
-</head>
-<body>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/": "../lib/three/examples/jsm/"
+      }
+    }
+  </script>
+  <body>
     <div id="webgl-output"></div>
     <script src="./splitMesh.js" type="module"></script>
-</body>
+  </body>
 </html>

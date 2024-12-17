@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-09-03 10:59:06
  * @FilePath: /threejs-demo/src/algorithms/quadTreeDemo.js
  */
-import { Box2, BoxGeometry, Vector2, Vector3, Mesh, MeshBasicMaterial, Color } from '../lib/three/three.module.js';
+import { Box2, BoxGeometry, Vector2, Vector3, Mesh, MeshBasicMaterial, Color } from 'three';
 import {
     initRenderer,
     resize,

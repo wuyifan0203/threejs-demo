@@ -20,7 +20,7 @@ import {
     Raycaster,
     AxesHelper,
     Matrix4
-} from '../lib/three/three.module.js'
+} from 'three'
 import {
     initAxesHelper,
     initScene,

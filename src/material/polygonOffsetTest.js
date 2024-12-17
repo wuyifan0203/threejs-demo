@@ -10,7 +10,7 @@ import {
   Vector3,
   MeshLambertMaterial,
   Box3,
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   initScene,

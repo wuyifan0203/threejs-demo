@@ -17,7 +17,7 @@ import {
     SpriteMaterial,
     Vector3,
     OrthographicCamera
-} from '../lib/three/three.module.js';
+} from 'three';
 import { jet } from '../lib/tools/colorMap.js';
 import {
     initGUI,

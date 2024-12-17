@@ -8,7 +8,7 @@ import {
   BufferAttribute,
   LineSegments,
   MeshBasicMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 
 import {

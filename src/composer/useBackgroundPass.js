@@ -11,7 +11,7 @@ import {
     BoxGeometry,
     MeshBasicMaterial,
     Vector4
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import { EffectComposer } from '../lib/three/EffectComposer.js'
 import {

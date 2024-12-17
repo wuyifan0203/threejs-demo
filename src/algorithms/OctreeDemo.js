@@ -16,7 +16,7 @@ import {
     Sphere,
     MeshBasicMaterial,
     BufferGeometry
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initScene,
     initRenderer,
@@ -27,7 +27,7 @@ import {
     initGUI
 } from '../lib/tools/common.js';
 
-import { Octree } from '../lib/three/Octree.js';
+import { Octree } from 'three/examples/jsm/data/Octree.js';
 
 window.onload = function () {
     init()

@@ -20,7 +20,7 @@ import {
     LineSegments,
     SphereGeometry,
     CylinderGeometry
-} from '../lib/three/three.module.js'
+} from 'three'
 import {
     resize,
     initScene,

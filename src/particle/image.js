@@ -14,7 +14,7 @@ import {
     BoxGeometry,
     MeshBasicMaterial,
     Mesh
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     resize,

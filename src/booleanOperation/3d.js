@@ -11,7 +11,7 @@ import {
   SphereGeometry,
   BoxGeometry,
   Matrix4,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { CSG } from '../lib/other/CSGMesh.js';
 import {

@@ -15,7 +15,7 @@ import {
   Mesh,
   MeshBasicMaterial,
   MeshNormalMaterial
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   initGUI,

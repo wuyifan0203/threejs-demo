@@ -14,7 +14,7 @@ import {
     Vector4, 
     Color, 
     CanvasTexture
-} from '../lib/three/three.module.js'
+} from 'three'
 import {
     initCoordinates,
     initCustomGrid,

@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-07-22 16:30:50
  * @FilePath: /threejs-demo/src/helper/viewHelperTest.js
  */
-import * as THREE from '../lib/three/three.module.js';
+import * as THREE from 'three';
 import { OrbitControls } from '../lib/three/OrbitControls.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 

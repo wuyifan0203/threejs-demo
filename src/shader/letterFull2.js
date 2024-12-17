@@ -1,4 +1,4 @@
-import * as THREE from "../lib/three/three.module.js";
+import * as THREE from "three";
 import * as TWEEN from "../lib/other/tween.esm.js";
 import {
   SimplexNoise

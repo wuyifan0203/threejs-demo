@@ -21,7 +21,7 @@ import {
   UnsignedShortType,
   NearestFilter,
   PerspectiveCamera,
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   resize,

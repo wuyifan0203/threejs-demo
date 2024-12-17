@@ -6,7 +6,7 @@
  * @FilePath: \threejs-demo\src\algorithms\collision.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Box3, Mesh, Raycaster, Vector3, Ray, Triangle } from "../lib/three/three.module.js";
+import { Box3, Mesh, Raycaster, Vector3, Ray, Triangle } from "three";
 
 const directions = [
     new Vector3(1, 0, 0), // +x

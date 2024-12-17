@@ -7,7 +7,7 @@
 import { FullScreenQuad } from '../lib/three/Pass.js';
 import {
     WebGLRenderTarget, DepthTexture, DataTexture, Vector2, Mesh, Material, Color, WebGLRenderer, ShaderMaterial, NoBlending
-} from '../lib/three/three.module.js'
+} from 'three'
 
 
 function debugDeepPeeling(scene, camera) {

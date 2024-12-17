@@ -6,7 +6,7 @@
  * @FilePath: /threejs-demo/src/intersection/Polygon.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Triangle } from '../lib/three/three.module.js'
+import { Triangle } from 'three'
 
 let triangleId = 0;
 class CustomTriangle extends Triangle {

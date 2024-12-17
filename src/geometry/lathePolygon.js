@@ -14,7 +14,7 @@ import {
   LatheGeometry,
   BufferGeometry,
   Float32BufferAttribute,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initPerspectiveCamera,

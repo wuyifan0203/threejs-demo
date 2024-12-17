@@ -11,7 +11,7 @@ import {
   MeshLambertMaterial,
   PointLight,
   Vector3,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

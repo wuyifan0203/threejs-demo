@@ -7,7 +7,7 @@
 
 import {
     Mesh, MeshBasicMaterial, OrthographicCamera, PlaneGeometry, CanvasTexture, Vector2, Vector3
-} from '../lib/three/three.module.js';
+} from 'three';
 
 const DirectionX = {
     '1': 1,

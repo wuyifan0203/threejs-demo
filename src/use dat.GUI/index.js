@@ -10,7 +10,7 @@ import {
   MeshBasicMaterial,
   SphereGeometry,
   Color,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initPerspectiveCamera,

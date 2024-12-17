@@ -15,7 +15,7 @@ import {
     TorusKnotGeometry,
     BufferGeometry,
     MeshBasicMaterial
-} from "../lib/three/three.module.js";
+} from "three";
 import {
     initAmbientLight,
     initCoordinates,

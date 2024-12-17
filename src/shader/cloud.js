@@ -17,7 +17,7 @@ import {
   InstancedBufferAttribute,
   PerspectiveCamera,
   Color
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   initGUI,

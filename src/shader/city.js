@@ -15,7 +15,7 @@ import {
     Uniform,
     Vector2,
     Vector3,
-} from "../lib/three/three.module.js";
+} from "../lib/three1/three.module.js";
 import {
     initRenderer,
     initLoader,

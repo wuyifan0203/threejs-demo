@@ -9,7 +9,7 @@ import {
   Vector2,
   Shape,
   LineCurve,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

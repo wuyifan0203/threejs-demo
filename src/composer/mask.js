@@ -12,7 +12,7 @@ import {
     SpotLight,
     AmbientLight,
     Object3D,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import { RenderPass } from '../lib/three/RenderPass.js'
 import { ClearMaskPass, MaskPass } from '../lib/three/MaskPass.js'

@@ -7,7 +7,7 @@
 import {
   Vector3,
   WebGLRenderer,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initOrbitControls,
   initOrthographicCamera,

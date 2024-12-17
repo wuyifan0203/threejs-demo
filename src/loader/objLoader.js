@@ -26,7 +26,7 @@ import {
   Color,
   Matrix4,
   Box3,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 window.onload = () => {
   init();

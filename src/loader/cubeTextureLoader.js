@@ -8,7 +8,7 @@
 import {
   Vector3,
   CubeTextureLoader,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   resize,

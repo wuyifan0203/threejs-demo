@@ -17,7 +17,7 @@ import {
     PlaneGeometry,
     Vector2,
     Float32BufferAttribute,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initOrbitControls,

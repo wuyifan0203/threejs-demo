@@ -8,7 +8,7 @@ import {
     Clock,
     Vector3,
     MeshStandardMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,

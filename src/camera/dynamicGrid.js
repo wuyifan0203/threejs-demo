@@ -13,7 +13,7 @@ import {
   Vector3,
   MeshNormalMaterial,
   RingGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { DynamicGrid } from '../lib/three/GridHelper2.js';
 import {
   initRenderer,

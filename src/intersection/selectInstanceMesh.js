@@ -17,7 +17,7 @@ import {
     Matrix4,
     Raycaster,
     MeshNormalMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initRenderer,

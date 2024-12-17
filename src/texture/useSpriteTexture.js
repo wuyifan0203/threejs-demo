@@ -16,7 +16,7 @@ import {
     BufferGeometry,
     Float32BufferAttribute,
     CameraHelper
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initOrbitControls,
     initRenderer,

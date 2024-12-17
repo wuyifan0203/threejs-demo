@@ -14,7 +14,7 @@ import {
   ReplaceStencilOp,
   NotEqualStencilFunc,
   PointLight,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

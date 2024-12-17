@@ -12,7 +12,7 @@ import {
   BoxGeometry,
   Color,
   ShaderMaterial,
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   initOrthographicCamera,

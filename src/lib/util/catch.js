@@ -9,8 +9,8 @@ import {
   WebGLRenderTarget,
   WebGLRenderer,
   ShaderMaterial,
-} from "../three/three.module.js";
-import { FullScreenQuad } from "../three/Pass.js";
+} from "three";
+import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 
 const size = new Vector2();
 const canvas = document.createElement("canvas");

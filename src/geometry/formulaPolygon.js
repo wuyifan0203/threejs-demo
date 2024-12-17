@@ -5,7 +5,7 @@ import {
   ExtrudeGeometry,
   Shape,
   Vector2,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initAxesHelper,

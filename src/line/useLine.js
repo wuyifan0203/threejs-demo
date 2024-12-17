@@ -14,7 +14,7 @@ import {
   Path,
   Line,
   LineLoop,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initScene,
   initOrbitControls,

@@ -14,7 +14,7 @@ import {
     Vector3,
     Matrix4,
     Box2,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initCoordinates,
     initCustomGrid,

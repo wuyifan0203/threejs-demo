@@ -35,7 +35,7 @@
 
 /* eslint-disable no-unused-vars */
 
-import { Vector3, Matrix4 } from '../three/three.module.js';
+import { Vector3, Matrix4 } from 'three';
 /**
  * @description: use Rodrigues` rotation formula to create rotate matrix
  * @param {vec3} vec3Before

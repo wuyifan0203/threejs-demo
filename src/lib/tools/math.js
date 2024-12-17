@@ -7,7 +7,7 @@
 
 import {
     Matrix4, Vector3, Plane
-} from "../three/three.module.js";
+} from "three";
 
 /**
  * @description: webgl -> canvas

@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-10 09:37:35
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2023-12-27 17:25:58
- * @FilePath: /threejs-demo/src/geometry/isSamplePolygon.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-17 17:57:14
+ * @FilePath: \threejs-demo\src\algorithms\isSamplePolygon.js
  */
 import {
   Vector3,
@@ -11,7 +11,7 @@ import {
   LineBasicMaterial,
   BufferAttribute,
   Vector2,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initAxesHelper,
@@ -21,9 +21,9 @@ import {
   isComplexPolygon,
   initScene,
   initOrbitControls,
-  initGUI
+  initGUI,
+  initViewHelper
 } from '../lib/tools/index.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
 
 
 window.onload = () => {
@@ -42,7 +42,7 @@ function init() {
   initAxesHelper(scene);
 
   const controls = initOrbitControls(camera, renderer.domElement);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const viewHelper =  initViewHelper(camera, renderer.domElement);
 
   const test1 = [
     new Vector3(0, 0, 0),

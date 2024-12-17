@@ -7,7 +7,7 @@
 import {
     BoxGeometry,
     Mesh, Vector2, Vector3, MeshBasicMaterial, Quaternion, Euler, Clock
-} from '../lib/three/three.module.js'
+} from 'three'
 import {
     initAxesHelper,
     initScene,

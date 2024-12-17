@@ -10,7 +10,7 @@ import {
   DoubleSide,
   Mesh,
   BoxGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import { 
   initRenderer, 

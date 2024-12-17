@@ -21,7 +21,7 @@ import {
   BufferAttribute,
   BufferGeometry,
   MeshLambertMaterial
-} from '../three/three.module.js';
+} from 'three';
 
 function draw2dLine(k, b, z, domain = [-10, 10]) {
   const start = [domain[0], line2d(k, b, domain[0]), z];

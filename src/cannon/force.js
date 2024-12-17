@@ -14,7 +14,7 @@ import {
     LoadingManager,
     CameraHelper,
     MeshStandardMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,

@@ -12,7 +12,7 @@ import {
   AmbientLight,
   WebGLRenderer,
   Color,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initGUI,
   initScene,

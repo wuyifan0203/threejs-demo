@@ -12,7 +12,7 @@ import {
   Vector3,
   MeshPhongMaterial,
   PlaneGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

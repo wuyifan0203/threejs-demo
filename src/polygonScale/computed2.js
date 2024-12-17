@@ -9,7 +9,7 @@
 
 import {
   BufferGeometry, Float16BufferAttribute, LineBasicMaterial, LineLoop, LineSegments, MeshBasicMaterial, Vector2,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   isComplexPolygon, vec2ToData, vec2ToVec3, vec2ToVec3Vertex,
 } from '../lib/tools/index.js';

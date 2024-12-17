@@ -18,7 +18,7 @@ import {
     SphereGeometry,
     MeshBasicMaterial,
     Ray
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initGUI,

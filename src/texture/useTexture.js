@@ -44,7 +44,7 @@ import {
     // LuminanceAlphaFormat, // 1025
     // DepthFormat, // 1026
     // DepthStencilFormat, // 1027
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initOrbitControls,
     initRenderer,

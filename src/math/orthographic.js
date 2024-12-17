@@ -13,7 +13,7 @@ import {
     OrthographicCamera,
     CameraHelper,
     AmbientLight
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,

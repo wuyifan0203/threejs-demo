@@ -14,7 +14,7 @@ import {
     GridHelper,
     Vector2,
     WebGLRenderTarget
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initRenderer,

@@ -16,7 +16,7 @@ import {
     Mesh,
     MeshNormalMaterial,
     Clock
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     resize,

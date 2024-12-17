@@ -11,7 +11,7 @@ import {
   AmbientLight,
   PlaneGeometry,
   MeshNormalMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { ImprovedNoise } from '../lib/three/ImprovedNoise.js';
 
 import {

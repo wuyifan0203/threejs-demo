@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-01-17 19:38:28
  * @FilePath: /threejs-demo/src/algorithms/QuadTree.js
  */
-import { Box2, Vector2 } from '../lib/three/three.module.js';
+import { Box2, Vector2 } from 'three';
 ///  --------------
 /// |  lu  |  ru  |     lu-> left up
 /// |------|-------     ru-> right up

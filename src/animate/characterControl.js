@@ -13,7 +13,7 @@ import {
     AnimationMixer,
     Matrix4,
     Quaternion,
-} from "../lib/three/three.module.js";
+} from "three";
 import {
     initRenderer,
     initOrthographicCamera,

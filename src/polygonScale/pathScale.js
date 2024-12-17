@@ -2,7 +2,7 @@
 /* eslint-disable no-var */
 import {
   BufferGeometry, Float32BufferAttribute, LineBasicMaterial, LineLoop, Points, PointsMaterial, Scene, Vector2, Vector3, Mesh, MeshBasicMaterial, Color,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initCustomGrid,
   initOrbitControls, initOrthographicCamera, initRenderer, array2DToVertex, vec2ToVec3Vertex,

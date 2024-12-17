@@ -24,7 +24,7 @@ import {
     MeshStandardMaterial,
     Matrix4,
     Frustum
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrbitControls,

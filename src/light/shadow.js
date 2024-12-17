@@ -24,7 +24,7 @@ import {
   SpotLightHelper,
   BoxGeometry,
   Color,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 
 window.onload = () => {

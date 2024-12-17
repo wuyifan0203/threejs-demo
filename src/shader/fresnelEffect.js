@@ -14,7 +14,7 @@ import {
     resize,
     initScene
 } from '../lib/tools/index.js';
-import { AdditiveBlending, Color, Mesh, ShaderMaterial, TorusKnotGeometry, Vector3 } from '../lib/three/three.module.js';
+import { AdditiveBlending, Color, Mesh, ShaderMaterial, TorusKnotGeometry, Vector3 } from 'three';
 
 window.onload = () => {
     init();

@@ -14,7 +14,7 @@ import {
     MeshLambertMaterial,
     AmbientLight,
     Matrix4,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initRenderer,

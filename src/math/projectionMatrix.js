@@ -16,7 +16,7 @@ import {
     OrthographicCamera,
     Vector3,
     Box3
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initOrbitControls,
     initOrthographicCamera,

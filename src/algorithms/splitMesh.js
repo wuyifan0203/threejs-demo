@@ -15,7 +15,7 @@ import {
   LineBasicMaterial,
   TorusGeometry,
   SphereGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initPerspectiveCamera,
@@ -23,9 +23,9 @@ import {
   resize,
   initScene,
   initGUI,
-  initOrbitControls
+  initOrbitControls,
+  initViewHelper
 } from '../lib/tools/index.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
 
 const { EPSILON } = Number;
 
@@ -44,7 +44,7 @@ function init() {
   initAxesHelper(scene);
 
   const controls = initOrbitControls(camera, renderer.domElement);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const viewHelper = initViewHelper(camera, renderer.domElement);
 
   draw(scene);
 

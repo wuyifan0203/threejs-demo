@@ -7,7 +7,7 @@ import {
   LineBasicMaterial,
   LineLoop,
   Points,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initAxesHelper,

@@ -6,7 +6,7 @@
  * @FilePath: \threejs-demo\src\lib\custom\AbstractPlayer.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Object3D, Vector3 } from "../three/three.module.js";
+import { Object3D, Vector3 } from "three";
 
 class AbstractPlayer extends Object3D {
     constructor(shape) {

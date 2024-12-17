@@ -25,7 +25,7 @@ import {
   BufferGeometry,
   BufferAttribute,
   PlaneGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 const init = () => {
   const renderer = initRenderer();

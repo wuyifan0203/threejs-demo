@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-10-12 17:53:10
  * @FilePath: \threejs-demo\src\shader\material\basic.js
  */
-import { ShaderMaterial, Color } from "../../lib/three/three.module.js";
+import { ShaderMaterial, Color } from "../three";
 
 const vertexShaderSource = /* glsl */ `
     varying vec2 vUv;

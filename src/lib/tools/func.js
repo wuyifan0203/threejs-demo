@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Matrix4, Quaternion, Vector3 } from '../three/three.module.js';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 /**
  * @description: plane function
  * @param {Vector3} normal

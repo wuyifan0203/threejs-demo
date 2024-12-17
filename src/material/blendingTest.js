@@ -17,7 +17,7 @@ import {
   SubtractiveBlending,
   MultiplyBlending,
   FrontSide, BackSide, DoubleSide
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

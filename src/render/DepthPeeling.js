@@ -16,7 +16,7 @@ import {
     Material,
     NoBlending,
     Mesh
-} from "../lib/three/three.module.js";
+} from "three";
 import { FullScreenQuad } from "../lib/three/Pass.js";
 
 const vertexShader = /* glsl */`

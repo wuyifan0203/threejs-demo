@@ -16,7 +16,7 @@ import {
   TorusGeometry,
   Group,
   Clock
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

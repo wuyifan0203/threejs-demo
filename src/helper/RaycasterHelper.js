@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-01-03 15:48:33
  * @FilePath: /threejs-demo/src/helper/RaycasterHelper.js
  */
-import { BufferGeometry, Float32BufferAttribute, LineSegments, Vector3, LineBasicMaterial } from "../lib/three/three.module.js";
+import { BufferGeometry, Float32BufferAttribute, LineSegments, Vector3, LineBasicMaterial } from "three";
 
 const _origin = new Vector3();
 const _end = new Vector3();

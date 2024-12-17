@@ -13,7 +13,7 @@ import {
     MeshNormalMaterial,
     WebGLRenderTarget,
     SRGBColorSpace
-} from '../lib/three/three.module.js';
+} from 'three';
 import { EffectComposer } from '../lib/three/EffectComposer.js';
 import { RenderPass } from '../lib/three/RenderPass.js';
 import { OutputPass } from '../lib/three/OutputPass.js';

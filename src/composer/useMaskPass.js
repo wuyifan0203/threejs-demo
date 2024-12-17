@@ -11,7 +11,7 @@ import {
     SphereGeometry,
     Vector2,
     MeshNormalMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import { RenderPass } from '../lib/three/RenderPass.js'
 import { TexturePass } from '../lib/three/TexturePass.js'

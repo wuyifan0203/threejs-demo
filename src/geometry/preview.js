@@ -11,7 +11,7 @@ import {
   Group,
   LineLoop,
   LineBasicMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initAxesHelper,

@@ -14,7 +14,7 @@ import {
   MeshLambertMaterial,
   Float32BufferAttribute,
   AmbientLight,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
 import { initRenderer, resize, initScene, initOrbitControls } from '../lib/tools/index.js';
 

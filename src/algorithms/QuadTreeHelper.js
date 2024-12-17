@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-01-17 15:34:11
  * @FilePath: /threejs-demo/src/algorithms/QuadTreeHelper.js
  */
-import { BufferGeometry, LineBasicMaterial, LineSegments, Vector2, Float32BufferAttribute } from "../lib/three/three.module.js";
+import { BufferGeometry, LineBasicMaterial, LineSegments, Vector2, Float32BufferAttribute } from "three";
 
 
 const keys = ['lu', 'ru', 'ld', 'rd'];

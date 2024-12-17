@@ -17,7 +17,7 @@ import {
     InstancedMesh,
     Object3D,
     InstancedBufferAttribute,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initRenderer,

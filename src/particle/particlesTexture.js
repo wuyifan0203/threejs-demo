@@ -12,7 +12,7 @@ import {
   Float32BufferAttribute,
   Points,
   CanvasTexture,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
   initRenderer,

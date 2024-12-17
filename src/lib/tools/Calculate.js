@@ -2,11 +2,11 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-28 13:44:26
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-28 14:18:13
+ * @LastEditTime: 2024-12-17 17:36:40
  * @FilePath: \threejs-demo\src\lib\tools\Calculate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Vector2, Vector3 } from '../three/three.module.js';
+import { Vector2, Vector3 } from 'three';
 
 const { abs, max, min } = Math;
 const EPSILON = 1e-6;

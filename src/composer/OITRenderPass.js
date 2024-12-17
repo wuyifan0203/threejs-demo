@@ -13,7 +13,7 @@ import {
     DataTexture,
     NoBlending,
     ShaderMaterial
-} from '../lib/three/three.module.js';
+} from 'three';
 import { catchRenderTarget, catchTexture, printfImage } from '../lib/util/catch.js'
 
 

@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-12 11:23:56
+ * @LastEditTime: 2024-12-17 18:11:09
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -27,16 +27,16 @@ import {
   Clock,
   MathUtils,
   Fog,
-} from "../three/three.module.js";
-import { CustomGrid } from "../three/CustomGrid.js";
-import { OrbitControls } from "../three/OrbitControls.js";
-import { GUI } from "../util/lil-gui.module.min.js";
-import { CoordinateHelper } from "../three/CoordinateHelper.js";
+} from "three";
+import { ViewHelper } from "three/examples/jsm/helpers/ViewHelper.js";
+import { Sky } from 'three/examples/jsm/objects/Sky.js';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
+import { CoordinateHelper } from "../custom/CoordinateHelper.js";
+import { CustomGrid } from "../custom/CustomGrid.js";
+import { OmnipotentLoader } from "../custom/OmnipotentLoader.js";
 import { Stats } from "../util/Stats.js";
-import { ViewHelper } from "../three/viewHelper.js";
-import { TransformControls } from "../three/TransformControls.js";
-import { Sky } from "../three/Sky.js";
-import { OmnipotentLoader } from "./OmnipotentLoader.js";
+import { GUI } from "../util/lil-gui.module.min.js";
 
 /**
  * @description: 初始化渲染器

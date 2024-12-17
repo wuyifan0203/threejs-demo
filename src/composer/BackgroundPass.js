@@ -6,7 +6,7 @@
  */
 
 import { Pass, FullScreenQuad } from "..//lib/three/Pass.js";
-import { ShaderMaterial, Vector4, Vector3 } from "../lib/three/three.module.js";
+import { ShaderMaterial, Vector4, Vector3 } from "three";
 
 const vertexShader = /* glsl */ `
 	void main() {

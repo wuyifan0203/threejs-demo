@@ -18,7 +18,7 @@ import {
     RepeatWrapping,
     MirroredRepeatWrapping,
     SRGBColorSpace,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initOrbitControls,
     initRenderer,

@@ -17,7 +17,7 @@
  */
 // exports.__esModule = true;
 // exports.Plane = exports.Polygon = exports.Vector = exports.Vertex = exports.CSG = void 0;
-import * as three_1 from '../three/three.module.js';
+import * as THREE from 'three';
 var CSG = /** @class */ (function () {
     function CSG() {
         this.polygons = [];
@@ -137,8 +137,8 @@ var CSG = /** @class */ (function () {
         }
         return CSG.fromPolygons(polys);
     };
-    CSG.ttvv0 = new three_1.Vector3();
-    CSG.tmpm3 = new three_1.Matrix3();
+    CSG.ttvv0 = new THREE.Vector3();
+    CSG.tmpm3 = new THREE.Matrix3();
     CSG.fromMesh = function (mesh, objectIndex) {
         var csg = CSG.fromGeometry(mesh.geometry, objectIndex);
         CSG.tmpm3.getNormalMatrix(mesh.matrix);
@@ -147,10 +147,10 @@ var CSG = /** @class */ (function () {
             for (var j = 0; j < p.vertices.length; j++) {
                 var v = p.vertices[j];
                 v.pos.copy(CSG.ttvv0
-                    .copy(new three_1.Vector3(v.pos.x, v.pos.y, v.pos.z))
+                    .copy(new THREE.Vector3(v.pos.x, v.pos.y, v.pos.z))
                     .applyMatrix4(mesh.matrix));
                 v.normal.copy(CSG.ttvv0
-                    .copy(new three_1.Vector3(v.normal.x, v.normal.y, v.normal.z))
+                    .copy(new THREE.Vector3(v.normal.x, v.normal.y, v.normal.z))
                     .applyMatrix3(CSG.tmpm3));
             }
         }
@@ -182,7 +182,7 @@ var CSG = /** @class */ (function () {
         var geom;
         var triCount = 0;
         ps.forEach(function (p) { return (triCount += p.vertices.length - 2); });
-        geom = new three_1.BufferGeometry();
+        geom = new THREE.BufferGeometry();
         var vertices = CSG.nbuf3(triCount * 3 * 3);
         var normals = CSG.nbuf3(triCount * 3 * 3);
         var uvs = CSG.nbuf2(triCount * 2 * 3);
@@ -217,11 +217,11 @@ var CSG = /** @class */ (function () {
                         colors.write(pvs[j - 1].color));
             }
         });
-        geom.setAttribute('position', new three_1.BufferAttribute(vertices.array, 3));
-        geom.setAttribute('normal', new three_1.BufferAttribute(normals.array, 3));
-        geom.setAttribute('uv', new three_1.BufferAttribute(uvs.array, 2));
+        geom.setAttribute('position', new THREE.BufferAttribute(vertices.array, 3));
+        geom.setAttribute('normal', new THREE.BufferAttribute(normals.array, 3));
+        geom.setAttribute('uv', new THREE.BufferAttribute(uvs.array, 2));
         colors &&
-            geom.setAttribute('color', new three_1.BufferAttribute(colors.array, 3));
+            geom.setAttribute('color', new THREE.BufferAttribute(colors.array, 3));
         if (grps.length) {
             var index = [];
             var gbase = 0;
@@ -232,11 +232,11 @@ var CSG = /** @class */ (function () {
             }
             geom.setIndex(index);
         }
-        var inv = new three_1.Matrix4().copy(toMatrix).invert();
+        var inv = new THREE.Matrix4().copy(toMatrix).invert();
         geom.applyMatrix4(inv);
         geom.computeBoundingSphere();
         geom.computeBoundingBox();
-        var m = new three_1.Mesh(geom, toMaterial);
+        var m = new THREE.Mesh(geom, toMaterial);
         m.matrix.copy(toMatrix);
         m.matrix.decompose(m.position, m.quaternion, m.scale);
         m.rotation.setFromQuaternion(m.quaternion);

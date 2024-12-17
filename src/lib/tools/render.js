@@ -1,4 +1,4 @@
-import { Vector2 } from "../three/three.module.js"
+import { Vector2 } from "three"
 
 
 const size = new Vector2();

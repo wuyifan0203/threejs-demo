@@ -7,7 +7,7 @@
 import {
     BoxGeometry,
     Mesh, Vector3, MeshBasicMaterial, Color,
-} from '../lib/three/three.module.js'
+} from 'three'
 import {
     initCoordinates,
     initCustomGrid,

@@ -16,7 +16,7 @@ import {
   Points,
   Texture,
   SRGBColorSpace,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {
   initRenderer, 

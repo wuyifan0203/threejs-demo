@@ -16,7 +16,7 @@ import {
     LineBasicMaterial,
     Mesh,
     MeshNormalMaterial
-  } from '../lib/three/three.module.js';
+  } from 'three';
   import {
     initRenderer,
     initPerspectiveCamera,

@@ -2,28 +2,37 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-05 17:06:30
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-09 15:17:48
+ * @LastEditTime: 2024-12-17 18:40:26
  * @FilePath: \threejs-demo\src\algorithms\occlusionCulling.html
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Occlusion Culling</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            width: 100%;
-            height: 100%;
-        }
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/": "../lib/three/examples/jsm/"
+      }
+    }
+  </script>
+  <body>
     <script type="module" src="./occlusionCulling.js"></script>
     <div id="webgl-output"></div>
-</body>
+  </body>
 </html>

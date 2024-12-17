@@ -12,7 +12,7 @@ import {
     PlaneGeometry,
     MeshStandardMaterial,
     BoxGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,

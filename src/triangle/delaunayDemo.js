@@ -15,7 +15,7 @@ import {
     Shape,
     ShapeGeometry,
     Float32BufferAttribute,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initCustomGrid,
     initOrbitControls,

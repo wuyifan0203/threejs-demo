@@ -19,7 +19,7 @@ import {
     TorusKnotGeometry,
     TextureLoader,
     PlaneGeometry,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initOrbitControls,

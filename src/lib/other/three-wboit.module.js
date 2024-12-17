@@ -21,9 +21,8 @@ import {
 	NearestFilter,
 	RGBAFormat,
 	SRGBColorSpace
-} from '../three/three.module.js';
-import { Pass } from '../three/Pass.js';
-import { ShaderPass } from '../three/ShaderPass.js';
+} from 'three';
+import { Pass, ShaderPass } from 'three/examples/jsm/Addons.js';
 
 /**
  * Color fill shader
@@ -803,7 +802,7 @@ class WboitPass extends Pass {
 
 	}
 
-	render(renderer, writeBuffer  , readBuffer,/*ƒ deltaTime, maskActive */) {
+	render(renderer, writeBuffer, readBuffer,/*ƒ deltaTime, maskActive */) {
 
 		const scene = this.scene;
 		if (!scene || !scene.isScene) return;

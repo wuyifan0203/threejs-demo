@@ -8,7 +8,7 @@ import {
   PointLight,
   PerspectiveCamera,
   MeshPhongMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { GLTFLoader } from '../lib/three/GLTFLoader.js';
 import { 
   initAmbientLight, 

@@ -16,7 +16,7 @@ import {
   MeshBasicMaterial,
   BoxGeometry,
   Matrix4,
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
   initRenderer,
   initOrthographicCamera,

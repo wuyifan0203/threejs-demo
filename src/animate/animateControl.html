@@ -8,39 +8,50 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Animate Controls</title>
     <style>
-        body{
-            margin: 0;
-        }
-        #info {
-            position: absolute;
-            top: 0px;
-            width: 100%;
-            padding: 10px;
-            box-sizing: border-box;
-            text-align: center;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            pointer-events: none;
-            z-index: 1;
-            font-size: 12px;
-        }
+      body {
+        margin: 0;
+      }
+      #info {
+        position: absolute;
+        top: 0px;
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        text-align: center;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        pointer-events: none;
+        z-index: 1;
+        font-size: 12px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/Addons.js": "../lib/three/examples/jsm/Addons.js"
+      }
+    }
+  </script>
+  <body>
     <div id="webgl-output">
-        <div id="info"> 
-            <p>Effective Duration = clip.duration / (action.timeScale * mixer.timeScale )</p>
-            <p>Control Mode use key 'W' 'A' 'S' 'D' 'Shift'</p>
-        </div>
+      <div id="info">
+        <p>
+          Effective Duration = clip.duration / (action.timeScale *
+          mixer.timeScale )
+        </p>
+        <p>Control Mode use key 'W' 'A' 'S' 'D' 'Shift'</p>
+      </div>
     </div>
     <script src="./animateControl.js" type="module"></script>
-</body>
+  </body>
 </html>

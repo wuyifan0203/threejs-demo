@@ -1,37 +1,54 @@
+<!--
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2024-09-27 20:10:41
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-17 18:44:52
+ * @FilePath: \threejs-demo\src\zFighting\pologyOffsetTest.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pologyOffsetTest</title>
     <style>
-        body{
-            margin: 0;
-        }
-        .info{
-            z-index: 100;
-            font-size: 16px;
-            text-align: left;
-            position: absolute;
-            padding: 1em;
-            top: 0px;
-            left:50%;
-        }
-        .r{ color:red}
+      body {
+        margin: 0;
+      }
+      .info {
+        z-index: 100;
+        font-size: 16px;
+        text-align: left;
+        position: absolute;
+        padding: 1em;
+        top: 0px;
+        left: 50%;
+      }
+      .r {
+        color: red;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/Addons.js": "../lib/three/examples/jsm/Addons.js"
+      }
+    }
+  </script>
+  <body>
     <div class="info">
-        方法1:<br>
-        <!-- transparent: <span class="r">true</span> <br>
+      方法1:<br />
+      <!-- transparent: <span class="r">true</span> <br>
         opacity:<span class="r">1</span><br> -->
-        depthTest:<span class="r">false</span><br>
-        方法2:<br>
-        ...
-
+      depthTest:<span class="r">false</span><br />
+      方法2:<br />
+      ...
     </div>
     <div id="webgl-output"></div>
     <script src="./pologyOffsetTest.js" type="module"></script>
-</body>
+  </body>
 </html>

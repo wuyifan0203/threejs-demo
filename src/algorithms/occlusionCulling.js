@@ -8,7 +8,7 @@ import {
     Vector3,
     Color,
     Group
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initPerspectiveCamera,
     initScene,

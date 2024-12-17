@@ -14,7 +14,7 @@ import {
   Mesh,
   MeshStandardMaterial,
   AmbientLight,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { EXRLoader } from '../lib/three/EXRLoader.js';
 import { ViewHelper } from '../lib/three/viewHelper.js';
 import {

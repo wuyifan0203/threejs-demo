@@ -2,13 +2,13 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-26 18:12:22
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-27 13:05:10
+ * @LastEditTime: 2024-12-17 17:31:34
  * @FilePath: \threejs-demo\src\lib\custom\MazeGeometry.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
 import { Maze } from '../custom/Maze.js'
-import { BufferGeometry, Vector3, Float32BufferAttribute } from "../three/three.module.js";
+import { BufferGeometry, Vector3, Float32BufferAttribute } from "three";
 
 let [ax, ay, bx, by, cx, cy, dx, dy] = [0, 0, 0, 0, 0, 0, 0, 0];
 let [ia, ib, ic, id] = [0, 0, 0, 0];

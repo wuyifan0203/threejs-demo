@@ -18,7 +18,7 @@ import {
     Vector2,
     Quaternion,
     Euler
-} from '../lib/three/three.module.js'
+} from 'three'
 
 const point = new Vector3();
 const mouse = new Vector2();

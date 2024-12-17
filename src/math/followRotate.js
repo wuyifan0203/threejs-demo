@@ -11,7 +11,7 @@ import {
     Quaternion,
     Vector3,
     Clock
-} from '../lib/three/three.module.js';
+} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,

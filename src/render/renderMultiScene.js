@@ -13,7 +13,7 @@ import {
   GridHelper,
   Vector2,
   TextureLoader
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
   initRenderer,

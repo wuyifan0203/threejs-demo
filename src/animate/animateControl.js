@@ -12,7 +12,7 @@ import {
   Object3D,
   Quaternion,
   Matrix4
-} from "../lib/three/three.module.js";
+} from "three";
 import {
   initRenderer,
   initOrthographicCamera,

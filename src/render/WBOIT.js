@@ -11,7 +11,7 @@ import {
     FloatType,
     HalfFloatType,
     UnsignedByteType
-} from "../lib/three/three.module.js";
+} from "three";
 
 
 

@@ -24,7 +24,7 @@ import {
     SpotLightHelper,
     ShapeGeometry,
     MeshPhongMaterial,
-} from '../lib/three/three.module.js';
+} from 'three';
 import { PI } from '../lib/tools/constant.js'
 
 window.onload = () => {

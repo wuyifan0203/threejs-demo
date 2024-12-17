@@ -17,7 +17,7 @@ import {
     PlaneGeometry,
     Vector2,
     GridHelper,
-} from '../lib/three/three.module.js';
+} from 'three';
 
 import {
     initOrbitControls,
