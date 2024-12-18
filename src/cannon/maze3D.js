@@ -42,11 +42,11 @@ import {
     HALF_PI
 } from '../lib/tools/index.js';
 import { MazeGeometry } from '../lib/custom/MazeGeometry.js';
-import { PointerLockControls } from '../lib/three/PointerLockControls.js'
-import { Octree } from '../lib/three/Octree.js';
-import { Capsule } from '../lib/three/Capsule.js';
-import { OctreeHelper } from '../lib/three/OctreeHelper.js';
-import { FullScreenQuad } from '../lib/three/Pass.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js'
+import { Octree } from 'three/examples/jsm/math/Octree.js';
+import { Capsule } from 'three/examples/jsm/math/Capsule.js';
+import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
+import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 
 const layerMap = {
     ALL: 7,

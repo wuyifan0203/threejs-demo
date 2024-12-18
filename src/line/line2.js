@@ -23,9 +23,9 @@ import {
   resize
 } from '../lib/tools/index.js';
 
-import { LineMaterial } from '../lib/three/LineMaterial.js';
-import { LineSegments2 } from '../lib/three/LineSegments2.js';
-import { LineSegmentsGeometry } from '../lib/three/LineSegmentsGeometry.js';
+import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
+import { LineSegments2 } from 'three/examples/jsm/lines/LineSegments2.js';
+import { LineSegmentsGeometry } from 'three/examples/jsm/lines/LineSegmentsGeometry.js';
 
 window.onload = () => {
   init();

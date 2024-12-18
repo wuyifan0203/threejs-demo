@@ -18,10 +18,10 @@ import {
     resize,
     initScene,
     initGUI,
-    initPerspectiveCamera
+    initPerspectiveCamera,
+    initViewHelper
 } from '../lib/tools/index.js';
-import { FirstPersonControls } from '../lib/three/FirstPersonControls.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
+import { FirstPersonControls } from 'three/examples/jsm/controls/FirstPersonControls.js';
 
 window.onload = () => {
     init();
@@ -49,7 +49,7 @@ function init() {
     controls.handleResize();
 
 
-    const viewHelper = new ViewHelper(camera, renderer.domElement);
+    const viewHelper = initViewHelper(camera, renderer.domElement);
 
 
     const clock = new Clock();

@@ -19,19 +19,19 @@ import {
   BufferAttribute,
   MeshBasicMaterial,
 } from 'three';
-import { OrbitControls } from '../lib/three/OrbitControls.js';
 import {
   initRenderer,
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
   angle2Radians,
+  initOrbitControls
 } from '../lib/tools/index.js';
 import { innerPoints } from './compute.js';
 
 import { EarCut } from './Earcut.js';
-import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
-import { GUI } from '../lib/util/lil-gui.module.min.js';;
+import { FaceNormalsHelper } from '../lib/custom/FaceNormalsHelper.js';
+import { GUI } from '../lib/util/lil-gui.module.min.js';
 
 (function () {
   init();
@@ -46,7 +46,7 @@ function init() {
   renderer.setClearColor(0xffffff);
   initCustomGrid(scene);
 
-  const controls = new OrbitControls(camera, renderer.domElement);
+  const controls = initOrbitControls(camera, renderer.domElement);
   draw(scene);
 
   render();

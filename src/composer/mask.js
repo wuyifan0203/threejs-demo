@@ -14,17 +14,16 @@ import {
     Object3D,
 } from 'three';
 
-import { RenderPass } from '../lib/three/RenderPass.js'
-import { ClearMaskPass, MaskPass } from '../lib/three/MaskPass.js'
-import { ShaderPass } from '../lib/three/ShaderPass.js'
-import { SepiaShader } from '../lib/three/SepiaShader.js'
-import { ColorifyShader } from '../lib/three/ColorifyShader.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ClearMaskPass, MaskPass } from 'three/examples/jsm/postprocessing/MaskPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { SepiaShader } from 'three/examples/jsm/shaders/SepiaShader.js'
+import { ColorifyShader } from 'three/examples/jsm/shaders/ColorifyShader.js'
 import {
     initRenderer,
     initOrbitControls,
     resize,
     initOrthographicCamera,
-    initGUI
 } from '../lib/tools/index.js';
 
 window.onload = () => {

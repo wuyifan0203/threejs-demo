@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-01-23 20:01:46
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 14:28:13
- * @FilePath: /threejs-demo/src/cannon/heightField.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-18 12:14:34
+ * @FilePath: \threejs-demo\src\cannon\heightField.js
  */
 import {
     Clock,
@@ -17,7 +17,6 @@ import {
     initScene,
     initAmbientLight,
     initDirectionLight,
-    initCoordinates,
     initStats,
     resize
 } from '../lib/tools/index.js';
@@ -28,7 +27,7 @@ import {
     Heightfield as HeightFieldShape,
     Sphere,
 } from '../lib/other/physijs/cannon.js';
-import { SimplexNoise } from '../lib/three/SimplexNoise.js';
+import { SimplexNoise } from '../lib/custom/SimplexNoise.js';
 import { CannonUtils } from '../lib/other/physijs/cannon-utils.js';
 
 const simplex = new SimplexNoise(4);

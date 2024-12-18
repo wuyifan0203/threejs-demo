@@ -14,10 +14,10 @@ import {
     GridHelper,
 } from 'three';
 
-import { RenderPass } from '../lib/three/RenderPass.js'
-import { ShaderPass } from '../lib/three/ShaderPass.js'
-import { CopyShader } from '../lib/three/CopyShader.js'
-import { EffectComposer } from '../lib/three/EffectComposer.js'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import {
     initRenderer,
     initOrbitControls,
@@ -27,7 +27,7 @@ import {
     initGUI,
     initDirectionLight
 } from '../lib/tools/index.js';
-import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
 
 window.onload = () => {
     init();

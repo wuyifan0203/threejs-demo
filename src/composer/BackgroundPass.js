@@ -1,11 +1,11 @@
 /*
  * @Date: 2024-01-25 13:46:19
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-02-02 15:03:32
- * @FilePath: /threejs-demo/src/composer/BackgroundPass.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-18 11:33:00
+ * @FilePath: \threejs-demo\src\composer\BackgroundPass.js
  */
 
-import { Pass, FullScreenQuad } from "..//lib/three/Pass.js";
+import { Pass, FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 import { ShaderMaterial, Vector4, Vector3 } from "three";
 
 const vertexShader = /* glsl */ `

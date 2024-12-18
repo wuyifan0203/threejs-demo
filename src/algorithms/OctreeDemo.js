@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-04-12 13:51:27
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-04-12 16:13:36
- * @FilePath: /threejs-demo/src/algorithms/OctreeDemo.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-18 11:31:20
+ * @FilePath: \threejs-demo\src\algorithms\OctreeDemo.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -27,7 +27,7 @@ import {
     initGUI
 } from '../lib/tools/common.js';
 
-import { Octree } from 'three/examples/jsm/data/Octree.js';
+import { Octree } from 'three/examples/jsm/math/Octree.js';
 
 window.onload = function () {
     init()

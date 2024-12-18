@@ -13,13 +13,12 @@ import {
     Vector4
 } from 'three';
 
-import { EffectComposer } from '../lib/three/EffectComposer.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import {
     initRenderer,
     resize,
     initOrthographicCamera,
     initScene,
-    initOrbitControls,
 } from '../lib/tools/index.js';
 import { BackgroundPass } from './BackgroundPass.js';
 

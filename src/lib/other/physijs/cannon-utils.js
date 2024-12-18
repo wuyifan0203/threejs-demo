@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-15 14:09:00
+ * @LastEditTime: 2024-12-18 11:35:58
  * @FilePath: \threejs-demo\src\lib\other\physijs\cannon-utils.js
  */
 import {
@@ -13,7 +13,7 @@ import {
     BufferGeometry,
     Float32BufferAttribute,
     PlaneGeometry
-} from '../../three/three.module.js';
+} from 'three';
 import { Body, Material, Cylinder, Quaternion, Shape, Vec3 } from './cannon.js'
 
 class CannonUtils {

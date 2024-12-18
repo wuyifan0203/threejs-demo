@@ -7,12 +7,11 @@
 import {
   PerspectiveCamera,
   MeshPhongMaterial,
-  DoubleSide,
   Mesh,
   BoxGeometry,
 } from 'three';
-import { ViewHelper } from '../lib/three/viewHelper.js';
-import { 
+import {
+  initViewHelper,
   initRenderer, 
   resize,
   initOrbitControls,
@@ -20,7 +19,7 @@ import {
   initScene,
   initStats
  } from '../lib/tools/index.js';
-import { FaceNormalsHelper } from '../lib/three/FaceNormalsHelper.js';
+import { FaceNormalsHelper } from '../lib/custom/FaceNormalsHelper.js';
 
 
 window.onload = () => {
@@ -41,7 +40,7 @@ function init() {
   const scene = initScene();
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const viewHelper = initViewHelper(camera, renderer.domElement);
   resize(renderer, camera);
 
   function render() {
@@ -56,7 +55,7 @@ function init() {
   render();
 
   const defaultParams = {
-    side: DoubleSide,
+    side: 2,
     transparent: true,
     opacity: 0.5,
     depthTest: false,

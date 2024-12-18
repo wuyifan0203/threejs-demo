@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-09-03 10:43:25
  * @FilePath: /threejs-demo/src/render/debugDepthPeeling.js
  */
-import { FullScreenQuad } from '../lib/three/Pass.js';
+import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import {
     WebGLRenderTarget, DepthTexture, DataTexture, Vector2, Mesh, Material, Color, WebGLRenderer, ShaderMaterial, NoBlending
 } from 'three'

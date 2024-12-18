@@ -31,9 +31,6 @@ import {
     initAmbientLight,
     initDirectionLight
 } from '../lib/tools/common.js';
-import { LineMaterial } from '../lib/three/LineMaterial.js';
-import { LineSegments2 } from '../lib/three/LineSegments2.js';
-import { LineSegmentsGeometry } from '../lib/three/LineSegmentsGeometry.js';
 import { RaycasterHelper } from '../helper/RaycasterHelper.js'
 
 window.onload = () => {

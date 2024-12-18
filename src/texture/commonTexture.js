@@ -17,10 +17,10 @@ import {
   initGUI,
   initScene,
   initOrbitControls,
-  initDirectionLight
+  initDirectionLight,
+  initViewHelper
 } from '../lib/tools/index.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
-import { FBXLoader } from '../lib/three/FBXLoader.js';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 
 window.onload = function () {
   init();
@@ -50,7 +50,7 @@ async function init() {
   camera.add(light);
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const viewHelper = initViewHelper(camera, renderer.domElement);
 
   const modelLoader = new FBXLoader();
   const textureLoader = new TextureLoader();

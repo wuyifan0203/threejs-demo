@@ -24,10 +24,10 @@ import {
   initGUI,
   initOrbitControls,
   initScene,
-  vec2ToVec3
+  vec2ToVec3,
+  initViewHelper
 } from '../lib/tools/index.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
-import { VertexNormalsHelper } from '../lib/three/VertexNormalsHelper.js';
+import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper.js';
 
 const { compile, isComplex } = math;
 
@@ -48,7 +48,7 @@ function init() {
   grid.rotateX(Math.PI / 2);
 
   const controls = initOrbitControls(camera, renderer.domElement);
-  const viewHelper = new ViewHelper(camera, renderer.domElement);
+  const viewHelper = initViewHelper(camera, renderer.domElement);
 
   draw(scene);
 

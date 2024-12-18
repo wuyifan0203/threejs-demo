@@ -17,10 +17,10 @@ import {
     resize,
     initOrthographicCamera,
     initScene,
-    initGUI
+    initGUI,
+    initViewHelper
 } from '../lib/tools/index.js';
-import { ArcballControls } from '../lib/three/ArcballControls.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
+import {ArcballControls} from 'three/examples/jsm/controls/ArcballControls.js';
 
 window.onload = () => {
     init();
@@ -40,7 +40,7 @@ function init() {
     const controls = new ArcballControls(orthographic, renderer.domElement, scene);
 
 
-    const viewHelper = new ViewHelper(orthographic, renderer.domElement);
+    const viewHelper = initViewHelper(orthographic, renderer.domElement);
 
     (function render() {
         renderer.clear();
@@ -59,7 +59,7 @@ function init() {
 
     scene.add(mesh, mesh1);
 
-    const o = { gizmoVisible: true }
+    const o = {gizmoVisible: true}
 
     const gui = initGUI();
     const folderOptions = gui.addFolder('Arcball parameters');

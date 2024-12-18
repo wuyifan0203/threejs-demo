@@ -1,16 +1,7 @@
-import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import {
-  Mesh,
-  BufferGeometry,
   Vector3,
-  BufferAttribute,
-  BoxGeometry,
-  MeshLambertMaterial,
   Matrix4,
-  Euler,
-  Quaternion,
-  Points,
-  PointsMaterial,
   PlaneHelper,
   Plane,
   MeshNormalMaterial,
@@ -20,14 +11,10 @@ import {
   initOrthographicCamera,
   initCustomGrid,
   initAxesHelper,
-  rotationFormula,
-  createMirrorMatrix,
   initScene,
   initOrbitControls,
-  initSpotLight,
   initAmbientLight,
   initDirectionLight,
-  initTransformControls,
   initGUI,
   resize
 } from '../lib/tools/index.js';

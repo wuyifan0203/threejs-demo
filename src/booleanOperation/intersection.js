@@ -36,7 +36,7 @@ import {
     HOLLOW_INTERSECTION,
     HOLLOW_SUBTRACTION
 } from '../lib/other/three-bvh-csg.js';
-import { TransformControls } from '../lib/three/TransformControls.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 window.onload = function () {
     init()

@@ -25,8 +25,6 @@ import {
     initScene
 } from '../lib/tools/common.js';
 
-import { Octree } from '../lib/three/Octree.js'
-
 window.onload = function () {
     init();
 }

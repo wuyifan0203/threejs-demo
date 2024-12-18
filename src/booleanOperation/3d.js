@@ -12,7 +12,7 @@ import {
   BoxGeometry,
   Matrix4,
 } from 'three';
-import { ViewHelper } from '../lib/three/viewHelper.js';
+import { ViewHelper } from 'three/examples/jsm/helpers/ViewHelper.js';
 import { CSG } from '../lib/other/CSGMesh.js';
 import {
   initRenderer,

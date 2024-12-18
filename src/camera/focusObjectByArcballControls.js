@@ -26,7 +26,7 @@ import {
     initGUI
 } from '../lib/tools/index.js';
 import { createNDCMatrix } from '../lib/tools/math.js';
-import { ArcballControls } from '../lib/three/ArcballControls.js';
+import { ArcballControls } from 'three/examples/jsm/controls/ArcballControls.js'
 
 window.onload = () => {
     init();

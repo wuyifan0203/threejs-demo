@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-04-28 13:30:57
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:41:51
- * @FilePath: /threejs-demo/src/noise/perlinNoiseDemo1.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-18 12:22:42
+ * @FilePath: \threejs-demo\src\noise\perlinNoiseDemo1.js
  */
 
 import {
@@ -12,7 +12,7 @@ import {
   PlaneGeometry,
   MeshNormalMaterial,
 } from 'three';
-import { ImprovedNoise } from '../lib/three/ImprovedNoise.js';
+import { ImprovedNoise } from 'three/examples/jsm/math/ImprovedNoise.js';
 
 import {
   initRenderer,

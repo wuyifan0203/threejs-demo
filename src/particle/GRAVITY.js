@@ -15,7 +15,7 @@ import {
   Float32BufferAttribute,
   AmbientLight,
 } from 'three';
-import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { initRenderer, resize, initScene, initOrbitControls } from '../lib/tools/index.js';
 
 window.onload = () => {

@@ -5,7 +5,6 @@
  * @FilePath: /threejs-demo/src/zFighting/pologyOffsetTest.js
  */
 import {
-  PerspectiveCamera,
   MeshPhongMaterial,
   Mesh,
   PlaneGeometry,

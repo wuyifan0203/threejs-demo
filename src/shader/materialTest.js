@@ -26,7 +26,7 @@ import {
   normalizeBufferAttribute,
   initStats
 } from "../lib/tools/index.js";
-import { Reflector } from "../lib/three/Reflector.js";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 
 import { BasicMaterial } from "./material/basic.js";
 import { NormalMaterial } from "./material/normal.js";

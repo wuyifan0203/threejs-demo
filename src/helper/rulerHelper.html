@@ -1,47 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <style>
-        *{
-            margin: 0;
-            padding: 0;
-        }
-        #app {
-            margin: auto;
-        }
-        canvas{
-            margin: 20px;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      #app {
+        margin: auto;
+      }
+      canvas {
+        margin: 20px;
+      }
     </style>
-</head>
-<script type="importmap">
-        {
-            "imports": {
-                "three": "../lib/three/build/three.module.js",
-                "three/examples/jsm/Addons.js": "../lib/three/examples/jsm/Addons.js"
-            }
-        }
-      </script>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/": "../lib/three/examples/jsm/"
+      }
+    }
+  </script>
 
-<body>
+  <body>
     <div id="app">
-        静态标尺，探寻如何使用canvas
-        <div id="ruler1"></div>
-        <hr>
-        计算半动态的尺子,结合Camera.projectMatrix属性计算0点与单位
-        <div id="ruler2"></div>
-        <hr>
-       最新研究成果,最终应用于CAD
-        <div id="ruler3"></div>
+      静态标尺，探寻如何使用canvas
+      <div id="ruler1"></div>
+      <hr />
+      计算半动态的尺子,结合Camera.projectMatrix属性计算0点与单位
+      <div id="ruler2"></div>
+      <hr />
+      最新研究成果,最终应用于CAD
+      <div id="ruler3"></div>
     </div>
 
-    <script src="./rulerHelper.js" type="module">
-    </script>
-</body>
-
+    <script src="./rulerHelper.js" type="module"></script>
+  </body>
 </html>

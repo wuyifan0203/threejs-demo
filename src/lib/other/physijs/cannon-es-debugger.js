@@ -3,7 +3,7 @@ import {
 } from './cannon.js';
 import {
   MeshBasicMaterial, SphereGeometry, BoxGeometry, PlaneGeometry, Mesh, CylinderGeometry, BufferGeometry, Float32BufferAttribute, Object3D, MathUtils
-} from '../../three/three.module.js';
+} from 'three';
 
 function CannonDebugger(scene, world, _temp) {
   let {

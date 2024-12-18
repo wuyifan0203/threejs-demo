@@ -18,9 +18,9 @@ import {
     initOrthographicCamera,
     initScene,
     initGUI,
-    initOrbitControls
+    initOrbitControls,
+    initViewHelper
 } from '../lib/tools/index.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
 
 window.onload = () => {
     init();
@@ -39,7 +39,7 @@ function init() {
 
     const controls = initOrbitControls(camera, renderer.domElement);
     controls.zoomToCursor = true;
-    const viewHelper = new ViewHelper(camera, renderer.domElement);
+    const viewHelper = initViewHelper(camera, renderer.domElement);
 
     function update() {
         renderer.clear();

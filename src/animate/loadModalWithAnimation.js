@@ -26,7 +26,7 @@ import {
     resize
 } from '../lib/tools/index.js';
 
-import { GLTFLoader } from '../lib/three/GLTFLoader.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 window.onload = () => {
     init();

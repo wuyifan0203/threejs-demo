@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/src/loader/OBJLoader.js
  */
 /* eslint-disable no-unused-vars */
-import { OBJLoader } from '../lib/three/OBJLoader.js';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import {
   initRenderer,
   initPerspectiveCamera,

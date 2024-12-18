@@ -27,7 +27,7 @@ import {
     initScene
 } from '../lib/tools/index.js';
 
-import { TransformControls } from '../lib/three/TransformControls.js'
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js'
 
 window.onload = () => {
     init();

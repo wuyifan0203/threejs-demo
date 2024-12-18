@@ -4,7 +4,7 @@
  * @LastEditTime: 2024-01-23 15:49:19
  * @FilePath: /threejs-demo/src/composer/OITRenderPass.js
  */
-import { FullScreenQuad, Pass } from '../lib/three/Pass.js';
+import { FullScreenQuad, Pass } from 'three/examples/jsm/postprocessing/Pass.js';
 import {
     Color,
     Vector2,

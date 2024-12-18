@@ -14,7 +14,7 @@ import {
   MeshNormalMaterial,
   RingGeometry,
 } from 'three';
-import { DynamicGrid } from '../lib/three/GridHelper2.js';
+import { DynamicGrid } from '../lib/custom/GridHelper2.js';
 import {
   initRenderer,
   resize,

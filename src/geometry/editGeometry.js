@@ -15,9 +15,9 @@ import {
     LineSegments,
     LineBasicMaterial,
     Mesh,
-    MeshNormalMaterial
-  } from 'three';
-  import {
+    MeshNormalMaterial,
+} from 'three';
+import {
     initRenderer,
     initPerspectiveCamera,
     initAxesHelper,
@@ -26,16 +26,14 @@ import {
     initScene,
     initOrbitControls,
     initGUI
-  } from '../lib/tools/index.js';
-  import {
-    EdgesGeometry
-  } from '../lib/three/EdgesGeometry.js'
-  
-  window.onload = () => {
+} from '../lib/tools/index.js';
+import {EdgesGeometry} from '../lib/custom/EdgesGeometry.js';
+
+window.onload = () => {
     init();
-  };
-  
-  function init() {
+};
+
+function init() {
     const renderer = initRenderer();
     const camera = initPerspectiveCamera(new Vector3(14, -16, 13));
     const scene = initScene();
@@ -45,46 +43,45 @@ import {
     resize(renderer, camera);
     initCustomGrid(scene);
     initAxesHelper(scene);
-  
+
     const controls = initOrbitControls(camera, renderer.domElement);
-  
+
     const geometryPool = {
-      box: new BoxGeometry(4, 4, 4),
-      sphere: new SphereGeometry(2, 32, 32),
-      cylinder: new CylinderGeometry(2, 2, 4, 32)
+        box: new BoxGeometry(4, 4, 4),
+        sphere: new SphereGeometry(2, 32, 32),
+        cylinder: new CylinderGeometry(2, 2, 4, 32)
     }
-  
-    const mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({ color: 0x0000ff }));
-  
+
+    const mesh = new LineSegments(new BufferGeometry(), new LineBasicMaterial({color: 0x0000ff}));
+
     scene.add(mesh);
 
     const pointGeometry = new SphereGeometry(0.1, 32, 32);
-    const pointMesh = new Mesh(pointGeometry, new MeshNormalMaterial({ color: 0xff0000 }));
+    const pointMesh = new Mesh(pointGeometry, new MeshNormalMaterial({color: 0xff0000}));
 
     scene.add(pointMesh)
-  
+
     function render() {
-      renderer.clear();
-      controls.update();
-      renderer.render(scene, camera);
-      requestAnimationFrame(render);
+        renderer.clear();
+        controls.update();
+        renderer.render(scene, camera);
+        requestAnimationFrame(render);
     };
 
     render();
-  
-  
-  
+
+
     function makeEdge() {
-      const geometry = geometryPool[operation.key];
-      const edge = new EdgesGeometry(geometry, operation.thresholdAngle);
-      mesh.geometry.dispose();
-      mesh.geometry = edge;
+        const geometry = geometryPool[operation.key];
+        const edge = new EdgesGeometry(geometry, operation.thresholdAngle);
+        mesh.geometry.dispose();
+        mesh.geometry = edge;
     }
-  
+
     makeEdge();
-  
+
     const gui = initGUI();
-  
+
     gui.add(operation, 'key', Object.keys(geometryPool)).onChange(makeEdge);
     gui.add(operation, 'thresholdAngle', 0, 180, 1).onChange(makeEdge);
-  }
+}

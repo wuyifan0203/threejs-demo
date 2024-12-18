@@ -6,54 +6,52 @@
 -->
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Use Pointer Lock Controls</title>
     <style>
-        body {
-            margin: 0;
-        }
+      body {
+        margin: 0;
+      }
 
-        #introduction {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(127, 255, 212, 0.6);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
+      #introduction {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(127, 255, 212, 0.6);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
 
-        #introduction div {
-            text-align: center;
-            font-size: 80px;
-        }
+      #introduction div {
+        text-align: center;
+        font-size: 80px;
+      }
     </style>
-</head>
-<script type="importmap">
-        {
-            "imports": {
-                "three": "../lib/three/build/three.module.js",
-                "three/examples/jsm/Addons.js": "../lib/three/examples/jsm/Addons.js"
-            }
-        }
-      </script>
+  </head>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "../lib/three/build/three.module.js",
+        "three/examples/jsm/": "../lib/three/examples/jsm/"
+      }
+    }
+  </script>
 
-<body>
+  <body>
     <div id="webgl-output">
-        <div id="introduction">
-            <div>Move with W A S D</div>
-            <div>Look with the mouse </div>
-            <div>Jump width SPACE</div>
-            <div>Exit with ESC</div>
-            <div></div>
-            <div>Press B to Start</div>
-        </div>
+      <div id="introduction">
+        <div>Move with W A S D</div>
+        <div>Look with the mouse</div>
+        <div>Jump width SPACE</div>
+        <div>Exit with ESC</div>
+        <div></div>
+        <div>Press B to Start</div>
+      </div>
     </div>
     <script src="./usePointerLockControls.js" type="module"></script>
-</body>
-
+  </body>
 </html>

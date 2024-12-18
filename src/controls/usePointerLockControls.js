@@ -23,8 +23,7 @@ import {
     initPerspectiveCamera,
     rainbowColors
 } from '../lib/tools/index.js';
-// import { PointerLockControls } from '../lib/three/PointerLockControls.js'; 
-import { PointerLockControls } from './PointerLockControls.js';
+import { PointerLockControls } from '../lib/custom/PointerLockControls.js';
 
 window.onload = () => {
     init();

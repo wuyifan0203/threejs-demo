@@ -26,7 +26,7 @@ import {
   resize,
   initAxesHelper,
 } from "../lib/tools/index.js";
-import { FBXLoader } from "../lib/three/FBXLoader.js";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 
 window.onload = () => {
   init();

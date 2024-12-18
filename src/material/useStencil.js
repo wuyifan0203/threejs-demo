@@ -10,7 +10,7 @@ import {
     Mesh,
     MeshBasicMaterial,
 } from 'three';
-import { STLLoader } from '../lib/three/STLLoader.js'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
 import {
     initRenderer,
     initDirectionLight,

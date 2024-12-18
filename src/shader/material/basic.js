@@ -1,10 +1,10 @@
 /*
  * @Date: 2023-09-18 19:54:15
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-12 17:53:10
+ * @LastEditTime: 2024-12-18 11:35:20
  * @FilePath: \threejs-demo\src\shader\material\basic.js
  */
-import { ShaderMaterial, Color } from "../three";
+import { ShaderMaterial, Color } from "three";
 
 const vertexShaderSource = /* glsl */ `
     varying vec2 vUv;

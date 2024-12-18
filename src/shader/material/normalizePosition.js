@@ -6,7 +6,7 @@
  * @FilePath: \threejs-demo\src\shader\material\normalizePosition.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { ShaderMaterial, Color } from "../three";
+import { ShaderMaterial, Color } from "three";
 
 const vs = /* glsl */ `
 // attribute vec3 position;

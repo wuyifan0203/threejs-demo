@@ -13,20 +13,19 @@ import {
     MeshNormalMaterial,
 } from 'three';
 
-import { RenderPass } from '../lib/three/RenderPass.js'
-import { TexturePass } from '../lib/three/TexturePass.js'
-import { MaskPass,ClearMaskPass } from '../lib/three/MaskPass.js'
-import { EffectComposer } from '../lib/three/EffectComposer.js'
-import { GUI } from '../lib/util/lil-gui.module.min.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { TexturePass } from 'three/examples/jsm/postprocessing/TexturePass.js'
+import { MaskPass,ClearMaskPass } from 'three/examples/jsm/postprocessing/MaskPass.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import {
     initRenderer,
     initOrbitControls,
     resize,
     initOrthographicCamera,
     initCustomGrid,
-    initScene
+    initScene,
+    initGUI
 } from '../lib/tools/index.js';
-import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
 
 window.onload = () => {
     init();
@@ -90,7 +89,7 @@ function init() {
     }
 
 
-    const gui = new GUI();
+    const gui = initGUI();
 
     const size = new Vector2();
 

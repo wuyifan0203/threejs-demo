@@ -17,9 +17,10 @@ import {
     resize,
     initOrthographicCamera,
     initScene,
+    initViewHelper
 } from '../lib/tools/index.js';
-import { OrbitUnlimitedControls } from '../lib/three/OrbitUnlimitedControls.js';
-import { ViewHelper } from '../lib/three/viewHelper.js';
+import { OrbitUnlimitedControls } from '../lib/other/OrbitUnlimitedControls.js';
+
 
 window.onload = () => {
     init();
@@ -38,7 +39,7 @@ function init() {
 
     const controls = new OrbitUnlimitedControls(camera, renderer.domElement);
     controls.zoomToCursor = true;
-    const viewHelper = new ViewHelper(camera, renderer.domElement);
+    const viewHelper = initViewHelper(camera, renderer.domElement);
 
     function render() {
         renderer.clear();

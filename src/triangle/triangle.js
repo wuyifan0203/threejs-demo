@@ -5,7 +5,7 @@
  * @FilePath: /threejs-demo/src/triangle/triangle.js
  */
 import { SweepContext, Point } from '../lib/other/poly2tri.js';
-import { ShapeUtils } from '../lib/three/ShapeUtils.js';
+import { ShapeUtils } from 'three/src/extras/ShapeUtils.js';
 import { Delaunator } from '../lib/other/delaunator.js';
 import { data } from './data.js';
 

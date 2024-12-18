@@ -27,7 +27,7 @@ import {
     initScene
 } from '../lib/tools/common.js';
 import { PHI, E, JN, JP, TEST, TESTN, N, P } from './data/index.js';
-import { Lut } from '../lib/three/Lut.js';
+import { Lut } from 'three/examples/jsm/math/Lut.js';
 
 window.onload = () => {
     init()

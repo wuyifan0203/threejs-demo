@@ -17,7 +17,7 @@ import {
     NoBlending,
     Mesh
 } from "three";
-import { FullScreenQuad } from "../lib/three/Pass.js";
+import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 
 const vertexShader = /* glsl */`
 		varying vec2 vUv;

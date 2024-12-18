@@ -26,8 +26,8 @@ import {
     initCustomGrid,
     resize
 } from '../lib/tools/index.js';
-import { GLTFLoader } from '../lib/three/GLTFLoader.js';
-import { AnimationUtils } from '../lib/three/AnimationUtils.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { AnimationUtils } from 'three/src/animation/AnimationUtils.js';
 
 window.onload = () => {
     init();

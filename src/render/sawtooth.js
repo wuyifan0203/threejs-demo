@@ -14,13 +14,13 @@ import {
     WebGLRenderTarget,
     SRGBColorSpace
 } from 'three';
-import { EffectComposer } from '../lib/three/EffectComposer.js';
-import { RenderPass } from '../lib/three/RenderPass.js';
-import { OutputPass } from '../lib/three/OutputPass.js';
-import { CopyShader } from '../lib/three/CopyShader.js';
-import { ShaderPass } from '../lib/three/ShaderPass.js';
-import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
-import { FXAAShader } from '../lib/three/FXAAShader.js'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js'
 
 import {
     initRenderer,

@@ -30,11 +30,11 @@ import {
     initCoordinates
 } from '../lib/tools/index.js';
 
-import { EffectComposer } from '../lib/three/EffectComposer.js';
-import { RenderPass } from '../lib/three/RenderPass.js';
-import { ShaderPass } from '../lib/three/ShaderPass.js';
-import { WboitPass, WboitUtils, MeshWboitMaterial } from '../lib/other/three-wboit.module.js';
-import { GammaCorrectionShader } from '../lib/three/GammaCorrectionShader.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { WboitPass, WboitUtils } from '../lib/other/three-wboit.module.js';
+import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js';
 
 
 window.onload = () => {

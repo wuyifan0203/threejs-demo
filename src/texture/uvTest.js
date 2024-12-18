@@ -6,7 +6,7 @@
  * @FilePath: \threejs-demo\src\texture\uvTest.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Float64BufferAttribute } from '../lib/three/Buffer.js';
+import { Float64BufferAttribute } from '../lib/custom/Buffer.js';
 import {
     Float32BufferAttribute,
     Mesh,

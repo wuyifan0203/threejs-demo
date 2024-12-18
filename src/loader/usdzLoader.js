@@ -6,7 +6,7 @@
  * @FilePath: /threejs-demo/src/loader/usdzLoader.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { USDZLoader } from '../lib/three/USDZLoader.js';
+import { USDZLoader } from 'three/examples/jsm/loaders/USDZLoader.js';
 import {
     initRenderer,
     initPerspectiveCamera,

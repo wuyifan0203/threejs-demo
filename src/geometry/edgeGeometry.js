@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-01-02 14:03:01
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-08-21 11:22:06
- * @FilePath: /threejs-demo/src/geometry/edgeGeometry.js
+ * @LastEditTime: 2024-12-18 12:21:25
+ * @FilePath: \threejs-demo\src\geometry\edgeGeometry.js
  */
 import {
   Vector3,
@@ -11,10 +11,8 @@ import {
   BoxGeometry,
   FogExp2,
   Mesh,
-  LineBasicMaterial,
   InstancedMesh,
   MeshNormalMaterial,
-  BufferAttribute,
   Matrix4,
   Vector2,
   Raycaster,
@@ -30,7 +28,7 @@ import {
   initOrbitControls,
   initGUI
 } from '../lib/tools/index.js';
-import { TransformControls } from '../lib/three/TransformControls.js';
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 
 window.onload = () => {
   init();
@@ -110,7 +108,6 @@ function init() {
   };
 
   const transformControls = new TransformControls(camera, renderer.domElement);
-  scene.add(transformControls);
 
   transformControls.addEventListener('dragging-changed', (event) => {
     orbit.enabled = !event.value;

@@ -28,7 +28,7 @@ import {
   initGUI,
   initAmbientLight,
 } from '../lib/tools/index.js';
-import { RGBELoader } from '../lib/three/RGBELoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 window.onload = () => {
   init();

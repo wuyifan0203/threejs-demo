@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-01-23 20:01:46
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 15:02:42
- * @FilePath: /threejs-demo/src/cannon/pointerLockControl.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2024-12-18 12:17:03
+ * @FilePath: \threejs-demo\src\cannon\pointerLockControl.js
  */
 import {
     Clock,
@@ -42,7 +42,7 @@ import {
     SplitSolver
 } from '../lib/other/physijs/cannon.js';
 import { PointerLockControlsCannon } from '../lib/other/physijs/PointerLockControlsCannon.js'
-import { SimplexNoise } from '../lib/three/SimplexNoise.js';
+import { SimplexNoise } from '../lib/custom/SimplexNoise.js';
 
 const simplex = new SimplexNoise(4);
 function map(val, smin, smax, emin, emax) {
