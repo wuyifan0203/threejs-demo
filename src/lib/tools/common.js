@@ -191,10 +191,10 @@ function initAxesHelper(scene) {
  * @description: 窗口自适应
  * @param {WebGLRenderer} render
  * @param {Camera} camera
- * @param {Function} callback (width,height)=>void
+ * @param {(w,h)=>void} callback (width,height)=>void
  * @return {void}
  */
-function resize(render, cameras, callback) {
+function resize(render, cameras, callback = () => { }) {
   cameras = Array.isArray(cameras) ? cameras : [cameras];
   window.addEventListener("resize", () => {
     const [w, h] = [window.innerWidth, window.innerHeight];
@@ -208,7 +208,7 @@ function resize(render, cameras, callback) {
       }
       camera.updateProjectionMatrix();
     });
-    callback && callback(w, h);
+    callback(w, h);
   });
 }
 

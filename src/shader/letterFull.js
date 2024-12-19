@@ -18,7 +18,7 @@ import {
     MeshNormalMaterial
 } from "three";
 import { update, Tween } from "../lib/other/tween.esm.js";
-import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise.js";
+import { SimplexNoise } from "../lib/custom//SimplexNoise.js";
 import {
     initOrbitControls,
     initPerspectiveCamera,

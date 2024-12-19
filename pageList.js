@@ -59,15 +59,19 @@ const list = [
     pages: [
       {
         path: "/composer/useOITRenderPass.html",
-        title: "Use OIT Render Pass",
+        title: "OIT Render Pass",
       },
       {
         path: "/composer/useCopyShader.html",
-        title: "Use Copy Shader",
+        title: "Copy Shader",
       },
       {
         path: "/composer/useBackgroundPass.html",
-        title: "Use useBackground Pass",
+        title: "Background Pass",
+      },
+      {
+        path: "/composer/unRealBloom.html",
+        title: "unRealBloom Pass",
       },
     ],
   },

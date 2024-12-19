@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as TWEEN from "../lib/other/tween.esm.js";
 import {
   SimplexNoise
-} from "three/examples/jsm/math/SimplexNoise.js";
+} from "../lib/custom/SimplexNoise.js";
 import {
     initOrbitControls,
 } from "../lib/tools/common.js";
