@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-09 17:10:03
+ * @LastEditTime: 2024-12-21 17:44:51
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -282,8 +282,8 @@ const list = [
         title: "Line Extend",
       },
       {
-        path: "/line/line2.html",
-        title: "Line2",
+        path: "/line/boldLine.html",
+        title: "Bold Line",
       },
     ],
   },
@@ -518,6 +518,10 @@ const list = [
       {
         path: "/booleanOperation/2d.html",
         title: "2D Boolean Operation",
+      },
+      {
+        path: "/booleanOperation/intersection.html",
+        title: "intersection",
       },
     ],
   },

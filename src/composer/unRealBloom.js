@@ -153,6 +153,9 @@ async function init() {
             }
         });
     });
+    gui.add(bloomPass, 'enabled').onChange((v) => {
+        v ? bloomFolder.show() : bloomFolder.hide()
+    })
     const bloomFolder = gui.addFolder('bloom');
     bloomFolder.add(bloomPass, 'threshold', 0.15, 1.0).onChange(function (value) {
         bloomPass.threshold = Number(value);
@@ -162,7 +165,7 @@ async function init() {
         bloomPass.strength = Number(value);
     });
 
-    gui.add(bloomPass, 'radius', 0.0, 1.0).step(0.01).onChange(function (value) {
+    bloomFolder.add(bloomPass, 'radius', 0.0, 1.0).step(0.01).onChange(function (value) {
         bloomPass.radius = Number(value);
     });
 
