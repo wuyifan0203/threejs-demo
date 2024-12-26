@@ -463,6 +463,10 @@ const list = [
         path: "/noise/perlinNoiseDemo1.html",
         title: "Perlin Noise Demo 1",
       },
+      {
+        path: "/noise/terrainGenerate.html",
+        title: "Terrain Generate",
+      },
     ],
   },
 

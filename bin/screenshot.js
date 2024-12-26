@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-28 09:49:28
+ * @LastEditTime: 2024-12-26 16:15:30
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -135,15 +135,15 @@ async function main() {
 async function getAllHref() {
   const paths = new Set();
   list.forEach(({ pages }) => {
-    pages.forEach(({path}) => {
+    pages.forEach(({ path }) => {
       paths.add(path);
     });
   });
-  exceptionURLs.forEach((exceeded)=>{
+  exceptionURLs.forEach((exceeded) => {
     paths.delete(exceeded);
   })
 
-  return  Array.from(paths).map(path => (`http://localhost:${port}${baseURL}/src${path}`));
+  return Array.from(paths).map(path => (`http://localhost:${port}${baseURL}/src${path}`));
 }
 
 async function preparePage(page) {
@@ -191,7 +191,7 @@ async function preparePage(page) {
           .buffer()
           .then((buffer) => (page.pageSize += buffer.length));
       }
-    } catch {}
+    } catch { }
   });
 
   page.url = undefined;
@@ -217,7 +217,7 @@ async function renderPage(page) {
       if (playBtn) playBtn.click();
     });
 
-    if (!isWebGLContext) return;
+    if (!isWebGLContext) return console.red('this page is not webgl');
     await page.evaluate(
       async (renderTimeout, parseTime) => {
         // 等待 parseTime 后 resolve
