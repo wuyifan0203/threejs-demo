@@ -7,7 +7,6 @@ import {
     BufferGeometry,
     MathUtils,
     MeshPhysicalMaterial,
-    OrthographicCamera,
     Color,
 } from 'three';
 import { SimplexNoise } from '../lib/custom/SimplexNoise.js';
@@ -129,14 +128,14 @@ function init() {
     }
 
     const gui = initGUI();
-    gui.add(size, 'x', 2, 10, 1).name('Size Width:').onChange(update);
-    gui.add(size, 'y', 2, 10, 1).name('Size Height:').onChange(update);
+    gui.add(size, 'x', 2, 10, 1).name('Size Width:').onChange(updateSize);
+    gui.add(size, 'y', 2, 10, 1).name('Size Height:').onChange(updateSize);
     gui.add(params, 'autoGenerate').name('Auto Generate');
     gui.add(orbitControl, 'autoRotate').name('Auto Rotate');
 
     setInterval(() => {
         params.autoGenerate && updateTerrain();
-    }, 2000)
+    }, 3000)
 
 
     function render() {
