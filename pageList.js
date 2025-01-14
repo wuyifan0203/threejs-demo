@@ -169,7 +169,11 @@ const list = [
     pages: [
       {
         path: "/material/clipping.html",
-        title: "Clipping",
+        title: "Clipping Plane",
+      },
+      {
+        path: "/material/clippingSphere.html",
+        title: "Clipping Sphere",
       },
       {
         path: "/material/polygonOffsetTest.html",
