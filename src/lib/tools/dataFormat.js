@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-06-19 14:33:10
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-14 16:42:35
+ * @LastEditTime: 2025-01-15 11:24:50
  * @FilePath: \threejs-demo\src\lib\tools\dataFormat.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -86,6 +86,22 @@ function dataToVec2(data) {
 }
 
 /**
+ * @description: 一维数组转三维向量
+ * @param {number[]} data
+ * @return {Vector3[]}
+ * @example
+ *  let data = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+ *  dataToVec3(data);
+ *  // -> [Vector3(1, 2, 3), Vector3(4, 5, 6), Vector3(7, 8, 9)]
+ */
+function dataToVec3(data) {
+  const res = [];
+  for (let i = 0, l = data.length; i < l; i += 3) {
+    res.push(new Vector3(data[i], data[i + 1], data[i + 2]));
+  }
+  return res;
+}
+/**
  * @description: Vector2数组转一维数组
  * @param {Vector2[]} data
  * @return {number[]}
@@ -151,6 +167,7 @@ export {
   vec2ToVec3Vertex,
   arrayToVec2,
   dataToVec2,
+  dataToVec3,
   array2DToVertex,
   vec2ToData,
   vec2ToVec3,

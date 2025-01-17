@@ -263,6 +263,18 @@ function previewCanvas(canvas) {
   document.body.appendChild(img); // 将 <img> 元素添加到文档中
 }
 
+function getLineLength(points) {
+  const current = new Vector3();
+  let length = 0;
+  const next = new Vector3();
+  for (let i = 1, l = points.length; i < l; i++) {
+    current.copy(points[i - 1]);
+    next.copy(points[i]);
+    length += current.distanceTo(next);
+  }
+  return length;
+}
+
 
 
 
@@ -286,5 +298,6 @@ export {
   CC2SSC,
   isComplexPolygon,
   isClockWise,
-  previewCanvas
+  previewCanvas,
+  getLineLength
 };

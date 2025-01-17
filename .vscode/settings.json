@@ -23,6 +23,7 @@
     "absarc",
     "Arcball",
     "broadphase",
+    "Catmull",
     "commitlint",
     "contactmaterials",
     "CONVEXPOLYHEDRON",
