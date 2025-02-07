@@ -1,4 +1,4 @@
-import { Loader, LoadingManager, TextureLoader } from 'three';
+import { CubeTextureLoader, Loader, LoadingManager, TextureLoader } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
@@ -7,7 +7,8 @@ const loaderMap = {
     gltf: GLTFLoader,
     fbx: FBXLoader,
     image: TextureLoader,
-    obj: OBJLoader
+    obj: OBJLoader,
+    cube: CubeTextureLoader
 }
 
 const defaultManager = new LoadingManager();
@@ -18,16 +19,21 @@ class OmnipotentLoader extends Loader {
         this.instances = {}
     }
 
-    load(url, onLoad, onProgress, onError) {
-        const fileType = this.#getFileType(url);
-        if (fileType === 'unknown') {
-            const errorMessage = 'Unknown file type: ' + url;
-            console.error(errorMessage);
-            onError && onError(new Error(errorMessage));
-            return;
+    load(urls, onLoad, onProgress, onError) {
+        if (Array.isArray(urls)) {
+            const loader = this.#getLoaderInstance('cube');
+            return loader.load(urls, onLoad, onProgress, onError);
+        } else {
+            const fileType = this.#getFileType(urls);
+            if (fileType === 'unknown') {
+                const errorMessage = 'Unknown file type: ' + urls;
+                console.error(errorMessage);
+                onError && onError(new Error(errorMessage));
+                return;
+            }
+            const loader = this.#getLoaderInstance(fileType);
+            return loader.load(urls, onLoad, onProgress, onError);
         }
-        const loader = this.#getLoaderInstance(fileType);
-        return loader.load(url, onLoad, onProgress, onError);
     }
 
     #getLoaderInstance(fileType) {
@@ -42,6 +48,10 @@ class OmnipotentLoader extends Loader {
     }
 
     loadAsync(url, onProgress) {
+        if (Array.isArray(url)) {
+            console.error('loadAsync cant`t support array');
+            return;
+        }
         const scope = this;
         return new Promise((resolve, reject) => {
             scope.load(url, resolve, onProgress, (error) => {

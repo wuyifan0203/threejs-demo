@@ -1,0 +1,204 @@
+/*
+ * @Author: wuyifan0203 1208097313@qq.com
+ * @Date: 2025-02-07 15:12:03
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-02-07 17:46:54
+ * @FilePath: \threejs-demo\src\texture\dataTexture.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
+import {
+    Mesh,
+    BoxGeometry,
+    MeshNormalMaterial,
+    PerspectiveCamera,
+    Vector3,
+    DirectionalLight
+} from 'three';
+import {
+    initRenderer,
+    initOrthographicCamera,
+    initCustomGrid,
+    initAxesHelper,
+    initScene,
+    resize,
+    initClock,
+    initLoader,
+    initAmbientLight,
+    imagePath
+} from '../lib/tools/index.js';
+import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+import { AbstractPlayer } from '../lib/custom/AbstractPlayer.js';
+
+
+const loader = initLoader();
+
+window.onload = () => {
+    init();
+};
+
+function init() {
+    const renderer = initRenderer();
+    renderer.autoClear = false;
+    const scene = initScene();
+    initAxesHelper(scene);
+    renderer.setClearColor(0xffffff);
+    const grid = initCustomGrid(scene);
+    grid.rotateX(Math.PI / 2);
+
+    scene.add(new Mesh(new BoxGeometry(3, 3, 3), new MeshNormalMaterial()));
+
+    const player = new Player();
+
+    const world = new World();
+
+    const clock = initClock();
+    let deltaTime = 0;
+    function render() {
+        renderer.clear();
+        deltaTime = clock.getDelta();
+        player.update(deltaTime);
+        renderer.render(world.scene, player.camera);
+        renderer.render(scene, player.camera);
+
+     
+        requestAnimationFrame(render);
+    }
+    render();
+    resize(renderer, player.camera);
+
+}
+
+class Player extends AbstractPlayer {
+    constructor(parameters = {}) {
+        super();
+        this.camera = new PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.parameters = Object.assign({
+            speed: 0.8
+        }, parameters);
+        const keyMap = this.keyMap = {
+            'W': false,
+            'A': false,
+            'S': false,
+            'D': false,
+            'E': false,
+            'Q': false,
+            ' ': false,
+            'SHIFT': false,
+            'ArrowUp': false,
+            'ArrowDown': false,
+            'ArrowLeft': false,
+            'ArrowRight': false,
+            'Enter': false,
+            'Escape': false,
+            'Tab': false,
+        };
+        const controls = new PointerLockControls(this.camera, document.body);
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('click', function (e) {
+            controls.lock();
+            if (controls.isLocked) {
+                e.preventDefault();
+                // 1.点击屏幕
+                // 2.放置或删除方块
+                // 3.更新纹理
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            const key = e.key.toUpperCase();
+            keyMap[key] = true;
+        })
+
+        document.addEventListener('keyup', function (e) {
+            const key = e.key.toUpperCase();
+            keyMap[key] = false;
+        })
+    }
+
+    _updateDirection() {
+        this.reset();
+        if (this.keyMap.W) this.direction.z -= 1;
+        if (this.keyMap.S) this.direction.z += 1;
+        if (this.keyMap.A) this.direction.x -= 1;
+        if (this.keyMap.D) this.direction.x += 1;
+        if (this.keyMap.E) this.direction.y += 1;
+        if (this.keyMap.Q) this.direction.y -= 1;
+
+        this.direction.applyQuaternion(this.camera.quaternion).normalize();
+    }
+
+    _updateSpeed() {
+        this.currentSpeed = this.keyMap.SHIFT ? this.parameters.speed * 3 : this.parameters.speed * 2;
+    }
+
+    _updatePosition(dt) {
+        this.direction.multiplyScalar(this.currentSpeed * dt);
+        if (this.direction.length() > 0) {
+
+        }
+        this.camera.position.add(this.direction);
+    }
+}
+
+class World {
+    constructor() {
+        this.scene = initScene();
+        this.size = new Vector3(512, 104, 512);
+
+        this.resource = {
+            cubeTexture: {},
+            texture: {}
+        }
+
+        this.init();
+    }
+
+    init() {
+        this.initLights();
+        this.initCubeTexture();
+        this.initTexture();
+    }
+
+    initLights() {
+        initAmbientLight(this.scene);
+
+        const directionLight1 = new DirectionalLight(0xffffff, 0.35);
+        directionLight1.position.set(150, 200, 50);
+        directionLight1.castShadow = true;
+        directionLight1.shadow.mapSize.width = 1024;
+        directionLight1.shadow.mapSize.height = 1024;
+        directionLight1.shadow.camera.left = -75;
+        directionLight1.shadow.camera.right = 75;
+        directionLight1.shadow.camera.top = 75;
+        directionLight1.shadow.camera.bottom = -75;
+        directionLight1.shadow.camera.near = 0.1;
+        directionLight1.shadow.camera.far = 500;
+        directionLight1.shadow.bias = -0.001;
+        directionLight1.shadow.blurSamples = 8;
+        directionLight1.shadow.radius = 4;
+        this.scene.add(directionLight1);
+
+        const directionLight2 = new DirectionalLight(0xffffff, 0.15);
+        directionLight2.position.set(-50, 200, -150);
+        this.scene.add(directionLight2);
+    }
+
+    initCubeTexture() {
+        loader.setPath(`../../${imagePath}/skyBox/`);
+        this.resource.cubeTexture['env'] = loader.load([
+            "Box_Right.bmp",
+            "Box_Left.bmp",
+            "Box_Top.bmp",
+            "Box_Bottom.bmp",
+            "Box_Front.bmp",
+            "Box_Back.bmp"
+        ]);
+
+        this.scene.background = this.resource.cubeTexture['env'];
+    }
+
+    initTexture() { }
+}
