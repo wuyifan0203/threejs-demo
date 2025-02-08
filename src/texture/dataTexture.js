@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-02-07 15:12:03
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-02-07 17:46:54
+ * @LastEditTime: 2025-02-08 20:11:21
  * @FilePath: \threejs-demo\src\texture\dataTexture.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -12,11 +12,11 @@ import {
     MeshNormalMaterial,
     PerspectiveCamera,
     Vector3,
-    DirectionalLight
+    DirectionalLight,
+    RepeatWrapping
 } from 'three';
 import {
     initRenderer,
-    initOrthographicCamera,
     initCustomGrid,
     initAxesHelper,
     initScene,
@@ -60,7 +60,7 @@ function init() {
         renderer.render(world.scene, player.camera);
         renderer.render(scene, player.camera);
 
-     
+
         requestAnimationFrame(render);
     }
     render();
@@ -147,6 +147,7 @@ class World {
     constructor() {
         this.scene = initScene();
         this.size = new Vector3(512, 104, 512);
+        this.center = new Vector3(0, 1, 0);
 
         this.resource = {
             cubeTexture: {},
@@ -198,7 +199,28 @@ class World {
         ]);
 
         this.scene.background = this.resource.cubeTexture['env'];
+
+        loader.setPath(`../../${imagePath}/starSkyBox/`);
+        this.resource.cubeTexture['stars'] = loader.load([
+            "StarSkyBoxRight.png",
+            "StarSkyBoxLeft.png",
+            "StarSkyBoxTop.png",
+            "StarSkyBoxBottom.png",
+            "StarSkyBoxFront.png",
+            "StarSkyBoxBack.png",
+        ]);
+
+        this.scene.background = this.resource.cubeTexture['stars'];
     }
 
-    initTexture() { }
+    initTexture() {
+        loader.setPath(`../../${imagePath}/world/`);
+        ['grass', 'dirt', 'stone', 'sand', 'gravel', 'leaf', 'wood', 'waterNormal', 'waterNormal2'].forEach((name) => {
+            loader.load(`${name}.png`, (texture) => { 
+                this.resource.texture[name] = texture;
+                texture.wrapS = RepeatWrapping;
+                texture.wrapT = RepeatWrapping;
+            })
+        })
+    }
 }

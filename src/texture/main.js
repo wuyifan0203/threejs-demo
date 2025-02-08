@@ -203,62 +203,9 @@ async function main() {
         }
 
     });
-    //controls.target.set(0, 25, 0);
-
-    const stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
-    // Setup scene
-    // Skybox
-    const environment = new THREE.CubeTextureLoader().load([
-        "skybox/Box_Right.bmp",
-        "skybox/Box_Left.bmp",
-        "skybox/Box_Top.bmp",
-        "skybox/Box_Bottom.bmp",
-        "skybox/Box_Front.bmp",
-        "skybox/Box_Back.bmp"
-    ]);
-    scene.background = environment;
-    const stars = new THREE.CubeTextureLoader().load([
-        "starSkybox/StarSkybox041.png",
-        "starSkybox/StarSkybox042.png",
-        "starSkybox/StarSkybox043.png",
-        "starSkybox/StarSkybox044.png",
-        "starSkybox/StarSkybox045.png",
-        "starSkybox/StarSkybox046.png"
-    ]);
-
-    const boxCenter = new THREE.Vector3(0, 1, 0);
-    const boxSize = new THREE.Vector3(512, 104, 512);
+ 
     const data = new Float32Array(boxSize.x * boxSize.y * boxSize.z * 4);
     noise.seed(Math.random());
-    const grassTex = new THREE.TextureLoader().load("grasstex.jpeg");
-    grassTex.wrapS = THREE.RepeatWrapping;
-    grassTex.wrapT = THREE.RepeatWrapping;
-    const dirtTex = new THREE.TextureLoader().load("dirttex.jpeg");
-    dirtTex.wrapS = THREE.RepeatWrapping;
-    dirtTex.wrapT = THREE.RepeatWrapping;
-    const stoneTex = new THREE.TextureLoader().load("stonetex.jpeg");
-    stoneTex.wrapS = THREE.RepeatWrapping;
-    stoneTex.wrapT = THREE.RepeatWrapping;
-    const woodTex = new THREE.TextureLoader().load("woodtex.png");
-    woodTex.wrapS = THREE.RepeatWrapping;
-    woodTex.wrapT = THREE.RepeatWrapping;
-    const leafTex = new THREE.TextureLoader().load("leaftex.jpeg");
-    leafTex.wrapS = THREE.RepeatWrapping;
-    leafTex.wrapT = THREE.RepeatWrapping;
-    const sandTex = new THREE.TextureLoader().load("sandtex.jpeg");
-    sandTex.wrapS = THREE.RepeatWrapping;
-    sandTex.wrapT = THREE.RepeatWrapping;
-    const gravelTex = new THREE.TextureLoader().load("graveltex.jpeg");
-    gravelTex.wrapS = THREE.RepeatWrapping;
-    gravelTex.wrapT = THREE.RepeatWrapping;
-    const waterNormalMap = new THREE.TextureLoader().load("waternormal.jpeg");
-    const waterNormalMap2 = new THREE.TextureLoader().load("waternormal2.png");
-    waterNormalMap.wrapS = THREE.RepeatWrapping;
-    waterNormalMap.wrapT = THREE.RepeatWrapping;
-    waterNormalMap2.wrapS = THREE.RepeatWrapping;
-    waterNormalMap2.wrapT = THREE.RepeatWrapping;
     for (let z = 0; z < boxSize.z; z++) {
         for (let x = 0; x < boxSize.x; x++) {
             let height = 0;
