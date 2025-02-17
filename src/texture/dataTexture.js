@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-02-07 15:12:03
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-02-12 18:28:56
+ * @LastEditTime: 2025-02-14 11:13:27
  * @FilePath: \threejs-demo\src\texture\dataTexture.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -16,7 +16,10 @@ import {
     RepeatWrapping,
     Data3DTexture,
     FloatType,
-    NearestFilter
+    NearestFilter,
+    MeshBasicMaterial,
+    InstancedMesh,
+    Matrix4
 } from 'three';
 import {
     initRenderer,
@@ -149,7 +152,7 @@ class Player extends AbstractPlayer {
 class World {
     constructor() {
         this.scene = initScene();
-        this.size = new Vector3(10, 40, 10);
+        this.size = new Vector3(50, 52, 50);
         this.center = new Vector3(0, 1, 0);
 
         this.resource = {
@@ -254,17 +257,43 @@ class World {
 
     buildPreview() {
         console.log(888);
-        const count = new Array(8).fill(0);
+        const count = new Array(9).fill(0);
         const cell = this.size.x * this.size.y
         for (let z = 0; z < this.size.z; z++) {
             for (let x = 0; x < this.size.x; x++) {
                 for (let y = 0; y < this.size.y; y++) {
-                    const idx = z * cell + x * this.size.y + y + 3;
+                    const idx = (z * cell + y * this.size.x + x) * 4 + 3
                     count[this.data[idx]]++;
                 }
             }
         }
         console.log('count: ', count);
+
+        const geometry = new BoxGeometry(2, 2, 2, 1, 1, 1);
+        const { grass, dirt, stone, sand, gravel, leaf, wood, waterNormal, waterNormal2 } = this.resource.texture;
+        const materials = [grass, dirt, stone, waterNormal, wood, leaf, sand, gravel].map((map) => new MeshBasicMaterial({ map }));
+
+        const meshes = [];
+        for (let i = 1; i < count.length; i++) {
+            const mesh = new InstancedMesh(geometry, new MeshBasicMaterial(), count[i]);
+            meshes.push(mesh);
+
+        }
+        this.scene.add(meshes[0]);
+        const mat = new Matrix4();
+
+        for (let z = 0; z < this.size.z; z++) {
+            for (let x = 0; x < this.size.x; x++) {
+                for (let y = 0; y < this.size.y; y++) {
+                    const idx = (z * cell + y * this.size.x + x) * 4;
+                    if (this.data[idx + 3] === 1) {
+                        const [x, y, z] = [this.data[idx], this.data[idx + 1], this.data[idx + 2]];
+                        meshes[0].setMatrixAt(idx / 4, mat.makeTranslation(x * 2, y * 2, z * 2));
+                    }
+                }
+            }
+        }
+
 
     }
 }

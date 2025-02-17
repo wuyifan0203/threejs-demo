@@ -130,35 +130,19 @@ self.onmessage = function (e) {
                         // 草地
                         factor = 0.5 + 0.5 * random()
                         data.set([0, factor, 0, 1], idx);
-                        // data[idx] = 0;
-                        // data[idx + 1] = factor;
-                        // data[idx + 2] = 0;
-                        // data[idx + 3] = 1 * caveFactor;
                     } else if (y >= storRange + height && y <= halfHeight + height) {
                         // 泥土
                         factor = 0.75 + 0.5 * random();
                         data.set([(161 / 255) * factor, (103 / 255) * factor, (60 / 255) * factor, 2], idx);
-                        // data[idx] = (161 / 255) * factor;
-                        // data[idx + 1] = (103 / 255) * factor;
-                        // data[idx + 2] = (60 / 255) * factor;
-                        // data[idx + 3] = 2 * caveFactor;
                     } else if (y < storRange + height) {
                         // 石头
                         factor = 0.5 + 0.25 * random();
                         data.set([factor, factor, factor, 3], idx);
-                        // data[idx] = factor;
-                        // data[idx + 1] = factor;
-                        // data[idx + 2] = factor;
-                        // data[idx + 3] = 3 * caveFactor;
                     }
                     // 填充水，为空且上方不是空气
                     if (y < halfHeight && data[idx + 3] === 0 && data[idx + 3 - upIdx] !== 0) {
                         factor = 0.5 + 0.25 * random();
                         data.set([factor * 0.25, factor * 0.5, factor, 4], idx);
-                        // data[idx] = factor * 0.25;
-                        // data[idx + 1] = factor * 0.5;
-                        // data[idx + 2] = factor;
-                        // data[idx + 3] = 4 * caveFactor;
                     }
                 }
             }
@@ -188,18 +172,10 @@ self.onmessage = function (e) {
                                                 // 砾石
                                                 factor = 0.5 + 0.25 * random();
                                                 data.set([factor, factor, factor, 8], idx);
-                                                // data[idx] = factor;
-                                                // data[idx + 1] = factor;
-                                                // data[idx + 2] = factor;
-                                                // data[idx + 3] = 8;
                                             } else {
                                                 // 沙子
                                                 factor = 0.75 + 0.5 * random();
                                                 data.set([factor * 0.760, factor * 0.698, factor * 0.502, 7], idx);
-                                                // data[i] = 0.760 * factor;
-                                                // data[i + 1] = 0.698 * factor;
-                                                // data[i + 2] = 0.502 * factor;
-                                                // data[i + 3] = 7;
                                             }
                                         }
                                     }
@@ -218,10 +194,6 @@ self.onmessage = function (e) {
                         }
                         if (!blocked) {
                             data.set([0, 0.5 + 0.5 * random(), 0, 1], idx);
-                            // data[idx] = 0;
-                            // data[idx + 1] = 0.5 + 0.5 * random();
-                            // data[idx + 2] = 0;
-                            // data[idx + 3] = 1;
                         }
                     }
                 }
@@ -229,84 +201,68 @@ self.onmessage = function (e) {
         }
     }
 
-    // for (let i = 0, count = round(sqrt(cell)); i < count; i++) {
-    //     let randomX = round(6 + random() * (sizeX - 12));
-    //     let randomZ = round(6 + random() * (sizeY - 12));
-    //     let placeY = 1;
-    //     let idx = 0;
-    //     // 该位置是否可以放树
-    //     for (let y = 1; y < sizeY; y++) {
-    //         idx = (randomZ * cell + y * sizeX + randomX) * 4;
-    //         // 判断上方是否为空气下方是否为草地
-    //         if (data[idx + 3] === 0 && data[idx + 3 - upIdx] === 1) {
-    //             placeY = y;
-    //             break;
-    //         }
-    //     }
-    //     if (placeY === 1) {
-    //         i--;
-    //         continue;
-    //     }
-    //     // 设置成树干
-    //     factor = 0.75 + 0.5 * random();
-    //     data.set([0.631 * factor, 0.403 * factor, 0.235 * factor, 5], idx);
-    //     // data[idx] = 0.631 * factor;
-    //     // data[idx + 1] = 0.403 * factor;
-    //     // data[idx + 2] = 0.235 * factor;
-    //     // data[idx + 3] = 5;
-    //     // 树高度
-    //     const height = round(4 + random() * 2);
-    //     const trunkHue = 0.25 + 0.75 * random();
-    //     // 设置树干
-    //     for (let i = 1; i <= height; i++) {
-    //         factor = (0.75 + 0.5 * random()) * trunkHue;
-    //         data.set([0.631 * factor, 0.403 * factor, 0.235 * factor, 5], idx + i * upIdx);
-    //         // data[idx + i * upIdx] = 0.631 * factor;
-    //         // data[idx + 1 + i * upIdx] = 0.403 * factor;
-    //         // data[idx + 2 + i * upIdx] = 0.235 * factor;
-    //         // data[idx + 3 + i * upIdx] = 5;
-    //     }
-    //     // 设置树叶高度
-    //     let leafHeight = floor(random() * 3);
-    //     let leaf2Height = floor(random() * 2);
-    //     let leafHue = 0.25 + 0.75 * random();
-    //     for (let z = randomZ - 2; z < randomZ + 3; z++) {
-    //         for (let y = (placeY + height + leafHeight) - 2; y < (placeY + height + leafHeight) + 2; y++) {
-    //             for (let x = randomX - 2; x < randomX + 3; x++) {
-    //                 if (!(z <= 0 || z >= boundZ || y <= 0 || y >= boundY || x <= 0 || x >= boundX)) {
-    //                     const idx = (z * cell + y * (sizeX) + x) * 4;
-    //                     if (data[idx + 3] !== 5) {
-    //                         factor = 0.5 + 0.25 * random();
-    //                         factor *= leafHue;
-    //                         data.set([factor * 0.25, factor, factor * 0.25, 6], idx);
-    //                         // data[idx] = factor * 0.25;
-    //                         // data[idx + 1] = factor;
-    //                         // data[idx + 2] = factor * 0.25;
-    //                         // data[idx + 3] = 6;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     for (let z = randomZ - 1; z < randomZ + 2; z++) {
-    //         for (let y = (placeY + height + leafHeight + leaf2Height) - 2; y < (placeY + height + leafHeight + leaf2Height) + 3; y++) {
-    //             for (let x = randomX - 1; x < randomX + 2; x++) {
-    //                 if (!(z <= 0 || z >= boundZ || y <= 0 || y >= boundY || x <= 0 || x >= boundX)) {
-    //                     const idx = (z * cell + y * (sizeX) + x) * 4;
-    //                     if (data[idx + 3] !== 5) {
-    //                         let factor = 0.5 + 0.25 * random();
-    //                         factor *= leafHue;
-    //                         data.set([factor * 0.25, factor, factor * 0.25, 6], idx);
-    //                         // data[idx] = factor * 0.25;
-    //                         // data[idx + 1] = factor;
-    //                         // data[idx + 2] = factor * 0.25;
-    //                         // data[idx + 3] = 6;
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
+    for (let i = 0, count = round(sqrt(cell)); i < count; i++) {
+        let randomX = round(6 + random() * (sizeX - 12));
+        let randomZ = round(6 + random() * (sizeY - 12));
+        let placeY = 1;
+        let idx = 0;
+        // 该位置是否可以放树
+        for (let y = 1; y < sizeY; y++) {
+            idx = (randomZ * cell + y * sizeX + randomX) * 4;
+            // 判断上方是否为空气下方是否为草地
+            if (data[idx + 3] === 0 && data[idx + 3 - upIdx] === 1) {
+                placeY = y;
+                break;
+            }
+        }
+        if (placeY === 1) {
+            i--;
+            continue;
+        }
+        // 设置成树干
+        factor = 0.75 + 0.5 * random();
+        data.set([0.631 * factor, 0.403 * factor, 0.235 * factor, 5], idx);
+        // 树高度
+        const height = round(4 + random() * 2);
+        const trunkHue = 0.25 + 0.75 * random();
+        // 设置树干
+        for (let i = 1; i <= height; i++) {
+            factor = (0.75 + 0.5 * random()) * trunkHue;
+            data.set([0.631 * factor, 0.403 * factor, 0.235 * factor, 5], idx + i * upIdx);
+        }
+        // 设置树叶高度
+        let leafHeight = floor(random() * 3);
+        let leaf2Height = floor(random() * 2);
+        let leafHue = 0.25 + 0.75 * random();
+        for (let z = randomZ - 2; z < randomZ + 3; z++) {
+            for (let y = (placeY + height + leafHeight) - 2; y < (placeY + height + leafHeight) + 2; y++) {
+                for (let x = randomX - 2; x < randomX + 3; x++) {
+                    if (!(z <= 0 || z >= boundZ || y <= 0 || y >= boundY || x <= 0 || x >= boundX)) {
+                        const idx = (z * cell + y * (sizeX) + x) * 4;
+                        if (data[idx + 3] !== 5) {
+                            factor = 0.5 + 0.25 * random();
+                            factor *= leafHue;
+                            data.set([factor * 0.25, factor, factor * 0.25, 6], idx);
+                        }
+                    }
+                }
+            }
+        }
+        for (let z = randomZ - 1; z < randomZ + 2; z++) {
+            for (let y = (placeY + height + leafHeight + leaf2Height) - 2; y < (placeY + height + leafHeight + leaf2Height) + 3; y++) {
+                for (let x = randomX - 1; x < randomX + 2; x++) {
+                    if (!(z <= 0 || z >= boundZ || y <= 0 || y >= boundY || x <= 0 || x >= boundX)) {
+                        const idx = (z * cell + y * (sizeX) + x) * 4;
+                        if (data[idx + 3] !== 5) {
+                            let factor = 0.5 + 0.25 * random();
+                            factor *= leafHue;
+                            data.set([factor * 0.25, factor, factor * 0.25, 6], idx);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     postMessage(data);
 
