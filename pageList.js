@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-21 17:44:51
+ * @LastEditTime: 2025-02-18 14:37:31
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -120,6 +120,10 @@ const list = [
       {
         path: "/camera/saveState.html",
         title: "Save Camera State",
+      },
+      {
+        path: "/camera/cubeCamera.html",
+        title: "Cube Camera reflection",
       },
     ],
   },
