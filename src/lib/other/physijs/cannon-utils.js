@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-18 11:35:58
+ * @LastEditTime: 2025-02-28 19:05:08
  * @FilePath: \threejs-demo\src\lib\other\physijs\cannon-utils.js
  */
 import {
@@ -14,7 +14,7 @@ import {
     Float32BufferAttribute,
     PlaneGeometry
 } from 'three';
-import { Body, Material, Cylinder, Quaternion, Shape, Vec3 } from './cannon.js'
+import { Sphere, ConvexPolyhedron, Body, Cylinder, Quaternion, Shape, Vec3 } from './cannon-es.js';
 
 class CannonUtils {
     constructor(world, scene) {
@@ -149,40 +149,90 @@ class CannonUtils {
     }
 
     static mesh2Body(mesh) {
-        switch (mesh.geometry.type) {
+        const shapes = CannonUtils.geometry2Shape(mesh.geometry);
+
+        const body = new Body({
+            mass: 1,
+        });
+        shapes.forEach(({ shape, offset, quaternion }) => {
+            body.addShape(shape, offset, quaternion);
+        });
+        return body;
+    }
+
+    static geometry2Shape(geometry) {
+        switch (geometry.type) {
             case 'TorusGeometry':
-                return createTorusBody(mesh.geometry);
+                {
+
+                    const result = [];
+                    const { radialSegments, radius, tube, tubularSegments, arc } = geometry.parameters;
+                    const pice = arc / tubularSegments;
+                    const halfPice = pice / 2;
+                    const D = radius * Math.sin(halfPice);
+                    const H = radius * Math.cos(halfPice)
+                    const d = (D * (H - tube)) / H;
+
+                    const columnShape = new Cylinder(tube, tube, d * 2, radialSegments);
+                    for (let j = 0, k = halfPice; j < tubularSegments; j++, k = j * pice + halfPice) {
+                        const offset = new Vec3(
+                            H * Math.cos(k),
+                            H * Math.sin(k),
+                            0
+                        );
+                        const quaternion = new Quaternion().setFromEuler(0, 0, k, 'YXZ')
+                        result.push({ columnShape, offset, quaternion })
+
+                    }
+                    return result;
+                }
+            case 'BoxGeometry':
+                {
+                    const { width, height, depth } = geometry.parameters;
+                    const shape = new Box(new Vec3(
+                        width / 2,
+                        height / 2,
+                        depth / 2
+                    ))
+                    return [{ shape, offset: new Vec3(0, 0, 0), quaternion: new Quaternion() }];
+                }
+            case 'SphereGeometry':
+                {
+                    const shape = new Sphere(geometry.parameters.radius)
+                    return [{ shape, offset: new Vec3(0, 0, 0), quaternion: new Quaternion() }];
+                }
+            case 'CylinderGeometry':
+                {
+                    const { radiusTop, radiusBottom, height, radialSegments } = geometry.parameters;
+                    const shape = new Cylinder(radiusTop, radiusBottom, height, radialSegments);
+                    return [{ shape, offset: new Vec3(0, 0, 0), quaternion: new Quaternion() }];
+                }
             default:
-                break;
+                {
+                    const position = geometry.attributes.position.array;
+                    const index = geometry.index?.array;
+
+                    const points = [];
+                    for (let i = 0; i < position.length; i += 3) {
+                        points.push(
+                            new Vec3(position[i], position[i + 1], position[i + 2])
+                        );
+                    }
+                    const faces = [];
+                    if (index) {
+                        for (let i = 0; i < index.length; i += 3) {
+                            faces.push([index[i], index[i + 1], index[i + 2]]);
+                        }
+                    } else {
+                        for (let i = 0; i < points.length; i += 3) {
+                            faces.push([i, i + 1, i + 2]);
+                        }
+                    }
+                    const shape = new ConvexPolyhedron({ vertices: points, faces });
+                    return [{ shape, offset: new Vec3(0, 0, 0), quaternion: new Quaternion() }];
+                }
         }
-    }
-}
-
-function createTorusBody(geometry) {
-    const body = new Body({ material: new Material() });
-    const { radialSegments, radius, tube, tubularSegments, arc } = geometry.parameters;
-    const pice = arc / tubularSegments;
-    const halfPice = pice / 2;
-    const D = radius * Math.sin(halfPice);
-    const H = radius * Math.cos(halfPice)
-    const d = (D * (H - tube)) / H;
-
-    const columnShape = new Cylinder(tube, tube, d * 2, radialSegments);
-
-    for (let j = 0, k = halfPice; j < tubularSegments; j++, k = j * pice + halfPice) {
-        const offset = new Vec3(
-            H * Math.cos(k),
-            H * Math.sin(k),
-            0
-        );
-        const quaternion = new Quaternion().setFromEuler(0, 0, k, 'YXZ')
-        body.addShape(columnShape, offset, quaternion)
 
     }
-
-
-    return body
-
 }
-
 export { CannonUtils }
