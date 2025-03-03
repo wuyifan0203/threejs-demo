@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-02-18 14:37:31
+ * @LastEditTime: 2025-03-03 19:16:49
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -275,6 +275,10 @@ const list = [
         path: "/cannon/vehicle.html",
         title: "Vehicle",
       },
+      {
+        path: "/cannon/breaker.html",
+        title: "Breaker Block",
+      },
     ],
   },
   {
@@ -477,7 +481,6 @@ const list = [
       },
     ],
   },
-
   {
     category: "algorithms",
     title: "Algorithms",

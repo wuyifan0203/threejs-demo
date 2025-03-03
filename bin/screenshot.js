@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-26 16:15:30
+ * @LastEditTime: 2025-03-03 19:27:50
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -39,7 +39,9 @@ class PromiseQueue {
 
 console.red = (...arg) => console.log(chalk.red(...arg));
 console.yellow = (...arg) => console.log(chalk.yellow(...arg));
+console.bgYellow = (...arg) => console.log(chalk.bgYellow(...arg));
 console.green = (...arg) => console.log(chalk.green(...arg));
+console.bgGreen = (...arg) => console.log(chalk.bgGreen(...arg));
 console.blue = (...arg) => console.log(chalk.blue(...arg));
 console.bgBlue = (...arg) => console.log(chalk.bgCyanBright(...arg));
 
@@ -99,9 +101,9 @@ let compareImage = null;
 
 async function main() {
   // 获取所有标签的href
-  let urls = [];
-  urls = await getAllHref();
-
+  let href = ['/composer/useOITRenderPass.html'];
+  href = getAllHref();
+  const urls = href.map(path => (`http://localhost:${port}${baseURL}/src${path}`));
   // urls.length = 1;
 
   total = urls.length;
@@ -132,7 +134,7 @@ async function main() {
   close();
 }
 
-async function getAllHref() {
+function getAllHref() {
   const paths = new Set();
   list.forEach(({ pages }) => {
     pages.forEach(({ path }) => {
@@ -143,7 +145,7 @@ async function getAllHref() {
     paths.delete(exceeded);
   })
 
-  return Array.from(paths).map(path => (`http://localhost:${port}${baseURL}/src${path}`));
+  return Array.from(paths);
 }
 
 async function preparePage(page) {
@@ -217,7 +219,7 @@ async function renderPage(page) {
       if (playBtn) playBtn.click();
     });
 
-    if (!isWebGLContext) return console.red('this page is not webgl');
+    if (!isWebGLContext) console.red('this page is not webgl');
     await page.evaluate(
       async (renderTimeout, parseTime) => {
         // 等待 parseTime 后 resolve
@@ -345,7 +347,7 @@ async function pageCapture(pages, url) {
           await image.write(
             path.join(__dirname, `../screenshots/${fileName}.png`)
           );
-          console.green(
+          console.bgYellow(
             `Diff ${differentPixels.toFixed(
               1
             )}% in file  ~ [update] screenShot ${fileName} success!`
@@ -353,7 +355,7 @@ async function pageCapture(pages, url) {
         }
       } else {
         await image.write(filePath);
-        console.green(
+        console.bgGreen(
           `[new add] screenShot ${fileName} success! : ${page.url}`
         );
       }
@@ -380,4 +382,4 @@ function close() {
   process.exit(1);
 }
 
-const exceptionURLs = [];
+const exceptionURLs = ['/shader/audioContext.html', '/noise/terrainGenerate.html'];

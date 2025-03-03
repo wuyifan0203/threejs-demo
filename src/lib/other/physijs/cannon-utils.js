@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-02-28 19:05:08
+ * @LastEditTime: 2025-03-03 17:16:45
  * @FilePath: \threejs-demo\src\lib\other\physijs\cannon-utils.js
  */
 import {
@@ -12,8 +12,9 @@ import {
     CylinderGeometry,
     BufferGeometry,
     Float32BufferAttribute,
-    PlaneGeometry
+    PlaneGeometry,
 } from 'three';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
 import { Sphere, ConvexPolyhedron, Body, Cylinder, Quaternion, Shape, Vec3 } from './cannon-es.js';
 
 class CannonUtils {
@@ -209,24 +210,21 @@ class CannonUtils {
                 }
             default:
                 {
-                    const position = geometry.attributes.position.array;
-                    const index = geometry.index?.array;
+                    let tempGeometry = new BufferGeometry();
+                    tempGeometry.setAttribute("position", geometry.getAttribute("position"));
+
+                    tempGeometry = mergeVertices(tempGeometry);
+
+                    const position = tempGeometry.attributes.position.array;
+                    const index = tempGeometry.index.array;
 
                     const points = [];
                     for (let i = 0; i < position.length; i += 3) {
-                        points.push(
-                            new Vec3(position[i], position[i + 1], position[i + 2])
-                        );
+                        points.push(new Vec3(position[i], position[i + 1], position[i + 2]));
                     }
                     const faces = [];
-                    if (index) {
-                        for (let i = 0; i < index.length; i += 3) {
-                            faces.push([index[i], index[i + 1], index[i + 2]]);
-                        }
-                    } else {
-                        for (let i = 0; i < points.length; i += 3) {
-                            faces.push([i, i + 1, i + 2]);
-                        }
+                    for (let i = 0; i < index.length; i += 3) {
+                        faces.push([index[i], index[i + 1], index[i + 2]]);
                     }
                     const shape = new ConvexPolyhedron({ vertices: points, faces });
                     return [{ shape, offset: new Vec3(0, 0, 0), quaternion: new Quaternion() }];

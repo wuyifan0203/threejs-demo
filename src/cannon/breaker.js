@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-02-26 17:36:05
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-02-28 19:09:25
+ * @LastEditTime: 2025-03-03 18:51:20
  * @FilePath: \threejs-demo\src\cannon\breaker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -15,40 +15,48 @@ import {
     SphereGeometry,
     MeshPhysicalMaterial,
     Raycaster,
+    Color,
+    CameraHelper
 } from 'three';
 import {
     initRenderer,
-    initAxesHelper,
     initOrbitControls,
     initScene,
     resize,
-    initAmbientLight,
     initDirectionLight,
     initClock,
-    initPerspectiveCamera
+    initPerspectiveCamera,
+    initGUI
 } from '../lib/tools/index.js';
 import { ConvexObjectBreaker } from 'three/examples/jsm/misc/ConvexObjectBreaker.js';
-import { World, Body, Box as BoxShape, Vec3, Sphere, Material, ContactMaterial, ConvexPolyhedron, Quaternion } from '../lib/other/physijs/cannon-es.js';
+import { World, Body, Box as BoxShape, Vec3, Sphere, Material, ContactMaterial, Quaternion } from '../lib/other/physijs/cannon-es.js';
 
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js';
 import { CannonUtils } from '../lib/other/physijs/cannon-utils.js';
-import { update } from 'three/examples/jsm/libs/tween.module.js';
 
 window.onload = () => {
     init();
 };
 function init() {
     const renderer = initRenderer();
+    renderer.setClearColor(new Color('#000000'));
     const camera = initPerspectiveCamera(new Vector3(20, 18, 10));
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
     const scene = initScene();
     const light = initDirectionLight();
-    light.position.set(0, 100, 150);
+    light.shadow.camera.left = -80;
+    light.shadow.camera.right = 80;
+    light.shadow.camera.top = 80;
+    light.shadow.camera.bottom = -80;
+    light.position.set(0, 100, 100);
     scene.add(light);
-    initAmbientLight(scene);
-    initAxesHelper(scene);
+
+    const params = {
+        muzzleVelocity: 40,
+        maxCollideTimes: 3
+    }
 
     const direction = new Vector3();
     const position = new Vector3();
@@ -58,11 +66,14 @@ function init() {
     const pointer = new Vector2();
 
     const balls = [];
-    const wallFragments = [];
-    const sphereVelocity = 40;
+    const wallFragments = new Map();
 
     const world = new World({ gravity: new Vec3(0, -10, 0) });
+    world.solver.iterations = 20;
+    world.solver.tolerance = 0.001;
+
     const cannonDebugger = new CannonDebugger(scene, world, { color: 0xffff00 });
+    cannonDebugger.visible = false;
 
     const cob = new ConvexObjectBreaker();
 
@@ -71,48 +82,59 @@ function init() {
     const wall = createWall(scene, world);
     wall.prepareBreak(cob);
 
-    world.addContactMaterial(new ContactMaterial(wallPhysicMaterial, ballPhysicMaterial, { friction: 0.5, restitution: 0.3 }));
-    // world.addContactMaterial(new ContactMaterial(ground.body.material, wallPhysicMaterial, { friction: 0.5, restitution: 0.3 }));
+    world.addContactMaterial(new ContactMaterial(wallPhysicMaterial, ballPhysicMaterial, { friction: 0.2, restitution: 0.1 }));
+    world.addContactMaterial(new ContactMaterial(wallPhysicMaterial, wallPhysicMaterial, { friction: 0.2, restitution: 0.01 }));
+    world.addContactMaterial(new ContactMaterial(ground.body.material, wallPhysicMaterial, { friction: 0.2, restitution: 0.001 }));
     world.addContactMaterial(new ContactMaterial(ground.body.material, ballPhysicMaterial, { friction: 0.2, restitution: 0.5 }));
 
-    window.addEventListener('click', ({ clientX, clientY }) => {
+    renderer.domElement.addEventListener('click', ({ clientX, clientY }) => {
         pointer.set((clientX / window.innerWidth) * 2 - 1, -(clientY / window.innerHeight) * 2 + 1);
         raycaster.setFromCamera(pointer, camera);
         const ball = createBall(scene, world);
         position.copy(raycaster.ray.direction).add(raycaster.ray.origin);
-        console.log('position: ', position);
         ball.body.position.copy(position);
-        const velocity = direction.copy(raycaster.ray.direction).multiplyScalar(sphereVelocity);
+        const velocity = direction.copy(raycaster.ray.direction).multiplyScalar(params.muzzleVelocity);
         ball.body.velocity.copy(velocity);
         balls.push(ball);
 
-        ball.body.addEventListener('collide', ({ body, contact, target }) => {
-            console.log('e: ', body, contact, target);
+        ball.body.addEventListener('collide', ({ body, contact }) => {
             if (body.typeName === 'Wall') {
                 collidePosition.copy(body.pointToLocalFrame(contact.bj.position).vadd(contact.rj));
                 normal.set(contact.ni.x, contact.ni.y, contact.ni.z).negate();
 
-                const fragments = cob.subdivideByImpact(wall.mesh, position, normal, 1, 1);
+                const fragments = cob.subdivideByImpact(wall.mesh, collidePosition, normal, 1, 1);
 
                 fragments.forEach((mesh) => {
-                    const fragment = createWallFragment(scene, world, mesh);
-                    wallFragments.push(fragment);
+                    const wallFragment = createWallFragment(scene, world, mesh);
+                    wallFragment.collideTimes = 0;
+                    wallFragments.set(wallFragment.id, wallFragment);
                 })
-
-
                 wall.dispose();
+            } else if (body.typeName === 'WallFragment') {
+                const currentWallFragment = wallFragments.get(body.mesh.uuid);
+                if (currentWallFragment.collideTimes < params.maxCollideTimes) {
+                    currentWallFragment.prepareBreak(cob);
+                    currentWallFragment.collideTimes += 1;
 
-                console.log('fragments: ', fragments);
+                    collidePosition.copy(body.pointToLocalFrame(contact.bj.position).vadd(contact.rj));
+                    normal.set(contact.ni.x, contact.ni.y, contact.ni.z).negate();
+
+                    const fragments = cob.subdivideByImpact(currentWallFragment.mesh, collidePosition, normal, 1, 1);
+
+                    fragments.forEach((mesh) => {
+                        const wallFragment = createWallFragment(scene, world, mesh);
+                        wallFragments.set(wallFragment.id, wallFragment);
+                    })
+                    currentWallFragment.dispose();
+                    wallFragments.delete(currentWallFragment.uuid);
+                }
             }
-
-            // const position = e, body.
-
         })
     })
 
     function updatePhysicsWorld() {
         world.step(fps, clock.getDelta());
-        controls.update();
+
         wall.update();
 
         for (let i = balls.length - 1; i >= 0; i--) {
@@ -126,12 +148,22 @@ function init() {
             }
         }
 
-        cannonDebugger.update();
+        wallFragments.values().forEach((wallFragment) => {
+            wallFragment.update();
+            if (wallFragment.mesh.position.y < -100) {
+                console.log('wallFragment out of world');
+                wallFragment.dispose();
+                wallFragments.delete(wallFragment.id);
+            }
+        })
+
+        cannonDebugger.visible && cannonDebugger.update();
     }
 
     const fps = 1 / 60;
     const clock = initClock();
     function render() {
+        controls.update();
         updatePhysicsWorld();
 
         renderer.render(scene, camera);
@@ -139,10 +171,15 @@ function init() {
     }
     render();
     resize(renderer, camera);
+
+    const gui = initGUI();
+    gui.add(params, "muzzleVelocity", 0.1, 500, 0.1);
+    gui.add(params, "maxCollideTimes", [1, 2, 3, 5, 10, Infinity]);
+    gui.add(cannonDebugger, 'visible').name('Cannon Debugger Visible');
 }
 
 function createGround(scene, world) {
-    const size = new Vector3(100, 0.5, 100);
+    const size = new Vector3(150, 1, 150);
     const halfSize = size.clone().multiplyScalar(0.5);
 
     const mesh = new Mesh(new BoxGeometry(size.x, size.y, size.z), new MeshStandardMaterial({ color: 'gray' }));
@@ -191,7 +228,7 @@ function createWall(scene, world) {
 
     const body = new Body({
         shape: wallShape,
-        mass: 1,
+        mass: 2,
         position: new Vec3().copy(mesh.position),
         material: wallPhysicMaterial,
     })
@@ -256,21 +293,32 @@ function createBall(scene, world) {
 }
 
 function createWallFragment(scene, world, mesh) {
-    console.log('mesh: ', mesh);
     scene.add(mesh);
+    mesh.receiveShadow = mesh.castShadow = true;
 
-    const shape = CannonUtils.geometry2Shape(mesh.geometry);
-    console.log('shape: ', shape);
+    const { shape } = CannonUtils.geometry2Shape(mesh.geometry)[0];
 
     const body = new Body({
         mass: mesh.userData.mass,
+        shape,
+        position: new Vec3().copy(mesh.position),
+        material: wallPhysicMaterial
     })
-    body.addShape(shape[0].shape, new Vec3().copy(mesh.position), new Quaternion().copy(mesh.quaternion));
 
     world.addBody(body);
 
+    body.typeName = 'WallFragment';
+    body.mesh = mesh;
+
+    body.allowSleep = true;         // 允许休眠
+    body.sleepSpeedLimit = 0.1;       // 当速度低于0.1时开始计时
+    body.sleepTimeLimit = 1.0;        // 连续1秒低于速度阈值后进入休眠状态
+
     return {
-        update(){
+        id: mesh.uuid,
+        mesh,
+        body,
+        update() {
             mesh.position.copy(body.position);
             mesh.quaternion.copy(body.quaternion);
         },
