@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-02-26 17:36:05
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-03 18:51:20
+ * @LastEditTime: 2025-03-04 10:15:40
  * @FilePath: \threejs-demo\src\cannon\breaker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -16,7 +16,10 @@ import {
     MeshPhysicalMaterial,
     Raycaster,
     Color,
-    CameraHelper
+    CameraHelper,
+    Audio,
+    AudioListener,
+    AudioLoader
 } from 'three';
 import {
     initRenderer,
@@ -26,7 +29,8 @@ import {
     initDirectionLight,
     initClock,
     initPerspectiveCamera,
-    initGUI
+    initGUI,
+    publicPath
 } from '../lib/tools/index.js';
 import { ConvexObjectBreaker } from 'three/examples/jsm/misc/ConvexObjectBreaker.js';
 import { World, Body, Box as BoxShape, Vec3, Sphere, Material, ContactMaterial, Quaternion } from '../lib/other/physijs/cannon-es.js';
@@ -104,6 +108,8 @@ function init() {
 
                 const fragments = cob.subdivideByImpact(wall.mesh, collidePosition, normal, 1, 1);
 
+                ball.audioPlay();
+
                 fragments.forEach((mesh) => {
                     const wallFragment = createWallFragment(scene, world, mesh);
                     wallFragment.collideTimes = 0;
@@ -120,6 +126,8 @@ function init() {
                     normal.set(contact.ni.x, contact.ni.y, contact.ni.z).negate();
 
                     const fragments = cob.subdivideByImpact(currentWallFragment.mesh, collidePosition, normal, 1, 1);
+
+                    ball.audioPlay();
 
                     fragments.forEach((mesh) => {
                         const wallFragment = createWallFragment(scene, world, mesh);
@@ -251,7 +259,8 @@ function createWall(scene, world) {
         },
         prepareBreak(breaker) {
             breaker.prepareBreakableObject(mesh, body.mass, new Vector3(), new Vector3(), true)
-        }
+        },
+ 
     }
 }
 
@@ -278,6 +287,14 @@ function createBall(scene, world) {
     body.typeName = 'Ball';
     body.mesh = mesh;
 
+    const audioLoader = new AudioLoader();
+    const listener = new AudioListener();
+    const audio = new Audio(listener);
+    audioLoader.load(`../../${publicPath}/audio/glassBreak.mp3`, (buffer) => { 
+        audio.setBuffer(buffer);
+        scene.add(listener);
+    })
+
     return {
         mesh,
         body,
@@ -288,6 +305,14 @@ function createBall(scene, world) {
         dispose() {
             scene.remove(mesh);
             world.removeBody(body);
+        },
+        audioPlay(){
+            if(audio.isPlaying){
+                audio.stop();
+                audio.play();
+            }else{
+                audio.play();
+            }
         }
     }
 }
