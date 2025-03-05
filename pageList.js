@@ -135,6 +135,10 @@ const list = [
         path: "/light/shadow.html",
         title: "Shadow",
       },
+      {
+        path: "/light/shadowRender.html",
+        title: "Custom Direction Light Shadow",
+      },
     ],
   },
   {

@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-07-09 20:33:06
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-03 19:27:50
+ * @LastEditTime: 2025-03-05 17:53:59
  * @FilePath: \threejs-demo\bin\screenshot.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -204,7 +204,7 @@ async function preparePage(page) {
 async function renderPage(page) {
   try {
     // 注入清理脚本 remove Status.js and GUI
-    page.evaluate(cleanPageScript);
+    await page.evaluate(cleanPageScript);
     // 等待页面的网络空闲状态
     await page.waitForNetworkIdle({
       timeout: networkTimeout * 60000,
@@ -219,36 +219,41 @@ async function renderPage(page) {
       if (playBtn) playBtn.click();
     });
 
-    if (!isWebGLContext) console.red('this page is not webgl');
-    await page.evaluate(
-      async (renderTimeout, parseTime) => {
-        // 等待 parseTime 后 resolve
-        await new Promise((resolve) => setTimeout(resolve, parseTime));
-        /* Resolve render promise */
-        window._renderStarted = true;
-        await new Promise(function (resolve) {
-          // 记录开始渲染时间
-          const renderStart = performance._now();
-          const waitingLoop = setInterval(function () {
-            // 是否渲染了 5 秒
-            const renderTimeoutExceeded =
-              renderTimeout > 0 &&
-              performance._now() - renderStart > 1000 * renderTimeout;
-            if (renderTimeoutExceeded) {
-              clearInterval(waitingLoop);
-              // 不能reject 会阻塞整个page
-              console.error("Render timeout exceeded");
-              resolve();
-            } else if (window._renderFinished) {
-              clearInterval(waitingLoop);
-              resolve();
-            }
-          }, 10);
-        });
-      },
-      renderTimeout,
-      page.pageSize / 1024 / 1024 / parseTime
-    );
+    if (!isWebGLContext) {
+      console.red('this page is not webgl');
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    } else {
+      await page.evaluate(
+        async (renderTimeout, parseTime) => {
+          // 等待 parseTime 后 resolve
+          await new Promise((resolve) => setTimeout(resolve, parseTime));
+          /* Resolve render promise */
+          window._renderStarted = true;
+          await new Promise(function (resolve) {
+            // 记录开始渲染时间
+            const renderStart = performance._now();
+            const waitingLoop = setInterval(function () {
+              // 是否渲染了 5 秒
+              const renderTimeoutExceeded =
+                renderTimeout > 0 &&
+                performance._now() - renderStart > 1000 * renderTimeout;
+              if (renderTimeoutExceeded) {
+                clearInterval(waitingLoop);
+                // 不能reject 会阻塞整个page
+                console.error("Render timeout exceeded");
+                resolve();
+              } else if (window._renderFinished) {
+                clearInterval(waitingLoop);
+                resolve();
+              }
+            }, 10);
+          });
+        },
+        renderTimeout,
+        page.pageSize / 1024 / 1024 / parseTime
+      );
+    }
+
   } catch (error) {
     throw new Error(`Error happened while rendering: ${error}`);
   }

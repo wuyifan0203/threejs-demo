@@ -20,7 +20,6 @@ import {
   Vector3,
   Mesh,
   MeshLambertMaterial,
-  AmbientLight,
   BoxGeometry,
   BufferGeometry,
   BufferAttribute,
