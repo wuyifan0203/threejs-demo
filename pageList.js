@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-03 19:16:49
+ * @LastEditTime: 2025-03-06 17:32:25
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -432,6 +432,10 @@ const list = [
       {
         path: "/geometry/edgeGeometry.html",
         title: "Edge Geometry",
+      },
+      {
+        path: "/object/rain.html",
+        title: "Heave Rain",
       },
     ],
   },
