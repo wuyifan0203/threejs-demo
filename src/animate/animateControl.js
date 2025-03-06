@@ -20,7 +20,7 @@ import {
   initGUI,
   initScene,
   initDirectionLight,
-  modelPath,
+  Model_Path,
   initClock,
   initCustomGrid,
   resize,
@@ -73,13 +73,13 @@ async function init() {
 
   const loader = new FBXLoader();
 
-  const walkGroup = await loader.loadAsync(`../../${modelPath}/ZombieWalk.fbx`);
+  const walkGroup = await loader.loadAsync(`../../${Model_Path}/ZombieWalk.fbx`);
   walkGroup.scale.set(0.05, 0.05, 0.05);
   const model = new Object3D();
   model.add(walkGroup);
   scene.add(model);
 
-  const idleGroup = await loader.loadAsync(`../../${modelPath}/ZombieIdle.fbx`);
+  const idleGroup = await loader.loadAsync(`../../${Model_Path}/ZombieIdle.fbx`);
   // 删除位移，保证动画在原点
   walkGroup.animations[0].tracks.shift();
 

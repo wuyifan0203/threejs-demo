@@ -9,15 +9,16 @@ import {
   PerspectiveCamera,
   MeshPhongMaterial,
 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { 
-  initAmbientLight, 
-  initDirectionLight, 
-  initRenderer, 
+import {
+  initAmbientLight,
+  initDirectionLight,
+  initRenderer,
   resize,
   initScene,
-  initOrbitControls
- } from '../lib/tools/index.js';
+  initOrbitControls,
+  initLoader,
+  Model_Path
+} from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -39,10 +40,10 @@ function init() {
   const scene = initScene();
   renderer.setClearColor(0xffffff);
 
-  const light = new PointLight(0xffffff, 3,0,0);
+  const light = new PointLight(0xffffff, 3, 0, 0);
   light.position.set(50, 50, 75);
 
-  const light3 = new PointLight(0xffffff, 2,0,0);
+  const light3 = new PointLight(0xffffff, 2, 0, 0);
   light3.position.set(-50, -50, 75);
 
   const light2 = initDirectionLight();
@@ -51,7 +52,6 @@ function init() {
   scene.add(light, light2);
 
   const controls = initOrbitControls(camera, renderer.domElement);
-  draw(scene, camera);
   resize(renderer, camera);
 
   function render() {
@@ -62,14 +62,9 @@ function init() {
     requestAnimationFrame(render);
   }
   render();
-  
 
-}
 
-function draw(scene) {
-  // model
-  const modelPath = '../../public/models/ar15_rifle/scene.gltf';
-  const loader = new GLTFLoader();
+  const loader = initLoader();
   let modelMesh = null;
 
   const modelOnLoad = (mesh) => {
@@ -85,5 +80,5 @@ function draw(scene) {
     console.error('load model fail !', e.stack);
   };
 
-  loader.load(modelPath, modelOnLoad, null, onError);
+  loader.load(`../../${Model_Path}/ar15_rifle/scene.gltf`, modelOnLoad, null, onError);
 }

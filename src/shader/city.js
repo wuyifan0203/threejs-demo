@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-12-03 15:13:16
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-10 18:42:52
+ * @LastEditTime: 2025-03-06 17:03:00
  * @FilePath: \threejs-demo\src\shader\city.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -22,18 +22,16 @@ import {
     resize,
     initOrbitControls,
     initScene,
-    modelPath,
+    Model_Path,
     initClock,
     initOrthographicCamera,
     initAxesHelper,
     initAmbientLight,
     initDirectionLight,
-    QUARTER_PI,
     HALF_PI,
 } from "../lib/tools/index.js";
 
 import { Tween, update } from '../lib/other/tween.esm.js';
-import g from "../lib/util/lil-gui.module.min.js";
 
 const V_INJECT_START = '//variable_inject_start';
 const V_INJECT_END = '//variable_inject_end';
@@ -84,7 +82,7 @@ async function init() {
 }
 
 async function createCity() {
-    const model = await loader.loadAsync(`../../${modelPath}/shanghai.FBX`);
+    const model = await loader.loadAsync(`../../${Model_Path}/shanghai.FBX`);
     model.scale.set(0.1, 0.1, 0.1);
     model.traverse((child) => child.isMesh && (child.castShadow = child.receiveShadow = true));
     scene.add(model);

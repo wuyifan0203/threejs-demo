@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-02-26 17:36:05
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-04 10:15:40
+ * @LastEditTime: 2025-03-06 17:13:03
  * @FilePath: \threejs-demo\src\cannon\breaker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -16,10 +16,8 @@ import {
     MeshPhysicalMaterial,
     Raycaster,
     Color,
-    CameraHelper,
     Audio,
     AudioListener,
-    AudioLoader
 } from 'three';
 import {
     initRenderer,
@@ -30,10 +28,11 @@ import {
     initClock,
     initPerspectiveCamera,
     initGUI,
-    publicPath
+    initLoader,
+    Audio_Path
 } from '../lib/tools/index.js';
 import { ConvexObjectBreaker } from 'three/examples/jsm/misc/ConvexObjectBreaker.js';
-import { World, Body, Box as BoxShape, Vec3, Sphere, Material, ContactMaterial, Quaternion } from '../lib/other/physijs/cannon-es.js';
+import { World, Body, Box as BoxShape, Vec3, Sphere, Material, ContactMaterial } from '../lib/other/physijs/cannon-es.js';
 
 import CannonDebugger from '../lib/other/physijs/cannon-es-debugger.js';
 import { CannonUtils } from '../lib/other/physijs/cannon-utils.js';
@@ -287,10 +286,10 @@ function createBall(scene, world) {
     body.typeName = 'Ball';
     body.mesh = mesh;
 
-    const audioLoader = new AudioLoader();
+    const loader = initLoader();
     const listener = new AudioListener();
     const audio = new Audio(listener);
-    audioLoader.load(`../../${publicPath}/audio/glassBreak.mp3`, (buffer) => { 
+    loader.load(`../../${Audio_Path}/glassBreak.mp3`, (buffer) => { 
         audio.setBuffer(buffer);
         scene.add(listener);
     })

@@ -24,8 +24,8 @@ import {
     resize,
     initPerspectiveCamera,
     initLoader,
-    imagePath,
-    modelPath,
+    Image_Path,
+    Model_Path,
     HALF_PI,
     initAmbientLight,
     initDirectionLight,
@@ -50,14 +50,14 @@ function init() {
     scene.add(light);
 
     const rgbELoader = new RGBELoader();
-    rgbELoader.load(`../../${imagePath}/hdr/OutdoorField.hdr`, (texture) => {
+    rgbELoader.load(`../../${Image_Path}/hdr/OutdoorField.hdr`, (texture) => {
         texture.mapping = EquirectangularReflectionMapping;
         scene.background = texture;
         scene.environment = texture;
     })
 
     const loader = initLoader();
-    loader.load(`../../${modelPath}/su7.glb`, (model) => {
+    loader.load(`../../${Model_Path}/su7.glb`, (model) => {
         scene.add(model.scene.children[0]);
     });
 

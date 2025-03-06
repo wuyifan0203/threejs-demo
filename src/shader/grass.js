@@ -20,7 +20,7 @@ import {
   initRenderer,
   initGUI,
   initScene,
-  imagePath,
+  Image_Path,
   initStats,
   resize,
   initPerspectiveCamera,
@@ -114,8 +114,8 @@ async function init() {
 
   const loader = new TextureLoader();
 
-  const grassTexture = loader.load(`../../${imagePath}/others/grass.jpg`);
-  const cloudTexture = loader.load(`../../${imagePath}/others/cloud.jpg`);
+  const grassTexture = loader.load(`../../${Image_Path}/others/grass.jpg`);
+  const cloudTexture = loader.load(`../../${Image_Path}/others/cloud.jpg`);
 
   const geometry = generateGrassGeometry(400000);
   const shaderMaterial = new ShaderMaterial({

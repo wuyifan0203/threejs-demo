@@ -22,7 +22,7 @@ import {
   initRenderer,
   initGUI,
   initScene,
-  imagePath,
+  Image_Path,
   initStats,
   resize,
 } from "../lib/tools/index.js";
@@ -100,7 +100,7 @@ async function init() {
   // cloud
   const loader = new TextureLoader();
   const cloudTexture = await loader.loadAsync(
-    `../../${imagePath}/others/cloud.png`
+    `../../${Image_Path}/others/cloud.png`
   );
 
   const geometry = new PlaneGeometry(64, 64);

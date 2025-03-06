@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-09-23 16:10:38
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-09-23 17:37:20
- * @FilePath: /threejs-demo/src/loader/usdzLoader.js
+ * @LastEditTime: 2025-03-06 17:08:20
+ * @FilePath: \threejs-demo\src\loader\usdzLoader.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import { USDZLoader } from 'three/examples/jsm/loaders/USDZLoader.js';
@@ -25,7 +25,7 @@ import {
     ShapeGeometry,
     MeshPhongMaterial,
 } from 'three';
-import { PI } from '../lib/tools/constant.js'
+import { Model_Path, PI } from '../lib/tools/constant.js'
 
 window.onload = () => {
     init();
@@ -72,9 +72,8 @@ async function init() {
     controls.target.set(-0.7, 6, 9);
     resize(renderer, camera);
 
-    const modelPath = '../../public/models/saeukkang.usdz';
     const loader = new USDZLoader();
-    const object = await loader.loadAsync(modelPath);
+    const object = await loader.loadAsync(`../../${Model_Path}/saeukkang.usdz`);
 
     object.traverse((child) => {
         if (child.isMesh) {

@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-01-09 14:37:51
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-23 10:39:53
- * @FilePath: /threejs-demo/src/particle/GRAVITY.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-03-06 17:06:24
+ * @FilePath: \threejs-demo\src\particle\GRAVITY.js
  */
 import {
   PointLight,
@@ -15,8 +15,7 @@ import {
   Float32BufferAttribute,
   AmbientLight,
 } from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { initRenderer, resize, initScene, initOrbitControls } from '../lib/tools/index.js';
+import { initRenderer, resize, initScene, initOrbitControls, initLoader, Model_Path } from '../lib/tools/index.js';
 
 window.onload = () => {
   init();
@@ -98,8 +97,7 @@ function draw(scene, camera) {
   scene.add(particleSystem);
 
   // model
-  const modelPath = '../../public/models/astronaut.glb';
-  const loader = new GLTFLoader();
+  const loader = initLoader();
   let modelMesh = null;
 
   const modelOnLoad = (mesh) => {
@@ -113,7 +111,7 @@ function draw(scene, camera) {
     console.error('load resources fail !', e.stack);
   };
 
-  loader.load(modelPath, modelOnLoad, null, onError);
+  loader.load(`../../${Model_Path}/astronaut.glb`, modelOnLoad, null, onError);
 
   const updateParticles = (camera) => {
     particleSystem.rotation.z += 0.015;

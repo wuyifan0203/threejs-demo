@@ -22,7 +22,7 @@ import {
   initGUI,
   resize,
   initScene,
-  imagePath,
+  Image_Path,
   normalizeBufferAttribute,
   initStats
 } from "../lib/tools/index.js";
@@ -50,7 +50,7 @@ async function init() {
   };
 
   const loader = new CubeTextureLoader();
-  loader.setPath(`../../${imagePath}/snow_field/`);
+  loader.setPath(`../../${Image_Path}/snow_field/`);
   scene.background = await loader.loadAsync([
     "px.png",
     "nx.png",

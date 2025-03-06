@@ -26,7 +26,7 @@ import {
     resize,
     initOrthographicCamera,
     initLoader,
-    imagePath,
+    Image_Path,
     matrixRender
 } from '../lib/tools/index.js';
 
@@ -42,7 +42,7 @@ async function init() {
     orbitControl.enableRotate = false;
 
     const loader = initLoader();
-    const texture = await loader.loadAsync(`../../${imagePath}/others/uv_grid_opengl.jpg`);
+    const texture = await loader.loadAsync(`../../${Image_Path}/others/uv_grid_opengl.jpg`);
 
     const viewport0 = createViewPort();
     const viewport1 = createViewPort1();

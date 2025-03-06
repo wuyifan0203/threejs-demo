@@ -26,8 +26,8 @@ import {
     resize,
     dataToVec3,
     initLoader,
-    imagePath,
-    modelPath,
+    Image_Path,
+    Model_Path,
     initDirectionLight,
     initAmbientLight,
     initClock,
@@ -83,13 +83,13 @@ async function init() {
 
     const road = new Mesh(createRoadGeometry(points, 1), new MeshBasicMaterial());
     scene.add(road);
-    loader.load(`../../${imagePath}/others/road.jpg`, (texture) => {
+    loader.load(`../../${Image_Path}/others/road.jpg`, (texture) => {
         texture.wrapS = RepeatWrapping;
         texture.repeat.set(100, 1);
         road.material.map = texture;
     });
 
-    const car = await loader.loadAsync(`../../${modelPath}/su7.glb`).then(({ scene: car }) => {
+    const car = await loader.loadAsync(`../../${Model_Path}/su7.glb`).then(({ scene: car }) => {
         car.traverse((child) => {
             if (child.isMesh) {
                 child.castShadow = true;

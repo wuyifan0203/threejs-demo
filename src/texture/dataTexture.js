@@ -30,7 +30,7 @@ import {
     initClock,
     initLoader,
     initAmbientLight,
-    imagePath
+    Image_Path
 } from '../lib/tools/index.js';
 import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { AbstractPlayer } from '../lib/custom/AbstractPlayer.js';
@@ -198,7 +198,7 @@ class World {
     }
 
     initCubeTexture() {
-        loader.setPath(`../../${imagePath}/skyBox/`);
+        loader.setPath(`../../${Image_Path}/skyBox/`);
         this.resource.cubeTexture['env'] = loader.load([
             "Box_Right.bmp",
             "Box_Left.bmp",
@@ -210,7 +210,7 @@ class World {
 
         this.scene.background = this.resource.cubeTexture['env'];
 
-        loader.setPath(`../../${imagePath}/starSkyBox/`);
+        loader.setPath(`../../${Image_Path}/starSkyBox/`);
         this.resource.cubeTexture['stars'] = loader.load([
             "StarSkyBoxRight.png",
             "StarSkyBoxLeft.png",
@@ -224,7 +224,7 @@ class World {
     }
 
     initTexture() {
-        loader.setPath(`../../${imagePath}/world/`);
+        loader.setPath(`../../${Image_Path}/world/`);
         ['grass', 'dirt', 'stone', 'sand', 'gravel', 'leaf', 'wood', 'waterNormal', 'waterNormal2'].forEach((name) => {
             loader.load(`${name}.png`, (texture) => {
                 this.resource.texture[name] = texture;

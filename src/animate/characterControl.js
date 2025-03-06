@@ -20,7 +20,7 @@ import {
     initOrbitControls,
     initScene,
     initDirectionLight,
-    modelPath,
+    Model_Path,
     initClock,
     initAmbientLight,
     initLoader,
@@ -152,16 +152,16 @@ async function init() {
 }
 
 async function createCharacter() {
-    const model = (await loader.loadAsync(`../../${modelPath}/character/character.glb`)).scene;
+    const model = (await loader.loadAsync(`../../${Model_Path}/character/character.glb`)).scene;
     model.traverse(child => {
         if (child.isMesh) {
             child.castShadow = true;
         }
     })
-    const idleClip = (await loader.loadAsync(`../../${modelPath}/character/character-idle.fbx`)).animations[0];
-    const walkClip = (await loader.loadAsync(`../../${modelPath}/character/character-walk.fbx`)).animations[0];
-    const jumpClip = (await loader.loadAsync(`../../${modelPath}/character/character-jump.fbx`)).animations[0];
-    const runClip = (await loader.loadAsync(`../../${modelPath}/character/character-running.fbx`)).animations[0];
+    const idleClip = (await loader.loadAsync(`../../${Model_Path}/character/character-idle.fbx`)).animations[0];
+    const walkClip = (await loader.loadAsync(`../../${Model_Path}/character/character-walk.fbx`)).animations[0];
+    const jumpClip = (await loader.loadAsync(`../../${Model_Path}/character/character-jump.fbx`)).animations[0];
+    const runClip = (await loader.loadAsync(`../../${Model_Path}/character/character-running.fbx`)).animations[0];
     // 清楚原始动画的位移
     runClip.tracks.shift();
 

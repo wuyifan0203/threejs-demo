@@ -32,7 +32,7 @@ import {
     initDirectionLight,
     initAxesHelper,
     initLoader,
-    imagePath,
+    Image_Path,
     initClock,
     resize,
     initGUI,
@@ -365,14 +365,14 @@ async function createMaze() {
     mesh.receiveShadow = mesh.castShadow = true;
 
     async function createMaterial() {
-        loader.setPath(`../../${imagePath}/Stylized_Bricks/`);
+        loader.setPath(`../../${Image_Path}/Stylized_Bricks/`);
 
         const wallColorMap = await loader.loadAsync(`baseColor.jpg`);
         const wallNormalMap = await loader.loadAsync(`normal.jpg`);
         const wallRoughnessMap = await loader.loadAsync(`roughness.jpg`);
         const wallAOMap = await loader.loadAsync(`ambientOcclusion.jpg`);
 
-        loader.setPath(`../../${imagePath}/Stylized_Stone/`);
+        loader.setPath(`../../${Image_Path}/Stylized_Stone/`);
         const groundColorMap = await loader.loadAsync(`baseColor.jpg`);
         const groundNormalMap = await loader.loadAsync(`normal.jpg`);
         const groundRoughnessMap = await loader.loadAsync(`roughness.jpg`);

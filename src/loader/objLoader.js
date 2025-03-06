@@ -5,7 +5,6 @@
  * @FilePath: /threejs-demo/src/loader/OBJLoader.js
  */
 /* eslint-disable no-unused-vars */
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
 import {
   initRenderer,
   initPerspectiveCamera,
@@ -13,7 +12,9 @@ import {
   initGUI,
   initScene,
   initOrbitControls,
-  initAmbientLight
+  initAmbientLight,
+  initLoader,
+  Model_Path
 } from '../lib/tools/index.js';
 import {
   Vector3,
@@ -24,7 +25,6 @@ import {
   ShapeGeometry,
   MeshPhongMaterial,
   Color,
-  Matrix4,
   Box3,
 } from 'three';
 
@@ -72,11 +72,10 @@ const init = () => {
   const controls = initOrbitControls(camera, renderer.domElement);
   resize(renderer, camera);
 
-  const modelPath = '../../public/models/mountain_lions.obj';
-  const loader = new OBJLoader();
+  const loader = initLoader();
   new Promise((resolve, reject) => {
     loader.load(
-      modelPath,
+      `../../${Model_Path}/mountain_lions.obj`,
       (obj) => {
         /// 模型太大了，缩放一下
         obj.rotateX(Math.PI / 2);
