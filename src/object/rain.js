@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-05 13:34:13
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-07 13:12:36
+ * @LastEditTime: 2025-03-07 19:25:45
  * @FilePath: \threejs-demo\src\object\rain.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -78,22 +78,25 @@ function init() {
             uniform float uTime;
             uniform float uHeightRange;
             uniform float uDropSpeed;
-            vec3 billBoarding(vec3 position,mat4 viewMatrix){
+            vec3 billBoarding(vec3 position,mat4 m){
                  // 从viewMatrix中提取相机前向量，并在xz平面上投影（忽略y分量）
-                vec3 camForward = normalize(vec3(viewMatrix[0][2], 0.0, viewMatrix[2][2]));
-                vec3 up = vec3(0.0, 1.0, 0.0);
-                vec3 right = normalize(cross(up, camForward));
+                // vec3 camForward = normalize(vec3(m[0][2], 0.0, m[2][2]));
+                // vec3 up = vec3(0.0, 1.0, 0.0);
+                // vec3 right = normalize(cross(up, camForward));
+                vec3 up = normalize(vec3(m[0][1], m[1][1], m[2][1]));
+                vec3 right = normalize(vec3(m[0][0], m[1][0], m[2][0]));
                 return right * position.x + up * position.y;
             }
 
         
             void main(){
                 vUv = uv;
-                vec3 transformed = billBoarding(vec3(position),viewMatrix);
+                mat4 fullMatrix = modelViewMatrix * instanceMatrix;
+                vec3 transformed = billBoarding(vec3(position),fullMatrix);
                 float progress = mod(aProgress - (uTime * aSpeed * uDropSpeed / uHeightRange), 1.0);
                 transformed.y += (progress * 2.0 - 1.0) * uHeightRange;
                 // instanceMesh 内置的 变量instanceMatrix
-                gl_Position = projectionMatrix * modelViewMatrix * instanceMatrix  * vec4(transformed, 1.0);
+                gl_Position = projectionMatrix * fullMatrix * vec4(transformed, 1.0);
             }
         `,
         fragmentShader:/*glsl*/`
@@ -146,13 +149,13 @@ function init() {
     function createRain() {
         const { x, z, w } = params.rain;
 
-        const rain = new InstancedMesh(new PlaneGeometry(0.03, 1), rainMaterial, w);
+        const rain = new InstancedMesh(new PlaneGeometry(), rainMaterial, w);
         const progress = new Float32Array(w);
         const speed = new Float32Array(w);
 
         for (let i = 0; i < w; i++) {
             dummy.position.set(randFloat(-x, x), 0, randFloat(-z, z));
-            // dummy.scale.set(0.03, randFloat(0.3, 0.5), 0.3);
+            dummy.scale.set(0.03, randFloat(0.3, 0.5), 0.3);
             dummy.updateMatrix();
             rain.setMatrixAt(i, dummy.matrix);
 
