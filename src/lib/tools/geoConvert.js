@@ -1,69 +1,58 @@
+import { Box2, Vector2 } from 'three';
 import { geoMercator } from '../other/d3-geo.es.js';
 
+const convert = geoMercator().scale(180)
 function LatitudeLongitude2px(position) {
     if (position[0] >= -180 && position[0] <= 180 && position[1] >= -90 && position[1] <= 90) {
-        return geoMercator(position).scale(180);
+        position = convert(position);
     }
-    return position;
+    return new Vector2(position[0], position[1]);
 }
 
-function getGeoInfo(geojson) {
-    const bounding = {
-        minLat: Number.MAX_VALUE,
-        minLng: Number.MAX_VALUE,
-        maxLng: 0,
-        maxLat: 0
-    };
-    const centerM = {
-        lat: 0,
-        lng: 0
-    };
-    let len = 0;
-    //遍历点
+const _box = new Box2();
+
+function convertGeoJSON(geojson) {
+    _box.makeEmpty();
     geojson.features.forEach((a) => {
-        if (a.geometry.type == 'MultiPolygon') {
-            a.geometry.coordinates.forEach((b) => {
-                b.forEach((c) => {
-                    c.forEach((item) => {
-                        let pos = LatitudeLongitude2px(item);
-                        //经纬度转墨卡托投影坐标换失败
-                        if (Number.isNaN(pos[0]) || Number.isNaN(pos[1])) {
-                            console.log(item, pos);
+        if (a.geometry.type === 'MultiPolygon') {
+            // type = MultiPolygon
+            a.geometry.shapes = a.geometry.coordinates.map((b) => {
+                const shape = [];
+                b.map((c) => {
+                    c.forEach((point) => {
+                        const position = LatitudeLongitude2px(point);
+                        if (isNaN(position.x) || isNaN(position.y)) {
+                            console.warn('points:', point, 'convert', position);
                             return;
                         }
-                        centerM.lng += pos[0];
-                        centerM.lat += pos[1];
-                        if (pos[0] < bounding.minLng) {
-                            bounding.minLng = pos[0];
-                        }
-                        if (pos[0] > bounding.maxLng) {
-                            bounding.maxLng = pos[0];
-                        }
-                        if (pos[1] < bounding.minLat) {
-                            bounding.minLat = pos[1];
-                        }
-                        if (pos[1] > bounding.maxLat) {
-                            bounding.maxLat = pos[1];
-                        }
-
-                        len++;
-
-                    });
+                        _box.expandByPoint(position);
+                        shape.push(position);
+                    })
                 });
+                return shape;
             });
         } else {
-            a.geometry.coordinates.forEach((c) => {
-                c.forEach((item) => {
-                    //...
-                });
-            });
+            // type = Polygon
+            a.geometry.shapes = a.geometry.coordinates.map((b) => {
+                const shape = [];
+                b.forEach((point) => {
+                    const position = LatitudeLongitude2px(point);
+                    if (isNaN(position.x) || isNaN(position.y)) {
+                        console.warn('points:', point, 'convert', position);
+                        return;
+                    }
+                    _box.expandByPoint(position);
+                    shape.push(position);
+                })
+                return shape;
+            })
         }
+
     });
-    centerM.lat = centerM.lat / len;
-    centerM.lng = centerM.lng / len;
-    //元素缩放比例
-    const scale = (bounding.maxLng - bounding.minLng) / 180;
-    return { bounding, centerM, scale };
+    return {
+        range: _box.getSize(new Vector2()),
+        center: _box.getCenter(new Vector2()),
+    }
 }
 
-export { getGeoInfo }
+export { convertGeoJSON }

@@ -1,7 +1,7 @@
 {
   "liveServer.settings.port": 5500,
   "editor.fontSize": 14,
-  "files.autoSave": "onFocusChange",
+  "files.autoSave": "off",
   "fileheader.customMade": {
     "Author": "git config user.name && git config user.email",
     "Date": "Do not edit", // 文件创建时间(不变)
@@ -36,6 +36,7 @@
     "HEIGHTFIELD",
     "iconfont",
     "importmap",
+    "lerp",
     "mediump",
     "Octree",
     "OETF",

@@ -284,6 +284,10 @@ const getColor = (index) => {
   return '#' + (r.length !== 1 ? r : '0' + r) + (g.length !== 1 ? g : '0' + g) + (b.length !== 1 ? b : '0' + b);
 };
 
+function getRainbowColor(index) {
+  return rainbowColors[index % 7];
+}
+
 const colors = [
   [0, 32, g => [0, 0, 128 + 4 * g]],
   [32, 33, g => [0, 0, 255]],
@@ -308,5 +312,6 @@ function jet(x) {
 export {
   getColor,
   rainbowColors,
-  jet
+  jet,
+  getRainbowColor
 };

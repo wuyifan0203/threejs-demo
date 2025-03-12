@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-12-17 18:11:09
+ * @LastEditTime: 2025-03-12 09:37:45
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -426,6 +426,26 @@ function initFog(scene, near = 0.01, far = 500, color = '#ffffff') {
   scene.fog = fog;
 }
 
+
+async function loadJSON(filePath) {
+  try {
+    const response = await fetch(filePath);
+
+    // 检查HTTP响应状态
+    if (!response.ok) {
+      throw new Error(`HTTP错误! 状态码: ${response.status}`);
+    }
+
+    // 解析JSON数据
+    const data = await response.json();
+    return data;
+
+  } catch (error) {
+    console.error('加载JSON失败:', error);
+    throw error; // 可选：将错误传递给调用方
+  }
+}
+
 export {
   initAxesHelper,
   initSpotLight,
@@ -449,5 +469,6 @@ export {
   initClock,
   initSky,
   initLoader,
-  initFog
+  initFog,
+  loadJSON
 };
