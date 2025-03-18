@@ -1,60 +1,68 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
-
+import js from "@eslint/js";
 
 export default [
-  { languageOptions: { globals: globals.browser } },
-  pluginJs.configs.recommended,
+  // 基础配置
+  {
+    languageOptions: {
+      globals: { ...globals.browser }, // 浏览器环境全局变量
+      sourceType: "module",            // ES 模块语法支持
+      ecmaVersion: "latest"            // 最新 ECMAScript 版本
+    },
+    ignores: [                         // 替换旧版 ignorePatterns[1](@ref)
+      "**/build/**",
+      "**/lib/three/**",
+      "**/lib/other/**"
+    ]
+  },
+  
+  // 继承推荐规则集
+  js.configs.recommended,              // 使用 @eslint/js 替代旧版 eslint:recommended[5](@ref)
+  
+  // 自定义规则
   {
     rules: {
-      // common
-      'no-console': ['warn', // 允许有warn，error，dir，其余的是警告
-        { allow: ['warn', 'error', 'dir'] },
-      ],
-      // 是否允许变量重复命名
-      'no-shadow': 0,
-      // 是否在声明前使用
-      'no-use-before-define': ['error', {
-        functions: false, // 函数允许
+      /* 控制台规则 */
+      "no-console": ["warn", { allow: ["warn", "error", "dir"] }],
+      
+      /* 变量与作用域 */
+      "no-shadow": "off",
+      "no-use-before-define": ["error", {
+        functions: false,
         classes: true,
         variables: true,
-        allowNamedExports: false,
+        allowNamedExports: false
       }],
-      // 每行最大长度限制
-      'max-len': 0,
-      // 是否使用 ++
-      'no-plusplus': 0,
-      // 是否开启连等 let a = b = c
-      'no-multi-assign': 0,
-      // 是否使用表达式 && ||
-      'no-unused-expressions': 0,
-      // 是否可以对形参赋值
-      'no-param-reassign': 0,
-      // 是否允许下划线命名 let _a
-      'no-underscore-dangle': 0,
-      // 是否支持位运算
-      'no-bitwise': 0,
-      // 是否连续使用运算符 a && b || c
-      'no-mixed-operators': 0,
-      // 使用 continue
-      'no-continue': 0,
-      // 使用指定语法
-      'no-restricted-syntax': 0,
-      // for in 是否做校验
-      'guard-for-in': 0,
-      //
-      'class-methods-use-this': 0,
-      'object-curly-newline': ['error', {
+      
+      /* 代码风格 */
+      "max-len": "off",
+      "object-curly-newline": ["error", {
         ObjectExpression: { multiline: true, minProperties: 5 },
         ObjectPattern: { multiline: true, minProperties: 5 },
         ImportDeclaration: { multiline: true, minProperties: 3 },
-        ExportDeclaration: { multiline: true, minProperties: 3 },
+        ExportDeclaration: { multiline: true, minProperties: 3 }
       }],
-      // switch 后 是否有 default
-      'default-case': ['error', { commentPattern: '^skip\\sdefault' }],
-      // 是否允许匿名函数
-      'func-names': 0,
-    },
-    ignorePatterns: ['**/build/**', '**/lib/three/**','**/lib/other/**'],
+      
+      /* 操作符与表达式 */
+      "no-plusplus": "off",
+      "no-multi-assign": "off",
+      "no-unused-expressions": "off",
+      "no-bitwise": "off",
+      "no-mixed-operators": "off",
+      
+      /* 函数与类 */
+      "func-names": "off",
+      "class-methods-use-this": "off",
+      
+      /* 流程控制 */
+      "no-continue": "off",
+      "no-restricted-syntax": "off",
+      "guard-for-in": "off",
+      "default-case": ["error", { commentPattern: "^skip\\sdefault" }],
+      
+      /* 其他 */
+      "no-param-reassign": "off",
+      "no-underscore-dangle": "off"
+    }
   }
 ];

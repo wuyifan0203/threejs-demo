@@ -1,4 +1,10 @@
-import { CubeTextureLoader, Loader, LoadingManager, TextureLoader, AudioLoader } from 'three';
+import {
+    CubeTextureLoader,
+    Loader,
+    LoadingManager,
+    TextureLoader,
+    AudioLoader
+} from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
@@ -83,6 +89,8 @@ class OmnipotentLoader extends Loader {
             'obj': 'obj',
             'png': 'image',
             'jpg': 'image',
+            'jpeg': 'image',
+            'webp': 'image',
             'mp3': 'audio'
         };
         return typeMap[ext] || 'unknown';

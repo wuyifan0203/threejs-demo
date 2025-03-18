@@ -74,9 +74,7 @@ async function init() {
     const startColor = new Color('#cccccc');
     const endColor = new Color('#045a8d');
     const materials = Array.from({ length: 7 }, (_, k) => {
-        return new MeshStandardMaterial({
-            color: new Color().lerpColors(startColor, endColor, k / 6)
-        })
+        return new MeshStandardMaterial({color: new Color().lerpColors(startColor, endColor, k / 6)})
     });
 
     const lineMaterial = new LineBasicMaterial({ color: '#ffffff' });
@@ -84,9 +82,10 @@ async function init() {
 
     json.features.map(({ geometry, properties }, i) => {
         geometry.shapes.forEach((points) => {
-            const geometry = new ExtrudeGeometry(new Shape(points), {
-                bevelEnabled: false
-            });
+            const geometry = new ExtrudeGeometry(
+                new Shape(points), 
+                {bevelEnabled: false}
+            );
             geometry.translate(-center.x, -center.y, 0);
             geometry.rotateX(HALF_PI);
             geometry.rotateY(-HALF_PI);

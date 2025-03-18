@@ -470,5 +470,5 @@ export {
   initSky,
   initLoader,
   initFog,
-  loadJSON
+  loadJSON,
 };

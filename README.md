@@ -2,23 +2,23 @@
 
 ![alt text](./public/images/cover.png)
 
-Preview Link: https://wuyifan0203.github.io/threejs-demo/
+👉 Preview Link: https://wuyifan0203.github.io/threejs-demo/
 
 ## Introduction
 
 This is a case library that serves as a feasibility verification and learning tool, developed using Three.js and other dependencies. The library includes functionalities such as:
 
-[x] Model import,
+* [x] Model import,
 
-[x] Geometry transformations,
+* [x] Geometry transformations,
 
-[x] Camera operations,
+* [x] Camera operations,
 
-[x] Object selection,
+* [x] Object selection,
 
-[x] Shader application,
+* [x] Shader application,
 
-[x] Physics engine,
+* [x] Physics engine,
 
 and more.
 ## Getting Started
@@ -41,5 +41,7 @@ pnpm dev
 If you have any suggestions or want to contribute code, feel free to submit a Pull Request or create an Issue.
 
 ## License
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 This project is licensed under the MIT License. Please refer to the `LICENSE` file for more information.
