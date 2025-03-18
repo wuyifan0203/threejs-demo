@@ -14,7 +14,7 @@ import {
     initGUI,
     initScene,
     initOrbitControls,
-    publicPath,
+    Public_Path,
     getColor,
     resize
 } from '../lib/tools/index.js';
@@ -68,7 +68,7 @@ async function init() {
 
     const fontObjects = {};
     for (const font of fonts) {
-        fontObjects[font] = await loader.loadAsync(`../../${publicPath}/fonts/${font}.json`);
+        fontObjects[font] = await loader.loadAsync(`../../${Public_Path}/fonts/${font}.json`);
     }
 
     const geometryParams = {

@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-06 17:32:25
+ * @LastEditTime: 2025-03-18 16:27:56
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -332,8 +332,8 @@ const list = [
         title: "Galaxy",
       },
       {
-        path: "/particle/rain.html",
-        title: "Rain",
+        path: "/particle/rainPoints.html",
+        title: "Rain (particle)",
       },
     ],
   },
@@ -409,6 +409,10 @@ const list = [
         path: "/loader/usdzLoader.html",
         title: "USDZ Loader",
       },
+      {
+        path: "/loader/geojsonLoader.html",
+        title: "Geojson Loader",
+      },
     ],
   },
   {
@@ -434,7 +438,7 @@ const list = [
         title: "Edge Geometry",
       },
       {
-        path: "/object/rain.html",
+        path: "/object/rainInstanceMesh.html",
         title: "Heave Rain",
       },
     ],

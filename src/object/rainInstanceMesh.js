@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-05 13:34:13
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-07 19:25:45
- * @FilePath: \threejs-demo\src\object\rain.js
+ * @LastEditTime: 2025-03-18 16:26:07
+ * @FilePath: \threejs-demo\src\object\rainInstanceMesh.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -80,11 +80,9 @@ function init() {
             uniform float uDropSpeed;
             vec3 billBoarding(vec3 position,mat4 m){
                  // 从viewMatrix中提取相机前向量，并在xz平面上投影（忽略y分量）
-                // vec3 camForward = normalize(vec3(m[0][2], 0.0, m[2][2]));
-                // vec3 up = vec3(0.0, 1.0, 0.0);
-                // vec3 right = normalize(cross(up, camForward));
-                vec3 up = normalize(vec3(m[0][1], m[1][1], m[2][1]));
-                vec3 right = normalize(vec3(m[0][0], m[1][0], m[2][0]));
+                vec3 camForward = normalize(vec3(m[0][2], 0.0, m[2][2]));
+                vec3 up = vec3(0.0, 1.0, 0.0);
+                vec3 right = normalize(cross(up, camForward));
                 return right * position.x + up * position.y;
             }
 
@@ -149,13 +147,13 @@ function init() {
     function createRain() {
         const { x, z, w } = params.rain;
 
-        const rain = new InstancedMesh(new PlaneGeometry(), rainMaterial, w);
+        const rain = new InstancedMesh(new PlaneGeometry(0.03, 0.3), rainMaterial, w);
         const progress = new Float32Array(w);
         const speed = new Float32Array(w);
 
         for (let i = 0; i < w; i++) {
             dummy.position.set(randFloat(-x, x), 0, randFloat(-z, z));
-            dummy.scale.set(0.03, randFloat(0.3, 0.5), 0.3);
+            // dummy.scale.set(0.03, randFloat(0.3, 0.5), 0.3);
             dummy.updateMatrix();
             rain.setMatrixAt(i, dummy.matrix);
 

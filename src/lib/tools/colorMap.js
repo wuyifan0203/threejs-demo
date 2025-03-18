@@ -7,6 +7,10 @@
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
+import { MathUtils } from "three";
+
+const { randInt } = MathUtils
+
 const colorMap = [
   [0, 0, 131.484375],
   [0, 0, 135.46875],
@@ -284,7 +288,7 @@ const getColor = (index) => {
   return '#' + (r.length !== 1 ? r : '0' + r) + (g.length !== 1 ? g : '0' + g) + (b.length !== 1 ? b : '0' + b);
 };
 
-function getRainbowColor(index) {
+function getRainbowColor(index = randInt(0, 6)) {
   return rainbowColors[index % 7];
 }
 

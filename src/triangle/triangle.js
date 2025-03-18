@@ -4,8 +4,7 @@
  * @LastEditTime: 2023-12-27 17:57:10
  * @FilePath: /threejs-demo/src/triangle/triangle.js
  */
-import { SweepContext, Point } from '../lib/other/poly2tri.js';
-import { ShapeUtils } from 'three/src/extras/ShapeUtils.js';
+import { SweepContext, Point, } from '../lib/other/poly2tri.js';
 import { Delaunator } from '../lib/other/delaunator.js';
 import { data } from './data.js';
 
@@ -16,6 +15,7 @@ import {
   Vector3,
   BufferGeometry,
   Vector2,
+  ShapeUtils
 } from 'three';
 import {
   initCustomGrid,
