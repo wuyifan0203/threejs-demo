@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-11 17:57:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-12 19:46:18
+ * @LastEditTime: 2025-03-18 11:24:13
  * @FilePath: \threejs-demo\src\loader\geojsonLoader.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -18,12 +18,14 @@ import {
     LineBasicMaterial,
     Raycaster,
     Vector2,
-    Vector3
+    Vector3,
+    Sprite,
+    SpriteMaterial,
+    CanvasTexture,
 } from 'three';
+import { MapControls } from 'three/examples/jsm/controls/MapControls.js'
 import {
     initRenderer,
-    initAxesHelper,
-    initOrbitControls,
     initScene,
     resize,
     loadJSON,
@@ -47,10 +49,9 @@ async function init() {
     camera.updateProjectionMatrix();
 
     const scene = initScene();
-    initAxesHelper(scene);
     renderer.setClearColor(0x1e90ff, 0.5);
 
-    const controls = initOrbitControls(camera, renderer.domElement);
+    const controls = new MapControls(camera, renderer.domElement);
 
     initAmbientLight(scene);
     const light = initDirectionLight();
@@ -68,7 +69,6 @@ async function init() {
     const json = await loadJSON('../../public/data/province.json');
 
     const { center } = convertGeoJSON(json);
-    console.log('center: ', center);
     const map = new Group();
 
     const startColor = new Color('#cccccc');
@@ -106,6 +106,10 @@ async function init() {
     });
     map.scale.set(0.2, 0.2, 0.2);
 
+
+    const marker = createMarker();
+    scene.add(marker);
+
     scene.add(map);
 
     // click event
@@ -122,10 +126,55 @@ async function init() {
             object.material = object.userData.material;
         });
         if (intersects.length > 0) {
-            intersects[0].object.material = heightLightMaterial;
-
-            console.log('intersects[0].object.userData.name: ', intersects[0].object.userData.name);
+            const { object, point } = intersects[0];
+            object.material = heightLightMaterial;
+            marker.visible = true;
+            marker.updateMarker(object, point);
+        } else {
+            marker.visible = false;
         }
     });
 }
 
+function createMarker() {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = '15px Arial';
+    const padding = 20;
+    const baseHeight = 30;
+
+    canvas.height = baseHeight;
+
+    const marker = new Sprite(new SpriteMaterial({ map: new CanvasTexture(canvas) }));
+    marker.position.set(0, 2, 0);
+
+    marker.updateMarker = function (object, point) {
+        const { name } = object.userData;
+        const requestWidth = ctx.measureText(name).width + padding;
+
+        if (canvas.width !== requestWidth || canvas.height !== baseHeight) {
+            canvas.width = requestWidth;
+            canvas.height = baseHeight; // 必须同步设置高度[1](@ref)
+
+            // 上下文重置补偿
+            ctx.font = '15px Arial';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            marker.material.map.dispose();
+            marker.material.map = new CanvasTexture(canvas); // 更新材质引用
+        }
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.textBaseline = 'middle'; // 垂直居中
+        ctx.fillStyle = '#000000';
+        ctx.fillText(name, padding / 2, canvas.height / 2);
+
+        marker.scale.set(canvas.width / 20, canvas.height / 20, 1); // 按比例缩放
+        marker.material.map.needsUpdate = true;
+
+        marker.position.set(point.x, 2, point.z)
+
+    }
+    return marker
+}
