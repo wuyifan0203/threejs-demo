@@ -1,7 +1,7 @@
 /*
  * @Date: 2023-01-09 14:37:51
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-18 15:07:48
+ * @LastEditTime: 2025-03-19 10:21:07
  * @FilePath: \threejs-demo\src\loader\rgbeLoader.js
  */
 import {
@@ -131,7 +131,7 @@ async function init() {
 }
 
 
-const loadTexture = async (list) => {
+async function  loadTexture (list) {
   const loader = new RGBELoader();
   loader.setPath(`../../${Image_Path}/hdr/`);
 

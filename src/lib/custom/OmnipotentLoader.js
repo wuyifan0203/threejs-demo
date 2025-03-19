@@ -8,6 +8,7 @@ import {
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
 
 const loaderMap = {
     gltf: GLTFLoader,
@@ -16,6 +17,7 @@ const loaderMap = {
     obj: OBJLoader,
     cube: CubeTextureLoader,
     audio: AudioLoader,
+    hdr: RGBELoader
 }
 
 const defaultManager = new LoadingManager();
@@ -91,7 +93,9 @@ class OmnipotentLoader extends Loader {
             'jpg': 'image',
             'jpeg': 'image',
             'webp': 'image',
-            'mp3': 'audio'
+            'mp3': 'audio',
+            'wav': 'audio',
+            'hdr': 'hdr'
         };
         return typeMap[ext] || 'unknown';
     }

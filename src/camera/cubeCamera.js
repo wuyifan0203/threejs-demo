@@ -63,9 +63,7 @@ function init() {
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
-    const cubeTarget = new WebGLCubeRenderTarget(1000, {
-        type:HalfFloatType
-    });
+    const cubeTarget = new WebGLCubeRenderTarget(1000, {type:HalfFloatType});
     const cubeCamera = new CubeCamera(0.1, 100, cubeTarget);
 
     const plane = new Mesh(new PlaneGeometry(10, 10), new MeshPhysicalMaterial({
