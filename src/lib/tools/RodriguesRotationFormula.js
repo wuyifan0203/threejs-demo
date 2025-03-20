@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2022-11-10 15:36:44
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-05-31 16:39:11
- * @FilePath: /threejs-demo/src/lib/tools/RodriguesRotationFormula.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-03-20 13:24:29
+ * @FilePath: \threejs-demo\src\lib\tools\RodriguesRotationFormula.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 /*
@@ -33,7 +33,7 @@
  *              神兽保佑            永无BUG
  */
 
-/* eslint-disable no-unused-vars */
+
 
 import { Vector3, Matrix4 } from 'three';
 /**
@@ -46,13 +46,13 @@ const zero = new Vector3();
 function rotationFormula(vec3Before, vec3After, target) {
   if (vec3Before.equals(zero) || vec3After.equals(zero)) {
     console.error('the value of vec3Before or vec3After is zero');
-    return target ? target: new Matrix4();
+    return target ? target : new Matrix4();
   }
   if (vec3Before.equals(vec3After)) {
     return target ? target.identity() : new Matrix4().identity();
   }
   const rotationAxis = new Vector3().crossVectors(vec3Before, vec3After);
-
+  const rotateAngle = Math.acos(dotProduct(vec3Before, vec3After) / normalizeVec3(vec3Before) * normalizeVec3(vec3After));
   return rotateMatrix(rotateAngle, rotationAxis, target);
 }
 
@@ -85,9 +85,9 @@ function dotProduct(vec31, vec32) {
 function rotateMatrix(rotateAngle, rotationAxis, target = new Matrix4()) {
   const norm = normalizeVec3(rotationAxis);
 
-  const Ux = isNaN(rotationAxis.x / norm) ? 0 :rotationAxis.x / norm;
-  const Uy = isNaN(rotationAxis.y / norm) ? 0 :rotationAxis.y / norm;
-  const Uz = isNaN(rotationAxis.z / norm) ? 0 :rotationAxis.z / norm;
+  const Ux = isNaN(rotationAxis.x / norm) ? 0 : rotationAxis.x / norm;
+  const Uy = isNaN(rotationAxis.y / norm) ? 0 : rotationAxis.y / norm;
+  const Uz = isNaN(rotationAxis.z / norm) ? 0 : rotationAxis.z / norm;
 
   const cr = Math.cos(rotateAngle);
   const sr = Math.sin(rotateAngle);
@@ -112,6 +112,4 @@ function rotateMatrix(rotateAngle, rotationAxis, target = new Matrix4()) {
   );
 }
 
-export {
-  rotationFormula
-};
+export { rotationFormula };

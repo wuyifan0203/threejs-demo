@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-12 09:37:45
+ * @LastEditTime: 2025-03-20 10:17:43
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -32,6 +32,7 @@ import { ViewHelper } from "three/examples/jsm/helpers/ViewHelper.js";
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
+import { TrackballControls } from "three/examples/jsm/controls/TrackballControls.js";
 import { CoordinateHelper } from "../custom/CoordinateHelper.js";
 import { CustomGrid } from "../custom/CustomGrid.js";
 import { OmnipotentLoader } from "../custom/OmnipotentLoader.js";
@@ -230,6 +231,12 @@ function initCustomGrid(scene, width = 50, height = 50, dx = 1, dy = 1) {
 
 function initOrbitControls(camera, container) {
   const controls = new OrbitControls(camera, container);
+  window.controls = controls;
+  return controls;
+}
+
+function initTrackballControls(camera, container) {
+  const controls = new TrackballControls(camera, container);
   window.controls = controls;
   return controls;
 }
@@ -471,4 +478,5 @@ export {
   initLoader,
   initFog,
   loadJSON,
+  initTrackballControls
 };

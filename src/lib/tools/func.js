@@ -1,5 +1,7 @@
 /* eslint-disable no-unused-vars */
-import { Matrix4, Quaternion, Vector3 } from 'three';
+import {
+ Matrix4, Quaternion, Vector3 
+} from 'three';
 /**
  * @description: plane function
  * @param {Vector3} normal
@@ -127,7 +129,6 @@ const normalizeVec3 = (vec3) => {
 
 const normal2Euler = (normal) => {
   normal.normalize();
-  console.log(normal);
   const dx = normal.z / normal.y;
   const dy = normal.z / normal.x;
   const dz = normal.x / normal.y;
@@ -195,8 +196,8 @@ const crossProduct = (v1, v2) => {
  * @param baseEedge
  * @param targetEdge
  */
-const isIntersection = (baseEedge, targetEdge) => {
-  const [basePointA, basePointB] = baseEedge;
+const isIntersection = (baseEdge, targetEdge) => {
+  const [basePointA, basePointB] = baseEdge;
   const [targetPointC, targetPointD] = targetEdge;
 
   const vBase = [basePointA.x - basePointB.x, basePointA.y - basePointB.y];

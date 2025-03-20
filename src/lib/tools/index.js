@@ -9,10 +9,10 @@
 
 export * from './common.js'
 export * from './RodriguesRotationFormula.js'
-export * from './draw.js';
 export * from './func.js';
 export * from './colorMap.js';
 export * from './dataFormat.js';
 export * from './constant.js';
 export * from './render.js';
 export * from './Calculate.js';
+export * from './downloadUtils.js';
