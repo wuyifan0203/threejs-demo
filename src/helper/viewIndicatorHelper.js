@@ -1,8 +1,4 @@
-import {
-    Mesh,
-    MeshBasicMaterial,
-    Vector3,
-} from 'three';
+import {Vector3,} from 'three';
 import {
     initRenderer,
     initOrthographicCamera,
@@ -11,10 +7,8 @@ import {
     initOrbitControls,
     initScene,
     resize,
-    initLoader,
-    Image_Path
 } from '../lib/tools/index.js';
-import { HollowRoundBoxGeometry } from '../lib/custom/HollowRoundBoxGeometry.js'
+import { ViewIndicator } from '../lib/custom/ViewIndicator.js';
 
 window.onload = () => {
     init();
@@ -24,22 +18,18 @@ function init() {
     const renderer = initRenderer();
     const camera = initOrthographicCamera(new Vector3(0, -200, 200));
     camera.up.set(0, 0, 1);
+    camera.zoom = 2
     camera.updateProjectionMatrix();
 
     const scene = initScene();
     initAxesHelper(scene);
-    renderer.setClearColor(0xffffff);
+    renderer.setClearColor(0xdddddd);
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
-    const loader = initLoader();
-    const uvTexture = loader.load(`../../${Image_Path}/others/uv_grid_opengl.jpg`);
-    const mesh = new Mesh(
-        new HollowRoundBoxGeometry(3, 0.2, 3),
-        new MeshBasicMaterial({ map: uvTexture, wireframe: false })
-    );
-    scene.add(mesh);
+    const helper = new ViewIndicator();
+    scene.add(helper);
 
 
     function render() {

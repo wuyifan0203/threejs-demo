@@ -13,18 +13,19 @@ export default [
       "**/build/**",
       "**/lib/three/**",
       "**/lib/other/**"
-    ]
+    ],
+    env: { browser: true, node: true },
   },
-  
+
   // 继承推荐规则集
   js.configs.recommended,              // 使用 @eslint/js 替代旧版 eslint:recommended[5](@ref)
-  
+
   // 自定义规则
   {
     rules: {
       /* 控制台规则 */
       "no-console": ["warn", { allow: ["warn", "error", "dir"] }],
-      
+
       /* 变量与作用域 */
       "no-shadow": "off",
       "no-use-before-define": ["error", {
@@ -33,7 +34,7 @@ export default [
         variables: true,
         allowNamedExports: false
       }],
-      
+
       /* 代码风格 */
       "max-len": "off",
       "object-curly-newline": ["error", {
@@ -42,24 +43,24 @@ export default [
         ImportDeclaration: { multiline: true, minProperties: 3 },
         ExportDeclaration: { multiline: true, minProperties: 3 }
       }],
-      
+
       /* 操作符与表达式 */
       "no-plusplus": "off",
       "no-multi-assign": "off",
       "no-unused-expressions": "off",
       "no-bitwise": "off",
       "no-mixed-operators": "off",
-      
+
       /* 函数与类 */
       "func-names": "off",
       "class-methods-use-this": "off",
-      
+
       /* 流程控制 */
       "no-continue": "off",
       "no-restricted-syntax": "off",
       "guard-for-in": "off",
       "default-case": ["error", { commentPattern: "^skip\\sdefault" }],
-      
+
       /* 其他 */
       "no-param-reassign": "off",
       "no-underscore-dangle": "off"
