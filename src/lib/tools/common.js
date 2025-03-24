@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-20 10:17:43
+ * @LastEditTime: 2025-03-24 15:54:55
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -238,6 +238,10 @@ function initOrbitControls(camera, container) {
 function initTrackballControls(camera, container) {
   const controls = new TrackballControls(camera, container);
   window.controls = controls;
+  controls.rotateSpeed = 3;
+  controls.staticMoving = true;
+  controls.panSpeed = 2;
+  controls.zoomSpeed = 3;
   return controls;
 }
 
