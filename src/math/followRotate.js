@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-06-07 15:12:24
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 17:27:56
- * @FilePath: /threejs-demo/src/math/followRotate.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-03-25 16:02:38
+ * @FilePath: \threejs-demo\src\math\followRotate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -106,8 +106,8 @@ function init() {
 
     const coord = initCoordinates(10);
     scene.add(coord);
-    coord.matrixWorldAutoUpdate = false;
-    coord.matrixAutoUpdate = false;
+    // coord.matrixWorldAutoUpdate = false;
+    // coord.matrixAutoUpdate = false;
 
     coord.update = function (dt) {
         const step = dt * Math.PI;
@@ -121,8 +121,6 @@ function init() {
     }
     // coord.visible = false
 
-
-
     const clock = new Clock();
 
     function render() {
@@ -133,7 +131,6 @@ function init() {
         if (o.isFollow) {
             currentQuaternion.copy(camera.quaternion);
             coord.quaternion.copy(camera.quaternion);
-            coord.updateMatrix();
         }
 
         stats.update()

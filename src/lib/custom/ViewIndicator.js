@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 13:41:04
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-24 19:40:14
+ * @LastEditTime: 2025-03-25 19:24:03
  * @FilePath: \threejs-demo\src\lib\custom\ViewIndicator.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -25,50 +25,102 @@ import {
     OrthographicCamera,
     Raycaster,
     Quaternion,
-    Euler
 } from "three";
 import {
-    equal,
     HALF_PI,
     PI,
-    TWO_PI
+    ZERO3,
 } from "../tools/index.js";
 
 const _v = /*PURE */ new Vector3();
 const _n = /*PURE */ new Matrix4();
-const _t = /*PURE */ new Quaternion();
-const _q = /*PURE */ new Quaternion();
+const targetQuaternion = /*PURE */ new Quaternion();
+const currentQuaternion = /*PURE */ new Quaternion();
 const _p = /*PURE */ new Quaternion();
 const _m = /*PURE */ new Vector2();
 
 const rotationMap = {
-    0: new Euler(0, 0, 0),
-    1: new Euler(0, 0, 0),
-    2: new Euler(0, 0, 0),
-    3: new Euler(0, 0, 0),
-    4: new Euler(0, 0, 0),
-    5: new Euler(0, 0, 0),
-    6: new Euler(0, 0, 0),
-    7: new Euler(0, 0, 0),
-    8: new Euler(0, 0, 0),
-    9: new Euler(0, 0, 0),
-    10: new Euler(0, 0, 0),
-    11: new Euler(0, 0, 0),
-    12: new Euler(0, 0, 0),
-    13: new Euler(0, 0, 0),
-    14: new Euler(0, 0, 0),
-    15: new Euler(0, 0, 0),
-    16: new Euler(0, 0, 0),
-    17: new Euler(0, 0, 0),
-    18: new Euler(0, 0, 0),
-    19: new Euler(0, 0, 0),
-    20: new Euler(0, 0, 0),
-    21: new Euler(0, 0, 0),
-    22: new Euler(0, 0, 0),
-    23: new Euler(0, 0, 0),
-    24: new Euler(0, 0, 0),
-    25: new Euler(0, 0, 0),
-    26: new Euler(0, 0, 0),
+    // left ??
+    0: {
+        target: new Vector3(1, 0, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // right ??
+    1: {
+        target: new Vector3(-1, 0, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // back
+    2: {
+        target: new Vector3(0, -1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // front
+    3: {
+        target: new Vector3(0, 1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // top
+    4: {
+        target: new Vector3(0, 0, -1),
+        up: new Vector3(0, 1, 0),
+    },
+    // bottom
+    5: {
+        target: new Vector3(0, 0, 1),
+        up: new Vector3(0, 1, 0),
+    },
+    6: new Matrix4(),
+    7: new Matrix4(),
+    8: new Matrix4(),
+    9: new Matrix4(),
+    10: new Matrix4(),
+    11: new Matrix4(),
+    12: new Matrix4(),
+    13: new Matrix4(),
+    // back-right
+    14: {
+        target: new Vector3(-1, -1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // front-right
+    15: {
+        target: new Vector3(-1, 1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // back-left
+    16: {
+        target: new Vector3(1, -1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    // front-left
+    17: {
+        target: new Vector3(1, 1, 0),
+        up: new Vector3(0, 0, 1),
+    },
+    18: new Matrix4(),
+    19: new Matrix4(),
+    20: {
+        target: new Vector3(1, 0, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    21: {
+        target: new Vector3(1, 0, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    22: new Matrix4(),
+    23: new Matrix4(),
+    // front-top
+    24: {
+        target: new Vector3(0, 1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // front-bottom
+    25: {
+        target: new Vector3(0, 1, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    26: new Matrix4(),
 }
 
 const _orthoCamera = new OrthographicCamera(- 2, 2, 2, - 2, 0, 6);
@@ -192,6 +244,8 @@ class ViewIndicator extends Object3D {
         this.indicator.conners = [];
         this.indicator.edges = [];
 
+        this.rotateSpeed = HALF_PI;
+
         // 判断是否在运动
         this.animating = false;
 
@@ -252,7 +306,7 @@ class ViewIndicator extends Object3D {
             _v.set(x, y, z).normalize();
             mesh.position.copy(_v).multiplyScalar(halfSize * edgeFactor * edgeOffset);
             mesh.direction = new Vector3().copy(_v);
-            _n.lookAt(mesh.position, new Vector3(), mesh.up);
+            _n.lookAt(mesh.position, ZERO3, mesh.up);
             mesh.quaternion.setFromRotationMatrix(_n);
 
             this.indicator.add(mesh);
@@ -287,6 +341,7 @@ class ViewIndicator extends Object3D {
 
         _v.set(0, 0, 1);
         _v.applyQuaternion(this._camera.quaternion);
+        currentQuaternion.copy(this._camera.quaternion);
 
         _m.x = (this._domElement.offsetWidth - renderSize) * renderOffset.x;
         _m.y = (this._domElement.offsetHeight - renderSize) * (1 - renderOffset.y);
@@ -358,29 +413,20 @@ class ViewIndicator extends Object3D {
         _radius = this._camera.position.distanceTo(this.center);
         _v.copy(object.direction).multiplyScalar(_radius).add(this.center);
 
-        _t.copy(rotationMap[object.userData.index]);
-
-        _dummy.position.copy(this.center);
-
-        _dummy.lookAt(this._camera.position);
-        _q.copy(_dummy.quaternion);
-
-        _dummy.lookAt(_v);
-        _q.premultiply(_dummy.quaternion);
-
-        _dummy.lookAt(this.center);
-        _q.premultiply(_dummy.quaternion);
+        const { target, up } = rotationMap[object.userData.index];
+        console.log('object.userData.index: ', object.userData.index);
+        targetQuaternion.setFromRotationMatrix(_n.lookAt(ZERO3, target, up));
+        this._camera.up.copy(up);
     }
 
     update(deltaTime) {
-        const step = deltaTime * TWO_PI;
+        const step = deltaTime * this.rotateSpeed;
 
-        _q.rotateTowards(_p, step);
-        this._camera.position.set(0, 0, 1).applyQuaternion(_q).multiplyScalar(_radius).add(this.center);
+        currentQuaternion.rotateTowards(targetQuaternion, step);
+        this._camera.quaternion.copy(currentQuaternion);
+        this._camera.position.set(0, 0, 1).applyQuaternion(currentQuaternion).multiplyScalar(_radius).add(this.center);
 
-        this._camera.quaternion.rotateTowards(_t, step);
-
-        this.animating = !equal(_q.angleTo(_p), 0);
+        this.animating = currentQuaternion.angleTo(targetQuaternion) !== 0;
     }
 
     dispose() {
@@ -496,10 +542,12 @@ function createFaceMaterials({ faceText, faceTextColor, faceTextSize, background
         context.fillText(faceText[i], offsetX * dpi, resolution / 2 * dpi);
     });
 
+    const pice = 1 / (6 * dpi);
+
     return faceText.map((text, i) => {
         const texture = new CanvasTexture(canvas);
-        texture.repeat.set(1 / (6 * dpi), 1);
-        texture.offset.set(i / (6 * dpi), 0);
+        texture.repeat.set(pice, 1);
+        texture.offset.set(i * pice, 0);
 
         const material = new MeshBasicMaterial({
             color: backgroundColor,
@@ -522,13 +570,15 @@ function createSpriteMaterials({ axisColor, axisTextSize }) {
     context.font = `${axisTextSize * dpi}px Arial bold`;
     COORD.forEach((_, i) => {
         context.fillStyle = axisColor[i];
-        context.fillText(COORD[i], 64 * i * dpi + 20 * dpi, 45 * dpi);
+        context.fillText(COORD[i], (64 * i + 20) * dpi, 45 * dpi);
     });
+
+    const pice = 1 / (3 * dpi);
 
     return COORD.map((key, i) => {
         const texture = new CanvasTexture(canvas);
-        texture.repeat.set(1 / (3 * dpi), 1);
-        texture.offset.set(i / (3 * dpi), 0);
+        texture.repeat.set(pice, 1);
+        texture.offset.set(i * pice, 0);
 
         const material = new SpriteMaterial({
             map: texture,
@@ -539,4 +589,4 @@ function createSpriteMaterials({ axisColor, axisTextSize }) {
     })
 }
 
-export { ViewIndicator };
+export { ViewIndicator, rotationMap };

@@ -2,23 +2,23 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 16:26:18
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-24 19:36:22
+ * @LastEditTime: 2025-03-25 19:23:05
  * @FilePath: \threejs-demo\src\helper\viewIndicatorHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Vector2, Vector3, } from 'three';
+import { Matrix4, Vector2, Vector3, } from 'three';
 import {
     initRenderer,
     initOrthographicCamera,
     initCustomGrid,
-    initAxesHelper,
     initScene,
     resize,
     initGUI,
     initTrackballControls,
-    initClock
+    initClock,
+    initCoordinates
 } from '../lib/tools/index.js';
-import { ViewIndicator } from '../lib/custom/ViewIndicator.js';
+import { ViewIndicator, rotationMap } from '../lib/custom/ViewIndicator.js';
 
 window.onload = () => {
     init();
@@ -28,14 +28,29 @@ function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
     const camera = initOrthographicCamera(new Vector3(0, -200, 200));
-    camera.up.set(0, 0, 1);
+    // camera.up.set(0, 0, 1);
     camera.zoom = 2
     camera.updateProjectionMatrix();
 
     const scene = initScene();
-    initAxesHelper(scene);
     renderer.setClearColor(0xeeeeee);
     initCustomGrid(scene);
+
+    const coord = initCoordinates(5);
+
+    // scene.add(coord);
+
+
+    const coord2 = initCoordinates(8);
+    coord2.setColors({
+        x: '#ff4466',
+        y: '#88ff44',
+        z: '#4488ff',
+    });
+    scene.add(coord2);
+
+    const { target, up } = rotationMap[20]
+    coord2.quaternion.setFromRotationMatrix(new Matrix4().lookAt(new Vector3(), target, up));
 
     let helper, viewIndicator;
 
@@ -80,7 +95,7 @@ function init() {
             helper.dispose();
         }
         viewIndicator = new ViewIndicator(camera, renderer.domElement, params);
-        scene.add(viewIndicator);
+        // scene.add(viewIndicator);
 
         helper = new ViewIndicator(camera, renderer.domElement, params);
         helper.scale.set(params.size / 2, params.size / 2, params.size / 2);
@@ -92,12 +107,17 @@ function init() {
     createHelper();
 
     const clock = initClock();
-    function render() {
+    let deltaTime = 0;
+    function render(t) {
         renderer.clear();
         controls.update();
+        deltaTime = clock.getDelta();
+        // coord.quaternion.copy(camera.quaternion);
         renderer.render(scene, camera);
         helper.center.copy(controls.target);
-        helper.animating && helper.update(clock.getDelta());
+        if (helper.animating) {
+            helper.update(deltaTime);
+        }
         helper?.render(renderer);
         requestAnimationFrame(render);
     }
@@ -110,7 +130,7 @@ function init() {
     })
 
     renderer.domElement.addEventListener('mousemove', (e) => {
-        helper.handleMove(e); 
+        helper.handleMove(e);
     })
 
     const gui = initGUI();
