@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 16:26:18
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-25 19:23:05
+ * @LastEditTime: 2025-03-26 18:09:22
  * @FilePath: \threejs-demo\src\helper\viewIndicatorHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -47,9 +47,9 @@ function init() {
         y: '#88ff44',
         z: '#4488ff',
     });
-    scene.add(coord2);
+    // scene.add(coord2);
 
-    const { target, up } = rotationMap[20]
+    const { target, up } = rotationMap[4]
     coord2.quaternion.setFromRotationMatrix(new Matrix4().lookAt(new Vector3(), target, up));
 
     let helper, viewIndicator;
@@ -95,7 +95,7 @@ function init() {
             helper.dispose();
         }
         viewIndicator = new ViewIndicator(camera, renderer.domElement, params);
-        // scene.add(viewIndicator);
+        scene.add(viewIndicator);
 
         helper = new ViewIndicator(camera, renderer.domElement, params);
         helper.scale.set(params.size / 2, params.size / 2, params.size / 2);
@@ -108,7 +108,7 @@ function init() {
 
     const clock = initClock();
     let deltaTime = 0;
-    function render(t) {
+    function render() {
         renderer.clear();
         controls.update();
         deltaTime = clock.getDelta();
@@ -149,6 +149,6 @@ function init() {
     gui.addColor(params, "backgroundColor").onChange(createHelper);
     gui.addColor(params, "hoverColor").onChange(createHelper);
     gui.addColor(params, "faceTextColor").onChange(createHelper);
-    gui.add(params.renderOffset, "x", 0, 1, 0.01).onChange(createHelper);
-    gui.add(params.renderOffset, "y", 0, 1, 0.01).onChange(createHelper);
+    gui.add(params.renderOffset, "x", 0, 1, 0.01).onChange(createHelper).name("renderOffsetX");
+    gui.add(params.renderOffset, "y", 0, 1, 0.01).onChange(createHelper).name("renderOffsetY");
 }

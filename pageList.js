@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-18 16:27:56
+ * @LastEditTime: 2025-03-26 18:11:33
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -455,6 +455,10 @@ const list = [
         path: "/helper/rulerHelper.html",
         title: "Ruler Helper Demo",
       },
+      {
+        path: "/helper/viewIndicatorHelper.html",
+        title: "View Indicator Helper",
+      }
     ],
   },
   {

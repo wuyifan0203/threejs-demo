@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 13:41:04
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-25 19:24:03
+ * @LastEditTime: 2025-03-26 18:04:02
  * @FilePath: \threejs-demo\src\lib\custom\ViewIndicator.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -70,14 +70,46 @@ const rotationMap = {
         target: new Vector3(0, 0, 1),
         up: new Vector3(0, 1, 0),
     },
-    6: new Matrix4(),
-    7: new Matrix4(),
-    8: new Matrix4(),
-    9: new Matrix4(),
-    10: new Matrix4(),
-    11: new Matrix4(),
-    12: new Matrix4(),
-    13: new Matrix4(),
+    // top-back-right
+    6: {
+        target: new Vector3(-1, -1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // top-back-left
+    7: {
+        target: new Vector3(1, -1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // top-front-right
+    8: {
+        target: new Vector3(-1, 1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // top-front-left
+    9: {
+        target: new Vector3(1, 1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // bottom-back-right
+    10: {
+        target: new Vector3(-1, -1, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    // bottom-back-left
+    11: {
+        target: new Vector3(1, -1, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    // bottom-front-right
+    12: {
+        target: new Vector3(-1, 1, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    //bottom-front-left
+    13: {
+        target: new Vector3(1, 1, 1),
+        up: new Vector3(0, 0, 1),
+    },
     // back-right
     14: {
         target: new Vector3(-1, -1, 0),
@@ -98,18 +130,36 @@ const rotationMap = {
         target: new Vector3(1, 1, 0),
         up: new Vector3(0, 0, 1),
     },
-    18: new Matrix4(),
-    19: new Matrix4(),
-    20: {
-        target: new Vector3(1, 0, 1),
+    // top-right
+    18: {
+        target: new Vector3(-1, 0, -1),
         up: new Vector3(0, 0, 1),
     },
+    // bottom-right
+    19: {
+        target: new Vector3(-1, 0, 1),
+        up: new Vector3(0, 0, 1),
+    },
+    // top-left
+    20: {
+        target: new Vector3(1, 0, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // bottom-left
     21: {
         target: new Vector3(1, 0, 1),
         up: new Vector3(0, 0, 1),
     },
-    22: new Matrix4(),
-    23: new Matrix4(),
+    // top-back
+    22: {
+        target: new Vector3(0, -1, -1),
+        up: new Vector3(0, 0, 1),
+    },
+    // bottom-back
+    23: {
+        target: new Vector3(0, -1, 1),
+        up: new Vector3(0, 0, 1),
+    },
     // front-top
     24: {
         target: new Vector3(0, 1, -1),
@@ -120,7 +170,6 @@ const rotationMap = {
         target: new Vector3(0, 1, 1),
         up: new Vector3(0, 0, 1),
     },
-    26: new Matrix4(),
 }
 
 const _orthoCamera = new OrthographicCamera(- 2, 2, 2, - 2, 0, 6);
