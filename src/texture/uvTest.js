@@ -2,11 +2,11 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2024-11-21 11:04:15
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-11-22 14:43:02
+ * @LastEditTime: 2025-03-27 14:53:41
  * @FilePath: \threejs-demo\src\texture\uvTest.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Float64BufferAttribute } from '../lib/custom/Buffer.js';
+import { Float64BufferAttribute } from '../lib/custom/Float64BufferAttribute.js';
 import {
     Float32BufferAttribute,
     Mesh,

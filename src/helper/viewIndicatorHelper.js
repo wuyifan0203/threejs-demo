@@ -2,11 +2,11 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 16:26:18
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-26 18:09:22
+ * @LastEditTime: 2025-03-27 18:43:44
  * @FilePath: \threejs-demo\src\helper\viewIndicatorHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { Matrix4, Vector2, Vector3, } from 'three';
+import { Vector3 } from 'three';
 import {
     initRenderer,
     initOrthographicCamera,
@@ -16,9 +16,9 @@ import {
     initGUI,
     initTrackballControls,
     initClock,
-    initCoordinates
+    createBackgroundTexture
 } from '../lib/tools/index.js';
-import { ViewIndicator, rotationMap } from '../lib/custom/ViewIndicator.js';
+import { ViewIndicator } from '../lib/custom/ViewIndicator.js';
 
 window.onload = () => {
     init();
@@ -28,7 +28,6 @@ function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
     const camera = initOrthographicCamera(new Vector3(0, -200, 200));
-    // camera.up.set(0, 0, 1);
     camera.zoom = 2
     camera.updateProjectionMatrix();
 
@@ -36,55 +35,40 @@ function init() {
     renderer.setClearColor(0xeeeeee);
     initCustomGrid(scene);
 
-    const coord = initCoordinates(5);
-
-    // scene.add(coord);
-
-
-    const coord2 = initCoordinates(8);
-    coord2.setColors({
-        x: '#ff4466',
-        y: '#88ff44',
-        z: '#4488ff',
-    });
-    // scene.add(coord2);
-
-    const { target, up } = rotationMap[4]
-    coord2.quaternion.setFromRotationMatrix(new Matrix4().lookAt(new Vector3(), target, up));
-
     let helper, viewIndicator;
 
     const params = {
-        "faceText": [
-            "LEFT",
-            "RIGHT",
-            "BACK",
-            "FRONT",
-            "TOP",
-            "BOTTOM",
-        ],
-        "faceTextColor": "#6e6e6e",
-        "faceTextSize": 28,
-        "axisColor": [
-            '#ff4466',
-            '#88ff44',
-            '#4488ff',
-        ],
-        "axisTextSize": 48,
-        "size": 2,
-        "faceSize": 1.6,
-        "faceRadius": 0.4,
-        "faceSmoothness": 4,
-        "connerRadius": 0.22,
-        "connerOffset": 0.79,
-        "connerSegments": 16,
-        "edgeWidth": 1.1,
-        "edgeHeight": 0.2,
-        "edgeOffset": 0.9,
-        "backgroundColor": "#ffffff",
-        "hoverColor": "#0ae2ff",
-        "renderOffset": new Vector2(1, 1)
+        face: {
+            fontsSize: 28,
+            range: 2,
+            size: 1.6,
+            radius: 0.4,
+            smoothness: 4,
+        },
+        conner: {
+            radius: 0.22,
+            offset: 0.8,
+            segments: 12,
+        },
+        edge: {
+            width: 1.1,
+            height: 0.2,
+            offset: 0.9,
+            radius: 0.08,
+            smoothness: 3,
+        },
+        axis: {
+            fontsSize: 48,
+            length: 2.4,
+        },
+        color: {
+            background: '#fafafa',
+            hover: '#e0e0e0',
+            faceContent: '#707070',
+            opacity: 1,
+        },
     }
+    scene.background = createBackgroundTexture('#c7eefd', '#ffffff');
 
     function createHelper() {
         if (viewIndicator) {
@@ -98,27 +82,27 @@ function init() {
         scene.add(viewIndicator);
 
         helper = new ViewIndicator(camera, renderer.domElement, params);
-        helper.scale.set(params.size / 2, params.size / 2, params.size / 2);
+        const halfSize = params.face.range / 2;
+        helper.scale.set(halfSize, halfSize, halfSize);
     }
 
     const controls = initTrackballControls(camera, renderer.domElement);
-    console.log('controls: ', controls);
 
     createHelper();
 
     const clock = initClock();
     let deltaTime = 0;
     function render() {
-        renderer.clear();
-        controls.update();
         deltaTime = clock.getDelta();
-        // coord.quaternion.copy(camera.quaternion);
-        renderer.render(scene, camera);
-        helper.center.copy(controls.target);
+        renderer.clear();
         if (helper.animating) {
             helper.update(deltaTime);
+        } else {
+            controls.update();
         }
-        helper?.render(renderer);
+        renderer.render(scene, camera);
+        helper.center.copy(controls.target);
+        helper.render(renderer);
         requestAnimationFrame(render);
     }
     render();
@@ -134,21 +118,34 @@ function init() {
     })
 
     const gui = initGUI();
+    const faceGUI = gui.addFolder("face");
+    faceGUI.add(params.face, "range", 0.5, 3, 0.1).onChange(createHelper);
+    faceGUI.add(params.face, "size", 0.1, 5, 0.001).onChange(createHelper);
+    faceGUI.add(params.face, "radius", 0.1, 1, 0.01).onChange(createHelper);
+    faceGUI.add(params.face, "smoothness", 1, 10, 1).onChange(createHelper);
+    faceGUI.add(params.face, "fontsSize", 1, 100, 1).onChange(createHelper);
 
-    gui.add(params, "size", 0.5, 3, 0.1).onChange(createHelper);
-    gui.add(params, "faceSize", 0.1, 5, 0.001).onChange(createHelper);
-    gui.add(params, "faceRadius", 0.1, 1, 0.001).onChange(createHelper);
-    gui.add(params, "faceTextSize", 1, 100, 1).onChange(createHelper);
-    gui.add(params, "axisTextSize", 1, 100, 1).onChange(createHelper);
-    gui.add(params, "connerRadius", 0.1, 2, 0.001).onChange(createHelper);
-    gui.add(params, "connerOffset", 0.1, 2, 0.001).onChange(createHelper);
-    gui.add(params, "connerSegments", 1, 32, 1).onChange(createHelper);
-    gui.add(params, "edgeWidth", 0.1, 2, 0.01).onChange(createHelper);
-    gui.add(params, "edgeHeight", 0.1, 2, 0.01).onChange(createHelper);
-    gui.add(params, "edgeOffset", 0.1, 2, 0.001).onChange(createHelper);
-    gui.addColor(params, "backgroundColor").onChange(createHelper);
-    gui.addColor(params, "hoverColor").onChange(createHelper);
-    gui.addColor(params, "faceTextColor").onChange(createHelper);
-    gui.add(params.renderOffset, "x", 0, 1, 0.01).onChange(createHelper).name("renderOffsetX");
-    gui.add(params.renderOffset, "y", 0, 1, 0.01).onChange(createHelper).name("renderOffsetY");
+    const connerGUI = gui.addFolder("conner");
+    connerGUI.add(params.conner, "radius", 0.1, 1, 0.01).onChange(createHelper);
+    connerGUI.add(params.conner, "offset", 0.1, 2, 0.01).onChange(createHelper);
+    connerGUI.add(params.conner, "segments", 1, 32, 1).onChange(createHelper);
+
+    const edgeGUI = gui.addFolder("edge");
+    edgeGUI.add(params.edge, "width", 0.1, 2, 0.01).onChange(createHelper);
+    edgeGUI.add(params.edge, "height", 0.1, 2, 0.01).onChange(createHelper);
+    edgeGUI.add(params.edge, "offset", 0.1, 2, 0.01).onChange(createHelper);
+    edgeGUI.add(params.edge, "radius", 0.1, 1, 0.01).onChange(createHelper);
+    edgeGUI.add(params.edge, "smoothness", 1, 10, 1).onChange(createHelper);
+
+    const axisGUI = gui.addFolder("axis");
+    axisGUI.add(params.axis, "length", 0.1, 5, 0.01).onChange(createHelper);
+    axisGUI.add(params.axis, "fontsSize", 1, 100, 1).onChange(createHelper);
+
+    const colorGUI = gui.addFolder("color");
+    colorGUI.addColor(params.color, "background").onChange(createHelper);
+    colorGUI.addColor(params.color, "hover").onChange(createHelper);
+    colorGUI.addColor(params.color, "faceContent").onChange(createHelper);
+    colorGUI.add(params.color, "opacity", 0, 1, 0.01).onChange(createHelper);
+
+    gui.add(helper, "animateSpeed", 0.2, 8, 0.01).name("animateSpeed");
 }

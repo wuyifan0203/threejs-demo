@@ -277,6 +277,37 @@ function getLineLength(points) {
 }
 
 
+/**
+ * @description: deepMerge
+ * @param {Object} target
+ * @param {Object} source
+ * @return {Object} target
+ */
+function deepMerge(target, source) {
+  for (const key in source) {
+    if (typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      // 如果是对象，递归合并
+      target[key] = target[key] || {};
+      deepMerge(target[key], source[key]);
+    } else if (Array.isArray(source[key])) {
+      // 如果是数组，合并较长数组（按索引合并）
+      target[key] = target[key] || [];
+      const maxLength = Math.max(target[key].length, source[key].length);
+      for (let i = 0; i < maxLength; i++) {
+        if (typeof source[key][i] === 'object') {
+          target[key][i] = deepMerge(target[key][i] || {}, source[key][i]);
+        } else {
+          target[key][i] = source[key][i] ?? target[key][i];
+        }
+      }
+    } else {
+      // 基本类型直接覆盖
+      target[key] = source[key];
+    }
+  }
+  return target;
+}
+
 
 
 
@@ -300,5 +331,6 @@ export {
   isComplexPolygon,
   isClockWise,
   previewCanvas,
-  getLineLength
+  getLineLength,
+  deepMerge
 };

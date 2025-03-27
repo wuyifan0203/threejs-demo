@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 13:41:04
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-26 18:04:02
+ * @LastEditTime: 2025-03-27 19:45:23
  * @FilePath: \threejs-demo\src\lib\custom\ViewIndicator.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -27,378 +27,218 @@ import {
     Quaternion,
 } from "three";
 import {
+    equal,
     HALF_PI,
     PI,
+    TWO_PI,
     ZERO3,
 } from "../tools/index.js";
 
 const _v = /*PURE */ new Vector3();
-const _n = /*PURE */ new Matrix4();
+const _matrix = /*PURE */ new Matrix4();
 const targetQuaternion = /*PURE */ new Quaternion();
 const currentQuaternion = /*PURE */ new Quaternion();
-const _p = /*PURE */ new Quaternion();
-const _m = /*PURE */ new Vector2();
-
-const rotationMap = {
-    // left ??
-    0: {
-        target: new Vector3(1, 0, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // right ??
-    1: {
-        target: new Vector3(-1, 0, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // back
-    2: {
-        target: new Vector3(0, -1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // front
-    3: {
-        target: new Vector3(0, 1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // top
-    4: {
-        target: new Vector3(0, 0, -1),
-        up: new Vector3(0, 1, 0),
-    },
-    // bottom
-    5: {
-        target: new Vector3(0, 0, 1),
-        up: new Vector3(0, 1, 0),
-    },
-    // top-back-right
-    6: {
-        target: new Vector3(-1, -1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-back-left
-    7: {
-        target: new Vector3(1, -1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-front-right
-    8: {
-        target: new Vector3(-1, 1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-front-left
-    9: {
-        target: new Vector3(1, 1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-back-right
-    10: {
-        target: new Vector3(-1, -1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-back-left
-    11: {
-        target: new Vector3(1, -1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-front-right
-    12: {
-        target: new Vector3(-1, 1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    //bottom-front-left
-    13: {
-        target: new Vector3(1, 1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // back-right
-    14: {
-        target: new Vector3(-1, -1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // front-right
-    15: {
-        target: new Vector3(-1, 1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // back-left
-    16: {
-        target: new Vector3(1, -1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // front-left
-    17: {
-        target: new Vector3(1, 1, 0),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-right
-    18: {
-        target: new Vector3(-1, 0, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-right
-    19: {
-        target: new Vector3(-1, 0, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-left
-    20: {
-        target: new Vector3(1, 0, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-left
-    21: {
-        target: new Vector3(1, 0, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // top-back
-    22: {
-        target: new Vector3(0, -1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // bottom-back
-    23: {
-        target: new Vector3(0, -1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-    // front-top
-    24: {
-        target: new Vector3(0, 1, -1),
-        up: new Vector3(0, 0, 1),
-    },
-    // front-bottom
-    25: {
-        target: new Vector3(0, 1, 1),
-        up: new Vector3(0, 0, 1),
-    },
-}
 
 const _orthoCamera = new OrthographicCamera(- 2, 2, 2, - 2, 0, 6);
 _orthoCamera.updateProjectionMatrix();
 _orthoCamera.position.set(0, 0, 3);
 
-const _viewport = new Vector4();
-const _r = new Raycaster();
 let _radius = 0;
-const _dummy = new Object3D();
+const _viewport = new Vector4();
+const _raycaster = new Raycaster();
 const _mouse = new Vector2();
-/** [posAxis, posValue, rotAxis rotValue][] */
-const FACE_TRANSFORMATIONS = [
-    0, -1, 1, -HALF_PI, 2, -HALF_PI,
-    0, 1, 1, HALF_PI, 0, HALF_PI,
-    1, 1, 2, PI, 0, -HALF_PI,
-    1, -1, 0, 0, 0, HALF_PI,
-    2, 1, 0, 0, 0, 0,
-    2, -1, 1, -PI, 0, 0
-];
 
-const CORNER_POSITIONS = [
-    1, 1, 1,
-    -1, 1, 1,
-    1, -1, 1,
-    -1, -1, 1,
-    1, 1, -1,
-    -1, 1, -1,
-    1, -1, -1,
-    -1, -1, -1,
-];
+const directionMap = {
+    0: new Vector3(1, 0, 0), // left
+    1: new Vector3(-1, 0, 0), // right
+    2: new Vector3(0, -1, 0), // back
+    3: new Vector3(0, 1, 0), // front
+    4: new Vector3(0, 0, -1), // top
+    5: new Vector3(0, 0, 1), // bottom
+    6: new Vector3(-1, -1, -1), // top-back-right
+    7: new Vector3(1, -1, -1), // top-back-left
+    8: new Vector3(-1, 1, -1), // top-front-right
+    9: new Vector3(1, 1, -1), // top-front-left
+    10: new Vector3(-1, -1, 1), // bottom-back-right
+    11: new Vector3(1, -1, 1), // bottom-back-left
+    12: new Vector3(-1, 1, 1), // bottom-front-right
+    13: new Vector3(1, 1, 1), // bottom-front-left
+    14: new Vector3(-1, -1, 0), // back-right
+    15: new Vector3(-1, 1, 0), // front-right
+    16: new Vector3(1, -1, 0), // back-left
+    17: new Vector3(1, 1, 0), // front-left
+    18: new Vector3(-1, 0, -1), // top-right
+    19: new Vector3(-1, 0, 1), // bottom-right
+    20: new Vector3(1, 0, -1), // top-left
+    21: new Vector3(1, 0, 1), // bottom-left
+    22: new Vector3(0, -1, -1), // top-back
+    23: new Vector3(0, -1, 1), // bottom-back
+    24: new Vector3(0, 1, -1), // front-top
+    25: new Vector3(0, 1, 1), // front-bottom
+}
 
-/** [direction[3], rotAxis1 ,rotValue2,rotAxis1 ,rotValue2 ][] */
-const EDGE_TRANSFORMATIONS = [
-    1, 1, 0, 2,
-    1, -1, 0, 2,
-    -1, 1, 0, 2,
-    -1, -1, 0, 2,
-    //
-    1, 0, 1, 1,
-    1, 0, -1, 1,
-    -1, 0, 1, 1,
-    -1, 0, -1, 1,
-    //
-    0, 1, 1, 0,
-    0, 1, -1, 0,
-    0, -1, 1, 0,
-    0, -1, -1, 0,
-];
+const upMap = [5, 5, 5, 5, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5];
 
-const AXIS = [
-    new Vector3(1, 0, 0),
-    new Vector3(0, 1, 0),
-    new Vector3(0, 0, 1),
-]
+/** [rotAxis rotValue][] */
+const FACE_ROTATION = [
+    1, -HALF_PI, 2, -HALF_PI,
+    1, HALF_PI, 0, HALF_PI,
+    2, PI, 0, -HALF_PI,
+    0, 0, 0, HALF_PI,
+    0, 0, 0, 0,
+    1, -PI, 0, 0
+];
 
 const COORD = ['x', 'y', 'z'];
-
 const connerFactor = 0.866; // Math.sqrt(3)/2
 const edgeFactor = Math.SQRT2;
 
-
 // params
-const size = 2;
-const halfSize = size / 2;
-const faceSize = size * 0.65;
-const faceRadius = 0.4;
-const faceSmoothness = 6;
-const faceTextColor = '#000000';
-const faceTextSize = 28;
-const connerRadius = faceSize * 0.18;
-const connerOffset = 0.75;
-const connerSegments = 32;
-const edgeWidth = size * 0.5;
-const edgeHeight = size * 0.18;
-const edgeOffset = 0.85;
-const axisTextSize = 48;
-const axisColor = [
-    '#ff4466',
-    '#88ff44',
-    '#4488ff',
-];
-const faceText = ['LEFT', 'TOP', 'RIGHT', 'BOTTOM', 'FRONT', 'BACK'];
-const backgroundColor = '#ffffff';
-const hoverColor = '#000055';
-
-
 const defaultParams = {
-    faceText,
-    faceTextColor,
-    faceTextSize,
-    axisColor,
-    axisTextSize,
-    size,
-    faceSize,
-    faceRadius,
-    faceSmoothness,
-    connerRadius,
-    connerOffset,
-    connerSegments,
-    edgeWidth,
-    edgeHeight,
-    edgeOffset,
-    backgroundColor,
-    hoverColor,
-    renderOffset: new Vector2(1, 1),
-    renderSize: 128,
+    face: {
+        content: ['LEFT', 'RIGHT', 'BACK', 'FRONT', 'TOP', 'BOTTOM'],
+        fontsSize: 28,
+        range: 2,
+        size: 1.3,
+        radius: 0.4,
+        smoothness: 4,
+    },
+    conner: {
+        radius: 0.36,
+        offset: 0.75,
+        segments: 12,
+    },
+    edge: {
+        width: 1.0,
+        height: 0.36,
+        offset: 0.85,
+        radius: 0.144,
+        smoothness: 3,
+    },
+    axis: {
+        fontsSize: 48,
+        length: 2.4,
+    },
+    color: {
+        background: '#ffffff',
+        hover: '#000055',
+        faceContent: '#000000',
+        axis: ['#ff4466', '#88ff44', '#4488ff',],
+        opacity: 1,
+    },
 }
 class ViewIndicator extends Object3D {
-    constructor(camera, domElement, params = defaultParams) {
-
+    constructor(camera, domElement, params = {}) {
         super();
-        this.parameters = Object.assign({}, defaultParams, params,);
-        this._camera = camera;
-        this._domElement = domElement;
 
+        this.camera = camera;
+        this.domElement = domElement;
+
+        // 相机观察的中心点
         this.center = new Vector3();
-
-        this.indicator = new Group();
-        this.indicator.faces = [];
-        this.indicator.conners = [];
-        this.indicator.edges = [];
-
-        this.rotateSpeed = HALF_PI;
-
+        // 动画速度
+        this.animateSpeed = TWO_PI;
         // 判断是否在运动
         this.animating = false;
+        // 渲染的偏移量
+        this.renderOffset = new Vector2(1, 1);
+        // 渲染的大小
+        this.renderSize = 128;
 
-        // Face
-        const { faceSize, faceRadius, faceSmoothness, faceText, faceTextColor, faceTextSize, backgroundColor } = this.parameters;
+        const face = this.face = Object.assign({}, defaultParams.face, params.face || {});
+        const color = this.color = Object.assign({}, defaultParams.color, params.color || {});
+        const axis = this.axis = Object.assign({}, defaultParams.axis, params.axis || {});
+        const conner = this.conner = Object.assign({}, defaultParams.conner, params.conner || {});
+        const edge = this.edge = Object.assign({}, defaultParams.edge, params.edge || {});;
 
-        const faceGeometry = RectangleRounded(faceSize, faceSize, faceRadius, faceSmoothness);
+        const halfSize = face.range * 0.5;
 
-        const faceMaterials = createFaceMaterials({ faceText, faceTextColor, faceTextSize, backgroundColor });
+        // 指示器
+        this.indicator = new Group();
+
+        // FACE
+        const faceGeometry = RectangleRounded(face.size, face.size, face.radius, face.smoothness);
+        const faceMaterials = createFaceMaterials(face, color);
 
         for (let f = 0; f < 6; f++) {
-            const [posAxis, posValue, rotAxis1, rotValue1, rotAxis2, rotValue2] = FACE_TRANSFORMATIONS.slice(f * 6, (f + 1) * 6);
+            const [rotAxis1, rotValue1, rotAxis2, rotValue2] = FACE_ROTATION.slice(f * 4, (f + 1) * 4);
 
             const mesh = new Mesh(faceGeometry, faceMaterials[f]);
-            mesh.name = 'FACE_' + faceText[f];
             mesh.userData.index = f;
             mesh.rotation[COORD[rotAxis1]] = rotValue1;
             mesh.rotation[COORD[rotAxis2]] = rotValue2;
-            mesh.position[COORD[posAxis]] = posValue * halfSize;
-            mesh.direction = new Vector3().copy(mesh.position).normalize();
+            mesh.position.copy(directionMap[f]).multiplyScalar(halfSize).negate();;
 
             this.indicator.add(mesh);
-            this.indicator.faces.push(mesh);
         }
 
         // Conner 
-        const { connerRadius, connerSegments, connerOffset } = this.parameters;
 
-        const connerGeometry = new CircleGeometry(connerRadius, connerSegments);
+        const connerGeometry = new CircleGeometry(conner.radius, conner.segments);
 
         for (let j = 0; j < 8; j++) {
-            const mesh = new Mesh(connerGeometry, new MeshBasicMaterial({ color: backgroundColor, }));
-            mesh.name = 'CONNER_' + j;
+            const mesh = new Mesh(connerGeometry, new MeshBasicMaterial({ color: color.background, transparent: true, opacity: color.opacity }));
             mesh.userData.index = 6 + j;
-            _v.fromArray(CORNER_POSITIONS, j * 3).normalize();
-            mesh.position.copy(_v).multiplyScalar(halfSize * connerFactor * connerOffset * 2);
-            mesh.direction = new Vector3().copy(_v);
+            _v.copy(directionMap[6 + j]).normalize().negate();
+            mesh.position.copy(_v).multiplyScalar(halfSize * connerFactor * conner.offset * 2);
             mesh.lookAt(_v.add(mesh.position));
 
             this.indicator.add(mesh);
-            this.indicator.conners.push(mesh);
         }
 
         // Edge
-        const { edgeWidth, edgeHeight, edgeOffset } = this.parameters;
-        const edgeGeometry = RectangleRounded(edgeWidth, edgeHeight, edgeHeight * 0.4, faceSmoothness);
+        const edgeGeometry = RectangleRounded(edge.width, edge.height, edge.radius, edge.smoothness);
         const edgeGeometries = [
             edgeGeometry,
             edgeGeometry.clone().rotateZ(HALF_PI),
             edgeGeometry,
         ]
         for (let j = 0; j < 12; j++) {
-            const [x, y, z, w] = EDGE_TRANSFORMATIONS.slice(j * 4, (j + 1) * 4);
-            const mesh = new Mesh(edgeGeometries[w], new MeshBasicMaterial({ color: backgroundColor, }));
-            mesh.name = 'EDGE_' + j;
+            const mesh = new Mesh(edgeGeometries[Math.ceil((j + 1) / 4) - 1], new MeshBasicMaterial({ color: color.background, transparent: true, opacity: color.opacity }));
             mesh.userData.index = 14 + j;
-
-            _v.set(x, y, z).normalize();
-            mesh.position.copy(_v).multiplyScalar(halfSize * edgeFactor * edgeOffset);
-            mesh.direction = new Vector3().copy(_v);
-            _n.lookAt(mesh.position, ZERO3, mesh.up);
-            mesh.quaternion.setFromRotationMatrix(_n);
+            _v.copy(directionMap[j + 14]).normalize().negate();
+            mesh.position.copy(_v).multiplyScalar(halfSize * edgeFactor * edge.offset);
+            _matrix.lookAt(mesh.position, ZERO3, mesh.up);
+            mesh.quaternion.setFromRotationMatrix(_matrix);
 
             this.indicator.add(mesh);
-            this.indicator.edges.push(mesh);
         }
 
-        const { axisColor, axisTextSize } = this.parameters;
         this.coordinate = new Group();
-        const spriteMaterials = createSpriteMaterials({ axisColor, axisTextSize });
-        this.coordinate.sprites = [];
-        this.coordinate.arrows = [];
+        this.sprites = new Group();
 
-        AXIS.forEach((axis, i) => {
-            const arrow = new ArrowHelper(axis, new Vector3(-1, -1, -1), size * 1.2, axisColor[i], 0.5, 0.2);
-            const sprite = new Sprite(spriteMaterials[i]);
-            sprite.position.copy(axis).multiplyScalar(2.5).add(arrow.position);
-            this.coordinate.add(sprite);
+        const spriteMaterials = createSpriteMaterials(color.axis, axis.fontsSize);
+
+        const startPos = new Vector3(-halfSize, -halfSize, -halfSize);
+
+        [0, 3, 5].forEach((index, i) => {
+            _v.copy(directionMap[index])
+            const arrow = new ArrowHelper(_v, startPos, axis.length, color.axis[i], 0.5, 0.2);
             this.coordinate.add(arrow);
-            this.coordinate.sprites.push(sprite);
-            this.coordinate.arrows.push(arrow);
+
+            const sprite = new Sprite(spriteMaterials[i]);
+            sprite.position.copy(_v).multiplyScalar(2.5).add(arrow.position);
+            this.sprites.add(sprite);
         });
 
         this.add(this.indicator);
         this.add(this.coordinate);
+        this.add(this.sprites);
     }
 
     render(renderer) {
-        const { renderSize, renderOffset } = this.parameters;
-
-        this.quaternion.copy(this._camera.quaternion).invert();
+        this.quaternion.copy(this.camera.quaternion).invert();
         this.updateMatrixWorld();
 
-        _v.set(0, 0, 1);
-        _v.applyQuaternion(this._camera.quaternion);
-        currentQuaternion.copy(this._camera.quaternion);
+        currentQuaternion.copy(this.camera.quaternion);
 
-        _m.x = (this._domElement.offsetWidth - renderSize) * renderOffset.x;
-        _m.y = (this._domElement.offsetHeight - renderSize) * (1 - renderOffset.y);
+        _v.x = (this.domElement.offsetWidth - this.renderSize) * this.renderOffset.x;
+        _v.y = (this.domElement.offsetHeight - this.renderSize) * (1 - this.renderOffset.y);
 
         renderer.clearDepth();
 
         renderer.getViewport(_viewport);
-        renderer.setViewport(_m.x, _m.y, renderSize, renderSize);
+        renderer.setViewport(_v.x, _v.y, this.renderSize, this.renderSize);
 
         renderer.render(this, _orthoCamera);
 
@@ -407,17 +247,16 @@ class ViewIndicator extends Object3D {
 
     handleClick(event) {
         if (this.animating) return;
-
         this.indicator.children.forEach((child) => {
-            child.material.color.set(backgroundColor);
+            child.material.color.set(this.color.background);
         });
         if (!this.containCursor(event)) return;
 
-        _r.setFromCamera(_mouse, _orthoCamera);
-        const intersects = _r.intersectObjects(this.indicator.children);
+        _raycaster.setFromCamera(_mouse, _orthoCamera);
+        const intersects = _raycaster.intersectObjects(this.indicator.children);
         if (intersects.length) {
             const object = intersects[0].object;
-            object.material.color.set(this.parameters.hoverColor);
+            object.material.color.set(this.color.hover);
             this._prepareAnimate(object);
             this.animating = true;
         } else {
@@ -426,23 +265,22 @@ class ViewIndicator extends Object3D {
     }
 
     handleMove(event) {
-
         this.indicator.children.forEach((child) => {
-            child.material.color.set(backgroundColor);
+            child.material.color.set(this.color.background);
         });
         if (!this.containCursor(event)) return;
 
-        _r.setFromCamera(_mouse, _orthoCamera);
-        const intersects = _r.intersectObjects(this.indicator.children);
+        _raycaster.setFromCamera(_mouse, _orthoCamera);
+        const intersects = _raycaster.intersectObjects(this.indicator.children);
         if (intersects.length) {
             const object = intersects[0].object;
-            object.material.color.set(this.parameters.hoverColor);
+            object.material.color.set(this.color.hover);
         }
     }
 
     containCursor({ clientX, clientY }) {
-        const { renderSize, renderOffset } = this.parameters;
-        const { offsetHeight, offsetWidth } = this._domElement;
+        const { renderSize, renderOffset } = this;
+        const { offsetHeight, offsetWidth } = this.domElement;
 
         const left = offsetWidth * renderOffset.x - renderSize;
         const top = offsetHeight * renderOffset.y - renderSize;
@@ -459,53 +297,44 @@ class ViewIndicator extends Object3D {
     }
 
     _prepareAnimate(object) {
-        _radius = this._camera.position.distanceTo(this.center);
-        _v.copy(object.direction).multiplyScalar(_radius).add(this.center);
+        _radius = this.camera.position.distanceTo(this.center);
 
-        const { target, up } = rotationMap[object.userData.index];
-        console.log('object.userData.index: ', object.userData.index);
-        targetQuaternion.setFromRotationMatrix(_n.lookAt(ZERO3, target, up));
-        this._camera.up.copy(up);
+        const index = object.userData.index;
+        _v.copy(directionMap[upMap[index]]);
+        targetQuaternion.setFromRotationMatrix(_matrix.lookAt(ZERO3, directionMap[index], _v));
+        this.camera.up.copy(_v);
     }
 
     update(deltaTime) {
-        const step = deltaTime * this.rotateSpeed;
+        currentQuaternion.rotateTowards(targetQuaternion, deltaTime * this.animateSpeed);
+        this.camera.quaternion.copy(currentQuaternion);
+        this.camera.position.set(0, 0, 1).applyQuaternion(currentQuaternion).multiplyScalar(_radius).add(this.center);
 
-        currentQuaternion.rotateTowards(targetQuaternion, step);
-        this._camera.quaternion.copy(currentQuaternion);
-        this._camera.position.set(0, 0, 1).applyQuaternion(currentQuaternion).multiplyScalar(_radius).add(this.center);
-
-        this.animating = currentQuaternion.angleTo(targetQuaternion) !== 0;
+        this.animating = !equal(currentQuaternion.angleTo(targetQuaternion), 0);
     }
 
     dispose() {
-        this.coordinate.sprites.forEach((sprite) => {
+        this.sprites.children.forEach((sprite) => {
             sprite.material.dispose();
             sprite.material.map.dispose();
             sprite.removeFromParent();
         });
 
-        this.coordinate.arrows.forEach((arrow) => {
+        this.coordinate.children.forEach((arrow) => {
             arrow.removeFromParent();
             arrow.dispose();
         });
 
-        this.indicator.faces.forEach((face) => {
-            face.geometry.dispose();
-            face.material.dispose();
-            face.material.map.dispose();
-            face.removeFromParent();
+        this.indicator.children.forEach((object) => {
+            object.geometry.dispose();
+            object.material.dispose();
+            object.material.map && object.material.map.dispose();
+            object.removeFromParent();
         });
-        this.indicator.conners.forEach((conner) => {
-            conner.geometry.dispose();
-            conner.material.dispose();
-            conner.removeFromParent();
-        });
-        this.indicator.edges.forEach((edge) => {
-            edge.geometry.dispose();
-            edge.material.dispose();
-            edge.removeFromParent();
-        })
+
+        this.coordinate.removeFromParent();
+        this.indicator.removeFromParent();
+        this.sprites.removeFromParent();
     }
 }
 
@@ -571,7 +400,7 @@ function RectangleRounded(w, h, r, s) { // width, height, radius corner, smoothn
 }
 
 
-function createFaceMaterials({ faceText, faceTextColor, faceTextSize, backgroundColor }) {
+function createFaceMaterials({ content, fontsSize }, { faceContent, background, opacity }) {
     const dpi = window.devicePixelRatio || 1;
     const canvas = document.createElement('canvas');
     const resolution = 128;
@@ -579,46 +408,43 @@ function createFaceMaterials({ faceText, faceTextColor, faceTextSize, background
     canvas.height = resolution * dpi;
 
     const context = canvas.getContext('2d');
-    context.fillStyle = backgroundColor;
+    context.fillStyle = background;
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = `bold ${faceTextSize * dpi}px Arial`;
-    context.fillStyle = faceTextColor;
+    context.font = `bold ${fontsSize * dpi}px Arial`;
+    context.fillStyle = faceContent;
     context.textBaseline = "middle";
 
-    faceText.forEach((text, i) => {
+    content.forEach((text, i) => {
         const textWidth = context.measureText(text).width / dpi;
-        const offsetX = resolution * i + (resolution - textWidth) / 2;
-        context.fillText(faceText[i], offsetX * dpi, resolution / 2 * dpi);
+        context.fillText(content[i], resolution * i + (resolution - textWidth) / 2 * dpi, resolution / 2 * dpi);
     });
 
     const pice = 1 / (6 * dpi);
 
-    return faceText.map((text, i) => {
+    return content.map((_, i) => {
         const texture = new CanvasTexture(canvas);
         texture.repeat.set(pice, 1);
         texture.offset.set(i * pice, 0);
 
-        const material = new MeshBasicMaterial({
-            color: backgroundColor,
+        return new MeshBasicMaterial({
+            color: background,
             map: texture,
             transparent: true,
+            opacity,
+            side: opacity < 1 ? 2 : 0
         });
-
-        material.name = text;
-
-        return material;
     })
 }
 
-function createSpriteMaterials({ axisColor, axisTextSize }) {
+function createSpriteMaterials(color, fontSize) {
     const dpi = window.devicePixelRatio || 1;
     const canvas = document.createElement('canvas');
     canvas.width = 64 * dpi * 3;
     canvas.height = 64 * dpi;
     const context = canvas.getContext('2d');
-    context.font = `${axisTextSize * dpi}px Arial bold`;
+    context.font = `${fontSize * dpi}px Arial bold`;
     COORD.forEach((_, i) => {
-        context.fillStyle = axisColor[i];
+        context.fillStyle = color[i];
         context.fillText(COORD[i], (64 * i + 20) * dpi, 45 * dpi);
     });
 
@@ -638,4 +464,4 @@ function createSpriteMaterials({ axisColor, axisTextSize }) {
     })
 }
 
-export { ViewIndicator, rotationMap };
+export { ViewIndicator };

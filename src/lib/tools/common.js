@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-26 19:09:45
+ * @LastEditTime: 2025-03-27 18:01:27
  * @FilePath: \threejs-demo\src\lib\tools\common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -27,6 +27,7 @@ import {
   Clock,
   MathUtils,
   Fog,
+  SRGBColorSpace,
 } from "three";
 import { ViewHelper } from "three/examples/jsm/helpers/ViewHelper.js";
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
@@ -334,6 +335,7 @@ function createBackgroundTexture(color, color2) {
     // 1
     const texture = new CanvasTexture(canvas);
     texture.wrapS = texture.wrapT = ClampToEdgeWrapping;
+    texture.colorSpace = SRGBColorSpace;
     return texture;
   })();
 }
