@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 16:26:18
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-27 18:43:44
+ * @LastEditTime: 2025-03-28 17:34:49
  * @FilePath: \threejs-demo\src\helper\viewIndicatorHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -65,7 +65,9 @@ function init() {
             background: '#fafafa',
             hover: '#e0e0e0',
             faceContent: '#707070',
-            opacity: 1,
+            faceOpacity: 1,
+            face: '#ffffff',
+            backgroundOpacity: 0.5
         },
     }
     scene.background = createBackgroundTexture('#c7eefd', '#ffffff');
@@ -144,8 +146,13 @@ function init() {
     const colorGUI = gui.addFolder("color");
     colorGUI.addColor(params.color, "background").onChange(createHelper);
     colorGUI.addColor(params.color, "hover").onChange(createHelper);
+    colorGUI.addColor(params.color, "face").onChange(createHelper);
     colorGUI.addColor(params.color, "faceContent").onChange(createHelper);
-    colorGUI.add(params.color, "opacity", 0, 1, 0.01).onChange(createHelper);
+    colorGUI.add(params.color, "faceOpacity", 0, 1, 0.01).onChange(createHelper);
+    colorGUI.add(params.color, "backgroundOpacity", 0, 1, 0.01).onChange(createHelper);
 
-    gui.add(helper, "animateSpeed", 0.2, 8, 0.01).name("animateSpeed");
+    gui.add(helper, 'renderSize', 100, 400, 1);
+    gui.add(helper.renderOffset, 'x', 0, 1, 0.001);
+    gui.add(helper.renderOffset, 'y', 0, 1, 0.001);
+    gui.add(helper, "animateSpeed", 0.2, 8, 0.01);
 }

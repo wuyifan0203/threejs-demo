@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 13:41:04
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-27 19:45:23
+ * @LastEditTime: 2025-03-28 17:48:24
  * @FilePath: \threejs-demo\src\lib\custom\ViewIndicator.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -25,7 +25,11 @@ import {
     OrthographicCamera,
     Raycaster,
     Quaternion,
+    ShaderMaterial,
+    Color,
+    UniformsUtils,
 } from "three";
+import { FullScreenQuad } from "three/examples/jsm/postprocessing/Pass.js";
 import {
     equal,
     HALF_PI,
@@ -42,6 +46,37 @@ const currentQuaternion = /*PURE */ new Quaternion();
 const _orthoCamera = new OrthographicCamera(- 2, 2, 2, - 2, 0, 6);
 _orthoCamera.updateProjectionMatrix();
 _orthoCamera.position.set(0, 0, 3);
+
+const materialOption = {
+    uniforms: {
+        uColor: { value: new Color('#ffffff') },
+        uOpacity: { value: 0.5 },
+    },
+    vertexShader:/*glsl*/ `
+        varying vec2 vUv;
+        void main() {
+            vUv = uv;
+            gl_Position = vec4(position, 1.0);
+        }
+    `,
+    fragmentShader: /*glsl*/`
+        uniform vec3 uColor;
+        uniform float uOpacity;
+        varying vec2 vUv;
+
+        const float Radius = 1.0;
+        
+        void main() {
+            // 将UV坐标从[0,1]映射到[-1,1]
+            vec2 uv = vUv * 2.0 - 1.0;
+            // 使用smoothstep创建平滑边缘
+            float circle = 1.0 - smoothstep(Radius - 0.01, Radius, length(uv));
+            // 输出最终颜色
+            gl_FragColor = vec4(uColor, uOpacity * circle);
+        }
+    `,
+    transparent: true,
+};
 
 let _radius = 0;
 const _viewport = new Vector4();
@@ -121,12 +156,15 @@ const defaultParams = {
     },
     color: {
         background: '#ffffff',
+        backgroundOpacity: 0.5,
         hover: '#000055',
         faceContent: '#000000',
         axis: ['#ff4466', '#88ff44', '#4488ff',],
-        opacity: 1,
+        faceOpacity: 1,
+        face: '#ffffff',
     },
 }
+
 class ViewIndicator extends Object3D {
     constructor(camera, domElement, params = {}) {
         super();
@@ -145,6 +183,8 @@ class ViewIndicator extends Object3D {
         // 渲染的大小
         this.renderSize = 128;
 
+        this.isHover = false;
+
         const face = this.face = Object.assign({}, defaultParams.face, params.face || {});
         const color = this.color = Object.assign({}, defaultParams.color, params.color || {});
         const axis = this.axis = Object.assign({}, defaultParams.axis, params.axis || {});
@@ -152,6 +192,12 @@ class ViewIndicator extends Object3D {
         const edge = this.edge = Object.assign({}, defaultParams.edge, params.edge || {});;
 
         const halfSize = face.range * 0.5;
+
+        materialOption.uniforms = UniformsUtils.merge([
+            { uColor: { value: new Color(color.background) } },
+            { uOpacity: { value: color.backgroundOpacity } },
+        ]);
+        this.background = new FullScreenQuad(new ShaderMaterial(materialOption));
 
         // 指示器
         this.indicator = new Group();
@@ -177,7 +223,7 @@ class ViewIndicator extends Object3D {
         const connerGeometry = new CircleGeometry(conner.radius, conner.segments);
 
         for (let j = 0; j < 8; j++) {
-            const mesh = new Mesh(connerGeometry, new MeshBasicMaterial({ color: color.background, transparent: true, opacity: color.opacity }));
+            const mesh = new Mesh(connerGeometry, new MeshBasicMaterial({ color: color.face, transparent: true, opacity: color.faceOpacity }));
             mesh.userData.index = 6 + j;
             _v.copy(directionMap[6 + j]).normalize().negate();
             mesh.position.copy(_v).multiplyScalar(halfSize * connerFactor * conner.offset * 2);
@@ -194,7 +240,7 @@ class ViewIndicator extends Object3D {
             edgeGeometry,
         ]
         for (let j = 0; j < 12; j++) {
-            const mesh = new Mesh(edgeGeometries[Math.ceil((j + 1) / 4) - 1], new MeshBasicMaterial({ color: color.background, transparent: true, opacity: color.opacity }));
+            const mesh = new Mesh(edgeGeometries[Math.ceil((j + 1) / 4) - 1], new MeshBasicMaterial({ color: color.face, transparent: true, opacity: color.faceOpacity }));
             mesh.userData.index = 14 + j;
             _v.copy(directionMap[j + 14]).normalize().negate();
             mesh.position.copy(_v).multiplyScalar(halfSize * edgeFactor * edge.offset);
@@ -217,7 +263,7 @@ class ViewIndicator extends Object3D {
             this.coordinate.add(arrow);
 
             const sprite = new Sprite(spriteMaterials[i]);
-            sprite.position.copy(_v).multiplyScalar(2.5).add(arrow.position);
+            sprite.position.copy(_v).multiplyScalar(axis.length + 0.1).add(arrow.position);
             this.sprites.add(sprite);
         });
 
@@ -235,10 +281,15 @@ class ViewIndicator extends Object3D {
         _v.x = (this.domElement.offsetWidth - this.renderSize) * this.renderOffset.x;
         _v.y = (this.domElement.offsetHeight - this.renderSize) * (1 - this.renderOffset.y);
 
-        renderer.clearDepth();
 
         renderer.getViewport(_viewport);
         renderer.setViewport(_v.x, _v.y, this.renderSize, this.renderSize);
+        renderer.clearDepth();
+
+        if (this.isHover) {
+            this.background.render(renderer);
+            renderer.clearDepth();
+        }
 
         renderer.render(this, _orthoCamera);
 
@@ -248,7 +299,7 @@ class ViewIndicator extends Object3D {
     handleClick(event) {
         if (this.animating) return;
         this.indicator.children.forEach((child) => {
-            child.material.color.set(this.color.background);
+            child.material.color.set(this.color.face);
         });
         if (!this.containCursor(event)) return;
 
@@ -266,9 +317,11 @@ class ViewIndicator extends Object3D {
 
     handleMove(event) {
         this.indicator.children.forEach((child) => {
-            child.material.color.set(this.color.background);
+            child.material.color.set(this.color.face);
         });
+        this.isHover = false;
         if (!this.containCursor(event)) return;
+        this.isHover = true;
 
         _raycaster.setFromCamera(_mouse, _orthoCamera);
         const intersects = _raycaster.intersectObjects(this.indicator.children);
@@ -282,8 +335,8 @@ class ViewIndicator extends Object3D {
         const { renderSize, renderOffset } = this;
         const { offsetHeight, offsetWidth } = this.domElement;
 
-        const left = offsetWidth * renderOffset.x - renderSize;
-        const top = offsetHeight * renderOffset.y - renderSize;
+        const left = (offsetWidth - renderSize) * renderOffset.x;
+        const top = (offsetHeight - renderSize) * renderOffset.y;
         const right = left + renderSize;
         const bottom = top + renderSize;
 
@@ -400,7 +453,7 @@ function RectangleRounded(w, h, r, s) { // width, height, radius corner, smoothn
 }
 
 
-function createFaceMaterials({ content, fontsSize }, { faceContent, background, opacity }) {
+function createFaceMaterials({ content, fontsSize }, { faceContent, face, faceOpacity }) {
     const dpi = window.devicePixelRatio || 1;
     const canvas = document.createElement('canvas');
     const resolution = 128;
@@ -408,7 +461,7 @@ function createFaceMaterials({ content, fontsSize }, { faceContent, background, 
     canvas.height = resolution * dpi;
 
     const context = canvas.getContext('2d');
-    context.fillStyle = background;
+    context.fillStyle = face;
     context.fillRect(0, 0, canvas.width, canvas.height);
     context.font = `bold ${fontsSize * dpi}px Arial`;
     context.fillStyle = faceContent;
@@ -427,11 +480,11 @@ function createFaceMaterials({ content, fontsSize }, { faceContent, background, 
         texture.offset.set(i * pice, 0);
 
         return new MeshBasicMaterial({
-            color: background,
+            color: face,
             map: texture,
             transparent: true,
-            opacity,
-            side: opacity < 1 ? 2 : 0
+            opacity: faceOpacity,
+            side: faceOpacity < 1 ? 2 : 0
         });
     })
 }

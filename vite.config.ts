@@ -9,14 +9,6 @@ export default defineConfig({
     root:'./',
     base:'/threejs-demo/',
     plugins:[
-        // viteStaticCopy({
-        //     targets:[
-        //         {
-        //             src:'screenshots',
-        //             dest:'./'
-        //         }
-        //     ]
-        // })
     ],
     server:{
         port:6500
