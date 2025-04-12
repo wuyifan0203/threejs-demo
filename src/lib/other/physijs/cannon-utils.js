@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-01-31 10:26:52
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-03 17:16:45
+ * @LastEditTime: 2025-04-12 17:30:19
  * @FilePath: \threejs-demo\src\lib\other\physijs\cannon-utils.js
  */
 import {
@@ -15,7 +15,16 @@ import {
     PlaneGeometry,
 } from 'three';
 import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js'
-import { Sphere, ConvexPolyhedron, Body, Cylinder, Quaternion, Shape, Vec3 } from './cannon-es.js';
+import {
+    Sphere,
+    ConvexPolyhedron,
+    Body,
+    Cylinder,
+    Quaternion,
+    Shape,
+    Vec3,
+    Box as BoxShape
+} from './cannon-es.js';
 
 class CannonUtils {
     constructor(world, scene) {
@@ -86,12 +95,7 @@ class CannonUtils {
                 {
                     const geometry = new BufferGeometry();
                     const s = shape.elementSize || 1; // assumes square heightfield, else i*x, j*y
-
-                    console.log(shape.data)
-
                     const positions = shape.data.flatMap((row, i) => row.flatMap((z, j) => [i * s, j * s, z]));
-                    console.log('positions: ', positions);
-
 
                     const indices = [];
 
@@ -152,9 +156,7 @@ class CannonUtils {
     static mesh2Body(mesh) {
         const shapes = CannonUtils.geometry2Shape(mesh.geometry);
 
-        const body = new Body({
-            mass: 1,
-        });
+        const body = new Body({ mass: 1, });
         shapes.forEach(({ shape, offset, quaternion }) => {
             body.addShape(shape, offset, quaternion);
         });
@@ -167,7 +169,13 @@ class CannonUtils {
                 {
 
                     const result = [];
-                    const { radialSegments, radius, tube, tubularSegments, arc } = geometry.parameters;
+                    const {
+                        radialSegments,
+                        radius,
+                        tube,
+                        tubularSegments,
+                        arc
+                    } = geometry.parameters;
                     const pice = arc / tubularSegments;
                     const halfPice = pice / 2;
                     const D = radius * Math.sin(halfPice);
@@ -182,7 +190,7 @@ class CannonUtils {
                             0
                         );
                         const quaternion = new Quaternion().setFromEuler(0, 0, k, 'YXZ')
-                        result.push({ columnShape, offset, quaternion })
+                        result.push({ shape: columnShape, offset, quaternion })
 
                     }
                     return result;
@@ -190,7 +198,7 @@ class CannonUtils {
             case 'BoxGeometry':
                 {
                     const { width, height, depth } = geometry.parameters;
-                    const shape = new Box(new Vec3(
+                    const shape = new BoxShape(new Vec3(
                         width / 2,
                         height / 2,
                         depth / 2

@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-07-24 16:36:17
- * @FilePath: /threejs-demo/src/lib/tools/colorMap.js
+ * @LastEditTime: 2025-04-12 16:05:22
+ * @FilePath: \threejs-demo\src\lib\tools\colorMap.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
@@ -289,7 +289,7 @@ const getColor = (index) => {
 };
 
 function getRainbowColor(index = randInt(0, 6)) {
-  return rainbowColors[index % 7];
+  return rainbowColors[index % 6];
 }
 
 const colors = [

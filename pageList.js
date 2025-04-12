@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-26 18:11:33
+ * @LastEditTime: 2025-04-12 17:19:53
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -361,6 +361,10 @@ const list = [
         path: "/texture/canvasTexture.html",
         title: "Use Canvas Texture",
       },
+      {
+        path:"/texture/textureAtlas.html",
+        title: "Texture Atlas",
+      }
     ],
   },
   {
