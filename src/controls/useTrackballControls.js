@@ -1,8 +1,8 @@
 /*
  * @Date: 2023-05-17 19:27:06
- * @LastEditors: Yifan Wu 1208097313@qq.com
- * @LastEditTime: 2024-07-22 15:42:06
- * @FilePath: /threejs-demo/src/controls/useTrackballControls.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-04-15 14:11:17
+ * @FilePath: \threejs-demo\src\controls\useTrackballControls.js
  */
 import {
     Vector3,
@@ -20,7 +20,8 @@ import {
     initGUI,
     initViewHelper
 } from '../lib/tools/index.js';
-import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls.js';
+// import {TrackballControls} from 'three/examples/jsm/controls/TrackballControls.js';
+import {TrackballControls} from '../lib/custom/TrackballControls.js';
 
 window.onload = () => {
     init();
@@ -38,18 +39,18 @@ function init() {
     initAxesHelper(scene);
 
     const controls = new TrackballControls(camera, renderer.domElement);
-    // controls.addEventListener('change',(e)=>{
-    //   console.log('change',e);
-    //   render()
-    // })
+    controls.addEventListener('change',(e)=>{
+      console.log('change',e);
+    //   tick()
+    })
 
-    // controls.addEventListener('start',(e)=>{
-    //   console.log('start',e);
-    // })
+    controls.addEventListener('start',(e)=>{
+      console.log('start',e);
+    })
 
-    // controls.addEventListener('end',(e)=>{
-    //   console.log('end',e);
-    // })
+    controls.addEventListener('end',(e)=>{
+      console.log('end',e);
+    })
     const viewHelper = initViewHelper(camera, renderer.domElement);
 
     controls.rotateSpeed = 3.0;
@@ -67,13 +68,22 @@ function init() {
 
     scene.add(mesh, mesh1);
 
-    (function render() {
+    function render() {
         renderer.clear();
         controls.update();
         renderer.render(scene, camera);
         viewHelper.render(renderer);
         requestAnimationFrame(render);
-    })();
+    };
+    render();
+
+    // function tick() {
+    //     renderer.clear();
+    //     renderer.render(scene, camera);
+    //     viewHelper.render(renderer);
+    // }
+
+    // tick();
 
 
     const gui = initGUI();

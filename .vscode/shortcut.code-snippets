@@ -56,6 +56,7 @@
             "    initAxesHelper,",
             "    initOrbitControls,",
             "    initScene,",
+            "    initGUI,",
             "    resize",
             "} from '../lib/tools/index.js';",
             "",
@@ -88,6 +89,7 @@
             "    render();",
             "",
             "    resize(renderer, camera);",
+            "    const gui = initGUI();",
             "}",
 		],
 		"description": "a javascript template to create threejs-demo"
