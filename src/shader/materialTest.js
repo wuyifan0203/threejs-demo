@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date:  2023-05-10 18:26:20
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2024-10-14 18:09:44
+ * @LastEditTime: 2025-04-27 13:33:57
  * @FilePath: \threejs-demo\src\shader\materialTest.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -24,13 +24,16 @@ import {
   initScene,
   Image_Path,
   normalizeBufferAttribute,
-  initStats
+  initStats,
+  initAmbientLight,
+  initDirectionLight
 } from "../lib/tools/index.js";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 
 import { BasicMaterial } from "./material/basic.js";
 import { NormalMaterial } from "./material/normal.js";
 import { NormalizePositionMaterial } from "./material/normalizePosition.js";
+import { CustomPhongMaterial } from "./material/phong.js"
 
 window.onload = () => {
   init();
@@ -43,10 +46,16 @@ async function init() {
 
   const stats = initStats();
 
+  const ambient = initAmbientLight(scene);
+
+  const light = initDirectionLight();
+  light.position.set(100, 100, 100);
+  scene.add(light);
+
   const orbitControls = initOrbitControls(camera, renderer.domElement);
+
   const params = {
     materialType: "normalizePosition",
-    color: "#ffffff",
   };
 
   const loader = new CubeTextureLoader();
@@ -64,6 +73,7 @@ async function init() {
     basic: new BasicMaterial(),
     normal: new NormalMaterial(),
     normalizePosition: new NormalizePositionMaterial(),
+    phong: new CustomPhongMaterial(),
   };
 
   materials[params.materialType].uniforms.color.value.set(params.color);
@@ -105,19 +115,68 @@ async function init() {
   })();
 
   const gui = initGUI();
-  gui.add(params, "materialType", Object.keys(materials)).onChange(() => {
+  gui.add(params, "materialType", Object.keys(materials)).onChange((v) => {
+    const material = materials[v];
+
+    updateMaterial();
+    Object.keys(folders).forEach((key) => {
+      folders[key].hide();
+    })
+    folders[v].show();
+
     meshes.forEach((mesh) => {
-      mesh.material = materials[params.materialType];
-      mesh.material.uniforms.color.value.set(params.color);
-      mesh.material.needsUpdate = true;
+      mesh.material = material;
     });
 
-    console.log("params.materialType: ", params.materialType);
+    console.log("params.materialType: ", v);
   });
-  gui.addColor(params, "color").onChange(() => {
+
+  const baseMaterialParams = {
+    color: "#ffffff",
+  };
+
+  const baseFolder = gui.addFolder("baseMaterial");
+  baseFolder.addColor(baseMaterialParams, "color").onChange(() => {
     meshes.forEach((mesh) => {
-      mesh.material.uniforms.color.value.set(params.color);
+      mesh.material.uniforms.color.value.set(baseMaterialParams.color);
       mesh.material.needsUpdate = true;
     });
   });
+
+  const phongMaterialParams = {
+    specular: "#ffffff",
+    shininess: 30,
+    ambientLightColor: "#ffffff",
+    lightColor: "#ffffff",
+    lightPosition: new Vector3().copy(light.position),
+  };
+
+  function updateMaterial() {
+    const material = materials[params.materialType];
+    material.uniforms.color.value.set(baseMaterialParams.color);
+
+    if (params.materialType === 'phong') {
+      material.uniforms.specular.value.set(phongMaterialParams.specular);
+      material.uniforms.shininess.value = phongMaterialParams.shininess;
+      material.uniforms.ambientLightColor.value.copy(ambient.color);
+      material.uniforms.lightColor.value.copy(light.color);
+      material.uniforms.lightPosition.value.copy(light.position)
+    }
+    material.needsUpdate = true;
+  }
+
+  const phongFolder = gui.addFolder("phongMaterial");
+  phongFolder.addColor(baseMaterialParams,"color").onChange(updateMaterial);
+  phongFolder.addColor(phongMaterialParams, "specular").onChange(updateMaterial);
+  phongFolder.add(phongMaterialParams, "shininess", 0, 100).onChange(updateMaterial);
+  phongFolder.addColor(phongMaterialParams, "ambientLightColor").onChange(updateMaterial);
+  phongFolder.addColor(phongMaterialParams, "lightColor").onChange(updateMaterial);
+  phongFolder.add(light.position, "x", -100, 100).onChange(updateMaterial).name("lightPositionX");
+
+  const folders = {
+    basic: baseFolder,
+    normal: baseFolder,
+    normalizePosition: baseFolder,
+    phong: phongFolder,
+  }
 }
