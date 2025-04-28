@@ -10,7 +10,6 @@
     "FilePath": "Do not edit", // 文件在项目中的相对路径 自动更新
     "custom_string_obkoro1_copyright": "Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved."
   },
-
   "fileheader.configObj": {
     "prohibitAutoAdd": ["json", "md"], // 禁止.json .md文件，自动添加头部注释
     "folderBlacklist": ["node_modules", "dist", "build","lib"]
@@ -40,8 +39,10 @@
     "lerp",
     "mediump",
     "metalness",
+    "occt",
     "Octree",
     "OETF",
+    "opencascade",
     "opengl",
     "Phong",
     "physijs",
