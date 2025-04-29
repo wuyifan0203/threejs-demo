@@ -40,10 +40,8 @@ function init() {
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    const mesh = new Mesh(new BufferGeometry(), new MeshNormalMaterial({ wireframe: true }));
+    const mesh = new Mesh(new BufferGeometry(), new MeshNormalMaterial());
     scene.add(mesh);
-
-    console.log(occ);
 
     const params = {
         width: 5,

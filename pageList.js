@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-12 17:19:53
+ * @LastEditTime: 2025-04-29 13:08:07
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -576,6 +576,10 @@ const list = [
         path: "/tween/useTween.html",
         title: "Use Tween",
       },
+      {
+        path:"/other/occt.html",
+        title: "OpenCascade Test",
+      }
     ],
   },
 ];
