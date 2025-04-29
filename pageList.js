@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-29 13:08:07
+ * @LastEditTime: 2025-04-29 15:09:25
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -362,7 +362,7 @@ const list = [
         title: "Use Canvas Texture",
       },
       {
-        path:"/texture/textureAtlas.html",
+        path: "/texture/textureAtlas.html",
         title: "Texture Atlas",
       }
     ],
@@ -536,6 +536,16 @@ const list = [
     ],
   },
   {
+    category: "occt",
+    title: "OpenCascade",
+    pages: [
+      {
+        path: "/occt/occt.html",
+        title: "OpenCascade Test",
+      }
+    ]
+  },
+  {
     category: "plot",
     title: "Plot",
     pages: [
@@ -576,10 +586,6 @@ const list = [
         path: "/tween/useTween.html",
         title: "Use Tween",
       },
-      {
-        path:"/other/occt.html",
-        title: "OpenCascade Test",
-      }
     ],
   },
 ];
