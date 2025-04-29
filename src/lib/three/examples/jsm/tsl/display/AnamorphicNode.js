@@ -1,8 +1,6 @@
 import { RenderTarget, Vector2, TempNode, QuadMesh, NodeMaterial, RendererUtils } from 'three/webgpu';
 import { nodeObject, Fn, float, NodeUpdateType, uv, passTexture, uniform, convertToTexture, vec2, vec3, Loop, mix, luminance } from 'three/tsl';
 
-/** @module AnamorphicNode **/
-
 const _quadMesh = /*@__PURE__*/ new QuadMesh();
 
 let _rendererState;
@@ -11,6 +9,7 @@ let _rendererState;
  * Post processing node for adding an anamorphic flare effect.
  *
  * @augments TempNode
+ * @three_import import { anamorphic } from 'three/addons/tsl/display/AnamorphicNode.js';
  */
 class AnamorphicNode extends TempNode {
 
@@ -24,11 +23,11 @@ class AnamorphicNode extends TempNode {
 	 * Constructs a new anamorphic node.
 	 *
 	 * @param {TextureNode} textureNode - The texture node that represents the input of the effect.
-	 * @param {Node<float>} tresholdNode - The threshold is one option to control the intensity and size of the effect.
+	 * @param {Node<float>} thresholdNode - The threshold is one option to control the intensity and size of the effect.
 	 * @param {Node<float>} scaleNode - Defines the vertical scale of the flares.
-	 * @param {Number} samples - More samples result in larger flares and a more expensive runtime behavior.
+	 * @param {number} samples - More samples result in larger flares and a more expensive runtime behavior.
 	 */
-	constructor( textureNode, tresholdNode, scaleNode, samples ) {
+	constructor( textureNode, thresholdNode, scaleNode, samples ) {
 
 		super( 'vec4' );
 
@@ -44,7 +43,7 @@ class AnamorphicNode extends TempNode {
 		 *
 		 * @type {Node<float>}
 		 */
-		this.tresholdNode = tresholdNode;
+		this.thresholdNode = thresholdNode;
 
 		/**
 		 * Defines the vertical scale of the flares.
@@ -103,7 +102,7 @@ class AnamorphicNode extends TempNode {
 		 * The `updateBeforeType` is set to `NodeUpdateType.FRAME` since the node renders
 		 * its effect once per frame in `updateBefore()`.
 		 *
-		 * @type {String}
+		 * @type {string}
 		 * @default 'frame'
 		 */
 		this.updateBeforeType = NodeUpdateType.FRAME;
@@ -124,8 +123,8 @@ class AnamorphicNode extends TempNode {
 	/**
 	 * Sets the size of the effect.
 	 *
-	 * @param {Number} width - The width of the effect.
-	 * @param {Number} height - The height of the effect.
+	 * @param {number} width - The width of the effect.
+	 * @param {number} height - The height of the effect.
 	 */
 	setSize( width, height ) {
 
@@ -204,7 +203,7 @@ class AnamorphicNode extends TempNode {
 
 				const uv = vec2( uvNode.x.add( this._invSize.x.mul( i ).mul( this.scaleNode ) ), uvNode.y );
 				const color = sampleTexture( uv );
-				const pass = threshold( color, this.tresholdNode ).mul( softness );
+				const pass = threshold( color, this.thresholdNode ).mul( softness );
 
 				total.addAssign( pass );
 
@@ -246,11 +245,12 @@ class AnamorphicNode extends TempNode {
 /**
  * TSL function for creating an anamorphic flare effect.
  *
+ * @tsl
  * @function
  * @param {TextureNode} node - The node that represents the input of the effect.
- * @param {Node<float> | Number} [threshold=0.9] - The threshold is one option to control the intensity and size of the effect.
- * @param {Node<float> | Number} [scale=3] - Defines the vertical scale of the flares.
- * @param {Number} [samples=32] - More samples result in larger flares and a more expensive runtime behavior.
+ * @param {Node<float> | number} [threshold=0.9] - The threshold is one option to control the intensity and size of the effect.
+ * @param {Node<float> | number} [scale=3] - Defines the vertical scale of the flares.
+ * @param {number} [samples=32] - More samples result in larger flares and a more expensive runtime behavior.
  * @returns {AnamorphicNode}
  */
 export const anamorphic = ( node, threshold = .9, scale = 3, samples = 32 ) => nodeObject( new AnamorphicNode( convertToTexture( node ), nodeObject( threshold ), nodeObject( scale ), samples ) );

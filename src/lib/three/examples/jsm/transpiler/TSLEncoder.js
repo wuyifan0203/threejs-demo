@@ -15,6 +15,7 @@ const opLib = {
 	'<=': 'lessThanEqual',
 	'>=': 'greaterThanEqual',
 	'==': 'equal',
+	'!=': 'notEqual',
 	'&&': 'and',
 	'||': 'or',
 	'^^': 'xor',
@@ -44,6 +45,8 @@ const unaryLib = {
 	'--': 'decrement' // decrementBefore
 };
 
+const textureLookupFunctions = [ 'texture', 'texture2D', 'texture3D', 'textureCube', 'textureLod', 'texelFetch', 'textureGrad' ];
+
 const isPrimitive = ( value ) => /^(true|false|-?(\d|\.\d))/.test( value );
 
 class TSLEncoder {
@@ -57,6 +60,8 @@ class TSLEncoder {
 		this.iife = false;
 		this.uniqueNames = false;
 		this.reference = false;
+
+		this._currentVariable = null;
 
 		this._currentProperties = {};
 		this._lastStatement = null;
@@ -80,12 +85,11 @@ class TSLEncoder {
 	emitUniform( node ) {
 
 		let code = `const ${ node.name } = `;
+		this.global.add( node.name );
 
 		if ( this.reference === true ) {
 
 			this.addImport( 'reference' );
-
-			this.global.add( node.name );
 
 			//code += `reference( '${ node.name }', '${ node.type }', uniforms )`;
 
@@ -94,11 +98,33 @@ class TSLEncoder {
 
 		} else {
 
-			this.addImport( 'uniform' );
+			if ( node.type === 'texture' ) {
 
-			this.global.add( node.name );
+				this.addImport( 'texture' );
 
-			code += `uniform( '${ node.type }' )`;
+				code += 'texture( /* <THREE.Texture> */ )';
+
+			} else if ( node.type === 'cubeTexture' ) {
+
+				this.addImport( 'cubeTexture' );
+
+				code += 'cubeTexture( /* <THREE.CubeTexture> */ )';
+
+			} else if ( node.type === 'texture3D' ) {
+
+				this.addImport( 'texture3D' );
+
+				code += 'texture3D( /* <THREE.Data3DTexture> */ )';
+
+			} else {
+
+				// default uniform
+
+				this.addImport( 'uniform' );
+
+				code += `uniform( '${ node.type }' )`;
+
+			}
 
 		}
 
@@ -109,12 +135,6 @@ class TSLEncoder {
 	emitExpression( node ) {
 
 		let code;
-
-		/*@TODO: else if ( node.isVarying ) {
-
-			code = this.emitVarying( node );
-
-		}*/
 
 		if ( node.isAccessor ) {
 
@@ -179,11 +199,43 @@ class TSLEncoder {
 
 			}
 
-			this.addImport( node.name );
+			// handle texture lookup function calls in separate branch
 
-			const paramsStr = params.length > 0 ? ' ' + params.join( ', ' ) + ' ' : '';
+			if ( textureLookupFunctions.includes( node.name ) ) {
 
-			code = `${ node.name }(${ paramsStr })`;
+				code = `${ params[ 0 ] }.sample( ${ params[ 1 ] } )`;
+
+				if ( node.name === 'texture' || node.name === 'texture2D' || node.name === 'texture3D' || node.name === 'textureCube' ) {
+
+					if ( params.length === 3 ) {
+
+						code += `.bias( ${ params[ 2 ] } )`;
+
+					}
+
+				} else if ( node.name === 'textureLod' ) {
+
+					code += `.level( ${ params[ 2 ] } )`;
+
+				} else if ( node.name === 'textureGrad' ) {
+
+					code += `.grad( ${ params[ 2 ] }, ${ params[ 3 ] } )`;
+
+				} else if ( node.name === 'texelFetch' ) {
+
+					code += '.setSampler( false )';
+
+				}
+
+			} else {
+
+				this.addImport( node.name );
+
+				const paramsStr = params.length > 0 ? ' ' + params.join( ', ' ) + ' ' : '';
+
+				code = `${ node.name }(${ paramsStr })`;
+
+			}
 
 		} else if ( node.isReturn ) {
 
@@ -194,6 +246,12 @@ class TSLEncoder {
 				code += ' ' + this.emitExpression( node.value );
 
 			}
+
+		} else if ( node.isDiscard ) {
+
+			this.addImport( 'Discard' );
+
+			code = 'Discard()';
 
 		} else if ( node.isAccessorElements ) {
 
@@ -243,6 +301,10 @@ class TSLEncoder {
 
 			code = this.emitUniform( node );
 
+		} else if ( node.isVarying ) {
+
+			code = this.emitVarying( node );
+
 		} else if ( node.isTernary ) {
 
 			code = this.emitTernary( node );
@@ -255,13 +317,28 @@ class TSLEncoder {
 
 			code = node.expression.type + '( ' + node.type + ' ' + node.expression.value + ' )';
 
+			this.addImport( node.expression.type );
+
 		} else if ( node.isUnary ) {
 
 			let type = unaryLib[ node.type ];
 
-			if ( node.after === false && ( node.type === '++' || node.type === '--' ) ) {
+			if ( node.type === '++' || node.type === '--' ) {
 
-				type += 'Before';
+				if ( this._currentVariable === null ) {
+
+					// optimize increment/decrement operator
+					// to avoid creating a new variable
+
+					node.after = false;
+
+				}
+
+				if ( node.after === false ) {
+
+					type += 'Before';
+
+				}
 
 			}
 
@@ -389,12 +466,34 @@ ${ this.tab }} )`;
 		const name = node.initialization.name;
 		const type = node.initialization.type;
 		const condition = node.condition.type;
-		const update = node.afterthought.type;
 
 		const nameParam = name !== 'i' ? `, name: '${ name }'` : '';
 		const typeParam = type !== 'int' ? `, type: '${ type }'` : '';
 		const conditionParam = condition !== '<' ? `, condition: '${ condition }'` : '';
-		const updateParam = update !== '++' ? `, update: '${ update }'` : '';
+
+		let updateParam = '';
+
+		if ( node.afterthought.isUnary ) {
+
+			if ( node.afterthought.type !== '++' ) {
+
+				updateParam = `, update: '${ node.afterthought.type }'`;
+
+			}
+
+		} else if ( node.afterthought.isOperator ) {
+
+			if ( node.afterthought.right.isAccessor || node.afterthought.right.isNumber ) {
+
+				updateParam = `, update: ${ this.emitExpression( node.afterthought.right ) }`;
+
+			} else {
+
+				updateParam = `, update: ( { i } ) => ${ this.emitExpression( node.afterthought ) }`;
+
+			}
+
+		}
 
 		let loopStr = `Loop( { start: ${ start }, end: ${ end + nameParam + typeParam + conditionParam + updateParam } }, ( { ${ name } } ) => {\n\n`;
 
@@ -414,8 +513,10 @@ ${ this.tab }} )`;
 
 		if ( ( initialization && initialization.isVariableDeclaration && initialization.next === null ) &&
 			( condition && condition.left.isAccessor && condition.left.property === initialization.name ) &&
-			( afterthought && afterthought.isUnary ) &&
-			( initialization.name === afterthought.expression.property )
+			( afterthought && (
+				( afterthought.isUnary && ( initialization.name === afterthought.expression.property ) ) ||
+				( afterthought.isOperator && ( initialization.name === afterthought.left.property ) )
+			) )
 		) {
 
 			return this.emitLoop( node );
@@ -435,7 +536,7 @@ ${ this.tab }} )`;
 		this.tab += '\t';
 
 		let forStr = '{\n\n' + this.tab + initialization + ';\n\n';
-		forStr += `${ this.tab }While( ${ condition }, () => {\n\n`;
+		forStr += `${ this.tab }Loop( ${ condition }, () => {\n\n`;
 
 		forStr += this.emitBody( node.body ) + '\n\n';
 
@@ -447,7 +548,7 @@ ${ this.tab }} )`;
 
 		forStr += this.tab + '}';
 
-		this.imports.add( 'While' );
+		this.imports.add( 'Loop' );
 
 		return forStr;
 
@@ -456,6 +557,8 @@ ${ this.tab }} )`;
 	emitVariables( node, isRoot = true ) {
 
 		const { name, type, value, next } = node;
+
+		this._currentVariable = node;
 
 		const valueStr = value ? this.emitExpression( value ) : '';
 
@@ -494,11 +597,22 @@ ${ this.tab }} )`;
 
 		this.addImport( type );
 
+		this._currentVariable = null;
+
 		return varStr;
 
 	}
 
-	/*emitVarying( node ) { }*/
+	emitVarying( node ) {
+
+		const { name, type } = node;
+
+		this.addImport( 'varying' );
+		this.addImport( type );
+
+		return `const ${ name } = varying( ${ type }(), '${ name }' )`;
+
+	}
 
 	emitOverloadingFunction( nodes ) {
 

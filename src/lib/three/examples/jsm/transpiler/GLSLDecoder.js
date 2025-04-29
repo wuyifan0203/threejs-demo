@@ -1,4 +1,4 @@
-import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform } from './AST.js';
+import { Program, FunctionDeclaration, For, AccessorElements, Ternary, Varying, DynamicElement, StaticElement, FunctionParameter, Unary, Conditional, VariableDeclaration, Operator, Number, String, FunctionCall, Return, Accessor, Uniform, Discard } from './AST.js';
 
 const unaryOperators = [
 	'+', '-', '~', '!', '++', '--'
@@ -33,6 +33,10 @@ const associativityRightToLeft = [
 const glslToTSL = {
 	inversesqrt: 'inverseSqrt'
 };
+
+const samplers = [ 'sampler1D', 'sampler2D', 'sampler2DArray', 'sampler2DShadow', 'sampler2DArrayShadow', 'isampler2D', 'isampler2DArray', 'usampler2D', 'usampler2DArray' ];
+const samplersCube = [ 'samplerCube', 'samplerCubeShadow', 'usamplerCube', 'isamplerCube' ];
+const samplers3D = [ 'sampler3D', 'isampler3D', 'usampler3D' ];
 
 const spaceRegExp = /^((\t| )\n*)+/;
 const lineRegExp = /^\n+/;
@@ -224,7 +228,7 @@ class Tokenizer {
 
 }
 
-const isType = ( str ) => /void|bool|float|u?int|(u|i)?vec[234]/.test( str );
+const isType = ( str ) => /void|bool|float|u?int|mat[234]|mat[234]x[234]|(u|i|b)?vec[234]/.test( str );
 
 class GLSLDecoder {
 
@@ -410,7 +414,6 @@ class GLSLDecoder {
 
 		}
 
-
 		// unary operators (after)
 
 		if ( lastToken.isOperator ) {
@@ -461,11 +464,11 @@ class GLSLDecoder {
 			const isHex = /^(0x)/.test( firstToken.str );
 
 			if ( isHex ) type = 'int';
-			else if ( /u$/.test( firstToken.str ) ) type = 'uint';
+			else if ( /u$|U$/.test( firstToken.str ) ) type = 'uint';
 			else if ( /f|e|\./.test( firstToken.str ) ) type = 'float';
 			else type = 'int';
 
-			let str = firstToken.str.replace( /u|i$/, '' );
+			let str = firstToken.str.replace( /u|U|i$/, '' );
 
 			if ( isHex === false ) {
 
@@ -484,6 +487,10 @@ class GLSLDecoder {
 			if ( firstToken.str === 'return' ) {
 
 				return new Return( this.parseExpressionFromTokens( tokens.slice( 1 ) ) );
+
+			} else if ( firstToken.str === 'discard' ) {
+
+				return new Discard();
 
 			}
 
@@ -719,8 +726,14 @@ class GLSLDecoder {
 
 		const tokens = this.readTokensUntil( ';' );
 
-		const type = tokens[ 1 ].str;
+		let type = tokens[ 1 ].str;
 		const name = tokens[ 2 ].str;
+
+		// GLSL to TSL types
+
+		if ( samplers.includes( type ) ) type = 'texture';
+		else if ( samplersCube.includes( type ) ) type = 'cubeTexture';
+		else if ( samplers3D.includes( type ) ) type = 'texture3D';
 
 		return new Uniform( type, name );
 
@@ -880,7 +893,7 @@ class GLSLDecoder {
 
 			//
 
-			if ( token.isLiteral ) {
+			if ( token.isLiteral || token.isOperator ) {
 
 				if ( token.str === 'const' ) {
 
