@@ -1,7 +1,7 @@
 import {
     Mesh,
-    BoxGeometry,
     MeshNormalMaterial,
+    BufferGeometry,
 } from 'three';
 import {
     initRenderer,
@@ -14,12 +14,14 @@ import {
     resize
 } from '../lib/tools/index.js';
 import { initOpenCascade } from '../lib/other/opencascade/index.js'
+import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
 
 
 let occ = null;
 window.onload = async () => {
     try {
         occ = await initOpenCascade();
+        OpenCascadeHelper.setOpenCascade(occ);
         init();
     } catch (error) {
         console.error('初始化失败:', error);
@@ -34,22 +36,28 @@ function init() {
 
     const scene = initScene();
     initAxesHelper(scene);
-    renderer.setClearColor(0xffffff);
+    renderer.setClearColor(0x000000);
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    const mesh = new Mesh(new BoxGeometry(3, 3, 3), new MeshNormalMaterial());
+    const mesh = new Mesh(new BufferGeometry(), new MeshNormalMaterial({ wireframe: true }));
     scene.add(mesh);
 
     console.log(occ);
 
     const params = {
-        width: 20,
-        thickness: 20,
-        height:20
+        width: 5,
+        thickness: 3,
+        height: 7
     }
 
-    const bottle = makeBottle(params.width, params.thickness,params.height);
+    function update(){
+        const bottle = makeBottle(params.width, params.thickness, params.height);
+        const geometry = OpenCascadeHelper.convertBufferGeometry(bottle);
+        mesh.geometry.dispose();
+        mesh.geometry = geometry;
+    }
+    update();
 
     function render() {
         controls.update();
@@ -61,6 +69,10 @@ function init() {
 
     resize(renderer, camera);
     const gui = initGUI();
+    gui.add(params, 'width', 2, 10, 1).onFinishChange(update);
+    gui.add(params, 'height', 2, 15, 1).onFinishChange(update);
+    gui.add(params, 'thickness', 2, 10, 1).onFinishChange(update);
+    gui.add(mesh.material,'wireframe')
 }
 
 function makeBottle(width, thickness, height) {

@@ -8,8 +8,6 @@
  */
 import { BufferAttribute, Vector2, Vector3 } from "three";
 
-const { max, min } = Math;
-
 /**
  * @description: Vector2转三维BUffer
  * @param {Vector2[]} pointList
