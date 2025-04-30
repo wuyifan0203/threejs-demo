@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import {
- Matrix4, Quaternion, Vector3 
+  Matrix4, Quaternion, Vector3
 } from 'three';
 /**
  * @description: plane function
@@ -308,6 +308,20 @@ function deepMerge(target, source) {
   return target;
 }
 
+function gridPositions(total, current, gap = 1) {
+  const size = Math.ceil(Math.sqrt(total));
+  const center = (size - 1) / 2;
+
+  const row = Math.floor(current / size);
+  const col = current % size;
+
+  return {
+    x: (col - center) * gap,
+    y: (row - center) * gap,
+    z: 0
+  };
+}
+
 
 
 
@@ -332,5 +346,6 @@ export {
   isClockWise,
   previewCanvas,
   getLineLength,
-  deepMerge
+  deepMerge,
+  gridPositions
 };

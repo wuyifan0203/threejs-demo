@@ -2,6 +2,7 @@ import {
     Mesh,
     MeshNormalMaterial,
     BufferGeometry,
+    Float32BufferAttribute,
 } from 'three';
 import {
     initRenderer,
@@ -49,11 +50,13 @@ function init() {
         height: 7
     }
 
-    function update(){
+    function update() {
         const bottle = makeBottle(params.width, params.thickness, params.height);
-        const geometry = OpenCascadeHelper.convertBufferGeometry(bottle);
+        const { position, normal } = OpenCascadeHelper.convertBuffer(bottle);
         mesh.geometry.dispose();
-        mesh.geometry = geometry;
+        mesh.geometry = new BufferGeometry();
+        mesh.geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
+        mesh.geometry.setAttribute('normal', new Float32BufferAttribute(normal, 3));
     }
     update();
 
@@ -70,7 +73,7 @@ function init() {
     gui.add(params, 'width', 2, 10, 1).onFinishChange(update);
     gui.add(params, 'height', 2, 15, 1).onFinishChange(update);
     gui.add(params, 'thickness', 2, 10, 1).onFinishChange(update);
-    gui.add(mesh.material,'wireframe')
+    gui.add(mesh.material, 'wireframe')
 }
 
 function makeBottle(width, thickness, height) {

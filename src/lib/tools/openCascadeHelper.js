@@ -2,11 +2,10 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-29 11:22:13
+ * @LastEditTime: 2025-04-30 15:24:14
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { BufferGeometry, Float32BufferAttribute } from 'three';
 
 let openCascade = null;
 class OpenCascadeHelper {
@@ -15,7 +14,7 @@ class OpenCascadeHelper {
     }
     static #tessellate(shape) {
         const faceList = [];
-        new openCascade.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.5, false);
+        new openCascade.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.1, true);
         const ExpFace = new openCascade.TopExp_Explorer_1();
         for (ExpFace.Init(shape, openCascade.TopAbs_ShapeEnum.TopAbs_FACE, openCascade.TopAbs_ShapeEnum.TopAbs_SHAPE); ExpFace.More(); ExpFace.Next()) {
             const myFace = openCascade.TopoDS.Face_1(ExpFace.Current());
@@ -70,9 +69,10 @@ class OpenCascadeHelper {
                     n1 = n2;
                     n2 = tmp;
                 }
-                this_face.tri_indexes[(validFaceTriCount * 3) + 0] = n1;
-                this_face.tri_indexes[(validFaceTriCount * 3) + 1] = n2;
-                this_face.tri_indexes[(validFaceTriCount * 3) + 2] = n3;
+                const count = validFaceTriCount * 3;
+                this_face.tri_indexes[count + 0] = n1;
+                this_face.tri_indexes[count + 1] = n2;
+                this_face.tri_indexes[count + 2] = n3;
                 validFaceTriCount++;
             }
             this_face.number_of_triangles = validFaceTriCount;
@@ -118,8 +118,7 @@ class OpenCascadeHelper {
         });
         return [vertexCoord, normalCoord, indices];
     }
-    static #generateBufferGeometry(triangleCount, vertexCoord, normalCoord, indices) {
-        const geometry = new BufferGeometry();
+    static #generateBuffer(triangleCount, vertexCoord, normalCoord, indices) {
 
         const position = new Float32Array(triangleCount * 9);
         const normal = new Float32Array(triangleCount * 9);
@@ -139,9 +138,7 @@ class OpenCascadeHelper {
             }
         }
 
-        geometry.setAttribute('position', new Float32BufferAttribute(position, 3));
-        geometry.setAttribute('normal', new Float32BufferAttribute(normal, 3));
-        return geometry
+        return { position, normal }
     }
     static #getTriangle(triangleIndex, indices) {
         const pA = indices[(triangleIndex * 3) + 0] * 3;
@@ -154,12 +151,12 @@ class OpenCascadeHelper {
         return { vertices, normals, texcoords };
     }
 
-    static convertBufferGeometry(shape) {
+    static convertBuffer(shape) {
         if (!openCascade) return console.error('openCascade not initialized,need `setOpenCascade`');
         const faceList = this.#tessellate(shape);
         const [vertexCoord, normalCoord, indices] = this.#joinPrimitives(faceList);
         const triangleCount = faceList.reduce((a, b) => a + b.number_of_triangles, 0);
-        return this.#generateBufferGeometry(triangleCount, vertexCoord, normalCoord, indices);
+        return this.#generateBuffer(triangleCount, vertexCoord, normalCoord, indices);
     }
 }
 

@@ -542,6 +542,10 @@ const list = [
       {
         path: "/occt/occt.html",
         title: "OpenCascade Test",
+      },
+      {
+        path: "/occt/useWorker.html",
+        title: "worker + occ.wasm",
       }
     ]
   },
