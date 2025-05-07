@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-30 15:24:14
+ * @LastEditTime: 2025-05-07 17:18:57
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -119,6 +119,7 @@ class OpenCascadeHelper {
         return [vertexCoord, normalCoord, indices];
     }
     static #generateBuffer(triangleCount, vertexCoord, normalCoord, indices) {
+        console.log('triangleCount, vertexCoord, normalCoord, indices: ', triangleCount, vertexCoord, normalCoord, indices);
 
         const position = new Float32Array(triangleCount * 9);
         const normal = new Float32Array(triangleCount * 9);

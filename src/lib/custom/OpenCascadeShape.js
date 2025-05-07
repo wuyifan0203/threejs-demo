@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-30 13:53:22
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-30 17:19:58
+ * @LastEditTime: 2025-05-07 17:50:40
  * @FilePath: \threejs-demo\src\lib\custom\OpenCascadeShape.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -13,10 +13,10 @@ class OpenCascadeShape {
         openCascade = occ;
     }
 
-    static Box({ x, y, z }) {
-        const box = new openCascade.BRepPrimAPI_MakeBox_2(x, y, z)
+    static Box({ xSpan, ySpan, zSpan }) {
+        const box = new openCascade.BRepPrimAPI_MakeBox_2(xSpan, ySpan, zSpan);
         const shape = box.Shape();
-        return this.transform({ x: -x / 2, y: -y / 2, z: -z / 2 }, shape);
+        return this.transform({ x: -xSpan / 2, y: -ySpan / 2, z: -zSpan / 2 }, shape);
     }
 
     static Sphere({ radius }) {
@@ -31,6 +31,16 @@ class OpenCascadeShape {
         const shape = new openCascade.BRepPrimAPI_MakeCone_2(radius1, radius2, height, angle).Shape();
         return this.transform({ x: 0, y: 0, z: -height / 2 }, shape);
     }
+
+    static Tours({ outerRadius, innerRadius, startAngle, endAngle }) {
+        const shape = new openCascade.BRepPrimAPI_MakeTorus_3(outerRadius, innerRadius, startAngle, endAngle).Shape();
+        return shape;
+    }
+    // half face
+    // revol
+    // prism
+    // Revolution
+    // wedge
 
     static transform(offset, occShape) {
         const transformation = new openCascade.gp_Trsf_1();

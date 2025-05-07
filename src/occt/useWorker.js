@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 15:09:33
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-30 17:17:40
- * @FilePath: \threejs-demo\src\occt\base.js
+ * @LastEditTime: 2025-05-07 19:33:23
+ * @FilePath: \threejs-demo\src\occt\useWorker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -22,7 +22,7 @@ import {
     initGUI,
     resize,
     gridPositions,
-    TWO_PI
+    TWO_PI,
 } from '../lib/tools/index.js';
 
 window.onload = () => {
@@ -44,9 +44,9 @@ function init() {
 
     const list = {
         Box: {
-            x: 2,
-            y: 2,
-            z: 2
+            xSpan: 2,
+            ySpan: 2,
+            zSpan: 2
         },
         Sphere: {
             radius: 1
@@ -61,7 +61,13 @@ function init() {
             radius2: 1,
             height: 2,
             angle: TWO_PI
-        }
+        },
+        Tours: {
+            outerRadius: 1,
+            innerRadius: 0.7,
+            startAngle: 0,
+            endAngle: TWO_PI,
+        },
     };
 
     const material = new MeshNormalMaterial();
@@ -90,8 +96,6 @@ function init() {
     }
 
 
-
-
     function render() {
         controls.update();
 
@@ -102,6 +106,23 @@ function init() {
 
     resize(renderer, camera);
     const gui = initGUI();
-    gui.add(material, 'wireframe')
+    gui.add(material, 'wireframe');
+
+    Object.entries(list).forEach(([name, values]) => {
+        const folder = gui.addFolder(name);
+        Object.entries(values).forEach(([key, value]) => {
+            const k = key.toLowerCase();
+            let kf = null
+            if (k.includes('angle')) {
+                kf = folder.add(values, key, 0, TWO_PI, 0.1);
+            } else {
+                kf = folder.add(values, key, 0, 3, 0.01);
+            };
+            kf.onFinishChange((v) => {
+                worker.postMessage({ list });
+            })
+        })
+
+    })
 }
 
