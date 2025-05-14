@@ -63,6 +63,9 @@ importers:
       puppeteer:
         specifier: ^23.4.0
         version: 23.10.3(typescript@5.6.2)
+      tweakpane:
+        specifier: ^4.0.5
+        version: 4.0.5
       vite:
         specifier: ^6.3.3
         version: 6.3.3(@types/node@22.6.1)(jiti@1.21.6)(yaml@2.6.1)
@@ -2269,6 +2272,9 @@ packages:
 
   tslib@2.7.0:
     resolution: {integrity: sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==}
+
+  tweakpane@4.0.5:
+    resolution: {integrity: sha512-rxEXdSI+ArlG1RyO6FghC4ZUX8JkEfz8F3v1JuteXSV0pEtHJzyo07fcDG+NsJfN5L39kSbCYbB9cBGHyuI/tQ==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -4800,6 +4806,8 @@ snapshots:
   tslib@1.14.1: {}
 
   tslib@2.7.0: {}
+
+  tweakpane@4.0.5: {}
 
   type-check@0.4.0:
     dependencies:
