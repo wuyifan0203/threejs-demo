@@ -7,19 +7,19 @@
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
-let openCascade = null;
+let occ = null;
 class OpenCascadeHelper {
     static setOpenCascade(occ) {
-        openCascade = occ;
+        occ = occ;
     }
     static #tessellate(shape) {
         const faceList = [];
-        new openCascade.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.1, true);
-        const ExpFace = new openCascade.TopExp_Explorer_1();
-        for (ExpFace.Init(shape, openCascade.TopAbs_ShapeEnum.TopAbs_FACE, openCascade.TopAbs_ShapeEnum.TopAbs_SHAPE); ExpFace.More(); ExpFace.Next()) {
-            const myFace = openCascade.TopoDS.Face_1(ExpFace.Current());
-            const aLocation = new openCascade.TopLoc_Location_1();
-            const myT = openCascade.BRep_Tool.Triangulation(myFace, aLocation, 0 /* == Poly_MeshPurpose_NONE */);
+        new occ.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.1, true);
+        const ExpFace = new occ.TopExp_Explorer_1();
+        for (ExpFace.Init(shape, occ.TopAbs_ShapeEnum.TopAbs_FACE, occ.TopAbs_ShapeEnum.TopAbs_SHAPE); ExpFace.More(); ExpFace.Next()) {
+            const myFace = occ.TopoDS.Face_1(ExpFace.Current());
+            const aLocation = new occ.TopLoc_Location_1();
+            const myT = occ.BRep_Tool.Triangulation(myFace, aLocation, 0 /* == Poly_MeshPurpose_NONE */);
             if (myT.IsNull()) {
                 continue;
             }
@@ -31,7 +31,7 @@ class OpenCascadeHelper {
                 number_of_triangles: 0,
             };
 
-            const pc = new openCascade.Poly_Connect_2(myT);
+            const pc = new occ.Poly_Connect_2(myT);
             const triangulation = myT.get();
 
             // write vertex buffer
@@ -44,8 +44,8 @@ class OpenCascadeHelper {
             }
 
             // write normal buffer
-            const myNormal = new openCascade.TColgp_Array1OfDir_2(1, triangulation.NbNodes());
-            openCascade.StdPrs_ToolTriangulatedShape.Normal(myFace, pc, myNormal);
+            const myNormal = new occ.TColgp_Array1OfDir_2(1, triangulation.NbNodes());
+            occ.StdPrs_ToolTriangulatedShape.Normal(myFace, pc, myNormal);
             this_face.normal_coord = new Array(myNormal.Length() * 3);
             for (let i = myNormal.Lower(); i <= myNormal.Upper(); i++) {
                 const d = myNormal.Value(i).Transformed(aLocation.Transformation());
@@ -64,7 +64,7 @@ class OpenCascadeHelper {
                 let n1 = t.Value(1);
                 let n2 = t.Value(2);
                 let n3 = t.Value(3);
-                if (orient !== openCascade.TopAbs_Orientation.TopAbs_FORWARD) {
+                if (orient !== occ.TopAbs_Orientation.TopAbs_FORWARD) {
                     let tmp = n1;
                     n1 = n2;
                     n2 = tmp;
@@ -153,11 +153,24 @@ class OpenCascadeHelper {
     }
 
     static convertBuffer(shape) {
-        if (!openCascade) return console.error('openCascade not initialized,need `setOpenCascade`');
+        if (!occ) return console.error('occ not initialized,need `setOpenCascade`');
         const faceList = this.#tessellate(shape);
         const [vertexCoord, normalCoord, indices] = this.#joinPrimitives(faceList);
         const triangleCount = faceList.reduce((a, b) => a + b.number_of_triangles, 0);
         return this.#generateBuffer(triangleCount, vertexCoord, normalCoord, indices);
+    }
+
+    static convertBuffer2(shape,maxDeviation) {
+        if (!occ) return console.error('occ not initialized,need `setOpenCascade`');
+    },
+}
+
+function ForEachFace(callback) {
+    const exporter = new occ.TopExp_Explorer(shape, occ.TopAbs_ShapeEnum.TopAbs_FACE);
+    let faceIndex = 0; 
+    while (exporter.More()) {
+        callback(faceIndex++,occ.TopoDS.Face(exporter.Current()));
+        exporter.Next();
     }
 }
 
