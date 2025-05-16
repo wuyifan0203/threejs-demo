@@ -19,10 +19,11 @@ import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
 
 
 let occ = null;
+let occH = null;
 window.onload = async () => {
     try {
         occ = await initOpenCascade();
-        OpenCascadeHelper.setOpenCascade(occ);
+        occH = new OpenCascadeHelper(occ);
         init();
     } catch (error) {
         console.error('初始化失败:', error);
@@ -52,7 +53,7 @@ function init() {
 
     function update() {
         const bottle = makeBottle(params.width, params.thickness, params.height);
-        const { position, normal } = OpenCascadeHelper.convertBuffer(bottle);
+        const { position, normal } = occH.convertBuffer(bottle);
         mesh.geometry.dispose();
         mesh.geometry = new BufferGeometry();
         mesh.geometry.setAttribute('position', new Float32BufferAttribute(position, 3));

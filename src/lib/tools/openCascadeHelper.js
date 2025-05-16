@@ -1,18 +1,38 @@
+import { log } from "three/src/Three.TSL.js";
+
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-07 17:18:57
+ * @LastEditTime: 2025-05-16 14:55:38
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-
-let occ = null;
 class OpenCascadeHelper {
-    static setOpenCascade(occ) {
-        occ = occ;
+
+    constructor(occ) {
+        this.occ = occ;
+        this.typeEnum = {
+            [occ.TopAbs_ShapeEnum.TopAbs_FACE]: occ.TopoDS.Face,
+            [occ.TopAbs_ShapeEnum.TopAbs_EDGE]: occ.TopoDS.Edge,
+            [occ.TopAbs_ShapeEnum.TopAbs_VERTEX]: occ.TopoDS.Vertex,
+            [occ.TopAbs_ShapeEnum.TopAbs_SHELL]: occ.TopoDS.Shell,
+            [occ.TopAbs_ShapeEnum.TopAbs_SOLID]: occ.TopoDS.Solid,
+        };
     }
-    static #tessellate(shape) {
+
+    static MAX_HASH = 1000000;
+
+    #forEach(shape, callback, type) {
+        let index = 0;
+        const exporter = new occ.TopExp_Explorer(shape, type);
+        exporter.Init(shape, type);
+        while (exporter.More()) {
+            callback(this.typeEnum[type](exporter.Current()), index++);
+            exporter.Next();
+        }
+    }
+    #tessellate(shape) {
         const faceList = [];
         new occ.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.1, true);
         const ExpFace = new occ.TopExp_Explorer_1();
@@ -80,7 +100,7 @@ class OpenCascadeHelper {
         }
         return faceList;
     }
-    static #joinPrimitives(faceList) {
+    #joinPrimitives(faceList) {
         let [obP, obN, obTR, advance] = [0, 0, 0, 0]
         const vertexCoord = [];
         const normalCoord = [];
@@ -118,7 +138,7 @@ class OpenCascadeHelper {
         });
         return [vertexCoord, normalCoord, indices];
     }
-    static #generateBuffer(triangleCount, vertexCoord, normalCoord, indices) {
+    #generateBuffer(triangleCount, vertexCoord, normalCoord, indices) {
         console.log('triangleCount, vertexCoord, normalCoord, indices: ', triangleCount, vertexCoord, normalCoord, indices);
 
         const position = new Float32Array(triangleCount * 9);
@@ -141,7 +161,7 @@ class OpenCascadeHelper {
 
         return { position, normal }
     }
-    static #getTriangle(triangleIndex, indices) {
+    #getTriangle(triangleIndex, indices) {
         const pA = indices[(triangleIndex * 3) + 0] * 3;
         const pB = indices[(triangleIndex * 3) + 1] * 3;
         const pC = indices[(triangleIndex * 3) + 2] * 3;
@@ -152,25 +172,69 @@ class OpenCascadeHelper {
         return { vertices, normals, texcoords };
     }
 
-    static convertBuffer(shape) {
-        if (!occ) return console.error('occ not initialized,need `setOpenCascade`');
+    convertBuffer(shape) {
         const faceList = this.#tessellate(shape);
         const [vertexCoord, normalCoord, indices] = this.#joinPrimitives(faceList);
         const triangleCount = faceList.reduce((a, b) => a + b.number_of_triangles, 0);
         return this.#generateBuffer(triangleCount, vertexCoord, normalCoord, indices);
     }
 
-    static convertBuffer2(shape,maxDeviation) {
-        if (!occ) return console.error('occ not initialized,need `setOpenCascade`');
-    },
-}
+    convertBuffer2(shapes, lineDeviation = 0.1, angleDeviation = 0.5) {
+        shapes = Array.isArray(shapes) ? shapes : [shapes];
+        const compound = new this.occ.TopoDs_Compound();
+        const builder = new this.occ.BPep_Builder();
+        builder.MakeCompound(compound);
 
-function ForEachFace(callback) {
-    const exporter = new occ.TopExp_Explorer(shape, occ.TopAbs_ShapeEnum.TopAbs_FACE);
-    let faceIndex = 0; 
-    while (exporter.More()) {
-        callback(faceIndex++,occ.TopoDS.Face(exporter.Current()));
-        exporter.Next();
+        const totalEdgeHashes = {};
+        const totalFaceHashes = {};
+        shapes.forEach((shape) => {
+            Object.assign(totalEdgeHashes, this.forEachEdge(shape, () => { }));
+            this.forEachFace(shape, (face, index) => {
+                totalFaceHashes[face.HashCode(this.MAX_HASH)] = index;
+            });
+            builder.Add(compound, shape);
+        });
+
+        const faceList = [];
+        const edgeList = [];
+
+        try {
+            const shape = new this.occ.TopoDS_Shape();
+            new this.occ.BRepMesh_IncrementalMesh(shape, lineDeviation, false, angleDeviation);
+
+        } catch (error) {
+            console.error(error);
+        }
+
+
+    }
+
+    forEachFace(shape, callback) {
+        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_FACE);
+    }
+
+    forEachWire(shape, callback) {
+        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_WIRE);
+    }
+
+    forEachShell(shape, callback) {
+        this.#forEach(callback, occ.TopAbs_ShapeEnum.TopAbs_SHELL);
+    }
+
+    forEachVertex(shape, callback) {
+        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_VERTEX);
+    }
+    forEachEdge(shape, callback) {
+        const hashes = {};
+        let index = 0;
+        this.#forEach(shape, (edge) => {
+            const hash = edge.HashCode(this.MAX_HASH);
+            if (!hashes.hasOwnProperty(hash)) {
+                hashes[hash] = index;
+                callback(edge, index++);
+            }
+        }, occ.TopAbs_ShapeEnum.TopAbs_EDGE);
+        return hashes;
     }
 }
 
