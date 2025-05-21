@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-03-20 13:41:04
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-28 17:48:24
+ * @LastEditTime: 2025-05-19 13:58:39
  * @FilePath: \threejs-demo\src\lib\custom\ViewIndicator.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -39,6 +39,7 @@ import {
 } from "../tools/index.js";
 
 const _v = /*PURE */ new Vector3();
+const _v2 = /*PURE */ new Vector2();
 const _matrix = /*PURE */ new Matrix4();
 const targetQuaternion = /*PURE */ new Quaternion();
 const currentQuaternion = /*PURE */ new Quaternion();
@@ -321,7 +322,6 @@ class ViewIndicator extends Object3D {
         });
         this.isHover = false;
         if (!this.containCursor(event)) return;
-        this.isHover = true;
 
         _raycaster.setFromCamera(_mouse, _orthoCamera);
         const intersects = _raycaster.intersectObjects(this.indicator.children);
@@ -344,6 +344,10 @@ class ViewIndicator extends Object3D {
         if (result) {
             _mouse.x = (clientX - left) / renderSize * 2 - 1;
             _mouse.y = - (clientY - top) / renderSize * 2 + 1;
+
+            const halfSize = renderSize * 0.5;
+            _v2.set(left + halfSize, top + halfSize);
+            this.isHover = _v2.distanceTo({ x: clientX, y: clientY }) <= halfSize;
         }
 
         return result;

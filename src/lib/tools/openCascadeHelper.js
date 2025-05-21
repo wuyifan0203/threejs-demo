@@ -1,15 +1,15 @@
-import { log } from "three/src/Three.TSL.js";
-
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-16 14:55:38
+ * @LastEditTime: 2025-05-21 15:12:04
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-class OpenCascadeHelper {
 
+const _v1 = new Vec3();
+const _v2 = new Vec3();
+class OpenCascadeHelper {
     constructor(occ) {
         this.occ = occ;
         this.typeEnum = {
@@ -198,15 +198,92 @@ class OpenCascadeHelper {
         const faceList = [];
         const edgeList = [];
 
+        let currentFace = 0;
         try {
             const shape = new this.occ.TopoDS_Shape();
             new this.occ.BRepMesh_IncrementalMesh(shape, lineDeviation, false, angleDeviation);
+
+            const totalEdgeHashes2 = {};
+            const triangulations = [];
+            const uvs = [];
+
+            this.forEachFace(shape, (face) => {
+                const location = this.occ.TopLoc_Location();
+                const handelTriangulation = this.occ.BRep_Tool.Triangulation(face, location);
+                if (handelTriangulation.IsNull()) {
+                    console.error('Encountered Null Face!');
+                    return;
+                }
+
+                const faceInfo = createFaceInfo(totalEdgeHashes[face.HashCode(this.MAX_HASH)]);
+
+                const pc = new this.occ.Poly_Connect(handelTriangulation);
+                const triangulation = handelTriangulation.get();
+                const nodes = triangulation.Nodes();
+
+                // vertex buffer
+                faceInfo.vertex = new Array(nodes.Length() * 3);
+                for (let i = 0, l = nodes.Length(), j = i; i < l; i++, j = i * 3) {
+                    const point = nodes.Value(i + 1).Transformed(location.Transformation());
+                    faceInfo.vertex[j + 0] = point.X();
+                    faceInfo.vertex[j + 1] = point.Y();
+                    faceInfo.vertex[j + 2] = point.Z();
+                }
+
+                // uv buffer
+                const orientation = face.Orientation();
+                if (triangulation.HasUVNodes()) {
+                    let [uMax, uMin, vMax, vMin] = [0, 0, 0, 0];
+
+                    const uvNodes = triangulation.UVNodes();
+                    const uvNodesLength = uvNodes.Length();
+
+                    faceInfo.uv = new Array(uvNodesLength * 2);
+                    for (let i = 0, j = i; i < uvNodesLength; i++, j = i * 2) {
+                        const point = uvNodes.Value(i + 1);
+                        const x = point.X(), y = point.Y();
+                        faceInfo.uv[j + 0] = x;
+                        faceInfo.uv[j + 1] = y;
+
+                        // compute uv bounds
+                        if (i === 0) { [uMax, uMin, vMax, vMin] = [x, x, y, y]; }
+                        if (x < uMin) { uMin = x; } else if (x > uMax) { uMax = x; }
+                        if (y < vMin) { vMin = y; } else if (y > vMax) { vMax = y; }
+                    }
+
+                    const surface = this.occ.BRep_Tool.Surface(face).get();
+                    // min + (max -min) * 0.5 => (min + max) * 0.5
+                    const handleUIsoCurve = surface.UIso((uMax + uMin) * 0.5);
+                    const handleVIsoCurve = surface.VIso((vMax + vMin) * 0.5);
+                    const uAdaptor = new this.occ.GeomAdaptor_Curve(handleVIsoCurve);
+                    const vAdaptor = new this.occ.GeomAdaptor_Curve(handleUIsoCurve);
+
+
+                }
+
+
+
+            })
 
         } catch (error) {
             console.error(error);
         }
 
 
+    }
+
+    lengthOfCurve(geomAdaptor, min, max, segment = 5) {
+        const gpPnt = new this.occ.gp_Pnt();
+        let length = 0;
+        for (let i = min; i <= max; s += (max - min) / segment) {
+            geomAdaptor.D0(i, gpPnt);
+            _v1.set(gpPnt.X(), gpPnt.Y(), gpPnt.Z());
+            if (i !== min) {
+                length += _v1.distanceTo(_v2);
+            }
+            _v2.copy(_v1);
+        }
+        return length;
     }
 
     forEachFace(shape, callback) {
@@ -235,6 +312,43 @@ class OpenCascadeHelper {
             }
         }, occ.TopAbs_ShapeEnum.TopAbs_EDGE);
         return hashes;
+    }
+}
+
+function createFaceInfo(faceIndex) {
+    return {
+        vertex: [],
+        uv: [],
+        normal: [],
+        index: [],
+        triangleCount: 0,
+        faceIndex
+    }
+}
+
+class Vec3 {
+    constructor(x=0,y=0,z=0){
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    set(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    copy({ x, y, z }) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    distanceTo({ x, y, z }) {
+        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2) + Math.pow(z - this.z, 2));
     }
 }
 
