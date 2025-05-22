@@ -1,17 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-05-13 13:29:38
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-22 13:57:26
- * @FilePath: \threejs-demo\src\occt\rotate.worker.js
- * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
- */
-/*
- * @Author: wuyifan0203 1208097313@qq.com
- * @Date: 2025-05-13 13:29:38
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-13 17:06:25
- * @FilePath: \threejs-demo\src\occt\rotate.worker.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-05-23 00:41:22
+ * @FilePath: /threejs-demo/src/occt/rotate.worker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 
