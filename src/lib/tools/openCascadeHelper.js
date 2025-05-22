@@ -2,10 +2,37 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-21 15:12:04
+ * @LastEditTime: 2025-05-22 18:00:17
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
+import potpack from "../other/potpack.js";
+
+class Vec3 {
+    constructor(x = 0, y = 0, z = 0) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    set(x, y, z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    copy({ x, y, z }) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+
+    distanceTo({ x, y, z }) {
+        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2) + Math.pow(z - this.z, 2));
+    }
+}
 
 const _v1 = new Vec3();
 const _v2 = new Vec3();
@@ -13,19 +40,19 @@ class OpenCascadeHelper {
     constructor(occ) {
         this.occ = occ;
         this.typeEnum = {
-            [occ.TopAbs_ShapeEnum.TopAbs_FACE]: occ.TopoDS.Face,
-            [occ.TopAbs_ShapeEnum.TopAbs_EDGE]: occ.TopoDS.Edge,
-            [occ.TopAbs_ShapeEnum.TopAbs_VERTEX]: occ.TopoDS.Vertex,
-            [occ.TopAbs_ShapeEnum.TopAbs_SHELL]: occ.TopoDS.Shell,
-            [occ.TopAbs_ShapeEnum.TopAbs_SOLID]: occ.TopoDS.Solid,
+            [occ.TopAbs_FACE]: occ.TopoDS.prototype.Face,
+            [occ.TopAbs_EDGE]: occ.TopoDS.prototype.Edge,
+            [occ.TopAbs_VERTEX]: occ.TopoDS.prototype.Vertex,
+            [occ.TopAbs_SHELL]: occ.TopoDS.prototype.Shell,
+            [occ.TopAbs_SOLID]: occ.TopoDS.prototype.Solid,
         };
     }
 
-    static MAX_HASH = 1000000;
+    static MAX_HASH = 100000000;
 
     #forEach(shape, callback, type) {
         let index = 0;
-        const exporter = new occ.TopExp_Explorer(shape, type);
+        const exporter = new this.occ.TopExp_Explorer(shape, type);
         exporter.Init(shape, type);
         while (exporter.More()) {
             callback(this.typeEnum[type](exporter.Current()), index++);
@@ -34,12 +61,12 @@ class OpenCascadeHelper {
     }
     #tessellate(shape) {
         const faceList = [];
-        new occ.BRepMesh_IncrementalMesh_2(shape, 0.1, false, 0.1, true);
-        const ExpFace = new occ.TopExp_Explorer_1();
-        for (ExpFace.Init(shape, occ.TopAbs_ShapeEnum.TopAbs_FACE, occ.TopAbs_ShapeEnum.TopAbs_SHAPE); ExpFace.More(); ExpFace.Next()) {
-            const myFace = occ.TopoDS.Face_1(ExpFace.Current());
-            const aLocation = new occ.TopLoc_Location_1();
-            const myT = occ.BRep_Tool.Triangulation(myFace, aLocation, 0 /* == Poly_MeshPurpose_NONE */);
+        new this.occ.BRepMesh_IncrementalMesh(shape, 0.1, false, 0.1, true);
+        const ExpFace = new this.occ.TopExp_Explorer();
+        for (ExpFace.Init(shape, this.occ.TopAbs_FACE, this.occ.TopAbs_SHAPE); ExpFace.More(); ExpFace.Next()) {
+            const myFace = this.occ.TopoDS_Face(ExpFace.Current());
+            const aLocation = new this.occ.TopLoc_Location();
+            const myT = this.occ.BRep_Tool.prototype.Triangulation(myFace, aLocation);
             if (myT.IsNull()) {
                 continue;
             }
@@ -51,7 +78,7 @@ class OpenCascadeHelper {
                 number_of_triangles: 0,
             };
 
-            const pc = new occ.Poly_Connect_2(myT);
+            const pc = new this.occ.Poly_Connect(myT);
             const triangulation = myT.get();
 
             // write vertex buffer
@@ -64,8 +91,8 @@ class OpenCascadeHelper {
             }
 
             // write normal buffer
-            const myNormal = new occ.TColgp_Array1OfDir_2(1, triangulation.NbNodes());
-            occ.StdPrs_ToolTriangulatedShape.Normal(myFace, pc, myNormal);
+            const myNormal = new this.occ.TColgp_Array1OfDir(1, triangulation.NbNodes());
+            this.occ.StdPrs_ToolTriangulatedShape.Normal(myFace, pc, myNormal);
             this_face.normal_coord = new Array(myNormal.Length() * 3);
             for (let i = myNormal.Lower(); i <= myNormal.Upper(); i++) {
                 const d = myNormal.Value(i).Transformed(aLocation.Transformation());
@@ -84,7 +111,7 @@ class OpenCascadeHelper {
                 let n1 = t.Value(1);
                 let n2 = t.Value(2);
                 let n3 = t.Value(3);
-                if (orient !== occ.TopAbs_Orientation.TopAbs_FORWARD) {
+                if (orient !== this.occ.TopAbs_Orientation.TopAbs_FORWARD) {
                     let tmp = n1;
                     n1 = n2;
                     n2 = tmp;
@@ -139,7 +166,6 @@ class OpenCascadeHelper {
         return [vertexCoord, normalCoord, indices];
     }
     #generateBuffer(triangleCount, vertexCoord, normalCoord, indices) {
-        console.log('triangleCount, vertexCoord, normalCoord, indices: ', triangleCount, vertexCoord, normalCoord, indices);
 
         const position = new Float32Array(triangleCount * 9);
         const normal = new Float32Array(triangleCount * 9);
@@ -181,8 +207,8 @@ class OpenCascadeHelper {
 
     convertBuffer2(shapes, lineDeviation = 0.1, angleDeviation = 0.5) {
         shapes = Array.isArray(shapes) ? shapes : [shapes];
-        const compound = new this.occ.TopoDs_Compound();
-        const builder = new this.occ.BPep_Builder();
+        const compound = new this.occ.TopoDS_Compound();
+        const builder = new this.occ.BRep_Builder();
         builder.MakeCompound(compound);
 
         const totalEdgeHashes = {};
@@ -190,32 +216,32 @@ class OpenCascadeHelper {
         shapes.forEach((shape) => {
             Object.assign(totalEdgeHashes, this.forEachEdge(shape, () => { }));
             this.forEachFace(shape, (face, index) => {
-                totalFaceHashes[face.HashCode(this.MAX_HASH)] = index;
+                totalFaceHashes[face.HashCode(OpenCascadeHelper.MAX_HASH)] = index;
             });
             builder.Add(compound, shape);
         });
+
 
         const faceList = [];
         const edgeList = [];
 
         let currentFace = 0;
         try {
-            const shape = new this.occ.TopoDS_Shape();
+            const shape = new this.occ.TopoDS_Shape(compound);
             new this.occ.BRepMesh_IncrementalMesh(shape, lineDeviation, false, angleDeviation);
 
             const totalEdgeHashes2 = {};
             const triangulations = [];
-            const uvs = [];
+            const uvBoxes = [];
 
             this.forEachFace(shape, (face) => {
-                const location = this.occ.TopLoc_Location();
-                const handelTriangulation = this.occ.BRep_Tool.Triangulation(face, location);
+                const location = new this.occ.TopLoc_Location();
+                const handelTriangulation = this.occ.BRep_Tool.prototype.Triangulation(face, location);
                 if (handelTriangulation.IsNull()) {
                     console.error('Encountered Null Face!');
                     return;
                 }
-
-                const faceInfo = createFaceInfo(totalEdgeHashes[face.HashCode(this.MAX_HASH)]);
+                const faceInfo = createFaceInfo(totalFaceHashes[face.HashCode(OpenCascadeHelper.MAX_HASH)]);
 
                 const pc = new this.occ.Poly_Connect(handelTriangulation);
                 const triangulation = handelTriangulation.get();
@@ -251,31 +277,162 @@ class OpenCascadeHelper {
                         if (y < vMin) { vMin = y; } else if (y > vMax) { vMax = y; }
                     }
 
-                    const surface = this.occ.BRep_Tool.Surface(face).get();
+                    const surface = this.occ.BRep_Tool.prototype.Surface(face).get();
                     // min + (max -min) * 0.5 => (min + max) * 0.5
                     const handleUIsoCurve = surface.UIso((uMax + uMin) * 0.5);
                     const handleVIsoCurve = surface.VIso((vMax + vMin) * 0.5);
                     const uAdaptor = new this.occ.GeomAdaptor_Curve(handleVIsoCurve);
                     const vAdaptor = new this.occ.GeomAdaptor_Curve(handleUIsoCurve);
+                    uvBoxes.push({
+                        w: this.lengthOfCurve(uAdaptor, uMin, uMax),
+                        h: this.lengthOfCurve(vAdaptor, vMin, vMax),
+                        index: currentFace
+                    });
 
+                    //
+                    for (let i = 0, j = i; i < uvNodesLength; i++, j = i * 2) {
+                        _v1.x = faceInfo.uv[j + 0];
+                        _v1.y = faceInfo.uv[j + 1];
 
+                        _v1.x = (_v1.x - uMin) / (uMax - uMin);
+                        _v1.y = (_v1.y - vMin) / (vMax - vMin);
+
+                        if (orientation !== this.occ.TopAbs_FORWARD) {
+                            _v1.x = 1 - _v1.y;
+                        }
+
+                        faceInfo.uv[j + 0] = _v1.x;
+                        faceInfo.uv[j + 1] = _v1.y;
+                    }
                 }
 
+                // normal buffer
+                const normal = new this.occ.TColgp_Array1OfDir(nodes.Lower(), nodes.Upper());
+                const sts = new this.occ.StdPrs_ToolTriangulatedShape();
+                sts.Normal(face, pc, normal);
+                faceInfo.normal = new Array(normal.Length() * 3);
+                for (let i = 0, l = normal.Length(), j = i; i < l; i++, j = i * 3) {
+                    const point = normal.Value(i + 1).Transformed(location.Transformation());
+                    faceInfo.normal[j + 0] = point.X();
+                    faceInfo.normal[j + 1] = point.Y();
+                    faceInfo.normal[j + 2] = point.Z();
+                }
 
+                // triangle buffer
+                const triangles = triangulation.Triangles();
+                faceInfo.index = new Array(triangles.Length() * 3);
+                let validFaceTriCount = 0;
+                for (let t = 1; t <= triangulation.NbTriangles(); t++) {
+                    const triangle = triangles.Value(t);
+                    let n1 = triangle.Value(1);
+                    let n2 = triangle.Value(2);
+                    let n3 = triangle.Value(3);
+                    if (orientation !== this.occ.TopAbs_FORWARD) {
+                        const tmp = n1;
+                        n1 = n2;
+                        n2 = tmp;
+                    }
 
+                    let j = validFaceTriCount * 3;
+                    faceInfo.index[j + 0] = n1 - 1;
+                    faceInfo.index[j + 1] = n2 - 1;
+                    faceInfo.index[j + 2] = n3 - 1;
+                    validFaceTriCount++;
+                }
+
+                faceInfo.triangleCount = validFaceTriCount;
+                faceList.push(faceInfo);
+                currentFace += 1;
+
+                this.forEachEdge(face, (edge) => {
+                    const edgeHash = edge.HashCode(OpenCascadeHelper.MAX_HASH);
+                    if (totalEdgeHashes2.hasOwnProperty(edgeHash)) {
+                        const edgeInfo = createEdgeInfo();
+
+                        const handlePolygonTra = this.occ.BRep_Tool.prototype.PolygonOnTriangulation(edge, handelTriangulation, location);
+                        const edgeNodes = handlePolygonTra.get().Nodes();
+
+                        // vertex buffer
+                        edgeInfo.vertex = new Array(edgeNodes.Length() * 3);
+                        for (let i = 0, l = edgeNodes.Length(), j = i; i < l; i++, j = i * 3) {
+                            const vertexIndex = (edgeNodes.Value(i + 1) - 1) * 3;
+                            edgeInfo.vertex[j + 0] = faceInfo.vertex[vertexIndex + 0];
+                            edgeInfo.vertex[j + 1] = faceInfo.vertex[vertexIndex + 1];
+                            edgeInfo.vertex[j + 2] = faceInfo.vertex[vertexIndex + 2];
+                        }
+
+                        edgeInfo.index = totalEdgeHashes[edgeHash];
+
+                        edgeList.push(edgeInfo);
+                    } else {
+                        totalEdgeHashes2[edgeHash] = edgeHash;
+                    }
+                })
+                triangulations.push(handelTriangulation);
+            });
+
+            const padding = 2;
+            for (let i = 0, l = uvBoxes.length; i < l; i++) {
+                uvBoxes[i].w += padding;
+                uvBoxes[i].h += padding;
+            }
+            const packing = potpack(uvBoxes);
+
+            for (let i = 0; i < uvBoxes.length; i++) {
+                const box = uvBoxes[i];
+                const faceInfo = faceList[box.index];
+
+                for (let j = 0, k = 0, l = faceInfo.uv.length / 2; j < l; j++, k = j * 2) {
+                    _v1.x = faceInfo.uv[k + 0];
+                    _v1.y = faceInfo.uv[k + 1];
+
+                    _v1.x = (_v1.x * (box.w - padding) + (box.x + padding / 2)) / Math.max(packing.w, packing.h);
+                    _v1.y = (_v1.y * (box.h - padding) + (box.y + padding / 2)) / Math.max(packing.w, packing.h);
+
+                    faceInfo.uv[k + 0] = _v1.x;
+                    faceInfo.uv[k + 1] = _v1.y
+                }
+            }
+
+            for (let index = 0; index < triangulations.length; index++) triangulations[index].Nullify();
+
+            this.forEachEdge(shape, (edge) => {
+                const edgeHash = edge.HashCode(OpenCascadeHelper.MAX_HASH);
+                if (!totalEdgeHashes2.hasOwnProperty(edgeHash)) {
+                    const edgeInfo = createEdgeInfo();
+
+                    const location = new this.occ.TopLoc_Location();
+                    const adaptorCurve = new this.occ.BPepAdaptor_Curve(edge);
+                    const deflection = new this.occ.GCPnts_TangentialDeflection(adaptorCurve, lineDeviation, 0.1);
+
+                    edgeInfo.vertex = new Array(deflection.NbPoints() * 3);
+                    for (let i = 0, l = deflection.NbPoints(), j = 0; i < l; i++, j = i * 3) {
+                        const point = deflection.Value(i + 1).Transformed(location.Transformation());
+                        edgeInfo.vertex[j + 0] = point.X();
+                        edgeInfo.vertex[j + 1] = point.Y();
+                        edgeInfo.vertex[j + 2] = point.Z();
+                    }
+
+                    edgeInfo.index = totalEdgeHashes[edgeHash];
+                    totalEdgeHashes2[edgeHash] = edgeHash;
+
+                    edgeList.push(edgeInfo);
+                }
             })
-
         } catch (error) {
             console.error(error);
         }
 
-
+        return {
+            faceList,
+            edgeList
+        }
     }
 
     lengthOfCurve(geomAdaptor, min, max, segment = 5) {
         const gpPnt = new this.occ.gp_Pnt();
         let length = 0;
-        for (let i = min; i <= max; s += (max - min) / segment) {
+        for (let i = min; i <= max; i += (max - min) / segment) {
             geomAdaptor.D0(i, gpPnt);
             _v1.set(gpPnt.X(), gpPnt.Y(), gpPnt.Z());
             if (i !== min) {
@@ -287,30 +444,30 @@ class OpenCascadeHelper {
     }
 
     forEachFace(shape, callback) {
-        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_FACE);
+        this.#forEach(shape, callback, this.occ.TopAbs_FACE);
     }
 
     forEachWire(shape, callback) {
-        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_WIRE);
+        this.#forEach(shape, callback, this.occ.TopAbs_WIRE);
     }
 
     forEachShell(shape, callback) {
-        this.#forEach(callback, occ.TopAbs_ShapeEnum.TopAbs_SHELL);
+        this.#forEach(shape, callback, this.occ.TopAbs_SHELL);
     }
 
     forEachVertex(shape, callback) {
-        this.#forEach(shape, callback, occ.TopAbs_ShapeEnum.TopAbs_VERTEX);
+        this.#forEach(shape, callback, this.occ.TopAbs_VERTEX);
     }
     forEachEdge(shape, callback) {
         const hashes = {};
         let index = 0;
         this.#forEach(shape, (edge) => {
-            const hash = edge.HashCode(this.MAX_HASH);
+            const hash = edge.HashCode(OpenCascadeHelper.MAX_HASH);
             if (!hashes.hasOwnProperty(hash)) {
                 hashes[hash] = index;
                 callback(edge, index++);
             }
-        }, occ.TopAbs_ShapeEnum.TopAbs_EDGE);
+        }, this.occ.TopAbs_EDGE);
         return hashes;
     }
 }
@@ -326,29 +483,10 @@ function createFaceInfo(faceIndex) {
     }
 }
 
-class Vec3 {
-    constructor(x=0,y=0,z=0){
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
-    set(x, y, z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-    }
-
-    copy({ x, y, z }) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        return this;
-    }
-
-    distanceTo({ x, y, z }) {
-        return Math.sqrt(Math.pow(x - this.x, 2) + Math.pow(y - this.y, 2) + Math.pow(z - this.z, 2));
+function createEdgeInfo() {
+    return {
+        vertex: [],
+        index: -1
     }
 }
 

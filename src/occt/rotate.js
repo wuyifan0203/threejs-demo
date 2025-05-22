@@ -39,8 +39,15 @@ function init() {
     studioWorker.onmessage = function ({ data }) {
         if (data.type in messageHandler) {
             const response = messageHandler[data.type](data.payload);
+            console.log('response: ', response);
             if (response) studioWorker.postMessage({ type: data.type, payload: response });
         }
+    }
+    studioWorker.onerror = function (e) {
+        console.log('error: ', e);
+    }
+    studioWorker.onmessageerror = function (e) {
+        console.log('messageerror: ', e.message);
     }
 
 

@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-30 13:21:38
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-16 18:57:04
+ * @LastEditTime: 2025-05-22 16:19:19
  * @FilePath: \threejs-demo\src\occt\worker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -22,7 +22,9 @@ initOpenCascade().then((occ) => {
         Object.entries(data.list).forEach(([type, parameter]) => {
             console.log('type, params: ', type, parameter);
             const shape = OpenCascadeShape[type](parameter);
-            const result = occH.convertBuffer(shape);
+            console.log('shape: ', shape);
+            const result = occH.convertBuffer2(shape);
+            console.log('result: ', result);
 
             const positionCopy = result.position.slice();
             const normalCopy = result.normal.slice();
