@@ -18,8 +18,6 @@ export const initOpenCascade = async (libs = []) => {
       }
     }
 
-    console.log(instance);
-
     return instance;
   } catch (error) {
     throw new Error('OpenCascade 加载失败: ' + error.message);
