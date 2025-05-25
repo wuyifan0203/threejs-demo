@@ -1,6 +1,7 @@
 {
   "liveServer.settings.port": 5501,
   "editor.fontSize": 14,
+  "editor.tabSize": 4,
   "files.autoSave": "off",
   "fileheader.customMade": {
     "Author": "git config user.name && git config user.email",

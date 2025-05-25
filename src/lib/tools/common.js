@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2023-11-21 16:26:11
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-03-27 18:01:27
- * @FilePath: \threejs-demo\src\lib\tools\common.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-05-25 23:20:43
+ * @FilePath: /threejs-demo/src/lib/tools/common.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -437,6 +437,7 @@ function initSky(scene, params = {}) {
 function initFog(scene, near = 0.01, far = 500, color = '#ffffff') {
   const fog = new Fog(color, near, far);
   scene.fog = fog;
+  return fog;
 }
 
 

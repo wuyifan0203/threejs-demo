@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-23 17:09:02
- * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-05-25 00:55:54
+ * @FilePath: /threejs-demo/src/lib/tools/openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import potpack from "../other/potpack.js";
@@ -401,7 +401,8 @@ class OpenCascadeHelper {
       const edgeData = {
         index: edge.index,
         start: indices.length,
-        end: 0
+        end: 0,
+        position:[]
       };
 
       for (let i = 0, l = edge.vertex.length - 3; i < l; i += 3) {
