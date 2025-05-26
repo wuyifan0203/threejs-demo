@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 15:09:33
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-05-25 23:37:44
- * @FilePath: /threejs-demo/src/occt/useWorker.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-05-26 09:56:24
+ * @FilePath: \threejs-demo\src\occt\useWorker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -17,12 +17,11 @@ import {
     MeshMatcapMaterial,
     Color,
     Box3,
+    Vector3
 } from "three";
 import {
     initRenderer,
-    initOrthographicCamera,
     initCustomGrid,
-    initAxesHelper,
     initOrbitControls,
     initScene,
     initGUI,
@@ -42,9 +41,9 @@ window.onload = () => {
 
 function init() {
     const renderer = initRenderer();
-    const camera = initPerspectiveCamera();
+    const camera = initPerspectiveCamera(new Vector3(20, 14, 12));
     camera.up.set(0, 0, 1);
-    camera.far = 300;
+    camera.far = 500;
     camera.zoom = 2.4;
     camera.updateProjectionMatrix();
 
@@ -56,6 +55,7 @@ function init() {
     const raycaster = new Raycaster();
 
     const controls = initOrbitControls(camera, renderer.domElement);
+    controls.target.set(0.5, -2, -0.15);
 
     const loader = initLoader();
     const texture = loader.load(`../../${Image_Path}/others/metal.png`);
@@ -101,7 +101,7 @@ function init() {
     const meshMap = {};
     const lineMap = {};
 
-    const worker = new Worker(new URL("./worker.js", import.meta.url), { type: "module", });
+    const worker = new Worker(new URL("./baseShape.worker.js", import.meta.url), { type: "module", });
 
     const box = new Box3();
     let fogDistance = 0;
@@ -151,8 +151,7 @@ function init() {
 
             box.union(geometry.boundingBox);
             fogDistance = Math.max(fogDistance, box.min.distanceTo(box.max) * 1.5);
-            console.log('fogDistance: ', fogDistance);
-            initFog(scene, fogDistance, fogDistance + 400, 0x222222);
+            initFog(scene, fogDistance, fogDistance + 300, 0x222222);
         },
     };
 

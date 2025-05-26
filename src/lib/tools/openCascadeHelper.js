@@ -1,9 +1,9 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
- * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-05-25 00:55:54
- * @FilePath: /threejs-demo/src/lib/tools/openCascadeHelper.js
+ * @LastEditors: wuyifan0203 1208097313@qq.com
+ * @LastEditTime: 2025-05-26 17:49:17
+ * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import potpack from "../other/potpack.js";
@@ -56,7 +56,7 @@ class OpenCascadeHelper {
 
   #forEach(shape, callback, type) {
     let index = 0;
-    const exporter = new this.occ.TopExp_Explorer(shape, type);
+    const exporter = new this.occ.TopExp_Explorer_2(shape, type);
     exporter.Init(shape, type);
     while (exporter.More()) {
       callback(this.typeEnum[type](exporter.Current()), index++);
