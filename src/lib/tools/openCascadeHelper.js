@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-29 09:56:12
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-26 17:49:17
+ * @LastEditTime: 2025-05-27 16:54:52
  * @FilePath: \threejs-demo\src\lib\tools\openCascadeHelper.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -44,11 +44,11 @@ class OpenCascadeHelper {
   constructor(occ) {
     this.occ = occ;
     this.typeEnum = {
-      [occ.TopAbs_FACE]: occ.TopoDS.prototype.Face,
-      [occ.TopAbs_EDGE]: occ.TopoDS.prototype.Edge,
-      [occ.TopAbs_VERTEX]: occ.TopoDS.prototype.Vertex,
-      [occ.TopAbs_SHELL]: occ.TopoDS.prototype.Shell,
-      [occ.TopAbs_SOLID]: occ.TopoDS.prototype.Solid,
+      [occ.TopAbs_ShapeEnum.TopAbs_FACE.value]: occ.TopoDS.Face_1,
+      [occ.TopAbs_ShapeEnum.TopAbs_EDGE.value]: occ.TopoDS.Edge_1,
+      [occ.TopAbs_ShapeEnum.TopAbs_VERTEX.value]: occ.TopoDS.Vertex_1,
+      [occ.TopAbs_ShapeEnum.TopAbs_SHELL.value]: occ.TopoDS.Shell_1,
+      [occ.TopAbs_ShapeEnum.TopAbs_SOLID.value]: occ.TopoDS.Solid_1,
     };
   }
 
@@ -56,10 +56,10 @@ class OpenCascadeHelper {
 
   #forEach(shape, callback, type) {
     let index = 0;
-    const exporter = new this.occ.TopExp_Explorer_2(shape, type);
-    exporter.Init(shape, type);
+    const exporter = new this.occ.TopExp_Explorer_2(shape, type, this.occ.TopAbs_ShapeEnum.TopAbs_SHAPE);
+    exporter.Init(shape, type, this.occ.TopAbs_ShapeEnum.TopAbs_SHAPE);
     while (exporter.More()) {
-      callback(this.typeEnum[type](exporter.Current()), index++);
+      callback(this.typeEnum[type.value](exporter.Current()), index++);
       exporter.Next();
     }
   }
@@ -80,25 +80,25 @@ class OpenCascadeHelper {
       builder.Add(compound, shape);
     });
 
-    return this.convertShape(compound, totalFaceHashes, totalEdgeHashes, lineDeviation, angleDeviation);
+    return this.#convertShape(compound, totalFaceHashes, totalEdgeHashes, lineDeviation, angleDeviation);
   }
 
-  convertShape(compound, totalFaceHashes, totalEdgeHashes, lineDeviation = 0.1, angleDeviation = 0.5) {
+  #convertShape(compound, totalFaceHashes, totalEdgeHashes, lineDeviation = 0.1, angleDeviation = 0.5) {
     const faceList = [];
     const edgeList = [];
 
     let currentFace = 0;
     try {
-      const shape = new this.occ.TopoDS_Shape(compound);
-      new this.occ.BRepMesh_IncrementalMesh(shape, lineDeviation, false, angleDeviation);
+      const shape = compound;
+      new this.occ.BRepMesh_IncrementalMesh_2(shape, lineDeviation, false, angleDeviation, true);
 
       const totalEdgeHashes2 = {};
       const triangulations = [];
       const uvBoxes = [];
 
       this.forEachFace(shape, (face) => {
-        const location = new this.occ.TopLoc_Location();
-        const handelTriangulation = this.occ.BRep_Tool.prototype.Triangulation(face, location);
+        const location = new this.occ.TopLoc_Location_1();
+        const handelTriangulation = this.occ.BRep_Tool.Triangulation(face, location, 0/* == Poly_MeshPurpose_NONE */);
         if (handelTriangulation.IsNull()) {
           console.error("Encountered Null Face!");
           return;
@@ -107,30 +107,27 @@ class OpenCascadeHelper {
           totalFaceHashes[face.HashCode(OpenCascadeHelper.MAX_HASH)]
         );
 
-        const pc = new this.occ.Poly_Connect(handelTriangulation);
+        const pc = new this.occ.Poly_Connect_2(handelTriangulation);
         const triangulation = handelTriangulation.get();
-        const nodes = triangulation.Nodes();
+        const nodesLength = triangulation.NbNodes();
 
         // vertex buffer
-        faceInfo.vertex = new Array(nodes.Length() * 3);
-        for (let i = 0, l = nodes.Length(), j = i; i < l; i++, j = i * 3) {
-          const point = nodes.Value(i + 1).Transformed(location.Transformation());
+        faceInfo.vertex = new Array(nodesLength * 3);
+        for (let i = 0, l = nodesLength, j = i; i < l; i++, j = i * 3) {
+          const point = triangulation.Node(i + 1).Transformed(location.Transformation());
           faceInfo.vertex[j + 0] = point.X();
           faceInfo.vertex[j + 1] = point.Y();
           faceInfo.vertex[j + 2] = point.Z();
         }
 
         // uv buffer
-        const orientation = face.Orientation();
+        const orientation = face.Orientation_1();
         if (triangulation.HasUVNodes()) {
           let [uMax, uMin, vMax, vMin] = [0, 0, 0, 0];
 
-          const uvNodes = triangulation.UVNodes();
-          const uvNodesLength = uvNodes.Length();
-
-          faceInfo.uv = new Array(uvNodesLength * 2);
-          for (let i = 0, j = i; i < uvNodesLength; i++, j = i * 2) {
-            const point = uvNodes.Value(i + 1);
+          faceInfo.uv = new Array(nodesLength * 2);
+          for (let i = 0, j = i; i < nodesLength; i++, j = i * 2) {
+            const point = triangulation.UVNode(i + 1);
             const x = point.X(), y = point.Y();
             faceInfo.uv[j + 0] = x;
             faceInfo.uv[j + 1] = y;
@@ -151,12 +148,12 @@ class OpenCascadeHelper {
             }
           }
 
-          const surface = this.occ.BRep_Tool.prototype.Surface(face).get();
+          const surface = this.occ.BRep_Tool.Surface_2(face).get();
           // min + (max -min) * 0.5 => (min + max) * 0.5
           const handleUIsoCurve = surface.UIso((uMax + uMin) * 0.5);
           const handleVIsoCurve = surface.VIso((vMax + vMin) * 0.5);
-          const uAdaptor = new this.occ.GeomAdaptor_Curve(handleVIsoCurve);
-          const vAdaptor = new this.occ.GeomAdaptor_Curve(handleUIsoCurve);
+          const uAdaptor = new this.occ.GeomAdaptor_Curve_2(handleVIsoCurve);
+          const vAdaptor = new this.occ.GeomAdaptor_Curve_2(handleUIsoCurve);
           uvBoxes.push({
             w: this.lengthOfCurve(uAdaptor, uMin, uMax),
             h: this.lengthOfCurve(vAdaptor, vMin, vMax),
@@ -164,14 +161,14 @@ class OpenCascadeHelper {
           });
 
           //
-          for (let i = 0, j = i; i < uvNodesLength; i++, j = i * 2) {
+          for (let i = 0, j = i; i < nodesLength; i++, j = i * 2) {
             _v1.x = faceInfo.uv[j + 0];
             _v1.y = faceInfo.uv[j + 1];
 
             _v1.x = (_v1.x - uMin) / (uMax - uMin);
             _v1.y = (_v1.y - vMin) / (vMax - vMin);
 
-            if (orientation !== this.occ.TopAbs_FORWARD) {
+            if (orientation !== this.occ.TopAbs_Orientation.TopAbs_FORWARD) {
               _v1.x = 1 - _v1.y;
             }
 
@@ -181,12 +178,8 @@ class OpenCascadeHelper {
         }
 
         // normal buffer
-        const normal = new this.occ.TColgp_Array1OfDir(
-          nodes.Lower(),
-          nodes.Upper()
-        );
-        const sts = new this.occ.StdPrs_ToolTriangulatedShape();
-        sts.Normal(face, pc, normal);
+        const normal = new this.occ.TColgp_Array1OfDir_2(1, nodesLength);
+        this.occ.StdPrs_ToolTriangulatedShape.Normal(face, pc, normal);
         faceInfo.normal = new Array(normal.Length() * 3);
         for (let i = 0, l = normal.Length(), j = i; i < l; i++, j = i * 3) {
           const point = normal.Value(i + 1).Transformed(location.Transformation());
@@ -204,7 +197,7 @@ class OpenCascadeHelper {
           let n1 = triangle.Value(1);
           let n2 = triangle.Value(2);
           let n3 = triangle.Value(3);
-          if (orientation !== this.occ.TopAbs_FORWARD) {
+          if (orientation !== this.occ.TopAbs_Orientation.TopAbs_FORWARD) {
             const tmp = n1;
             n1 = n2;
             n2 = tmp;
@@ -226,7 +219,7 @@ class OpenCascadeHelper {
           if (totalEdgeHashes2.hasOwnProperty(edgeHash)) {
             const edgeInfo = createEdgeInfo();
 
-            const handlePolygonTra = this.occ.BRep_Tool.prototype.PolygonOnTriangulation(edge, handelTriangulation, location);
+            const handlePolygonTra = this.occ.BRep_Tool.PolygonOnTriangulation_1(edge, handelTriangulation, location);
             const edgeNodes = handlePolygonTra.get().Nodes();
 
             // vertex buffer
@@ -308,7 +301,7 @@ class OpenCascadeHelper {
   }
 
   lengthOfCurve(geomAdaptor, min, max, segment = 5) {
-    const gpPnt = new this.occ.gp_Pnt();
+    const gpPnt = new this.occ.gp_Pnt_1();
     let length = 0;
     for (let i = min; i <= max; i += (max - min) / segment) {
       geomAdaptor.D0(i, gpPnt);
@@ -322,19 +315,19 @@ class OpenCascadeHelper {
   }
 
   forEachFace(shape, callback) {
-    this.#forEach(shape, callback, this.occ.TopAbs_FACE);
+    this.#forEach(shape, callback, this.occ.TopAbs_ShapeEnum.TopAbs_FACE);
   }
 
   forEachWire(shape, callback) {
-    this.#forEach(shape, callback, this.occ.TopAbs_WIRE);
+    this.#forEach(shape, callback, this.occ.TopAbs_ShapeEnum.TopAbs_WIRE);
   }
 
   forEachShell(shape, callback) {
-    this.#forEach(shape, callback, this.occ.TopAbs_SHELL);
+    this.#forEach(shape, callback, this.occ.TopAbs_ShapeEnum.TopAbs_SHELL);
   }
 
   forEachVertex(shape, callback) {
-    this.#forEach(shape, callback, this.occ.TopAbs_VERTEX);
+    this.#forEach(shape, callback, this.occ.TopAbs_ShapeEnum.TopAbs_VERTEX);
   }
   forEachEdge(shape, callback) {
     const hashes = {};
@@ -345,7 +338,7 @@ class OpenCascadeHelper {
         hashes[hash] = index;
         callback(edge, index++);
       }
-    }, this.occ.TopAbs_EDGE);
+    }, this.occ.TopAbs_ShapeEnum.TopAbs_EDGE);
     return hashes;
   }
 
@@ -402,7 +395,7 @@ class OpenCascadeHelper {
         index: edge.index,
         start: indices.length,
         end: 0,
-        position:[]
+        position: []
       };
 
       for (let i = 0, l = edge.vertex.length - 3; i < l; i += 3) {
@@ -424,7 +417,7 @@ class OpenCascadeHelper {
     return {
       position,
       indices,
-      edgeData:globalEdgeData,
+      edgeData: globalEdgeData,
     }
   }
 }

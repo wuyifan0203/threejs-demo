@@ -2,7 +2,7 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-04-30 13:53:22
  * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-26 17:33:51
+ * @LastEditTime: 2025-05-27 14:25:12
  * @FilePath: \threejs-demo\src\lib\custom\OpenCascadeShape.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -68,7 +68,7 @@ class OpenCascadeShape {
     transform(offset, shape) {
         const transformation = new this.occ.gp_Trsf_1();
         transformation.SetTranslation_1(new this.occ.gp_Vec_4(offset.x, offset.y, offset.z));
-        const translation = new openCascade.TopLoc_Location_2(transformation);
+        const translation = new this.occ.TopLoc_Location_2(transformation);
         return shape.Moved(translation, true);
     }
 }
