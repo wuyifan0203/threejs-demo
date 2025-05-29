@@ -42,7 +42,7 @@
     "jimp": "^1.6.0",
     "lint-staged": "^15.3.0",
     "pixelmatch": "^6.0.0",
-    "puppeteer": "^23.4.0",
+    "puppeteer": "23.4.0",
     "tweakpane": "^4.0.5",
     "vite": "^6.3.3"
   },

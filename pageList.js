@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-07-19 22:28:29
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-04-29 15:09:25
- * @FilePath: \threejs-demo\pageList.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-05-29 18:36:03
+ * @FilePath: /threejs-demo/pageList.js
  */
 const list = [
   {
@@ -544,9 +544,13 @@ const list = [
         title: "OpenCascade Test",
       },
       {
-        path: "/occt/useWorker.html",
-        title: "worker + occ.wasm",
-      }
+        path: "/occt/baseShape.html",
+        title: "baseShape",
+      },
+      {
+        path: "/occt/face.html",
+        title: "Face",
+      },
     ]
   },
   {
