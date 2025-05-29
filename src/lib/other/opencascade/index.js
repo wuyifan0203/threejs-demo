@@ -2,11 +2,11 @@
 
 export const initOpenCascade = async () => {
   try {
-    const opencascade =  await import('./opencascade.full.js'); // 动态导入wasm.js文件
+    const opencascade =  await import('./occ.core.js'); // 动态导入wasm.js文件
     const instance = await new opencascade.default({
       locateFile(path) {
         if (path.endsWith('.wasm')) {
-            return '../lib/other/opencascade/opencascade.full.wasm'; // 直接返回路径
+            return '../lib/other/opencascade/occ.core.wasm'; // 直接返回路径
         }
         return path;
       },
