@@ -1,12 +1,11 @@
 /*
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-05-26 14:10:52
- * @LastEditors: wuyifan0203 1208097313@qq.com
- * @LastEditTime: 2025-05-27 17:16:51
- * @FilePath: \threejs-demo\src\occt\face.worker.js
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-06-23 01:42:57
+ * @FilePath: /threejs-demo/src/occt/face.worker.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { OpenCascadeShape } from '../lib/custom/OpenCascadeShape.js';
 import { initOpenCascade } from '../lib/other/opencascade/index.js';
 import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
 
@@ -14,7 +13,6 @@ import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
 initOpenCascade().then((occ) => {
     console.log('occ init success: ', occ);
     const och = new OpenCascadeHelper(occ);
-    const ocs = new OpenCascadeShape(occ);
 
     const messageHandler = {
         makeBox({ width, height, depth }) {
