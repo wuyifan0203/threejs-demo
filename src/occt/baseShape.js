@@ -86,6 +86,11 @@ function init() {
             startAngle: 0,
             endAngle: TWO_PI,
         },
+        EllipseSphere:{
+            radiusX: 1,
+            radiusY: 2,
+            radiusZ: 1,
+        }
     };
 
     const deviation = {

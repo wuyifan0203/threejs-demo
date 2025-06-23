@@ -42,6 +42,29 @@ class OpenCascadeShape {
             pnts.push(new this.occ.gp_Pnt_3(point.x, point.y, point.z));
         }
     }
+    EllipseSphere({ radiusX, radiusY, radiusZ }) {
+        const sphere = this.Sphere({ radius: 1 });
+
+        const scaleMatrix = new this.occ.gp_GTrsf_1();
+        const axis = new this.occ.gp_Ax2_3(new this.occ.gp_Pnt_3(0, 0, 0), new this.occ.gp_Dir_4(0, 0, 1));
+        scaleMatrix.SetAffinity_2(axis, 1);
+        scaleMatrix.SetVectorialPart(
+            new this.occ.gp_Mat_2(
+                radiusX, 0, 0,
+                0, radiusY, 0,
+                0, 0, radiusZ
+            )
+        );
+
+        const brepTrsf = new this.occ.BRepBuilderAPI_GTransform_2(sphere, scaleMatrix, true);
+        brepTrsf.Build(new this.occ.Message_ProgressRange_1());
+
+        if (!brepTrsf.IsDone()) {
+            throw new Error("椭球体构造失败");
+        }
+
+        return brepTrsf.Shape();
+    }
 
     // half face
     // revol
@@ -54,13 +77,6 @@ class OpenCascadeShape {
         const translation = new this.occ.TopLoc_Location_2(transformation);
         return shape.Moved(translation, true);
     }
-
-    // scale(shape, scale, { x, y, z } = { x: 0, y: 0, z: 0 }) {
-    //     const transformation = new this.occ.gp_Trsf_1();
-    //     transformation.SetScale(new this.occ.gp_Pnt_3(x, y, z), scale);
-    //     const scale = new this.occ.TopLoc_Location_2(transformation);
-    //     return shape.Moved(scale, true);
-    // }
 }
 
 

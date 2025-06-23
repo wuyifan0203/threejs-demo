@@ -23,6 +23,7 @@ mainBuild:
   - symbol: gp_Vec
   - symbol: gp_Pnt
   - symbol: gp_Dir
+  - symbol: gp_Mat
   - symbol: gp_Ax1
   - symbol: gp_Ax2
   - symbol: gp_Ax3
@@ -204,6 +205,7 @@ mainBuild:
   - symbol: BRepBuilderAPI_Sewing
   - symbol: BRepBuilderAPI_WireError
   - symbol: BRepBuilderAPI_MakeShell
+  - symbol: BRepBuilderAPI_GTransform
   - symbol: BRepPrimAPI_MakeOneAxis
   - symbol: BRepPrimAPI_MakeCylinder
   - symbol: BRepPrimAPI_MakeBox
