@@ -21,6 +21,7 @@ import {
     initGUI,
     resize
 } from '../lib/tools/index.js';
+import { UploadUtils } from '../lib/tools/uploadUtils.js';
 
 window.onload = () => {
     init();
@@ -41,7 +42,7 @@ function init() {
     const mesh = new Mesh(new BoxGeometry(3, 3, 3), new MeshNormalMaterial());
     scene.add(mesh);
 
-    const worker = new Worker('./importStep.worker.js');
+    const worker = new Worker('./importStep.worker.js', { type: 'module' });
 
     const messageHandler = {
         init: () => {
@@ -68,5 +69,21 @@ function init() {
     render();
 
     resize(renderer, camera);
+
+    const params = {
+        importSTEP: async () => {
+            const files = await UploadUtils.uploadFile({ formate: 'stp', mutiple: true });
+            for (const file of files) {
+                const reader = new FileReader();
+                reader.readAsArrayBuffer(file);
+                reader.onload = () => {
+                    const arrayBuffer = reader.result;
+                    console.log('arrayBuffer: ', arrayBuffer);
+                    worker.postMessage({ type: 'importSTEP', payload: arrayBuffer });
+                };
+            }
+        }
+    };
     const gui = initGUI();
+    gui.add(params, 'importSTEP');
 }
