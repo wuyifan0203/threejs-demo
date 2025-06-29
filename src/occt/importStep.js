@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-06-10 23:36:34
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-06-23 01:13:58
+ * @LastEditTime: 2025-06-30 01:06:08
  * @FilePath: /threejs-demo/src/occt/importStep.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -79,7 +79,7 @@ function init() {
                 reader.onload = () => {
                     const arrayBuffer = reader.result;
                     console.log('arrayBuffer: ', arrayBuffer);
-                    worker.postMessage({ type: 'importSTEP', payload: arrayBuffer });
+                    worker.postMessage({ type: 'importSTEP', payload: { arrayBuffer } });
                 };
             }
         }
