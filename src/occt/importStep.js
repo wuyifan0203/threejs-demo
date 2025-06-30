@@ -8,8 +8,9 @@
  */
 import {
     Mesh,
-    BoxGeometry,
-    MeshNormalMaterial,
+    Object3D,
+    LineSegments,
+    Vector3,
 } from 'three';
 import {
     initRenderer,
@@ -22,14 +23,15 @@ import {
     resize
 } from '../lib/tools/index.js';
 import { UploadUtils } from '../lib/tools/uploadUtils.js';
+import { OpenCascadeBuilder } from '../lib/tools/OpenCascadeBuilder.js';
 
 window.onload = () => {
     init();
 };
 
-function init() {
-    const renderer = initRenderer();
-    const camera = initOrthographicCamera();
+async function init() {
+    const renderer = initRenderer({ logarithmicDepthBuffer: true });
+    const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
     camera.up.set(0, 0, 1);
     camera.updateProjectionMatrix();
 
@@ -39,8 +41,12 @@ function init() {
     initCustomGrid(scene);
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    const mesh = new Mesh(new BoxGeometry(3, 3, 3), new MeshNormalMaterial());
-    scene.add(mesh);
+
+    const container = new Object3D();
+    scene.add(container);
+
+    const builder = new OpenCascadeBuilder();
+    const objectMap = new WeakMap();
 
     const worker = new Worker('./importStep.worker.js', { type: 'module' });
 
@@ -48,6 +54,16 @@ function init() {
         init: () => {
             worker.postMessage({ type: 'init' });
         },
+        build: (payload) => {
+            const { faceList, edgeList } = payload
+            const solid = new Mesh(builder.buildSolid(faceList), builder.material.solid);
+            const edge = new LineSegments(builder.buildEdge(edgeList), builder.material.edge);
+
+            console.timeEnd('importSTEP');
+            solid.add(edge);
+            container.add(solid);
+            objectMap.set(payload, { solid, edge })
+        }
     };
 
     worker.onmessage = ({ data }) => {
@@ -71,19 +87,43 @@ function init() {
     resize(renderer, camera);
 
     const params = {
+        loadFile: (file) => {
+            console.time('importSTEP');
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = () => {
+                const arrayBuffer = reader.result;
+                worker.postMessage({ type: 'importSTEP', payload: { arrayBuffer } }), [arrayBuffer];
+            };
+        },
+        defaultImport: async () => {
+            const response = await fetch('../../public/models/Harmonic reducer.stp');
+            const blob = await response.blob();
+            const file = new File([blob], 'Harmonic reducer.stp', { type: blob.type });
+            params.loadFile(file);
+        },
         importSTEP: async () => {
             const files = await UploadUtils.uploadFile({ formate: 'stp', mutiple: true });
             for (const file of files) {
-                const reader = new FileReader();
-                reader.readAsArrayBuffer(file);
-                reader.onload = () => {
-                    const arrayBuffer = reader.result;
-                    console.log('arrayBuffer: ', arrayBuffer);
-                    worker.postMessage({ type: 'importSTEP', payload: { arrayBuffer } });
-                };
+                params.loadFile(file);
             }
+        },
+        clear() {
+            container.traverse((obj) => {
+                if (obj instanceof Mesh) {
+                    container.remove(obj);
+                    obj.geometry.dispose();
+                    obj.material.dispose();
+                }
+            })
         }
     };
+
+
     const gui = initGUI();
+    gui.add(params, 'defaultImport');
     gui.add(params, 'importSTEP');
+    gui.add(params, 'clear');
+
+    setTimeout(params.defaultImport, 500);
 }

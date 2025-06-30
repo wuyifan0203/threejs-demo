@@ -10,7 +10,6 @@ import {
     Mesh,
     MeshNormalMaterial,
     BufferGeometry,
-    Float32BufferAttribute,
 } from 'three';
 import {
     initRenderer,
@@ -22,7 +21,7 @@ import {
     initGUI,
     resize
 } from '../lib/tools/index.js';
-import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
+import { OpenCascadeBuilder } from '../lib/tools/OpenCascadeBuilder.js';
 
 window.onload = () => {
     init();
@@ -38,6 +37,7 @@ function init() {
     initAxesHelper(scene);
     renderer.setClearColor(0xffffff);
     initCustomGrid(scene);
+    const builder = new OpenCascadeBuilder();
 
     const controls = initOrbitControls(camera, renderer.domElement);
     const mesh = new Mesh(new BufferGeometry(), new MeshNormalMaterial());
@@ -49,15 +49,8 @@ function init() {
             worker.postMessage({ type: 'makeBox', payload: { width: 3, height: 3, depth: 3 } });
         } else if (type === 'generate') {
             const { faceList } = payload;
-            const buffer = OpenCascadeHelper.convertBufferAttribute(faceList);
-            console.log('buffer: ', buffer);
             mesh.geometry.dispose();
-            const geometry = new BufferGeometry();
-            geometry.setAttribute('position', new Float32BufferAttribute(buffer.position, 3));
-            geometry.setAttribute('normal', new Float32BufferAttribute(buffer.normal, 3));
-            geometry.setAttribute('uv', new Float32BufferAttribute(buffer.uvs, 2));
-            geometry.setIndex(buffer.indices);
-            mesh.geometry = geometry;
+            mesh.geometry =  builder.buildSolid(faceList);
         }
     }
 

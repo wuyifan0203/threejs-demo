@@ -9,12 +9,7 @@
 import {
     Mesh,
     BufferGeometry,
-    Float32BufferAttribute,
-    LineBasicMaterial,
     LineSegments,
-    Raycaster,
-    Vector2,
-    MeshMatcapMaterial,
     Color,
     Box3,
     Vector3
@@ -29,11 +24,10 @@ import {
     gridPositions,
     TWO_PI,
     initLoader,
-    Image_Path,
     initFog,
     initPerspectiveCamera
 } from "../lib/tools/index.js";
-import { OpenCascadeHelper } from "../lib/tools/openCascadeHelper.js";
+import { OpenCascadeBuilder } from "../lib/tools/OpenCascadeBuilder.js";
 
 window.onload = () => {
     init();
@@ -51,14 +45,11 @@ function init() {
     scene.background = new Color(0x222222);
     initCustomGrid(scene);
 
-    const mouse = new Vector2();
-    const raycaster = new Raycaster();
 
     const controls = initOrbitControls(camera, renderer.domElement);
     controls.target.set(0.5, -2, -0.15);
 
     const loader = initLoader();
-    const texture = loader.load(`../../${Image_Path}/others/metal.png`);
 
     const list = {
         Box: {
@@ -86,7 +77,7 @@ function init() {
             startAngle: 0,
             endAngle: TWO_PI,
         },
-        EllipseSphere:{
+        EllipseSphere: {
             radiusX: 1,
             radiusY: 2,
             radiusZ: 1,
@@ -98,17 +89,14 @@ function init() {
         angle: 0.3,
     };
 
-    const material = new MeshMatcapMaterial({
-        color: 0xf5f5f5,
-        matcap: texture,
-    });
-    const lineMaterial = new LineBasicMaterial({ vertexColors: true });
     const meshMap = {};
     const lineMap = {};
 
     const worker = new Worker(new URL("./baseShape.worker.js", import.meta.url), { type: "module", });
 
     const box = new Box3();
+
+    const builder = new OpenCascadeBuilder();
     let fogDistance = 0;
 
     const workerFunctionMap = {
@@ -117,44 +105,29 @@ function init() {
         },
         generate(payload) {
             const { type, result } = payload;
-            const buffer = OpenCascadeHelper.convertBufferAttribute(result.faceList);
-            const edgeBuffer = OpenCascadeHelper.convertEdgeBufferAttribute(result.edgeList);
 
-            const line = lineMap[type] === undefined ? new LineSegments(new BufferGeometry(), lineMaterial) : lineMap[type];
-            const mesh = meshMap[type] === undefined ? new Mesh(new BufferGeometry(), material) : meshMap[type];
+            let line = lineMap[type];
+            let mesh = meshMap[type];
             if (meshMap[type]) {
                 mesh.geometry.dispose();
-                mesh.geometry = new BufferGeometry();
                 line.geometry.dispose();
-                line.geometry = new BufferGeometry();
             } else {
+                mesh = new Mesh(new BufferGeometry(), builder.material.solid);
+                line = new LineSegments(new BufferGeometry(), builder.material.edge);
                 scene.add(mesh);
                 mesh.add(line);
                 meshMap[type] = mesh;
                 lineMap[type] = line;
             }
-            const geometry = mesh.geometry;
-            geometry.setIndex(buffer.indices);
-            geometry.setAttribute("position", new Float32BufferAttribute(buffer.position, 3));
-            geometry.setAttribute("normal", new Float32BufferAttribute(buffer.normal, 3));
-            geometry.setAttribute("uv", new Float32BufferAttribute(buffer.uv, 2));
-            geometry.setAttribute("uv2", new Float32BufferAttribute(buffer.uv2, 2));
-            geometry.setAttribute("color", new Float32BufferAttribute(buffer.colors, 3));
-            geometry.computeBoundingBox();
-
-            const lineGeometry = line.geometry; lineGeometry.setAttribute("position", new Float32BufferAttribute(edgeBuffer.position, 3));
-            lineGeometry.setAttribute("color", new Float32BufferAttribute(new Float32Array(edgeBuffer.position.length).fill(0), 3));
-            line.userData = {
-                indices: edgeBuffer.indices,
-                edgeData: edgeBuffer.edgeData,
-            };
-
+            mesh.geometry = builder.buildSolid(result.faceList);
+            line.geometry = builder.buildEdge(result.edgeList);
+       
             Object.values(meshMap).forEach((mesh, i) => {
                 const pos = gridPositions(Object.keys(meshMap).length, i, 4);
                 mesh.position.copy(pos);
             });
 
-            box.union(geometry.boundingBox);
+            box.union(mesh.geometry.boundingBox);
             fogDistance = Math.max(fogDistance, box.min.distanceTo(box.max) * 1.5);
             initFog(scene, fogDistance, fogDistance + 300, 0x222222);
         },
@@ -178,34 +151,6 @@ function init() {
     render();
 
     resize(renderer, camera);
-
-    function heightLightEdge(lineSegments, index) {
-        const edgeIndex = index > 0 ? lineSegments.userData.indices[index] : index;
-        const { start, end } = lineSegments.userData.edgeData[edgeIndex];
-
-        const colorAttribute = lineSegments.geometry.getAttribute("color");
-
-        for (let i = 0, l = colorAttribute.array.length; i < l; i++) {
-            const index = Math.floor(i / 3);
-            colorAttribute.array[i] = index >= start && index <= end ? 1 : 0;
-        }
-        colorAttribute.needsUpdate = true;
-    }
-
-    window.addEventListener("mousemove", (event) => {
-        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
-        const intersects = raycaster.intersectObjects(Object.values(lineMap), false);
-
-        if (intersects.length > 0) {
-            heightLightEdge(intersects[0].object, intersects[0].index);
-        } else {
-            Object.values(lineMap).forEach((line) => {
-                heightLightEdge(line, -1);
-            });
-        }
-    });
 
     const gui = initGUI();
     gui.add(deviation, "line", 0, 1, 0.01).onFinishChange(() => {

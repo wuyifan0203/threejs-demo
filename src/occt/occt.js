@@ -2,10 +2,7 @@ import {
     Mesh,
     MeshNormalMaterial,
     BufferGeometry,
-    Float32BufferAttribute,
-    MeshMatcapMaterial,
     LineSegments,
-    LineBasicMaterial,
     Vector3,
 } from 'three';
 import {
@@ -17,11 +14,10 @@ import {
     initScene,
     initGUI,
     resize,
-    initLoader,
-    Image_Path
 } from '../lib/tools/index.js';
 import { initOpenCascade } from '../lib/other/opencascade/index.js'
 import { OpenCascadeHelper } from '../lib/tools/openCascadeHelper.js';
+import { OpenCascadeBuilder } from '../lib/tools/OpenCascadeBuilder.js';
 
 
 let occ = null;
@@ -49,18 +45,15 @@ function init() {
     renderer.setClearColor(0x000000);
     initCustomGrid(scene);
 
-    const texture = initLoader().load(`../../${Image_Path}/others/metal.png`); // 加载纹理图
+
+    const builder = new OpenCascadeBuilder();
 
     const controls = initOrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.target.set(-1, 1, 2.7);
     const normalMaterial = new MeshNormalMaterial();
-    const renderMaterial = new MeshMatcapMaterial({
-        color: 0xf5f5f5,
-        matcap: texture,
-    });
     const mesh = new Mesh(new BufferGeometry(), normalMaterial);
-    const lineSegment = new LineSegments(new BufferGeometry(), new LineBasicMaterial());
+    const lineSegment = new LineSegments(new BufferGeometry(), builder.material.edge);
     mesh.add(lineSegment);
     scene.add(mesh);
 
@@ -74,22 +67,13 @@ function init() {
     function update() {
         const bottle = makeBottle(params.width, params.thickness, params.height);
         const { faceList, edgeList } = occH.shape2Buffer(bottle);
-        const buffer = OpenCascadeHelper.convertBufferAttribute(faceList);
+
 
         mesh.geometry.dispose();
-        mesh.geometry = new BufferGeometry();
-        mesh.geometry.setIndex(buffer.indices);
-        mesh.geometry.setAttribute('position', new Float32BufferAttribute(buffer.position, 3));
-        mesh.geometry.setAttribute('uv', new Float32BufferAttribute(buffer.uv, 2));
-        mesh.geometry.setAttribute('color', new Float32BufferAttribute(buffer.colors, 3));
-        mesh.geometry.setAttribute('normal', new Float32BufferAttribute(buffer.normal, 3));
-        mesh.geometry.computeVertexNormals();
-        mesh.geometry.computeBoundingBox();
+        mesh.geometry = builder.buildSolid(faceList);
 
-        const linesBuffer = OpenCascadeHelper.convertEdgeBufferAttribute(edgeList);
         lineSegment.geometry.dispose();
-        lineSegment.geometry = new BufferGeometry();
-        lineSegment.geometry.setAttribute('position', new Float32BufferAttribute(linesBuffer.position, 3));
+        lineSegment.geometry = builder.buildEdge(edgeList);
     }
     update();
 
@@ -106,7 +90,7 @@ function init() {
     gui.add(params, 'width', 2, 10, 1).onFinishChange(update);
     gui.add(params, 'height', 2, 15, 1).onFinishChange(update);
     gui.add(params, 'thickness', 2, 10, 1).onFinishChange(update);
-    gui.add(params, 'material', { normalMaterial, renderMaterial }).onChange((e) => {
+    gui.add(params, 'material', { normalMaterial, renderMaterial: builder.material.solid }).onChange((e) => {
         mesh.material = e;
     });
     gui.add(normalMaterial, 'wireframe');
