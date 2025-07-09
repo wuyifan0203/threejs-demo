@@ -212,6 +212,7 @@ function resize(render, cameras, callback = () => { }) {
     });
     callback(w, h);
   });
+  callback(window.innerWidth, window.innerHeight);
 }
 
 /**
