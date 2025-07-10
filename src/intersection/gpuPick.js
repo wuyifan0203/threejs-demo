@@ -17,6 +17,7 @@ import {
     WebGLRenderTarget,
     Vector2,
     Vector3,
+    CameraHelper,
 } from 'three';
 import {
     initRenderer,
@@ -28,9 +29,10 @@ import {
     resize,
     getColor,
     initAmbientLight,
-    initDirectionLight
+    initDirectionLight,
 } from '../lib/tools/index.js';
 import { createRandom } from '../lib/tools/math.js';
+import { printRenderTarget } from '../lib/util/catch.js';
 
 window.onload = () => {
     init();
@@ -39,24 +41,27 @@ window.onload = () => {
 function init() {
     const renderer = initRenderer();
     renderer.autoClear = false;
-    const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
+    const camera = initOrthographicCamera(new Vector3(500, 500, 500));
     camera.up.set(0, 0, 1);
+    camera.far = 1000;
     camera.zoom = 0.2;
     camera.updateProjectionMatrix();
 
     const controls = initOrbitControls(camera, renderer.domElement);
-    controls.enableZoom = false;
+    // controls.enableZoom = false;
 
     const pickScene = initScene();
     pickScene.background = new Color(0x000000);
     const scene = initScene();
+    scene.background = new Color(0xf0f0f0);
+
     const light = initDirectionLight();
     light.position.set(0, -1000, 1000);
     scene.add(light);
     initAmbientLight(scene);
 
     const params = {
-        count: 1000,
+        count: 100,
         pickRange: 1, // 1,3,5,10
         objectType: 'mesh', //  mesh | instance
         debuggerMode: false
@@ -97,7 +102,7 @@ function init() {
         clear();
 
         for (let i = 0; i < params.count; i++) {
-            const id = i + 1000 * i;
+            const id = (i + 1) + 50 * i;
             const mesh = new Mesh(geometry, new MeshPhongMaterial({ color: getColor(i) }));
 
             mesh.position.x = createRandom(-100, 100);
@@ -107,6 +112,7 @@ function init() {
             mesh.rotation.x = createRandom(0, 2 * Math.PI);
             mesh.rotation.y = createRandom(0, 2 * Math.PI);
             mesh.rotation.z = createRandom(0, 2 * Math.PI);
+            mesh.userData.pickID = id;
 
             mesh.updateMatrix();
             meshGroup.add(mesh);
@@ -129,16 +135,29 @@ function init() {
         pickTarget.setSize(params.pickRange, params.pickRange);
     }
 
+    const tmpCamera = camera.clone();
+    const helper = new CameraHelper(tmpCamera);
+    helper.visible = false;
+    pickScene.add(helper);
+
     function pickObject() {
         preparePick();
+
+        const length = params.pickRange * 2;
 
         renderer.setRenderTarget(pickTarget);
         camera.setViewOffset(
             renderSize.x, renderSize.y,
-            mouse.x - params.pickRange / 2,
-            mouse.y - params.pickRange / 2,
-            params.pickRange, params.pickRange,
+            mouse.x - params.pickRange,
+            mouse.y - params.pickRange,
+            length, length,
         );
+
+        tmpCamera.copy(camera);
+        tmpCamera.position.copy(camera)
+        tmpCamera.updateProjectionMatrix();
+
+        helper.update();
 
         renderer.render(pickScene, camera);
         renderer.readRenderTargetPixels(pickTarget, 0, 0, params.pickRange, params.pickRange, pickContent);
@@ -150,69 +169,88 @@ function init() {
             const index = i * 4;
             // r,g,b
             const id = color2id(pickContent[index], pickContent[index + 1], pickContent[index + 2]);
+            console.log('id: ', id);
             if (meshMap.has(id)) {
-                return meshMap.get(id);
+                const res = meshMap.get(id);
+                console.log('res: ', res);
+                return res;
             }
         }
         return null;
+    }
+
+    function clearHighlight() {
+        Array.from(highlightSet).forEach((mesh) => {
+            mesh.material = mesh.userData.material;
+        });
+        highlightSet.clear();
     }
 
     updateCount();
 
     const highlightMaterial = new MeshNormalMaterial();
 
-    let lastHighlightObject = null;
+    const highlightSet = new Set();
     renderer.domElement.addEventListener('click', ({ clientX, clientY }) => {
         if (!enablePick) {
             return;
         }
         mouse.set(clientX, clientY);
         const result = pickObject();
-        console.log('result: ', result);
-        console.log('lastHighlightObject', lastHighlightObject);
         if (result) {
-            lastHighlightObject = result;
-            lastHighlightObject.userData = {
-                material: lastHighlightObject.material
+            if (!highlightSet.has(result)) {
+                highlightSet.add(result);
+                result.userData.material = result.material;
+                result.material = highlightMaterial;
+                render();
             }
-            lastHighlightObject.material = highlightMaterial;
-        } else if (lastHighlightObject !== null) {
-            lastHighlightObject.material = lastHighlightObject.userData.material;
-            lastHighlightObject = null;
+            params.debuggerMode && printRenderTarget('pick', renderer, pickTarget);
         }
     })
 
     renderer.domElement.addEventListener('mousedown', ({ clientX, clientY }) => {
         startPos.set(clientX, clientY);
-    })
+    });
     renderer.domElement.addEventListener('mouseup', ({ clientX, clientY }) => {
         enablePick = startPos.distanceTo({ x: clientX, y: clientY }) < 1;
+    });
+    renderer.domElement.addEventListener('contextmenu', (e) => {
+        e.preventDefault();
+        clearHighlight();
+        render();
     })
 
     function render() {
         renderer.clear();
-        renderer.setClearColor(0xffffff);
 
-        controls.update();
         if (!params.debuggerMode) {
             renderer.render(scene, camera);
         } else {
             renderer.render(pickScene, camera);
         }
-
-        requestAnimationFrame(render);
     }
     render();
 
+    controls.addEventListener('change', render)
+
     resize(renderer, camera, (w, h) => {
         debuggerTarget.setSize(w, h);
+        render();
     });
     const gui = initGUI();
 
-    gui.add(params, 'count', 1000, 10000, 10).onChange(updateCount);
-    gui.add(params, 'pickRange', [1, 3, 5, 10]).onChange(updateCount);
-    gui.add(params, 'objectType', ['mesh', 'instance']).onChange(updateCount);
-    gui.add(params, 'debuggerMode');
+    gui.add(params, 'count', 1000, 10000, 10).onChange(() => {
+        updateCount();
+        clearHighlight();
+        render();
+    });
+    gui.add(params, 'pickRange', [1, 3, 5, 10, 30]);
+    // gui.add(params, 'objectType', ['mesh', 'instance']).onChange(updateCount);
+    gui.add(params, 'debuggerMode').onChange(() => {
+        helper.visible = params.debuggerMode;
+        helper.update();
+        render();
+    });
 }
 
 function color2id(r, g, b) {
