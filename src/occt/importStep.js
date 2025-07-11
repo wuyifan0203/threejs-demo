@@ -33,6 +33,7 @@ async function init() {
     const renderer = initRenderer({ logarithmicDepthBuffer: true });
     const camera = initOrthographicCamera(new Vector3(1000, 1000, 1000));
     camera.up.set(0, 0, 1);
+    camera.zoom = 0.1;
     camera.updateProjectionMatrix();
 
     const scene = initScene();

@@ -36,6 +36,8 @@ pnpm dev
 3. Run `pnpm screenshot` to generate case screenshots.
 4. Run `pnpm dev` to preview the effect.
 
+> if you first time to run `pnpm screenshot`, you should run `npx puppeteer browsers install chrome` first.
+
 ## Contribution
 
 If you have any suggestions or want to contribute code, feel free to submit a Pull Request or create an Issue.

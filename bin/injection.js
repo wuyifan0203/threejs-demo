@@ -18,11 +18,11 @@
         return x - Math.floor(x);
     };
 
-  
+
     /* Deterministic timer */
     window.performance._now = performance.now;
 
-      //代理performance
+    //代理performance
     let frameId = 0;
     const now = () => frameId * 16;
     window.Date.now = now;
@@ -39,7 +39,7 @@
         if (!window._renderStarted) {
             setTimeout(function () {
                 requestAnimationFrame(cb);
-            }, 50);
+            }, 200);
         } else {
             RAF(function () {
                 if (frameId++ < maxFrameId) {

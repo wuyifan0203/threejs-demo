@@ -427,6 +427,10 @@ const list = [
         path: "/intersection/selectInstanceMesh.html",
         title: "Select InstanceMesh",
       },
+      {
+        path: "/intersection/gpuPick.html",
+        title: "GPU Pick",
+      },
     ],
   },
   {
@@ -541,7 +545,7 @@ const list = [
     pages: [
       {
         path: "/occt/occt.html",
-        title: "OpenCascade Test",
+        title: "OpenCascade Test (no worker)",
       },
       {
         path: "/occt/baseShape.html",
@@ -551,6 +555,10 @@ const list = [
         path: "/occt/face.html",
         title: "Face",
       },
+      {
+        path: "/occt/importStep.html",
+        title: "Import Step File",
+      }
     ]
   },
   {

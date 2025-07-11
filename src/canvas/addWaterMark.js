@@ -7,16 +7,20 @@
 import { initGUI } from "../lib/tools/common.js";
 
 function init() {
-  const width = window.innerWidth;
-  const height = window.innerHeight;
+
 
   const Linear = document.createElement("canvas");
   const LinearCtx = Linear.getContext("2d");
 
   document.body.append(Linear);
+  Linear.style.width = `100vw`;
+  Linear.style.height = `100vh`;
+
+  const { width, height } = Linear.getBoundingClientRect();
 
   Linear.width = width;
   Linear.height = height;
+
 
   const gradient = LinearCtx.createLinearGradient(0, 0, width, 0);
 

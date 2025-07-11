@@ -22,7 +22,6 @@ import {
 import {
     initRenderer,
     initOrthographicCamera,
-    initAxesHelper,
     initOrbitControls,
     initScene,
     initGUI,
@@ -61,7 +60,7 @@ function init() {
     initAmbientLight(scene);
 
     const params = {
-        count: 100,
+        count: 1000,
         pickRange: 1, // 1,3,5,10
         objectType: 'mesh', //  mesh | instance
         debuggerMode: false
@@ -78,6 +77,7 @@ function init() {
     const pickTarget = new WebGLRenderTarget({ depthBuffer: true });
     let pickContent = new Uint8Array();
     const pickOrder = [];
+    const pickGroup = new Group();
 
 
     // object
@@ -85,16 +85,19 @@ function init() {
     const meshGroup = new Group();
 
     scene.add(meshGroup);
+    pickScene.add(pickGroup);
 
     function clear() {
-        meshGroup.children.forEach((mesh) => {
+        while (meshGroup.children.length > 0) {
+            const mesh = meshGroup.children[0];
             mesh.material.dispose();
             meshGroup.remove(mesh);
-        });
-        pickScene.children.forEach((obj) => {
+        }
+        while (pickGroup.children.length > 0) {
+            const obj = pickGroup.children[0];
             obj.material.dispose();
-            pickScene.remove(obj);
-        })
+            pickGroup.remove(obj);
+        }
         meshMap.clear();
     }
 
@@ -102,7 +105,7 @@ function init() {
         clear();
 
         for (let i = 0; i < params.count; i++) {
-            const id = (i + 1) + 50 * i;
+            const id = (i + 1) + i * 50;
             const mesh = new Mesh(geometry, new MeshPhongMaterial({ color: getColor(i) }));
 
             mesh.position.x = createRandom(-100, 100);
@@ -122,7 +125,7 @@ function init() {
             pickMesh.matrix.copy(mesh.matrix);
             pickMesh.matrix.decompose(pickMesh.position, pickMesh.quaternion, pickMesh.scale);
 
-            pickScene.add(pickMesh);
+            pickGroup.add(pickMesh);
         }
     }
 
@@ -139,6 +142,7 @@ function init() {
     const helper = new CameraHelper(tmpCamera);
     helper.visible = false;
     pickScene.add(helper);
+    console.log('pickScene: ', pickScene);
 
     function pickObject() {
         preparePick();
@@ -156,13 +160,15 @@ function init() {
         tmpCamera.copy(camera);
         tmpCamera.position.copy(camera)
         tmpCamera.updateProjectionMatrix();
-
         helper.update();
+        helper.visible = false;
 
         renderer.render(pickScene, camera);
         renderer.readRenderTargetPixels(pickTarget, 0, 0, params.pickRange, params.pickRange, pickContent);
         camera.clearViewOffset();
         renderer.setRenderTarget(null);
+        helper.visible = true;
+
 
         // get picked object
         for (let i of pickOrder) {
@@ -202,10 +208,13 @@ function init() {
                 highlightSet.add(result);
                 result.userData.material = result.material;
                 result.material = highlightMaterial;
-                render();
+
             }
-            params.debuggerMode && printRenderTarget('pick', renderer, pickTarget);
+            if (params.debuggerMode) {
+                printRenderTarget('pick', renderer, pickTarget);
+            }
         }
+        render();
     })
 
     renderer.domElement.addEventListener('mousedown', ({ clientX, clientY }) => {
@@ -235,6 +244,7 @@ function init() {
 
     resize(renderer, camera, (w, h) => {
         debuggerTarget.setSize(w, h);
+        renderSize.set(w, h);
         render();
     });
     const gui = initGUI();
@@ -245,7 +255,6 @@ function init() {
         render();
     });
     gui.add(params, 'pickRange', [1, 3, 5, 10, 30]);
-    // gui.add(params, 'objectType', ['mesh', 'instance']).onChange(updateCount);
     gui.add(params, 'debuggerMode').onChange(() => {
         helper.visible = params.debuggerMode;
         helper.update();
