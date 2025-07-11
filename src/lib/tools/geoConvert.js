@@ -1,3 +1,11 @@
+/*
+ * @Author: wuyifan wuyifan@udschina.com
+ * @Date: 2025-06-23 16:13:21
+ * @LastEditors: wuyifan wuyifan@udschina.com
+ * @LastEditTime: 2025-07-11 16:57:17
+ * @FilePath: \threejs-demo\src\lib\tools\geoConvert.js
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+ */
 import { Box2, Vector2 } from 'three';
 import { geoMercator } from '../other/d3-geo.es.js';
 
@@ -11,6 +19,11 @@ function LatitudeLongitude2px(position) {
 
 const _box = new Box2();
 
+/**
+ * @description: 将json坐标系转换为墨脱坐标系
+ * @param {JSON} geojson
+ * @return {{range: Vector2, center: Vector2}}
+ */
 function convertGeoJSON(geojson) {
     _box.makeEmpty();
     geojson.features.forEach((a) => {
