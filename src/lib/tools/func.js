@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import {
+  Matrix3,
   Matrix4, Quaternion, Vector3
 } from 'three';
 /**
@@ -322,6 +323,38 @@ function gridPositions(total, current, gap = 1) {
   };
 }
 
+/**
+ * @description: 变换图形
+ * @param {{shape:Array<Vector2>,holes:Array<Array<Vector2>>}} shapeType 图形类型
+ * @param {'translate'|'rotate'|'scale'} type 变换类型
+ * @param {Vector2|number} params 变换参数
+ * @return {void}
+ */
+function transformShape({ shape, holes }, type, params) {
+  const matrix = new Matrix3();
+  switch (type) {
+    case 'translate':
+      matrix.makeTranslation(params);
+      break;
+    case 'rotate':
+      matrix.makeRotation(params);
+      break;
+    case 'scale':
+      matrix.makeScale(params.x, params.y);
+      break;
+  }
+  shape.forEach((point) => {
+    point.applyMatrix3(matrix);
+  });
+  if (holes && holes.length) {
+    holes.forEach((hole) => {
+      hole.forEach((point) => {
+        point.applyMatrix3(matrix);
+      })
+    })
+  }
+}
+
 
 
 
@@ -347,5 +380,6 @@ export {
   previewCanvas,
   getLineLength,
   deepMerge,
-  gridPositions
+  gridPositions,
+  transformShape,
 };

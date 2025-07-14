@@ -1,3 +1,11 @@
+<!--
+ * @Author: wuyifan wuyifan@udschina.com
+ * @Date: 2025-07-11 16:48:51
+ * @LastEditors: wuyifan wuyifan@udschina.com
+ * @LastEditTime: 2025-07-14 17:34:12
+ * @FilePath: \threejs-demo\src\shader\map.html
+ * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
+-->
 <!DOCTYPE html>
 <html lang="en">
    <head>
@@ -24,4 +32,47 @@
        <div id="webgl-output"></div>
        <script src="./map.js" type="module"></script>
    </body>
+<canvas id="hexCanvas"></canvas>
+<script>
+const R = 40;                          // 六边形外接圆半径
+const hexW = 3 * R;                    // 真实 tile 宽度
+const hexH = Math.sqrt(3) * R;         // 真实 tile 高度
+const canvasSize = Math.max(hexW, hexH); // ✅ 正方形 canvas 尺寸
+
+const canvas = document.getElementById('hexCanvas');
+canvas.width = canvas.height = canvasSize;
+
+const ctx = canvas.getContext('2d');
+ctx.fillStyle = 'black';
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+ctx.strokeStyle = 'white';
+ctx.lineWidth = 6;
+
+// 六边形绘制函数
+function drawHex(cx, cy) {
+  ctx.beginPath();
+  for (let i = 0; i <= 6; i++) {
+    const angle = Math.PI / 3 * i;
+    const x = cx + R * Math.cos(angle);
+    const y = cy + R * Math.sin(angle);
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+}
+
+// 平移偏移，使 hex 内容居中
+const offsetX = (canvas.width - hexW) / 2;
+const offsetY = (canvas.height - hexH) / 2;
+
+// 六边形中心 Y 位置 = hexH / 2 + offsetY
+const centerY = hexH / 2 + offsetY;
+
+// 画三个 hex：左半 + 中间 + 右半
+drawHex(offsetX+ canvasSize / 2, centerY);
+// drawHex(offsetX + R * 1.5, centerY + R - 6);
+// drawHex(offsetX + R * 3.0, centerY);
+// drawHex(offsetX + R * 1.5, centerY - R  +6);
+</script>
 </html>
