@@ -98,7 +98,7 @@ async function init() {
 
     const planeTexture = new CanvasTexture(createCanvas());
     planeTexture.wrapS = planeTexture.wrapT = RepeatWrapping;
-    planeTexture.repeat.set(10, 10);
+    planeTexture.repeat.set(50, 50);
 
     const plane = new Mesh(
         new BoxGeometry(100, 100),
@@ -115,19 +115,25 @@ async function init() {
 
 function createCanvas() {
     const R = 40;                          // 六边形外接圆半径
-    const hexW = 3 * R;                    // 真实 tile 宽度
-    const hexH = Math.sqrt(3) * R;         // 真实 tile 高度
-    const canvasSize = Math.max(hexW, hexH); // ✅ 正方形 canvas 尺寸
+    const hexH = Math.sqrt(3) / 2 * R;
+    const canvasHeight = hexH * 4;
+    const canvasWidth = 3 * R;
 
     const canvas = document.createElement('canvas');
-    canvas.width = canvas.height = canvasSize;
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    canvas.style.width = canvasWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
+
+    document.body.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.strokeStyle = 'white';
-    ctx.lineWidth = 6;
+    ctx.lineWidth = 3;
 
     // 六边形绘制函数
     function drawHex(cx, cy) {
@@ -143,17 +149,21 @@ function createCanvas() {
     }
 
     // 平移偏移，使 hex 内容居中
-    const offsetX = (canvas.width - hexW) / 2;
-    const offsetY = (canvas.height - hexH) / 2;
+    const centerX = canvasWidth / 2;
+    const centerY = canvasHeight / 2;
 
-    // 六边形中心 Y 位置 = hexH / 2 + offsetY
-    const centerY = hexH / 2 + offsetY;
+
+
 
     // 画三个 hex：左半 + 中间 + 右半
-    drawHex(offsetX + 0, centerY);
-    drawHex(offsetX + R * 1.5, centerY + R - 6);
-    drawHex(offsetX + R * 3.0, centerY);
-    drawHex(offsetX + R * 1.5, centerY - R + 6);
+    drawHex(centerX, centerY);
+    drawHex(centerX, centerY - 2 * hexH);
+    drawHex(centerX, centerY + 2 * hexH);
+
+    drawHex(centerX - R * 3 / 2, centerY - hexH);
+    drawHex(centerX - R * 3 / 2, centerY + hexH);
+    drawHex(centerX + R * 3 / 2, centerY - hexH);
+    drawHex(centerX + R * 3 / 2, centerY + hexH);
 
     return canvas;
 }
