@@ -18,7 +18,10 @@ import {
     CatmullRomCurve3,
     CanvasTexture,
     RepeatWrapping,
-    MeshBasicMaterial
+    MeshBasicMaterial,
+    PlaneGeometry,
+    ShaderMaterial,
+    Uniform
 } from 'three';
 import {
     initRenderer,
@@ -48,7 +51,6 @@ async function init() {
     const scene = initScene();
     initAxesHelper(scene);
     renderer.setClearColor(0xffffff);
-    initCustomGrid(scene);
 
     const dataPath = `../../public/data`;
     const conuntryData = await loadJSON(`${dataPath}/country.json`);
@@ -66,8 +68,7 @@ async function init() {
     const offset = new Vector2().copy(provinceGeo.center).negate();
 
     provinceData.features.forEach((province) => {
-        console.log(6);
-        province.geometry.shapes.forEach((points, i) => {
+        province.geometry.shapes.forEach((points) => {
             transformShape({ shape: points }, 'translate', offset);
             transformShape({ shape: points }, 'scale', new Vector2(1, -1));
 
@@ -98,13 +99,44 @@ async function init() {
 
     const planeTexture = new CanvasTexture(createCanvas());
     planeTexture.wrapS = planeTexture.wrapT = RepeatWrapping;
-    planeTexture.repeat.set(50, 50);
+    planeTexture.repeat.set(100, 100);
+
+    const planeMaterial = new ShaderMaterial({
+        uniforms: {
+            uTime: new Uniform(0),
+            uDiffuse: new Uniform(planeTexture),
+        },
+        vertexShader: /*glsl*/`
+            varying vec2 vUv;
+            varying vec3 vWorldPosition;
+            void main() {
+                vUv = uv;
+                vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+                gl_Position = projectionMatrix * modelMatrix * vec4(position, 1.0);
+            }
+        `,
+        fragmentShader: /*glsl*/`
+        const float width = 20.0;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform sampler2D uDiffuse;
+            varying vec3 vWorldPosition;
+
+            void main() {
+                vec3 color = texture2D(uDiffuse, vUv).rgb;
+                // float distance = length(vWorldPosition);
+                // float alpha = smoothstep(width, 0.0, distance);
+
+                gl_FragColor = vec4(color, 1.0);
+            }
+        `
+    })
 
     const plane = new Mesh(
-        new BoxGeometry(100, 100),
-        new MeshBasicMaterial({ map: planeTexture })
+        new PlaneGeometry(500, 500),
+        planeMaterial
     );
-    plane.position.z = 10;
+    plane.position.z = -2;
     scene.add(plane);
 
 
@@ -126,7 +158,7 @@ function createCanvas() {
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
 
-    document.body.appendChild(canvas);
+    // document.body.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = 'black';
@@ -151,9 +183,6 @@ function createCanvas() {
     // 平移偏移，使 hex 内容居中
     const centerX = canvasWidth / 2;
     const centerY = canvasHeight / 2;
-
-
-
 
     // 画三个 hex：左半 + 中间 + 右半
     drawHex(centerX, centerY);

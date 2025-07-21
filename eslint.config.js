@@ -14,7 +14,6 @@ export default [
       "**/lib/three/**",
       "**/lib/other/**"
     ],
-    env: { browser: true, node: true },
   },
 
   // 继承推荐规则集

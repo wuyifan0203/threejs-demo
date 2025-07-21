@@ -106,21 +106,11 @@ async function init() {
   const geometry = new PlaneGeometry(64, 64);
   const material = new ShaderMaterial({
     uniforms: {
-      map: {
-        value: cloudTexture,
-      },
-      fogColor: {
-        value: new Color(params.fogColor),
-      },
-      fogNear: {
-        value: params.fogNear,
-      },
-      fogFar: {
-        value: params.fogFar,
-      },
-      enableFog: {
-        value: Number(params.enableFog),
-      }
+      map: {value: cloudTexture,},
+      fogColor: {value: new Color(params.fogColor),},
+      fogNear: {value: params.fogNear,},
+      fogFar: {value: params.fogFar,},
+      enableFog: {value: Number(params.enableFog),}
     },
     vertexShader: vs,
     fragmentShader: fs,

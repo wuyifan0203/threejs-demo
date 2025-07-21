@@ -23,7 +23,6 @@ import {
     initOrbitControls,
     initScene,
     Model_Path,
-    initClock,
     initOrthographicCamera,
     initAxesHelper,
     initAmbientLight,
@@ -67,11 +66,8 @@ async function init() {
     cityModel.position.z = -50;
     scene.add(cityModel);
 
-    const clock = initClock();
-    let delta = 0;
     resize(renderer, camera);
     function render() {
-        delta = clock.getDelta();
         orbitControls.update();
         renderer.render(scene, camera);
         update();
@@ -85,7 +81,7 @@ async function createCity() {
     const model = await loader.loadAsync(`../../${Model_Path}/shanghai.FBX`);
     model.scale.set(0.1, 0.1, 0.1);
     model.traverse((child) => child.isMesh && (child.castShadow = child.receiveShadow = true));
-    scene.add(model);
+    window.scene.add(model);
     const [city, land, road] = [model.children[3], model.children[1], model.children[0]];
     city.material.color.set('#ff00ff');
     city.material.transparent = true;

@@ -135,9 +135,7 @@ async function init() {
     normalMaterial: new MeshNormalMaterial({ side: 2 }),
   };
 
-  const params = {
-    material: "shaderMaterial",
-  };
+  const params = {material: "shaderMaterial",};
 
   const mesh = new Mesh(geometry, materialMap[params.material]);
   scene.add(mesh);

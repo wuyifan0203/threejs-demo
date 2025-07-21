@@ -54,9 +54,7 @@ async function init() {
 
   const orbitControls = initOrbitControls(camera, renderer.domElement);
 
-  const params = {
-    materialType: "normalizePosition",
-  };
+  const params = {materialType: "normalizePosition",};
 
   const loader = new CubeTextureLoader();
   loader.setPath(`../../${Image_Path}/snow_field/`);
@@ -131,9 +129,7 @@ async function init() {
     console.log("params.materialType: ", v);
   });
 
-  const baseMaterialParams = {
-    color: "#ffffff",
-  };
+  const baseMaterialParams = {color: "#ffffff",};
 
   const baseFolder = gui.addFolder("baseMaterial");
   baseFolder.addColor(baseMaterialParams, "color").onChange(() => {
@@ -173,7 +169,7 @@ async function init() {
   phongFolder.addColor(phongMaterialParams, "lightColor").onChange(updateMaterial);
   phongFolder.add(light.position, "x", -100, 100).onChange(updateMaterial).name("lightPositionX");
 
-  const folders = {
+  var folders = {
     basic: baseFolder,
     normal: baseFolder,
     normalizePosition: baseFolder,

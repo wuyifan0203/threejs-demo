@@ -1,4 +1,6 @@
-import { ShaderMaterial, Uniform, Color, Vector3 } from 'three';
+import {
+ ShaderMaterial, Uniform, Color, Vector3 
+} from 'three';
 
 class CustomPhongMaterial extends ShaderMaterial {
     constructor() {

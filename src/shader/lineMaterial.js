@@ -27,6 +27,72 @@ import {
     initClock,
 } from "../lib/tools/index.js";
 
+
+class GradationLineMaterial extends ShaderMaterial {
+    static defaultParams = {
+        color: '#ff0000',
+        gradualColor: '#00ff00',
+        lineWidth: 30,
+        speed: 60,
+        time: 0,
+        lineLength: 0
+    }
+    constructor(params) {
+        super({
+            uniforms: {
+                uTime: new Uniform(params.uTime || 0),
+                uColor: new Uniform(new Color(params.uColor || '#ff0000')),
+                uGradualColor: new Uniform(new Color(params.uGradualColor || '#00ff00')),
+                uSpeed: new Uniform(params.uSpeed || 0),
+                uLineWidth: new Uniform(params.uLineWidth || 1),
+                uLineLength: new Uniform(params.uLineLength || 0)
+            },
+            vertexShader:/*glsl*/`
+                varying vec3 vPosition;
+                varying vec2 vUv;
+                void main() {
+                    vPosition = position;
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader:/*glsl*/`
+                uniform float uTime;
+                uniform vec3 uColor;
+                uniform vec3 uGradualColor;
+                uniform float uSpeed;
+                uniform float uLineWidth;
+                uniform float uLineLength;
+                varying vec3 vPosition;
+                varying vec2 vUv;
+
+                void main() {
+                    float d = mod(vUv.x * uLineLength - uSpeed * uTime, uLineLength);
+                    // 1// 基础逻辑
+                    // if(abs(d) < uLineWidth){
+                    //     gl_FragColor = vec4(uGradualColor, 1.0);
+                    // }else{
+                    //     gl_FragColor = vec4(uColor, 1.0);
+                    // }
+                    // 2//加入渐变色
+                    // if(abs(d) < uLineWidth){
+                    //     vec3 color = mix(uColor, uGradualColor,  d / uLineWidth);
+                    //     gl_FragColor = vec4(color, 1.0);
+                    // }else{
+                    //     gl_FragColor = vec4(uColor, 1.0);
+                    // }
+                    // 3// 优化if else
+                    float gradation = d / uLineWidth;
+                    float inRange = step(d, uLineWidth);
+                    vec3 color = mix(uColor, uGradualColor,  gradation * inRange); 
+                    gl_FragColor = vec4(color, 1.0);
+                }
+            `
+        });        
+    }
+
+}
+
 window.onload = () => {
     init();
 };
@@ -103,69 +169,4 @@ function init() {
     gui.add(params, 'lineWidth', 0, 100).onChange(() => {
         material.uniforms.uLineWidth.value = params.lineWidth;
     });
-}
-
-class GradationLineMaterial extends ShaderMaterial {
-    static defaultParams = {
-        color: '#ff0000',
-        gradualColor: '#00ff00',
-        lineWidth: 30,
-        speed: 60,
-        time: 0,
-        lineLength: 0
-    }
-    constructor(params) {
-        super({
-            uniforms: {
-                uTime: new Uniform(params.uTime || 0),
-                uColor: new Uniform(new Color(params.uColor || '#ff0000')),
-                uGradualColor: new Uniform(new Color(params.uGradualColor || '#00ff00')),
-                uSpeed: new Uniform(params.uSpeed || 0),
-                uLineWidth: new Uniform(params.uLineWidth || 1),
-                uLineLength: new Uniform(params.uLineLength || 0)
-            },
-            vertexShader:/*glsl*/`
-                varying vec3 vPosition;
-                varying vec2 vUv;
-                void main() {
-                    vPosition = position;
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader:/*glsl*/`
-                uniform float uTime;
-                uniform vec3 uColor;
-                uniform vec3 uGradualColor;
-                uniform float uSpeed;
-                uniform float uLineWidth;
-                uniform float uLineLength;
-                varying vec3 vPosition;
-                varying vec2 vUv;
-
-                void main() {
-                    float d = mod(vUv.x * uLineLength - uSpeed * uTime, uLineLength);
-                    // 1// 基础逻辑
-                    // if(abs(d) < uLineWidth){
-                    //     gl_FragColor = vec4(uGradualColor, 1.0);
-                    // }else{
-                    //     gl_FragColor = vec4(uColor, 1.0);
-                    // }
-                    // 2//加入渐变色
-                    // if(abs(d) < uLineWidth){
-                    //     vec3 color = mix(uColor, uGradualColor,  d / uLineWidth);
-                    //     gl_FragColor = vec4(color, 1.0);
-                    // }else{
-                    //     gl_FragColor = vec4(uColor, 1.0);
-                    // }
-                    // 3// 优化if else
-                    float gradation = d / uLineWidth;
-                    float inRange = step(d, uLineWidth);
-                    vec3 color = mix(uColor, uGradualColor,  gradation * inRange); 
-                    gl_FragColor = vec4(color, 1.0);
-                }
-            `
-        });        
-    }
-
 }
