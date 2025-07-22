@@ -26,7 +26,6 @@ import {
 import {
     initRenderer,
     initOrthographicCamera,
-    initCustomGrid,
     initAxesHelper,
     initOrbitControls,
     initScene,
@@ -75,7 +74,7 @@ async function init() {
             const geometry = new ExtrudeGeometry(new Shape(points));
             const mesh = new Mesh(geometry, material);
             mesh.userData = province.properties;
-            scene.add(mesh);
+            // scene.add(mesh);
         })
     });
 
@@ -85,7 +84,7 @@ async function init() {
     const geometry = new TubeGeometry(new CatmullRomCurve3(vec2ToVec3(countryShape), true), 2000, 0.1);
     const countryMesh = new Mesh(geometry, material);
     countryMesh.position.z = 4;
-    scene.add(countryMesh);
+    // scene.add(countryMesh);
 
 
 
@@ -105,6 +104,10 @@ async function init() {
         uniforms: {
             uTime: new Uniform(0),
             uDiffuse: new Uniform(planeTexture),
+            uRepeat: new Uniform(planeTexture.repeat),
+            uSpeed: new Uniform(0.01),
+            uRadius: new Uniform(10),
+            uOpacityScale: new Uniform(0),
         },
         vertexShader: /*glsl*/`
             varying vec2 vUv;
@@ -112,30 +115,46 @@ async function init() {
             void main() {
                 vUv = uv;
                 vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
-                gl_Position = projectionMatrix * modelMatrix * vec4(position, 1.0);
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
             }
         `,
         fragmentShader: /*glsl*/`
-        const float width = 20.0;
+            #include <common>
+            const float width = 20.0;
+            const vec3 center = vec3(0, 0, 0);
             varying vec2 vUv;
+            varying vec3 vWorldPosition;
+            uniform float uSpeed;
+            uniform float uRadius;
+            uniform float uOpacityScale;
             uniform float uTime;
             uniform sampler2D uDiffuse;
-            varying vec3 vWorldPosition;
+            uniform vec2 uRepeat;
 
             void main() {
-                vec3 color = texture2D(uDiffuse, vUv).rgb;
-                // float distance = length(vWorldPosition);
-                // float alpha = smoothstep(width, 0.0, distance);
+                vec2 uv = vUv * uRepeat;
+                float innerRadius = uRadius + uTime * uSpeed;
+                float outerRadius = innerRadius + width;
 
-                gl_FragColor = vec4(color, 1.0);
+                float d = distance(vWorldPosition, center);
+                float isInRing = step(innerRadius, d) * step(d, outerRadius);
+                float alpha = smoothstep(width, 0.0, d) * isInRing;
+                vec3 color = texture2D(uDiffuse, uv).rgb;
+
+                gl_FragColor = vec4(color, alpha);
             }
         `
     })
 
     const plane = new Mesh(
         new PlaneGeometry(500, 500),
+        // new MeshBasicMaterial({ map: planeTexture })
         planeMaterial
     );
+
+    planeMaterial.onBeforeRender = () => {
+        planeMaterial.uniforms.uTime.value += 0.01;
+    }
     plane.position.z = -2;
     scene.add(plane);
 
