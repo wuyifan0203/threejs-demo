@@ -8,7 +8,6 @@
  */
 import {
     Mesh,
-    BoxGeometry,
     MeshNormalMaterial,
     ExtrudeGeometry,
     Shape,
@@ -21,7 +20,8 @@ import {
     MeshBasicMaterial,
     PlaneGeometry,
     ShaderMaterial,
-    Uniform
+    Uniform,
+    Color
 } from 'three';
 import {
     initRenderer,
@@ -56,14 +56,13 @@ async function init() {
     const provinceData = await loadJSON(`${dataPath}/province.json`);
 
     const countryGeo = convertGeoJSON(conuntryData);
-    console.log('countryGeo: ', conuntryData);
     const provinceGeo = convertGeoJSON(provinceData);
-    console.log('provinceGeo: ', provinceGeo);
-    console.log('provinceData: ', provinceData);
+ 
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
-    const material = new MeshNormalMaterial();
+    const faceMaterial = new MeshNormalMaterial();
+    const sideMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
     const offset = new Vector2().copy(provinceGeo.center).negate();
 
     provinceData.features.forEach((province) => {
@@ -72,9 +71,9 @@ async function init() {
             transformShape({ shape: points }, 'scale', new Vector2(1, -1));
 
             const geometry = new ExtrudeGeometry(new Shape(points));
-            const mesh = new Mesh(geometry, material);
+            const mesh = new Mesh(geometry, [faceMaterial, sideMaterial]);
             mesh.userData = province.properties;
-            // scene.add(mesh);
+            scene.add(mesh);
         })
     });
 
@@ -82,9 +81,9 @@ async function init() {
     transformShape({ shape: countryShape }, 'translate', countryGeo.center.negate());
     transformShape({ shape: countryShape }, 'scale', new Vector2(1, -1));
     const geometry = new TubeGeometry(new CatmullRomCurve3(vec2ToVec3(countryShape), true), 2000, 0.1);
-    const countryMesh = new Mesh(geometry, material);
+    const countryMesh = new Mesh(geometry, new MeshNormalMaterial());
     countryMesh.position.z = 4;
-    // scene.add(countryMesh);
+    scene.add(countryMesh);
 
 
 
@@ -103,11 +102,15 @@ async function init() {
     const planeMaterial = new ShaderMaterial({
         uniforms: {
             uTime: new Uniform(0),
-            uDiffuse: new Uniform(planeTexture),
+            uAlphaMap: new Uniform(planeTexture),
             uRepeat: new Uniform(planeTexture.repeat),
             uSpeed: new Uniform(0.01),
             uRadius: new Uniform(10),
-            uOpacityScale: new Uniform(0),
+            uFadeScale: new Uniform(0.5),
+            uColor: new Uniform(new Color('#22bffd')),
+            uBaseColor: new Uniform(new Color('#064057')),
+            uWidth: new Uniform(15),
+            uOpacity: new Uniform(1),
         },
         vertexShader: /*glsl*/`
             varying vec2 vUv;
@@ -119,49 +122,86 @@ async function init() {
             }
         `,
         fragmentShader: /*glsl*/`
-            #include <common>
-            const float width = 20.0;
+            // 圆环宽度
+            uniform float uWidth;
+            // 圆环扩散中心
             const vec3 center = vec3(0, 0, 0);
             varying vec2 vUv;
             varying vec3 vWorldPosition;
-            uniform float uSpeed;
+            // 半径
             uniform float uRadius;
-            uniform float uOpacityScale;
-            uniform float uTime;
-            uniform sampler2D uDiffuse;
+            // 渐变比例
+            uniform float uFadeScale;
+            // alpha贴图
+            uniform sampler2D uAlphaMap;
+            // 贴图重复次数
             uniform vec2 uRepeat;
+            // 颜色
+            uniform vec3 uColor;
+            // 背景颜色
+            uniform vec3 uBaseColor;
+            // 透明度
+            uniform float uOpacity;
 
             void main() {
                 vec2 uv = vUv * uRepeat;
-                float innerRadius = uRadius + uTime * uSpeed;
-                float outerRadius = innerRadius + width;
+                float innerRadius = uRadius;
+                float outerRadius = innerRadius + uWidth;
 
+                // 计算当前像素点到中心的距离
                 float d = distance(vWorldPosition, center);
+                // 计算当前像素点是否在环内
                 float isInRing = step(innerRadius, d) * step(d, outerRadius);
-                float alpha = smoothstep(width, 0.0, d) * isInRing;
-                vec3 color = texture2D(uDiffuse, uv).rgb;
 
-                gl_FragColor = vec4(color, alpha);
+                // 计算渐变中心
+                float fadeCenter = mix(innerRadius, outerRadius, uFadeScale);
+                // 计算渐变范围
+                float fadeRange = uWidth * 0.5;
+                // 计算渐变值
+                float fade = smoothstep(1.0, 0.0, abs(d - fadeCenter) / fadeRange) ;
+
+                // 计算alpha值
+                float alpha = texture2D(uAlphaMap, uv).b;
+
+                // 计算影响值
+                float affect = isInRing * alpha * fade * uOpacity;
+                // 计算最终颜色
+                vec3 diffues = mix(uBaseColor, uColor, affect);
+
+                gl_FragColor = vec4(diffues, 1.0);
             }
         `
-    })
+    });
 
     const plane = new Mesh(
         new PlaneGeometry(500, 500),
-        // new MeshBasicMaterial({ map: planeTexture })
         planeMaterial
     );
 
-    planeMaterial.onBeforeRender = () => {
-        planeMaterial.uniforms.uTime.value += 0.01;
+    plane.onBeforeRender = () => {
+        let curRadius = planeMaterial.uniforms.uRadius.value;
+        planeMaterial.uniforms.uRadius.value = (curRadius + 1) % 250;
+        planeMaterial.uniforms.uOpacity.value = 1 - (curRadius + 1) % 250 / 250;
     }
     plane.position.z = -2;
     scene.add(plane);
 
 
-
     resize(renderer, camera);
+    const params = {
+        baseColor: '#064057',
+        color: '#22bffd',
+    }
     const gui = initGUI();
+    gui.addColor(params, 'baseColor').onChange((value) => {
+        planeMaterial.uniforms.uBaseColor.value.set(value);
+    });
+    gui.addColor(params, 'color').onChange((value) => {
+        planeMaterial.uniforms.uColor.value.set(value);
+    });
+    gui.add(planeMaterial.uniforms.uRadius, 'value').min(0).max(250).step(1).name('radius');
+    gui.add(planeMaterial.uniforms.uFadeScale, 'value').min(0).max(1).step(0.01).name('fadeScale');
+    gui.add(planeMaterial.uniforms.uWidth, 'value').min(0).max(150).step(1).name('width');
 }
 
 function createCanvas() {
