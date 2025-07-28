@@ -1,8 +1,8 @@
 /*
- * @Author: wuyifan wuyifan@udschina.com
+ * @Author: wuyifan 
  * @Date: 2025-07-11 16:48:39
- * @LastEditors: wuyifan wuyifan@udschina.com
- * @LastEditTime: 2025-07-14 17:32:15
+ * @LastEditors: wuyifan 1208097313@qq.com
+ * @LastEditTime: 2025-07-28 17:34:56
  * @FilePath: \threejs-demo\src\shader\map.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -21,7 +21,11 @@ import {
     PlaneGeometry,
     ShaderMaterial,
     Uniform,
-    Color
+    Color,
+    BufferGeometry,
+    LineBasicMaterial,
+    Line,
+    Group
 } from 'three';
 import {
     initRenderer,
@@ -57,23 +61,33 @@ async function init() {
 
     const countryGeo = convertGeoJSON(conuntryData);
     const provinceGeo = convertGeoJSON(provinceData);
- 
+
 
     const controls = initOrbitControls(camera, renderer.domElement);
 
     const faceMaterial = new MeshNormalMaterial();
     const sideMaterial = new MeshBasicMaterial({ color: 0x00ff00 });
+    const lineMaterial = new LineBasicMaterial({ color: 0xffffff });
     const offset = new Vector2().copy(provinceGeo.center).negate();
+    const depth = 1;
+
+    const mapGroup = new Group();
+    scene.add(mapGroup);
 
     provinceData.features.forEach((province) => {
         province.geometry.shapes.forEach((points) => {
             transformShape({ shape: points }, 'translate', offset);
             transformShape({ shape: points }, 'scale', new Vector2(1, -1));
 
-            const geometry = new ExtrudeGeometry(new Shape(points));
+
+            const geometry = new ExtrudeGeometry(new Shape(points), { depth });
             const mesh = new Mesh(geometry, [faceMaterial, sideMaterial]);
             mesh.userData = province.properties;
-            scene.add(mesh);
+
+            const lineSegment = new Line(new BufferGeometry().setFromPoints(vec2ToVec3(points)), lineMaterial);
+            lineSegment.position.z = 2;
+            mesh.add(lineSegment);
+            mapGroup.add(mesh);
         })
     });
 
@@ -82,8 +96,8 @@ async function init() {
     transformShape({ shape: countryShape }, 'scale', new Vector2(1, -1));
     const geometry = new TubeGeometry(new CatmullRomCurve3(vec2ToVec3(countryShape), true), 2000, 0.1);
     const countryMesh = new Mesh(geometry, new MeshNormalMaterial());
-    countryMesh.position.z = 4;
-    scene.add(countryMesh);
+    countryMesh.position.z = 2;
+    mapGroup.add(countryMesh);
 
 
 
@@ -97,7 +111,7 @@ async function init() {
 
     const planeTexture = new CanvasTexture(createCanvas());
     planeTexture.wrapS = planeTexture.wrapT = RepeatWrapping;
-    planeTexture.repeat.set(100, 100);
+    planeTexture.repeat.set(80, 80);
 
     const planeMaterial = new ShaderMaterial({
         uniforms: {
@@ -183,7 +197,7 @@ async function init() {
         planeMaterial.uniforms.uRadius.value = (curRadius + 1) % 250;
         planeMaterial.uniforms.uOpacity.value = 1 - (curRadius + 1) % 250 / 250;
     }
-    plane.position.z = -2;
+    plane.position.z = -1;
     scene.add(plane);
 
 
@@ -216,8 +230,6 @@ function createCanvas() {
 
     canvas.style.width = canvasWidth + 'px';
     canvas.style.height = canvasHeight + 'px';
-
-    // document.body.appendChild(canvas);
 
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = 'black';
