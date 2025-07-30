@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "naumovs.color-highlight",// 颜色高亮
+        "whtouche.vscode-js-console-utils", // log
+        "ritwickdey.liveserver",//  live server
+        "slevesque.shader",//  shader
+        "obkoro1.korofileheader", // 文件头注释
+        "bierner.comment-tagged-templates", // SHADER高亮
+        "dbaeumer.vscode-eslint", // eslint
+    ]
+}
