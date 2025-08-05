@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-08-01 15:04:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-04 17:40:50
+ * @LastEditTime: 2025-08-05 17:35:59
  * @FilePath: \threejs-demo\src\intersection\voxelsGenerate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -18,7 +18,7 @@ import {
     Raycaster,
     TorusKnotGeometry,
     Vector3,
-    MathUtils
+    MathUtils,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import {
@@ -27,14 +27,13 @@ import {
 import {
     initRenderer,
     initOrthographicCamera,
-    initCustomGrid,
-    initAxesHelper,
     initOrbitControls,
     initScene,
     initGUI,
     resize,
     initAmbientLight,
     initDirectionLight,
+    initGroundPlane,
 } from '../lib/tools/index.js';
 import { gsap } from '../lib/other/gsap.js'
 
@@ -59,14 +58,15 @@ const dirArray = ['up', 'down'];
 
 function init() {
     const renderer = initRenderer();
-    const camera = initOrthographicCamera();
+    const camera = initOrthographicCamera(new Vector3(0, -400, 300));
     camera.up.set(0, 0, 1);
+    camera.zoom = 0.3;
     camera.updateProjectionMatrix();
 
     const scene = initScene();
     initAmbientLight(scene);
-    initAxesHelper(scene);
-    initCustomGrid(scene);
+    const ground = initGroundPlane(scene);
+    ground.position.z = -10;
     const light = initDirectionLight();
     light.position.set(100, 100, 100);
     scene.add(light);
@@ -94,23 +94,31 @@ function init() {
 
         const voxels = generate(range, mesh, params.gridSize);
         params.instanceMesh = new InstancedMesh(baseGeometry, voxelsMaterial, voxels.length);
+        params.instanceMesh.instanceMatrix.array.fill(0);
+        params.instanceMesh.castShadow = true;
         scene.add(params.instanceMesh);
 
         const timeLine = gsap.timeline();
-        const startPos = new Vector3();
 
         for (let index = 0, l = voxels.length; index < l; index++) {
             const { position, color } = voxels[index];
-            startPos.set(randFloat(30, 50) * randInt(0, 1), randFloat(30, 50) * randInt(0, 1), position.z);
+            // ✅ 每个 voxel 都有自己的 startPos
+            const startPos = new Vector3(
+                randFloat(30, 50) * randInt(0, 1),
+                randFloat(30, 50) * randInt(0, 1),
+                position.z
+            );
 
-            timeLine.to(startPos, {
+            const animatedPos = startPos.clone(); // ✅ 用于动画控制的中间变量
+
+            timeLine.to(animatedPos, {
                 x: position.x,
                 y: position.y,
                 z: position.z,
-                duration: 0.2,
+                duration: 0.3,
                 ease: 'power2.out',
                 onUpdate: () => {
-                    dummy.position.set(startPos.x, startPos.y, startPos.z);
+                    dummy.position.copy(animatedPos);
                     dummy.scale.set(params.gridSize, params.gridSize, params.gridSize);
                     dummy.updateMatrix();
 
@@ -121,15 +129,15 @@ function init() {
                 }
             }, index * 0.001); // 关键：每个实例延迟启动时间（按 index 控制）
         }
+
+
     }
 
 
     generateVoxels(mockMesh);
 
-    let angle = 0;
     function render() {
         controls.update();
-        params.instanceMesh.rotation.set(0, 0, angle += 0.02);
         renderer.render(scene, camera);
         requestAnimationFrame(render);
     }
@@ -184,9 +192,9 @@ function generate(range, mesh, gridSize) {
 
     const voxels = [];
 
-    for (let ix = 0; ix < count.x; ix++) {
-        for (let iy = 0; iy < count.y; iy++) {
-            for (let iz = 0; iz < count.z; iz++) {
+    for (let iz = 0; iz < count.z; iz++) {
+        for (let ix = 0; ix < count.x; ix++) {
+            for (let iy = 0; iy < count.y; iy++) {
                 const x = range.min.x + ix * gridSize;
                 const y = range.min.y + iy * gridSize;
                 const z = range.min.z + iz * gridSize;
