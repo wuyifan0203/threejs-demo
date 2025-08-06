@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-08-01 15:04:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-05 17:35:59
+ * @LastEditTime: 2025-08-06 17:31:26
  * @FilePath: \threejs-demo\src\intersection\voxelsGenerate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -19,8 +19,10 @@ import {
     TorusKnotGeometry,
     Vector3,
     MathUtils,
+    Box3Helper,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+import { TeapotGeometry } from 'three/examples/jsm/geometries/TeapotGeometry.js';
 import {
     disposeBoundsTree, acceleratedRaycast, computeBoundsTree
 } from '../lib/other/three-mesh-bvh.js'
@@ -34,6 +36,10 @@ import {
     initAmbientLight,
     initDirectionLight,
     initGroundPlane,
+    initLoader,
+    HALF_PI,
+    Model_Path,
+    DIRECTION
 } from '../lib/tools/index.js';
 import { gsap } from '../lib/other/gsap.js'
 
@@ -49,12 +55,14 @@ window.onload = () => {
 
 const { randFloat, randInt } = MathUtils;
 
-const ZPostive = new Vector3(0, 0, 1);
-const ZNegative = new Vector3(0, 0, -1);
 const raycast = new Raycaster();
 
 const dummy = new Object3D();
-const dirArray = ['up', 'down'];
+const tmpBox = new Box3();
+const direction = new Vector3();
+const dirArray = Object.keys(DIRECTION);
+const loader = initLoader();
+
 
 function init() {
     const renderer = initRenderer();
@@ -73,11 +81,30 @@ function init() {
     const controls = initOrbitControls(camera, renderer.domElement);
 
     const baseGeometry = new RoundedBoxGeometry(1, 1, 1, 5, 0.2);
-    const mockMesh = new Mesh(new TorusKnotGeometry(10, 3, 64, 8, 2, 3), new MeshLambertMaterial({ color: 0x156289, emissive: 0x072534, flatShading: true, side: 2 }));
     const voxelsMaterial = new MeshLambertMaterial({});
 
+    const modelMap = {
+        TorusKnot: new Mesh(new TorusKnotGeometry(10, 3, 64, 8, 2, 3), new MeshLambertMaterial({ color: 0x156289, emissive: 0x072534, flatShading: true, side: 2 })),
+        Teapot: new Mesh(new TeapotGeometry(10).rotateX(HALF_PI), new MeshLambertMaterial({ color: '#ffa504', emissive: '#895201', flatShading: true, side: 2 })),
+        Duck: null,
+    }
+
+    loader.load(`../../${Model_Path}/rubber_duck_toy/rubber_duck_toy_1k.gltf`, (res) => {
+        modelMap.Duck = res.scene.children[0];
+        modelMap.Duck.scale.set(100, 100, 100);
+        modelMap.Duck.rotation.set(HALF_PI, 0, 0);
+
+
+        scene.add(modelMap.Duck);
+
+        console.log('modelMap: ', modelMap);
+    });
+
+
+
     const params = {
-        gridSize: 1,
+        model: 'TorusKnot',
+        gridSize: 3,
         instanceMesh: new InstancedMesh(baseGeometry, voxelsMaterial, 0)
     };
 
@@ -134,7 +161,8 @@ function init() {
     }
 
 
-    generateVoxels(mockMesh);
+    generateVoxels(modelMap[params.model]);
+
 
     function render() {
         controls.update();
@@ -145,21 +173,35 @@ function init() {
 
     resize(renderer, camera);
     const gui = initGUI();
-    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => {
-        generateVoxels(mockMesh);
+    gui.add(params, 'model', Object.keys(modelMap)).onFinishChange(() => {
+        generateVoxels(modelMap[params.model]);
     })
+
+    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => {
+        generateVoxels(modelMap[params.model]);
+    })
+
+    scene.add(boundingBox);
+
 }
 
+
 const worldBox = new Box3();
+const boundingBox = new Box3Helper(worldBox);
 function getRange(mesh, gridSize) {
     worldBox.makeEmpty();
+
     mesh.traverse((child) => {
         if (child?.isMesh) {
             child.geometry.computeBoundingBox();
-            worldBox.expandByObject(child);
+            child.updateWorldMatrix();
+            tmpBox.copy(child.geometry.boundingBox);
+            tmpBox.applyMatrix4(child.matrixWorld);
+            worldBox.union(tmpBox);
         }
     });
     const size = worldBox.getSize(new Vector3());
+    console.log('worldBox: ', worldBox);
     const count = new Vector3(
         Math.ceil(size.x / gridSize),
         Math.ceil(size.y / gridSize),
@@ -177,6 +219,7 @@ function getRange(mesh, gridSize) {
 
 function generate(range, mesh, gridSize) {
     const { count } = range;
+    console.log('range: ', range);
 
     const meshList = []
     mesh.traverse((child) => {
@@ -188,19 +231,21 @@ function generate(range, mesh, gridSize) {
 
 
     const inverseMatrix = new Matrix4();
-    const tmpBox = new Box3();
 
     const voxels = [];
+    let i = 0
 
     for (let iz = 0; iz < count.z; iz++) {
         for (let ix = 0; ix < count.x; ix++) {
             for (let iy = 0; iy < count.y; iy++) {
+                i++;
                 const x = range.min.x + ix * gridSize;
                 const y = range.min.y + iy * gridSize;
                 const z = range.min.z + iz * gridSize;
                 const point = new Vector3(x, y, z);
                 const res = intersectTest(point);
-                if (res.up % 2 === 1 && res.down % 2 === 1 && res.intersection.length > 0) {
+                console.log('res: ', res);
+                if (res.POSZ % 2 === 1 && res.NEGZ % 2 === 1 && res.intersection.length > 0) {
                     const color = getColor(res.intersection);
                     voxels.push({
                         position: point,
@@ -210,6 +255,8 @@ function generate(range, mesh, gridSize) {
             }
         }
     }
+    console.log('i: ', i, 'total', count.x * count.y * count.z);
+
 
     console.log('voxels: ', voxels);
 
@@ -217,22 +264,24 @@ function generate(range, mesh, gridSize) {
         const res = { intersection: [], up: -1, down: -1 };
         for (let i = 0; i < meshList.length; i++) {
             const mesh = meshList[i];
-            mesh.updateWorldMatrix();
             tmpBox.copy(mesh.geometry.boundingBox);
             tmpBox.applyMatrix4(mesh.matrixWorld);
+            boundingBox.box.copy(tmpBox.clone());
             // 先判断是否在box内,不在直接跳过
             if (!tmpBox.containsPoint(point)) {
+                console.log('不在box内');
                 continue;
             }
 
 
             inverseMatrix.copy(mesh.matrixWorld).invert();
-            [ZPostive, ZNegative].forEach((dir, i) => {
+            dirArray.forEach((dir) => {
+                direction.copy(DIRECTION[dir]);
                 raycast.ray.origin.copy(point);
-                raycast.ray.direction.copy(dir);
+                raycast.ray.direction.copy(direction);
                 raycast.ray.applyMatrix4(inverseMatrix);
-                const intersects = raycast.intersectObject(mesh);
-                res[dirArray[i]] = intersects.length;
+                const intersects = raycast.intersectObject(mesh, true);
+                res[dir] = intersects.length;
                 res.intersection.push(...intersects);
             });
         }
@@ -250,7 +299,6 @@ function getColor(intersection) {
     const { map, color } = materials[face.materialIndex];
     if (map !== null) {
         // TODO: 从纹理中获取颜色
-        console.log(uv);
         result.copy(color);
     } else {
         result.copy(color);

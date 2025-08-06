@@ -332,6 +332,7 @@ function gridPositions(total, current, gap = 1) {
  */
 function transformShape({ shape, holes }, type, params) {
   const matrix = new Matrix3();
+  // eslint-disable-next-line default-case
   switch (type) {
     case 'translate':
       matrix.makeTranslation(params);

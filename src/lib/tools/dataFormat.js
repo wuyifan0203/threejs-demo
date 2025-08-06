@@ -6,7 +6,9 @@
  * @FilePath: \threejs-demo\src\lib\tools\dataFormat.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
-import { BufferAttribute, Vector2, Vector3 } from "three";
+import {
+ BufferAttribute, Vector2, Vector3 
+} from "three";
 
 /**
  * @description: Vector2转三维BUffer
