@@ -9,7 +9,6 @@ import {
   TorusKnotGeometry,
   MeshPhongMaterial,
   Mesh,
-  AmbientLight,
   Plane,
   PlaneHelper,
   Clock,
@@ -22,7 +21,8 @@ import {
   initOrbitControls,
   initScene,
   initGUI,
-  initDirectionLight
+  initDirectionLight,
+  initAmbientLight
 } from '../lib/tools/index.js';
 
 
@@ -39,8 +39,8 @@ function init() {
 
   const scene = initScene();
   initGroundPlane(scene);
+  initAmbientLight(scene);
 
-  scene.add(new AmbientLight());
 
   const light = initDirectionLight(0xffffff,5);
   light.position.set(40, 40, 80);

@@ -16,7 +16,6 @@
     "folderBlacklist": ["node_modules", "dist", "build","lib"]
   },
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
     "source.fixAll.stylelint": "explicit"
   },
   "cSpell.words": [

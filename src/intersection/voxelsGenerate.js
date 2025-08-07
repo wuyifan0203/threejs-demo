@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-08-01 15:04:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-06 17:31:26
+ * @LastEditTime: 2025-08-07 15:13:40
  * @FilePath: \threejs-demo\src\intersection\voxelsGenerate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -11,7 +11,6 @@ import {
     BufferGeometry,
     Color,
     InstancedMesh,
-    Matrix4,
     Mesh,
     MeshLambertMaterial,
     Object3D,
@@ -20,6 +19,8 @@ import {
     Vector3,
     MathUtils,
     Box3Helper,
+    Plane,
+    PlaneHelper,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { TeapotGeometry } from 'three/examples/jsm/geometries/TeapotGeometry.js';
@@ -39,7 +40,7 @@ import {
     initLoader,
     HALF_PI,
     Model_Path,
-    DIRECTION
+    DIRECTION,
 } from '../lib/tools/index.js';
 import { gsap } from '../lib/other/gsap.js'
 
@@ -53,7 +54,7 @@ window.onload = () => {
     init();
 };
 
-const { randFloat, randInt } = MathUtils;
+const { clamp } = MathUtils;
 
 const raycast = new Raycaster();
 
@@ -63,9 +64,10 @@ const direction = new Vector3();
 const dirArray = Object.keys(DIRECTION);
 const loader = initLoader();
 
-
 function init() {
     const renderer = initRenderer();
+    renderer.localClippingEnabled = true;
+
     const camera = initOrthographicCamera(new Vector3(0, -400, 300));
     camera.up.set(0, 0, 1);
     camera.zoom = 0.3;
@@ -80,12 +82,36 @@ function init() {
     scene.add(light);
     const controls = initOrbitControls(camera, renderer.domElement);
 
+    const clipVoxel = new Plane(DIRECTION.NEGZ);
+    const clipModel = new Plane(DIRECTION.POSZ);
+    const planeHelper = new PlaneHelper(clipVoxel, 20);
+    scene.add(planeHelper);
+
     const baseGeometry = new RoundedBoxGeometry(1, 1, 1, 5, 0.2);
-    const voxelsMaterial = new MeshLambertMaterial({});
+    const voxelsMaterial = new MeshLambertMaterial({
+        clipShadows: true,
+        clippingPlanes: [clipVoxel]
+    });
 
     const modelMap = {
-        TorusKnot: new Mesh(new TorusKnotGeometry(10, 3, 64, 8, 2, 3), new MeshLambertMaterial({ color: 0x156289, emissive: 0x072534, flatShading: true, side: 2 })),
-        Teapot: new Mesh(new TeapotGeometry(10).rotateX(HALF_PI), new MeshLambertMaterial({ color: '#ffa504', emissive: '#895201', flatShading: true, side: 2 })),
+        TorusKnot: new Mesh(
+            new TorusKnotGeometry(10, 3, 64, 8, 2, 3),
+            new MeshLambertMaterial({
+                color: 0x156289,
+                emissive: 0x072534,
+                flatShading: true,
+                side: 2,
+                clippingPlanes: [clipModel]
+            })),
+        Teapot: new Mesh(
+            new TeapotGeometry(10).rotateX(HALF_PI),
+            new MeshLambertMaterial({
+                color: '#ffa504',
+                emissive: '#895201',
+                flatShading: true,
+                side: 2,
+                clippingPlanes: [clipModel]
+            })),
         Duck: null,
     }
 
@@ -93,76 +119,85 @@ function init() {
         modelMap.Duck = res.scene.children[0];
         modelMap.Duck.scale.set(100, 100, 100);
         modelMap.Duck.rotation.set(HALF_PI, 0, 0);
-
-
-        scene.add(modelMap.Duck);
-
-        console.log('modelMap: ', modelMap);
+        modelMap.Duck.updateMatrixWorld(true);
+        modelMap.Duck.traverse((child) => {
+            if (child?.isMesh) {
+                child.castShadow = true;
+                child.geometry.computeBoundingBox();
+                child.material.side = 2;
+                child.material.clippingPlanes = [clipModel];
+                child.updateMatrixWorld(true);
+            }
+        });
     });
 
-
+    let voxels = [];
+    let range = null;
+    let instanceMesh = new InstancedMesh(baseGeometry, voxelsMaterial, 0);
 
     const params = {
         model: 'TorusKnot',
-        gridSize: 3,
-        instanceMesh: new InstancedMesh(baseGeometry, voxelsMaterial, 0)
+        gridSize: 1,
+        fadeIn() {
+            animate(voxels.toReversed(), range.max.z, -1);
+        },
+        fadeOut() {
+            animate(voxels, range.min.z, 1);
+        },
     };
 
-    function generateVoxels(mesh) {
-        const range = getRange(mesh, params.gridSize);
-        if (range.count.x * range.count.y * range.count.z > 150000) {
-            return alert('Grid Size can not be more than 150000')
-        }
-        params.instanceMesh.removeFromParent();
-        params.instanceMesh.dispose();
-        params.instanceMesh.parent = null;
-        params.instanceMesh.geometry.dispose();
-        params.instanceMesh.material.dispose();
+    let lastModel = null;
+    function updateMesh(mesh) {
+        scene.remove(lastModel);
+        range = getRange(mesh, params.gridSize);
+        instanceMesh.removeFromParent();
+        instanceMesh.dispose();
+        instanceMesh.parent = null;
+        instanceMesh.geometry.dispose();
+        instanceMesh.material.dispose();
+        lastModel = mesh;
+        lastModel.castShadow = true;
 
-        const voxels = generate(range, mesh, params.gridSize);
-        params.instanceMesh = new InstancedMesh(baseGeometry, voxelsMaterial, voxels.length);
-        params.instanceMesh.instanceMatrix.array.fill(0);
-        params.instanceMesh.castShadow = true;
-        scene.add(params.instanceMesh);
+        voxels = generateVoxels(range, mesh, params.gridSize);
+        instanceMesh = new InstancedMesh(baseGeometry, voxelsMaterial, voxels.length);
+        instanceMesh.instanceMatrix.array.fill(0);
+        instanceMesh.castShadow = true;
+        scene.add(instanceMesh);
+        scene.add(mesh);
+    }
 
-        const timeLine = gsap.timeline();
+    const timeLine = gsap.timeline();
 
+    function animate(voxels, start, sign) {
         for (let index = 0, l = voxels.length; index < l; index++) {
-            const { position, color } = voxels[index];
-            // ✅ 每个 voxel 都有自己的 startPos
-            const startPos = new Vector3(
-                randFloat(30, 50) * randInt(0, 1),
-                randFloat(30, 50) * randInt(0, 1),
-                position.z
-            );
+            const { position, color, z } = voxels[index];
+            const tmpV = new Vector3();
 
-            const animatedPos = startPos.clone(); // ✅ 用于动画控制的中间变量
-
-            timeLine.to(animatedPos, {
+            timeLine.to(position, {
                 x: position.x,
                 y: position.y,
                 z: position.z,
                 duration: 0.3,
                 ease: 'power2.out',
                 onUpdate: () => {
-                    dummy.position.copy(animatedPos);
+                    tmpV.z = start + sign * z * params.gridSize;
+                    clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, tmpV);
+                    clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, tmpV);
+
+                    dummy.position.copy(position);
                     dummy.scale.set(params.gridSize, params.gridSize, params.gridSize);
                     dummy.updateMatrix();
 
-                    params.instanceMesh.setMatrixAt(index, dummy.matrix);
-                    params.instanceMesh.setColorAt(index, color);
-                    params.instanceMesh.instanceMatrix.needsUpdate = true;
-                    params.instanceMesh.instanceColor.needsUpdate = true;
+                    instanceMesh.setMatrixAt(index, dummy.matrix);
+                    instanceMesh.setColorAt(index, color);
+                    instanceMesh.instanceMatrix.needsUpdate = true;
+                    instanceMesh.instanceColor.needsUpdate = true;
                 }
             }, index * 0.001); // 关键：每个实例延迟启动时间（按 index 控制）
         }
-
-
     }
 
-
-    generateVoxels(modelMap[params.model]);
-
+    updateMesh(modelMap[params.model]);
 
     function render() {
         controls.update();
@@ -173,16 +208,10 @@ function init() {
 
     resize(renderer, camera);
     const gui = initGUI();
-    gui.add(params, 'model', Object.keys(modelMap)).onFinishChange(() => {
-        generateVoxels(modelMap[params.model]);
-    })
-
-    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => {
-        generateVoxels(modelMap[params.model]);
-    })
-
-    scene.add(boundingBox);
-
+    gui.add(params, 'model', Object.keys(modelMap)).onFinishChange(() => updateMesh(modelMap[params.model]));
+    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => updateMesh(modelMap[params.model]));
+    gui.add(params, 'fadeIn');
+    gui.add(params, 'fadeOut');
 }
 
 
@@ -190,18 +219,19 @@ const worldBox = new Box3();
 const boundingBox = new Box3Helper(worldBox);
 function getRange(mesh, gridSize) {
     worldBox.makeEmpty();
-
     mesh.traverse((child) => {
         if (child?.isMesh) {
             child.geometry.computeBoundingBox();
-            child.updateWorldMatrix();
-            tmpBox.copy(child.geometry.boundingBox);
-            tmpBox.applyMatrix4(child.matrixWorld);
-            worldBox.union(tmpBox);
+            child.updateMatrixWorld(true);
+
+            if (child.geometry.boundingBox !== null) {
+                tmpBox.copy(child.geometry.boundingBox);
+                tmpBox.applyMatrix4(child.matrixWorld);
+                worldBox.union(tmpBox);
+            }
         }
     });
     const size = worldBox.getSize(new Vector3());
-    console.log('worldBox: ', worldBox);
     const count = new Vector3(
         Math.ceil(size.x / gridSize),
         Math.ceil(size.y / gridSize),
@@ -217,10 +247,8 @@ function getRange(mesh, gridSize) {
     }
 }
 
-function generate(range, mesh, gridSize) {
-    const { count } = range;
-    console.log('range: ', range);
-
+function generateVoxels(range, mesh, gridSize) {
+    const { count, min } = range;
     const meshList = []
     mesh.traverse((child) => {
         if (child?.isMesh) {
@@ -229,39 +257,33 @@ function generate(range, mesh, gridSize) {
         }
     });
 
-
-    const inverseMatrix = new Matrix4();
-
     const voxels = [];
-    let i = 0
 
-    for (let iz = 0; iz < count.z; iz++) {
-        for (let ix = 0; ix < count.x; ix++) {
-            for (let iy = 0; iy < count.y; iy++) {
-                i++;
-                const x = range.min.x + ix * gridSize;
-                const y = range.min.y + iy * gridSize;
-                const z = range.min.z + iz * gridSize;
+    for (let iz = 0, dz = 0; iz < count.z; iz++, dz = iz * gridSize) {
+        for (let ix = 0, dx = 0; ix < count.x; ix++, dx = ix * gridSize) {
+            for (let iy = 0, dy = 0; iy < count.y; iy++, dy = iy * gridSize) {
+                const x = min.x + dx;
+                const y = min.y + dy;
+                const z = min.z + dz;
                 const point = new Vector3(x, y, z);
                 const res = intersectTest(point);
-                console.log('res: ', res);
-                if (res.POSZ % 2 === 1 && res.NEGZ % 2 === 1 && res.intersection.length > 0) {
-                    const color = getColor(res.intersection);
+                const isIntersect = dirArray.some((dir) => res[dir] % 2 === 1);
+                res.intersection.sort((a, b) => (Math.abs(a.distance) - Math.abs(b.distance)));
+
+                const firstIntersect = res.intersection[0];
+                if (res.intersection.length > 0 && isIntersect && Math.abs(firstIntersect.distance) < gridSize) {
                     voxels.push({
                         position: point,
-                        color,
+                        color: getColor(firstIntersect),
+                        z: iz
                     })
                 }
             }
         }
     }
-    console.log('i: ', i, 'total', count.x * count.y * count.z);
-
-
-    console.log('voxels: ', voxels);
 
     function intersectTest(point) {
-        const res = { intersection: [], up: -1, down: -1 };
+        const res = { intersection: [] };
         for (let i = 0; i < meshList.length; i++) {
             const mesh = meshList[i];
             tmpBox.copy(mesh.geometry.boundingBox);
@@ -269,17 +291,13 @@ function generate(range, mesh, gridSize) {
             boundingBox.box.copy(tmpBox.clone());
             // 先判断是否在box内,不在直接跳过
             if (!tmpBox.containsPoint(point)) {
-                console.log('不在box内');
                 continue;
             }
 
-
-            inverseMatrix.copy(mesh.matrixWorld).invert();
             dirArray.forEach((dir) => {
                 direction.copy(DIRECTION[dir]);
                 raycast.ray.origin.copy(point);
                 raycast.ray.direction.copy(direction);
-                raycast.ray.applyMatrix4(inverseMatrix);
                 const intersects = raycast.intersectObject(mesh, true);
                 res[dir] = intersects.length;
                 res.intersection.push(...intersects);
@@ -293,15 +311,30 @@ function generate(range, mesh, gridSize) {
 
 function getColor(intersection) {
     const result = new Color();
-    intersection.sort((a, b) => (a.distance - b.distance));
-    const { object, face, uv } = intersection[0];
-    const materials = Array.isArray(object.material) ? intersection[0].object.material : [intersection[0].object.material];
-    const { map, color } = materials[face.materialIndex];
-    if (map !== null) {
-        // TODO: 从纹理中获取颜色
-        result.copy(color);
+    const { object, face, uv } = intersection;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    const material = materials[face.materialIndex];
+    if (material.map !== null) {
+        const map = material.map;
+        const image = map.image;
+        let textureContext = material.userData?.cacheTextureContext;
+        if (textureContext === undefined) {
+            const textureCanvas = document.createElement('canvas');
+            textureContext = textureCanvas.getContext('2d', { willReadFrequently: true });
+
+            textureCanvas.width = image.width;
+            textureCanvas.height = image.height;
+            textureContext.drawImage(image, 0, 0);
+            material.userData.cacheTextureContext = textureContext;
+        }
+
+        const u = clamp(uv.x, 0, 1 - 1 / image.width);
+        const v = clamp(map.flipY ? 1 - uv.y : uv.y, 0, 1 - 1 / image.height);
+
+        const pixel = textureContext.getImageData(Math.floor(u * image.width), Math.floor(v * image.height), 1, 1).data;
+        result.setRGB(pixel[0] / 255, pixel[1] / 255, pixel[2] / 255);
     } else {
-        result.copy(color);
+        result.copy(material.color);
     }
     return result;
 }
