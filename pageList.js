@@ -1,7 +1,7 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-08 16:39:54
+ * @LastEditTime: 2025-08-08 16:43:16
  * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
@@ -301,6 +301,10 @@ const list = [
         path: "/line/boldLine.html",
         title: "Bold Line",
       },
+      {
+        path:"/line/drawBoard.html",
+        title:"Draw Board"
+      }
     ],
   },
   {
