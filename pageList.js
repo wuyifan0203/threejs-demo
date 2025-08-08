@@ -1,8 +1,8 @@
 /*
  * @Date: 2024-07-19 22:28:29
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-05-29 18:36:03
- * @FilePath: /threejs-demo/pageList.js
+ * @LastEditTime: 2025-08-08 16:39:54
+ * @FilePath: \threejs-demo\pageList.js
  */
 const list = [
   {
@@ -431,6 +431,10 @@ const list = [
         path: "/intersection/gpuPick.html",
         title: "GPU Pick",
       },
+      {
+        path: "/intersection/voxelsGenerate.html",
+        title: "Voxels Generate",
+      }
     ],
   },
   {

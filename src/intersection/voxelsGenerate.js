@@ -1,8 +1,9 @@
+/* eslint-disable no-use-before-define */
 /*
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-08-01 15:04:35
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-07 15:13:40
+ * @LastEditTime: 2025-08-08 16:37:24
  * @FilePath: \threejs-demo\src\intersection\voxelsGenerate.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -20,7 +21,6 @@ import {
     MathUtils,
     Box3Helper,
     Plane,
-    PlaneHelper,
 } from 'three';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
 import { TeapotGeometry } from 'three/examples/jsm/geometries/TeapotGeometry.js';
@@ -54,7 +54,7 @@ window.onload = () => {
     init();
 };
 
-const { clamp } = MathUtils;
+const { clamp, lerp } = MathUtils;
 
 const raycast = new Raycaster();
 
@@ -84,8 +84,6 @@ function init() {
 
     const clipVoxel = new Plane(DIRECTION.NEGZ);
     const clipModel = new Plane(DIRECTION.POSZ);
-    const planeHelper = new PlaneHelper(clipVoxel, 20);
-    scene.add(planeHelper);
 
     const baseGeometry = new RoundedBoxGeometry(1, 1, 1, 5, 0.2);
     const voxelsMaterial = new MeshLambertMaterial({
@@ -113,6 +111,7 @@ function init() {
                 clippingPlanes: [clipModel]
             })),
         Duck: null,
+        Watermelon: null
     }
 
     loader.load(`../../${Model_Path}/rubber_duck_toy/rubber_duck_toy_1k.gltf`, (res) => {
@@ -131,6 +130,22 @@ function init() {
         });
     });
 
+    loader.load(`../../${Model_Path}/watermelon.glb`, (res) => {
+        modelMap.Watermelon = res.scene.children[0];
+        modelMap.Watermelon.scale.set(10, 10, 10);
+        modelMap.Watermelon.rotation.set(HALF_PI, 0, 0);
+        modelMap.Watermelon.updateMatrixWorld(true);
+        modelMap.Watermelon.traverse((child) => {
+            if (child?.isMesh) {
+                child.castShadow = true;
+                child.geometry.computeBoundingBox();
+                child.material.side = 2;
+                child.material.clippingPlanes = [clipModel];
+                child.updateMatrixWorld(true);
+            }
+        });
+    })
+
     let voxels = [];
     let range = null;
     let instanceMesh = new InstancedMesh(baseGeometry, voxelsMaterial, 0);
@@ -139,10 +154,20 @@ function init() {
         model: 'TorusKnot',
         gridSize: 1,
         fadeIn() {
-            animate(voxels.toReversed(), range.max.z, -1);
+            // Model -> Voxel
+            fadeInBtn.disable(true);
+            fadeOutBtn.enable(true);
+            clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, range.min.z));
+            clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, range.min.z));
+            animateVoxels(voxels, 1);
         },
         fadeOut() {
-            animate(voxels, range.min.z, 1);
+            // Voxel -> Model
+            fadeInBtn.enable(true);
+            fadeOutBtn.disable(true);
+            clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, range.max.z));
+            clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, range.max.z));
+            animateVoxels(voxels.toReversed(), -1);
         },
     };
 
@@ -166,38 +191,75 @@ function init() {
         scene.add(mesh);
     }
 
-    const timeLine = gsap.timeline();
+    function animateVoxels(voxels, sign) {
+        const startPositions = [];
+        const endPositions = [];
 
-    function animate(voxels, start, sign) {
-        for (let index = 0, l = voxels.length; index < l; index++) {
-            const { position, color, z } = voxels[index];
-            const tmpV = new Vector3();
+        const rangeSize = range.size.length() * 0.5; // 模型范围的一半，用来生成随机范围
 
-            timeLine.to(position, {
-                x: position.x,
-                y: position.y,
-                z: position.z,
-                duration: 0.3,
-                ease: 'power2.out',
-                onUpdate: () => {
-                    tmpV.z = start + sign * z * params.gridSize;
-                    clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, tmpV);
-                    clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, tmpV);
+        for (let i = 0; i < voxels.length; i++) {
+            const { position } = voxels[i];
+            const randomPos = new Vector3(
+                position.x + (Math.random() - 0.5) * rangeSize * 5,
+                position.y + (Math.random() - 0.5) * rangeSize * 5,
+                position.z + (Math.random() - 0.5) * rangeSize * 5
+            );
+            if (sign === 1) {
+                // fadeIn: 随机起点 → position
+                startPositions.push(randomPos);
+                endPositions.push(position.clone());
+            } else {
+                // fadeOut: position → 随机终点
+                startPositions.push(position.clone());
+                endPositions.push(randomPos);
+            }
+        }
 
-                    dummy.position.copy(position);
-                    dummy.scale.set(params.gridSize, params.gridSize, params.gridSize);
+        let progress = 0;
+        const tl = gsap.timeline();
+
+        const [min, max] = [sign === 1 ? range.min.z : range.max.z, sign === 1 ? range.max.z : range.min.z]
+        const tmpV = new Vector3();
+
+        const scalefactor = sign === 1 ? [0, 1] : [1, 0];
+
+        tl.to({ t: 0 }, {
+            t: 1,
+            duration: 1.5,
+            ease: "power2.inOut",
+            onUpdate: function () {
+                progress = this.targets()[0].t;
+
+                // 平面位置插值
+                const planeZ = lerp(min, max, progress);
+                clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, planeZ));
+                clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, planeZ));
+
+                const scale = lerp(scalefactor[0], scalefactor[1], progress) * params.gridSize;
+
+                // 更新实例矩阵
+                for (let i = 0; i < voxels.length; i++) {
+                    const { color } = voxels[i];
+                    tmpV.lerpVectors(startPositions[i], endPositions[i], progress);
+
+                    dummy.position.copy(tmpV);
+                    dummy.scale.set(scale, scale, scale);
                     dummy.updateMatrix();
 
-                    instanceMesh.setMatrixAt(index, dummy.matrix);
-                    instanceMesh.setColorAt(index, color);
-                    instanceMesh.instanceMatrix.needsUpdate = true;
-                    instanceMesh.instanceColor.needsUpdate = true;
+                    instanceMesh.setMatrixAt(i, dummy.matrix);
+                    instanceMesh.setColorAt(i, color);
                 }
-            }, index * 0.001); // 关键：每个实例延迟启动时间（按 index 控制）
-        }
+
+                instanceMesh.instanceMatrix.needsUpdate = true;
+                instanceMesh.instanceColor.needsUpdate = true;
+            }
+        });
     }
 
     updateMesh(modelMap[params.model]);
+
+    clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, range.min.z));
+    clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, range.min.z));
 
     function render() {
         controls.update();
@@ -208,10 +270,23 @@ function init() {
 
     resize(renderer, camera);
     const gui = initGUI();
-    gui.add(params, 'model', Object.keys(modelMap)).onFinishChange(() => updateMesh(modelMap[params.model]));
-    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => updateMesh(modelMap[params.model]));
-    gui.add(params, 'fadeIn');
-    gui.add(params, 'fadeOut');
+    gui.add(params, 'model', Object.keys(modelMap)).onFinishChange(() => {
+        fadeInBtn.enable(true);
+        fadeOutBtn.disable(true);
+        updateMesh(modelMap[params.model]);
+        clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, range.min.z));
+        clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, range.min.z));
+    });
+    gui.add(params, 'gridSize', 0.2, 10, 0.1).onFinishChange(() => {
+        fadeInBtn.enable(true);
+        fadeOutBtn.disable(true);
+        updateMesh(modelMap[params.model]);
+        clipVoxel.setFromNormalAndCoplanarPoint(clipVoxel.normal, new Vector3(0, 0, range.min.z));
+        clipModel.setFromNormalAndCoplanarPoint(clipModel.normal, new Vector3(0, 0, range.min.z));
+    });
+    const fadeInBtn = gui.add(params, 'fadeIn');
+    const fadeOutBtn = gui.add(params, 'fadeOut').disable(true);
+
 }
 
 
