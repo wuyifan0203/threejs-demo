@@ -478,11 +478,13 @@ function html2canvas( element ) {
 
 				}
 
-				if ( element.type === 'color' || element.type === 'text' || element.type === 'number' ) {
+				if ( element.type === 'color' || element.type === 'text' || element.type === 'number' || element.type === 'email' || element.type === 'password' ) {
 
 					clipper.add( { x: x, y: y, width: width, height: height } );
 
-					drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), element.value );
+					const displayValue = element.type === 'password' ? '*'.repeat( element.value.length ) : element.value;
+
+					drawText( style, x + parseInt( style.paddingLeft ), y + parseInt( style.paddingTop ), displayValue );
 
 					clipper.remove();
 
@@ -575,6 +577,12 @@ function htmlevent( element, event, x, y ) {
 					const proportion = offsetX / width;
 					element.value = min + ( max - min ) * proportion;
 					element.dispatchEvent( new InputEvent( 'input', { bubbles: true } ) );
+
+				}
+
+				if ( element instanceof HTMLInputElement && ( element.type === 'text' || element.type === 'number' || element.type === 'email' || element.type === 'password' ) && ( event === 'mousedown' || event === 'click' ) ) {
+
+					element.focus();
 
 				}
 
