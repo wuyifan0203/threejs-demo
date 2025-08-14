@@ -2,8 +2,8 @@
  * @Author: wuyifan0203 1208097313@qq.com
  * @Date: 2025-01-15 10:57:53
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-06-07 02:43:00
- * @FilePath: /threejs-demo/src/line/curveRoad.js
+ * @LastEditTime: 2025-08-11 11:32:01
+ * @FilePath: \threejs-demo\src\line\curveRoad.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
 import {
@@ -16,7 +16,6 @@ import {
     RepeatWrapping,
     CameraHelper,
     PerspectiveCamera,
-    RepeatWrapping
 } from 'three';
 import {
     initRenderer,
@@ -32,7 +31,6 @@ import {
     initDirectionLight,
     initAmbientLight,
     initClock,
-    initPerspectiveCamera,
     initGUI,
     HALF_PI,
     initCoordinates,
@@ -118,8 +116,6 @@ async function init() {
 
     const c = initCoordinates(2);
     scene.add(c);
-    const right = new Vector3();
-    const front = new Vector3();
 
     function render() {
         time = clock.getElapsedTime();

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>GPUComputationRenderer Example</title>
+    <style>
+        body {
+            margin: 0;
+            background: black;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+<script type="importmap">
+        {
+            "imports": {
+                "three": "../lib/three/build/three.module.js",
+                "three/examples/jsm/": "../lib/three/examples/jsm/"
+            }
+        }
+</script>
+    <script type="module">
+        import * as THREE from 'three';
+        import { GPUComputationRenderer } from 'three/examples/jsm/misc/GPUComputationRenderer.js';
+
+
+        // ----- 基本参数 -----
+        const WIDTH = 2; // 64x64 粒子
+        const PARTICLES = WIDTH * WIDTH;
+
+        // ----- 场景 / 相机 / 渲染器 -----
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 1, 1000);
+        camera.position.z = 5;
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(innerWidth, innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // ----- 创建 GPUComputationRenderer -----
+        const gpuCompute = new GPUComputationRenderer(WIDTH, WIDTH, renderer);
+
+        // 初始化位置数据
+        const posTexture = gpuCompute.createTexture();
+        for (let i = 0; i < posTexture.image.data.length; i += 4) {
+            posTexture.image.data[i + 0] = Math.random() * 2 - 1; // x
+            posTexture.image.data[i + 1] = Math.random() * 2 - 1; // y
+            posTexture.image.data[i + 2] = 0; // z
+            posTexture.image.data[i + 3] = 1; // alpha
+        }
+
+        // 位置更新着色器（每帧 +0.01 移动）
+        const positionFragmentShader = `
+uniform float delta;
+void main() {
+    vec2 uv = gl_FragCoord.xy / resolution.xy;
+    vec4 pos = texture2D(texturePosition, uv);
+    pos.x += 0.01;
+    gl_FragColor = pos;
+}
+`;
+
+        // 创建计算变量
+        const positionVariable = gpuCompute.addVariable("texturePosition", positionFragmentShader, posTexture);
+        gpuCompute.setVariableDependencies(positionVariable, [positionVariable]);
+        positionVariable.material.uniforms.delta = { value: 0 };
+
+        // 初始化
+        const error = gpuCompute.init();
+        if (error) console.error(error);
+
+        // ----- 创建粒子可视化 -----
+        const geometry = new THREE.BufferGeometry();
+        const positions = new Float32Array(PARTICLES * 3);
+        const uvs = new Float32Array(PARTICLES * 2);
+        let p = 0, u = 0;
+        for (let y = 0; y < WIDTH; y++) {
+            for (let x = 0; x < WIDTH; x++) {
+                positions[p++] = 0; // 先用 0 占位
+                positions[p++] = 0;
+                positions[p++] = 0;
+                uvs[u++] = x / (WIDTH - 1);
+                uvs[u++] = y / (WIDTH - 1);
+            }
+        }
+        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+        geometry.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+
+        const particleMaterial = new THREE.ShaderMaterial({
+            uniforms: {
+                texturePosition: { value: null }
+            },
+            vertexShader: `
+        uniform sampler2D texturePosition;
+        void main() {
+            vec4 pos = texture2D(texturePosition, uv);
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos.xyz, 1.0);
+            gl_PointSize = 3.0;
+        }
+    `,
+            fragmentShader: `
+        void main() {
+            gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0); // 黄色
+        }
+    `
+        });
+        const particlesMesh = new THREE.Points(geometry, particleMaterial);
+        scene.add(particlesMesh);
+
+        // ----- 动画循环 -----
+        function animate() {
+            requestAnimationFrame(animate);
+
+            gpuCompute.compute();
+            particleMaterial.uniforms.texturePosition.value = gpuCompute.getCurrentRenderTarget(positionVariable).texture;
+
+            renderer.render(scene, camera);
+        }
+        animate();
+    </script>
+</body>
+
+</html>
