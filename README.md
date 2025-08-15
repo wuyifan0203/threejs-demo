@@ -2,7 +2,7 @@
 
 ![alt text](./public/images/cover.png)
 
-👉 Preview Link: https://wuyifan0203.github.io/threejs-demo/
+👉 Preview Link: [https://avan0203.github.io/threejs-demo/](https://avan0203.github.io/threejs-demo/)
 
 ## Introduction
 
