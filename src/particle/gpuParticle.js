@@ -2,7 +2,7 @@
  * @Author: wuyifan 1208097313@qq.com
  * @Date: 2025-08-14 13:34:44
  * @LastEditors: wuyifan 1208097313@qq.com
- * @LastEditTime: 2025-08-15 16:54:34
+ * @LastEditTime: 2025-08-18 16:12:40
  * @FilePath: \threejs-demo\src\particle\gpuParticle.js
  * Copyright (c) 2024 by wuyifan email: 1208097313@qq.com, All Rights Reserved.
  */
@@ -15,6 +15,9 @@ import {
     FloatType,
     MathUtils,
     Uniform,
+    ShaderMaterial,
+    UniformsUtils,
+    Mesh
 } from 'three';
 import {
     initRenderer,
@@ -35,15 +38,49 @@ window.onload = () => {
     init();
 };
 
+const vertexShader = /*glsl*/  `
+    uniform sampler2D positionTexture;
+    attribute vec2 instancePosition;
+    void main(){
+        vec3 pos = position.xyz;
+        pos += texture2D(positionTexture, instancePosition).xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+    }
+`;
+
+const fragmentShader = /*glsl*/`
+    void main(){
+        gl_FragColor=vec4(1.);
+    }
+`
+
 const positionFragmentShader = /*glsl*/`
     void main(){
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        vec4 position = texture2D(positionTexture, uv);
+        vec4 velocity = texture2D(velocityTexture, uv);
+        position += velocity;
+
+        gl_FragColor = vec4(position.xyz, 1.0);
     }
 `;
 
 const velocityFragmentShader = /*glsl*/`
+    uniform sampler2D targetPosition;
     void main(){
-        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        vec2 uv = gl_FragCoord.xy / resolution.xy;
+        vec4 position = texture2D(targetPosition, uv);
+        vec4 velocity = texture2D(targetPosition, uv);
+        vec4 targetPosition = texture2D(targetPosition, uv);
+
+        float d = distance(position.xyz, targetPosition.xyz);
+        // 乘弹簧进度系数
+        velocity += normalize(targetPosition.xyz - position.xyz) * d /20.0;
+        // 施加摩擦力，摩擦力系数0.5
+        vec4 friction = -velocity * 0.5;
+        velocity += friction;
+
+        gl_FragColor = vec4(velocity.xyz, 1.0);
     }
 `;
 
@@ -89,16 +126,38 @@ async function init() {
 
     velocityVariable.material.uniforms.targetPosition = new Uniform(dataTextures[1]);
 
-
-
     const geometry = new SphereGeometry(0.2, 8, 8);
     const instanceGeometry = new InstancedBufferGeometry();
     instanceGeometry.setAttribute('position', geometry.attributes.position);
     instanceGeometry.setAttribute('uv', geometry.attributes.uv);
     instanceGeometry.setIndex(geometry.index);
-    instanceGeometry.setAttribute('instancePosition', new InstancedBufferAttribute());
+    const initPosition = new Float32Array(count * 2);
+    for (let i = 0; i < count; i++) {
+        initPosition.set(i, (i % size) / size, ~~(i / size) / size);
+    }
+    instanceGeometry.setAttribute('instancePosition', new InstancedBufferAttribute(initPosition, 2));
+
+    const uniforms = UniformsUtils.merge({
+        positionTexture: new Uniform(null),
+        velocityTexture: new Uniform(null),
+    })
+    const material = new ShaderMaterial({
+        vertexShader,
+        fragmentShader,
+        uniforms
+    });
+
+    const mesh = new Mesh(instanceGeometry, material);
+    scene.add(mesh);
+
+    function update() {
+        gpuCtRenderer.compute();
+        uniforms.positionTexture.value = gpuCtRenderer.getCurrentRenderTarget(positionVariable).texture;
+        uniforms.velocityTexture.value = gpuCtRenderer.getCurrentRenderTarget(velocityVariable).texture;
+    }
 
     function render() {
+        update();
         controls.update();
 
         renderer.render(scene, camera);
